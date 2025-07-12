@@ -13,23 +13,20 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// Re-export all types and interfaces
-export type { ILogContext, IPerformanceMetrics } from './types.ts'
+export interface ILogContext {
+    readonly className?: string
+    readonly methodName?: string
+    readonly methodSignature?: string
+    readonly operationId?: string
+    readonly requestId?: string
+    readonly userId?: string
+    readonly args?: Record<string, unknown>
+    readonly metadata?: Record<string, unknown>
+}
 
-// Re-export logger instance
-export { logger } from './logger-factory.ts'
-
-// Re-export all decorator-optimized logging functions
-export {
-    createDecoratorPrefix,
-    logMethodStart,
-    logMethodSuccess,
-    logMethodError,
-    logMethodDebug
-} from './decorator-logging.ts'
-
-// Re-export performance utilities
-export { createPerformanceSnapshot } from './performance-utils.ts'
-
-// Re-export logging utilities
-export { extractLogRelevantArgs, extractResultMetadata } from './logging-utils.ts'
+export interface IPerformanceMetrics {
+    readonly startTime: number
+    readonly duration?: number
+    readonly memoryUsage?: NodeJS.MemoryUsage
+    readonly cpuUsage?: NodeJS.CpuUsage
+} 

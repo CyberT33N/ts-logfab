@@ -13,23 +13,17 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// Re-export all types and interfaces
-export type { ILogContext, IPerformanceMetrics } from './types.ts'
+// ==== Imports ====
+import type { IPerformanceMetrics } from './types.ts'
 
-// Re-export logger instance
-export { logger } from './logger-factory.ts'
-
-// Re-export all decorator-optimized logging functions
-export {
-    createDecoratorPrefix,
-    logMethodStart,
-    logMethodSuccess,
-    logMethodError,
-    logMethodDebug
-} from './decorator-logging.ts'
-
-// Re-export performance utilities
-export { createPerformanceSnapshot } from './performance-utils.ts'
-
-// Re-export logging utilities
-export { extractLogRelevantArgs, extractResultMetadata } from './logging-utils.ts'
+/**
+ * 🎯 Creates performance metrics snapshot
+ * @returns The performance metrics snapshot
+ */
+export function createPerformanceSnapshot(): IPerformanceMetrics {
+    return {
+        startTime: Date.now(),
+        memoryUsage: process.memoryUsage(),
+        cpuUsage: process.cpuUsage()
+    }
+} 
