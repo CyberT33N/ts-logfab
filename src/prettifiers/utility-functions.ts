@@ -17,6 +17,9 @@
 */
 
 // ==== Imports ====
+import is from '@sindresorhus/is'
+import prettyBytes from 'pretty-bytes'
+import prettyMilliseconds from 'pretty-ms'
 import terminalLink from 'terminal-link'
 import { TERMINAL_COLORS } from './colors.ts'
 
@@ -52,37 +55,27 @@ export function intelligentTruncate(
 }
 
 /**
- * 🎯 Formats bytes to a human-readable string
+ * 🎯 Formats bytes to a human-readable string using Enterprise-Grade Sindre Sorhus Package
  * @param bytes - The number of bytes
  * @returns The formatted bytes
  */
 export function formatBytes(bytes: number): string {
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'] as const
-
-    if (bytes === 0) {
-        return '0 B'
-    }
-
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    const value = Math.round(bytes / Math.pow(1024, i) * 100) / 100
-
-    return `${value.toString()} ${sizes[i] ?? 'B'}`
+    return prettyBytes(bytes, {
+        binary: true,     // Use 1024-based calculation (like our previous implementation)
+        space: true       // Keep space between number and unit
+    })
 }
 
 /**
- * 🎯 Formats milliseconds to a human-readable string
+ * 🎯 Formats milliseconds to a human-readable string using Enterprise-Grade Sindre Sorhus Package
  * @param ms - The number of milliseconds
  * @returns The formatted milliseconds
  */
 export function formatDuration(ms: number): string {
-    const roundedMs = Math.round(ms)
-    const roundedSeconds = Math.round(ms / 1000 * 100) / 100
-    const roundedMinutes = Math.round(ms / 60000 * 100) / 100
-    
-    if (ms < 1000) {return `${roundedMs.toString()}ms`}
-    if (ms < 60000) {return `${roundedSeconds.toString()}s`}
-
-    return `${roundedMinutes.toString()}m`
+    return prettyMilliseconds(ms, {
+        compact: true,           // Short format: 1h 10m → 1h (like our previous implementation)
+        secondsDecimalDigits: 1  // Keep 1 decimal place for seconds
+    })
 }
 
 /**
@@ -105,10 +98,21 @@ export function createProgressBar(value: number, max: number, width = 15): strin
     return TERMINAL_COLORS.success(bar)
 }
 
+/**
+ * 🎯 Creates a terminal link
+ * @param text - The text to link
+ * @param url - The URL to link to
+ * @returns The terminal link
+ */
 export function createTerminalLink(text: string, url: string): string {
     return terminalLink(text, url, { fallback: () => text })
 }
 
+/**
+ * 🎯 Gets the icon for the metadata
+ * @param key - The key of the metadata
+ * @returns The icon for the metadata
+ */
 export function getMetadataIcon(key: string): string {
     const iconMap = {
         focus: '🎯',
@@ -122,47 +126,50 @@ export function getMetadataIcon(key: string): string {
 
 /**
  * 🎯 Analyzes result value and returns type information
+ * @param value - The value to analyze
+ * @returns The type information of the value
  */
 export function analyzeResultValue(value: unknown): { 
     type: string; 
     size: number | null; 
 } {
-    if (value === null) {return { type: 'null', size: null }}
-    if (value === undefined) {return { type: 'undefined', size: null }}
+    if (is.null(value)) {
+        return { type: 'null', size: null }
+    }
+    if (is.undefined(value)) {
+        return { type: 'undefined', size: null }
+    }
     
-    const valueType = typeof value
-    
-    if (valueType === 'string') {
+    if (is.string(value)) {
         return { 
             type: 'String', 
-            size: (value as string).length
+            size: value.length
         }
     }
     
-    if (valueType === 'number') {
+    if (is.number(value)) {
         return { 
             type: 'Number', 
             size: null
         }
     }
     
-    if (valueType === 'boolean') {
+    if (is.boolean(value)) {
         return { 
             type: 'Boolean', 
             size: null
         }
     }
     
-    if (Array.isArray(value)) {
+    if (is.array(value)) {
         return { 
             type: 'Array', 
             size: value.length
         }
     }
     
-    if (valueType === 'object') {
-        const obj = value as Record<string, unknown>
-        const keys = Object.keys(obj)
+    if (is.plainObject(value)) {
+        const keys = Object.keys(value)
         return { 
             type: 'Object', 
             size: keys.length
@@ -170,7 +177,7 @@ export function analyzeResultValue(value: unknown): {
     }
     
     return { 
-        type: valueType, 
+        type: 'Unknown', 
         size: null
     }
 } 
