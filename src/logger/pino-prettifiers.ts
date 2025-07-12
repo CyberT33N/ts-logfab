@@ -944,7 +944,7 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
         const typedEntries: (readonly [string, string])[] = metaEntries.map(
-            ([key, value]: readonly [string, unknown]) => [key, stringify(value)] as const
+            ([key, value]: readonly [string, unknown]) => [key, stringify(value) ?? '[Value]'] as const
         )
         const tableOutput = createMetadataTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
@@ -959,7 +959,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         if (argEntries.length === 0) {return ''}
         
         // 🎯 OVERWRITE "args:" LABEL AND ADD PROPER SPACING
-        const typedEntries: (readonly [string, unknown])[] = argEntries.map(([key, value]) => [key, value] as const)
+        const typedEntries: (readonly [string, unknown])[] = argEntries.map(
+            ([key, value]: readonly [string, unknown]) => [key, value] as const
+        )
         const tableOutput = createArgumentsTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
@@ -996,6 +998,7 @@ export function createEnterprisePrettyConfig():
         timestampKey: 'time',
         
         // 🎯 FUNCTIONAL: Essential properties for clean logs
+        // eslint-disable-next-line max-len
         ignore: 'pid,hostname,name,service,version,environment,nodeVersion,platform,prefix,className,methodName,argumentTypes,argumentCount',
         
         // 🌈 PROFESSIONAL COLOR SCHEME  
@@ -1039,5 +1042,5 @@ export function enhanceLogLevel(
     } as const
     
     const enhancer = enhancers[level.toLowerCase() as keyof typeof enhancers]
-    return enhancer ? enhancer() : message
+    return enhancer()
 } 
