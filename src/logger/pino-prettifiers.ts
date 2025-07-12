@@ -757,7 +757,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
 ) => {
     const logObj = log as ReadonlyDeep<Record<string, unknown>>
     const msgValue = logObj[messageKey]
-    const msg = stringify(msgValue)!
+    const msg = stringify(msgValue) ?? '[Message]'
     const prefix = typeof logObj.prefix === 'string' ? logObj.prefix : ''
     
     // Suppress unused warning: colors parameter is required for Pino compatibility
@@ -774,8 +774,9 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
         '50': 'ERROR',
         '60': 'FATAL'
     } as const
-    /* eslint-enable @typescript-eslint/naming-convention */
-    const actualLevel = levelMap[String(rawLevel) as keyof typeof levelMap] || 'INFO'
+
+
+    const actualLevel = levelMap[String(rawLevel) as keyof typeof levelMap]
     
     // Get current timestamp for inline display
     const now = new Date()
@@ -796,8 +797,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
         'FATAL': { icon: '💀', color: TERMINAL_COLORS.critical }
     } as const
     
-    const levelInfo = levelConfig[actualLevel] || 
-                     { icon: 'ℹ️', color: TERMINAL_COLORS.primary }
+    const levelInfo = levelConfig[actualLevel]
     
     if (prefix.length === 0) {
         // 📝 AWARD-WINNING SINGLE-LINE LOG FORMAT (NO DIVIDER)
@@ -815,7 +815,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     const parts = prefix.split('::')
     if (parts.length >= 2) {
         const [className, methodPart] = parts
-        const method = methodPart && methodPart.split('(')[0] || methodPart || ''
+        const method = methodPart.split('(')[0]
         const appMeta = getAppMetadata()
         const methodInfo = getMethodVisibility(method)
         
@@ -825,7 +825,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
         // 🎯 DECORATOR LOG HEADER WITH DYNAMIC DATA - NOW INTEGRATED INTO TABLE
         const decoratorHeader = `${TERMINAL_COLORS.icon(levelInfo.icon)} ${levelInfo.color(`[${actualLevel}]`)} ` +
                                `${TERMINAL_COLORS.muted(timeStr)} | ` +
-                               `${TERMINAL_COLORS.text(appMeta.company)} ` +
+                               `${TERMINAL_COLORS.text(appMeta.author)} ` +
                                `${TERMINAL_COLORS.accent(`${appMeta.name} v${appMeta.version}`)} ` +
                                TERMINAL_COLORS.muted(`[${appMeta.environment}]`)
         
@@ -862,7 +862,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎨 AWARD-WINNING CUSTOM PRETTIFIERS - CLI-TABLE3 POWERED
+// 🎨 CUSTOM PRETTIFIERS - CLI-TABLE3 POWERED
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPrettifiers'] => ({
@@ -925,7 +925,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
             }
         }
         
-        if (analyticsData.length === 0) {return ''}
+        if (analyticsData.length === 0) {
+            return ''
+        }
         
         // 🎯 OVERWRITE "performance:" LABEL AND ADD PROPER SPACING  
         const tableOutput = createAnalyticsTable(analyticsData)
@@ -942,7 +944,7 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
         const typedEntries: (readonly [string, string])[] = metaEntries.map(
-            ([key, value]) => [key, stringify(value)] as const
+            ([key, value]: readonly [string, unknown]) => [key, stringify(value)] as const
         )
         const tableOutput = createMetadataTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
