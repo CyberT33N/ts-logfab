@@ -32,6 +32,9 @@ dependencies:
   pino:
     specifier: ^9.7.0
     version: 9.7.0
+  safe-stable-stringify:
+    specifier: ^2.5.0
+    version: 2.5.0
   strip-ansi:
     specifier: ^7.1.0
     version: 7.1.0

@@ -26,6 +26,7 @@ import chalk from 'chalk'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import CliTable from 'cli-table3'
 import type { PrettyOptions } from 'pino-pretty'
+import { configure } from 'safe-stable-stringify'
 import terminalLink from 'terminal-link'
 import type { ReadonlyDeep } from 'type-fest'
 import env from '@/env.ts'
@@ -36,6 +37,16 @@ type CliTableConstructor = new (options?: Record<string, unknown>) => {
     toString(): string
 }
 const CLI_TABLE_TYPED = CliTable as CliTableConstructor
+
+// 🎯 ENTERPRISE SAFE-STABLE-STRINGIFY CONFIGURATION
+const stringify = configure({
+    circularValue: '[Circular]',
+    deterministic: true,
+    bigint: true,
+    maximumDepth: 10,
+    maximumBreadth: 100,
+    strict: false
+})
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎨 AWARD-WINNING UNIFIED COLOR PALETTE - TERMINAL HARMONY
@@ -573,27 +584,8 @@ interface IColors {
 // 🎯 AWARD-WINNING UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function safeStringify(value: unknown): string {
-    if (value === null) {return 'null'}
-    if (value === undefined) {return 'undefined'}
-    
-    try {
-        if (typeof value === 'string') {return value}
-        if (typeof value === 'number') {return value.toString()}
-        if (typeof value === 'boolean') {return value.toString()}
-        if (typeof value === 'bigint') {return value.toString()}
-        if (typeof value === 'symbol') {return value.toString()}
-        
-        // Handle objects safely
-        if (typeof value === 'object') {
-            return JSON.stringify(value, null, 2)
-        }
-        
-        return String(value)
-    } catch {
-        return '[Complex Object]'
-    }
-}
+// 🎯 ENTERPRISE SAFE STRINGIFY mit safe-stable-stringify
+// Obsolete Function entfernt - stringify() behandelt alle Fälle direkt!
 
 function formatBytes(bytes: number): string {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'] as const
@@ -637,7 +629,7 @@ function getMetadataIcon(key: string): string {
         mode: '🎚️'
     } as const
     
-    return iconMap[key as keyof typeof iconMap] ?? '📋'
+    return iconMap[key as keyof typeof iconMap] || '📋'
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -723,13 +715,13 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
         return { type: 'string', icon: '📝', displayValue: `"${truncated}"` }
     }
     case 'number':
-        return { type: 'number', icon: '🔢', displayValue: safeStringify(value) }
+        return { type: 'number', icon: '🔢', displayValue: stringify(value) }
     case 'boolean':
-        return { type: 'boolean', icon: '☑️', displayValue: safeStringify(value) }
+        return { type: 'boolean', icon: '☑️', displayValue: stringify(value) }
     case 'function':
         return { type: 'function', icon: '⚡', displayValue: '[Function]' }
     case 'bigint':
-        return { type: 'bigint', icon: '🔢', displayValue: safeStringify(value) }
+        return { type: 'bigint', icon: '🔢', displayValue: stringify(value) }
     case 'symbol':
         return { type: 'symbol', icon: '🔣', displayValue: '[Symbol]' }
     case 'object': {
@@ -745,7 +737,7 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
         return { type: 'undefined', icon: '⚫', displayValue: 'undefined' }
     default:
         // This handles any potential future types
-        return { type: 'unknown', icon: '❓', displayValue: safeStringify(value) }
+        return { type: 'unknown', icon: '❓', displayValue: stringify(value) }
     }
 }
 
@@ -781,7 +773,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
 ) => {
     const logObj = log as ReadonlyDeep<Record<string, unknown>>
     const msgValue = logObj[messageKey]
-    const msg = safeStringify(msgValue)
+    const msg = stringify(msgValue)!
     const prefix = typeof logObj.prefix === 'string' ? logObj.prefix : ''
     
     // Suppress unused warning: colors parameter is required for Pino compatibility
@@ -966,7 +958,7 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
         const typedEntries: (readonly [string, string])[] = metaEntries.map(
-            ([key, value]) => [key, safeStringify(value)] as const
+            ([key, value]) => [key, stringify(value)] as const
         )
         const tableOutput = createMetadataTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
