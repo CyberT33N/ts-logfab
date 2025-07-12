@@ -16,17 +16,20 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 UTILITY FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ==== Imports ====
 import terminalLink from 'terminal-link'
 import { TERMINAL_COLORS } from './colors.ts'
 
 /**
  * 🎯 Intelligently truncates text to fit within specified width
+ * @param text - The text to truncate
+ * @param maxWidth - The maximum width of the text
+ * @param ellipsis - The ellipsis to use
+ * @returns The truncated text
  */
-export function intelligentTruncate(text: string, maxWidth: number, ellipsis = '…'): string {
+export function intelligentTruncate(
+    text: string, maxWidth: number, ellipsis = '…'
+): string {
     if (text.length <= maxWidth) {
         return text
     }
@@ -48,14 +51,29 @@ export function intelligentTruncate(text: string, maxWidth: number, ellipsis = '
     return truncated + ellipsis
 }
 
+/**
+ * 🎯 Formats bytes to a human-readable string
+ * @param bytes - The number of bytes
+ * @returns The formatted bytes
+ */
 export function formatBytes(bytes: number): string {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'] as const
-    if (bytes === 0) {return '0 B'}
+
+    if (bytes === 0) {
+        return '0 B'
+    }
+
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     const value = Math.round(bytes / Math.pow(1024, i) * 100) / 100
+
     return `${value.toString()} ${sizes[i] ?? 'B'}`
 }
 
+/**
+ * 🎯 Formats milliseconds to a human-readable string
+ * @param ms - The number of milliseconds
+ * @returns The formatted milliseconds
+ */
 export function formatDuration(ms: number): string {
     const roundedMs = Math.round(ms)
     const roundedSeconds = Math.round(ms / 1000 * 100) / 100
@@ -63,9 +81,17 @@ export function formatDuration(ms: number): string {
     
     if (ms < 1000) {return `${roundedMs.toString()}ms`}
     if (ms < 60000) {return `${roundedSeconds.toString()}s`}
+
     return `${roundedMinutes.toString()}m`
 }
 
+/**
+ * 🎯 Creates a progress bar
+ * @param value - The value of the progress bar
+ * @param max - The maximum value of the progress bar
+ * @param width - The width of the progress bar
+ * @returns The progress bar
+ */
 export function createProgressBar(value: number, max: number, width = 15): string {
     const percentage = Math.max(0, Math.min(1, value / max))
     const filled = Math.round(width * percentage)
@@ -75,6 +101,7 @@ export function createProgressBar(value: number, max: number, width = 15): strin
     
     if (percentage > 0.8) {return TERMINAL_COLORS.error(bar)}
     if (percentage > 0.6) {return TERMINAL_COLORS.warning(bar)}
+    
     return TERMINAL_COLORS.success(bar)
 }
 

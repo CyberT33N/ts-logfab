@@ -44,10 +44,6 @@ const stringify = configure({
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENTERPRISE-GRADE SINDRESORHUS TYPE GUARDS - NO TYPECASTING ANTI-PATTERNS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // 🎨 PINO-COMPATIBLE COLOR TYPES FOR FUNCTIONAL ARCHITECTURE
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -65,6 +61,14 @@ interface IColors {
     bold: IColorFunction
 }
 
+/**
+ * 🎨 Creates enterprise-grade message format for pino-pretty
+ * @param log - The log object
+ * @param messageKey - The key of the message in the log object
+ * @param levelLabel - The label of the level in the log object
+ * @param colors - The colors to use for the log object
+ * @returns The message format for pino-pretty
+ */
 export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     log: ReadonlyDeep<unknown>, 
     messageKey: string, 
@@ -79,7 +83,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     const logObj = log
     const msgValue = logObj[messageKey]
     const msg = stringify(msgValue) ?? '[Message]'
-    const prefix = typeof logObj.prefix === 'string' ? logObj.prefix : ''
+    const prefix = is.string(logObj.prefix) ? logObj.prefix : ''
     
     // Suppress unused warning: colors parameter is required for Pino compatibility
     void colors
@@ -95,7 +99,6 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
         '50': 'ERROR',
         '60': 'FATAL'
     } as const
-
 
     const actualLevel = levelMap[String(rawLevel) as keyof typeof levelMap]
     
@@ -121,7 +124,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     const levelInfo = levelConfig[actualLevel]
     
     if (prefix.length === 0) {
-        // 📝 AWARD-WINNING SINGLE-LINE LOG FORMAT (NO DIVIDER)
+        // 📝 SINGLE-LINE LOG FORMAT (NO DIVIDER)
         const timeDisplay = TERMINAL_COLORS.muted(timeStr)
         const levelDisplay = `${TERMINAL_COLORS.icon(levelInfo.icon)} ${levelInfo.color(`[${actualLevel}]`)}`
         const messageDisplay = TERMINAL_COLORS.text(msg)
@@ -160,8 +163,8 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
             decoratorHeader, 
             logObj
         )
+
         result += decoratorTable + '\n'
-        
         return result
     }
     
@@ -186,6 +189,10 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
 // 🎨 CUSTOM PRETTIFIERS - CLI-TABLE3 POWERED
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/**
+ * 🎨 Creates enterprise-grade custom prettifiers for pino-pretty
+ * @returns Custom prettifiers for pino-pretty
+ */
 export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPrettifiers'] => ({
     // 🕰️ TIME STYLING - INTEGRATED INTO MESSAGE FORMAT
     time: (): string => '',
@@ -201,7 +208,7 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         const analyticsData: (readonly [string, string, string, string])[] = []
         
         // ⏱️ DURATION with Progress Bars
-        if (typeof perfObj.duration === 'number') {
+        if (is.number(perfObj.duration)) {
             const duration = Number(perfObj.duration)
             const durationFormatted = formatDuration(duration)
             const bar = createProgressBar(duration, 5000, 39)
@@ -232,7 +239,7 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         // 🖥️ CPU with Styling
         if (is.plainObject(perfObj.cpuUsage)) {
             const cpu = perfObj.cpuUsage
-            if (typeof cpu.user === 'number') {
+            if (is.number(cpu.user)) {
                 const userMs = Number(cpu.user) / 1000
                 const cpuFormatted = formatDuration(userMs)
                 const bar = createProgressBar(userMs, 1000, 39)
@@ -258,15 +265,20 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
     
     // 🔧 METADATA - PROFESSIONAL CLI-TABLE3
     metadata: (metadata: unknown): string => {
-        if (!is.plainObject(metadata)) {return ''}
+        if (!is.plainObject(metadata)) {
+            return ''
+        }
         
         const metaEntries = Object.entries(metadata)
-        if (metaEntries.length === 0) {return ''}
+        if (metaEntries.length === 0) {
+            return ''
+        }
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
         const typedEntries: (readonly [string, string])[] = metaEntries.map(
             ([key, value]: readonly [string, unknown]) => [key, stringify(value) ?? '[Value]'] as const
         )
+
         const tableOutput = createMetadataTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
@@ -274,15 +286,21 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
     
     // 📥 ARGUMENTS ANALYZER - PROFESSIONAL CLI-TABLE3 POWERED
     args: (args: unknown): string => {
-        if (!is.plainObject(args)) {return ''}
+        if (!is.plainObject(args)) {
+            return ''
+        }
         
         const argEntries = Object.entries(args)
-        if (argEntries.length === 0) {return ''}
+
+        if (argEntries.length === 0) {
+            return ''
+        }
         
         // 🎯 OVERWRITE "args:" LABEL AND ADD PROPER SPACING
         const typedEntries: (readonly [string, unknown])[] = argEntries.map(
             ([key, value]: readonly [string, unknown]) => [key, value] as const
         )
+
         const tableOutput = createArgumentsTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
@@ -290,7 +308,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
     
     // 🎯 RESULT ANALYTICS - PROFESSIONAL CLI-TABLE3 POWERED
     result: (result: unknown): string => {
-        if (result === null || result === undefined) {return ''}
+        if (is.nullOrUndefined(result)) {
+            return ''
+        }
         
         // 🎯 OVERWRITE "result:" LABEL AND ADD PROPER SPACING
         const tableOutput = createResultAnalyticsTable(result)
@@ -300,11 +320,12 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 AWARD-WINNING CONFIGURATION
+// 🎯 CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎨 Creates award-winning terminal logging configuration
+ * 🎨 Creates terminal logging configuration
+ * @returns The terminal logging configuration
  */
 export function createEnterprisePrettyConfig(): 
     Parameters<typeof import('pino-pretty')>[0] {

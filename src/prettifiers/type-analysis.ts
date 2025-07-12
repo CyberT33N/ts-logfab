@@ -16,11 +16,8 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 TYPE ANALYSIS FOR ARGUMENTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-import lodash from 'lodash'
+// ==== Imports ====
+import is from '@sindresorhus/is'
 import { configure } from 'safe-stable-stringify'
 
 // 🎯 ENTERPRISE SAFE-STABLE-STRINGIFY CONFIGURATION
@@ -34,9 +31,13 @@ const stringify = configure({
 })
 
 /**
- * 🎯 ENTERPRISE-GRADE ARGUMENT TYPE ANALYSIS - LODASH POWERED
+ * 🎯 ARGUMENT TYPE ANALYSIS - LODASH POWERED
+ * @param value - The value to analyze
+ * @returns The type analysis of the value
  */
-export function analyzeArgumentType(value: unknown): { type: string; icon: string; displayValue: string } {
+export function analyzeArgumentType(
+    value: unknown
+): { type: string; icon: string; displayValue: string } {
     if (value === null) {
         return { 
             type: 'null', 
@@ -52,41 +53,41 @@ export function analyzeArgumentType(value: unknown): { type: string; icon: strin
             displayValue: 'undefined' }
     }
     
-    // 🎯 LODASH UTILITY FUNCTIONS - ENTERPRISE GRADE TYPE CHECKING
-    if (lodash.isString(value)) {
+    // 🎯 SINDRESORHUS TYPE GUARDS - ENTERPRISE GRADE TYPE CHECKING
+    if (is.string(value)) {
         const truncated = value.length > 25 ? value.slice(0, 22) + '...' : value
         return { type: 'string', icon: '📝', displayValue: `"${truncated}"` }
     }
     
-    if (lodash.isNumber(value)) {
+    if (is.number(value)) {
         const stringified = stringify(value)
         return { type: 'number', icon: '🔢', displayValue: stringified }
     }
     
-    if (lodash.isBoolean(value)) {
+    if (is.boolean(value)) {
         const stringified = stringify(value)
         return { type: 'boolean', icon: '☑️', displayValue: stringified }
     }
     
-    if (lodash.isFunction(value)) {
+    if (is.function(value)) {
         return { type: 'function', icon: '⚡', displayValue: '[Function]' }
     }
     
-    if (typeof value === 'bigint') {
+    if (is.bigint(value)) {
         const stringified = stringify(value)
         return { type: 'bigint', icon: '🔢', displayValue: stringified ?? '0n' }
     }
     
-    if (lodash.isSymbol(value)) {
+    if (is.symbol(value)) {
         return { type: 'symbol', icon: '🔣', displayValue: '[Symbol]' }
     }
     
-    if (lodash.isArray(value)) {
+    if (is.array(value)) {
         const arrayLength = value.length.toString()
         return { type: 'array', icon: '📋', displayValue: `[Array(${arrayLength})]` }
     }
     
-    if (lodash.isPlainObject(value)) {
+    if (is.plainObject(value)) {
         return { type: 'object', icon: '📦', displayValue: '[Object]' }
     }
     
@@ -95,14 +96,14 @@ export function analyzeArgumentType(value: unknown): { type: string; icon: strin
     return { type: 'unknown', icon: '❓', displayValue: stringified }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 METHOD VISIBILITY DETECTION
-// ═══════════════════════════════════════════════════════════════════════════════
-
 /**
  * 🎯 METHOD VISIBILITY DETECTION
+ * @param methodName - The name of the method
+ * @returns The visibility of the method
  */
-export function getMethodVisibility(methodName: string): { visibility: string; icon: string } {
+export function getMethodVisibility(
+    methodName: string
+): { visibility: string; icon: string } {
     if (methodName.startsWith('_')) {
         return { visibility: 'private', icon: '🔒' }
     }

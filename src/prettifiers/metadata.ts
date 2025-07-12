@@ -16,15 +16,13 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DYNAMIC APP METADATA EXTRACTION
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ==== Imports ====
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { PackageJson } from 'zod-package-json'
 import env, { Environment } from '@/env.ts'
 
+// ==== Types ====
 interface IAppMetadata {
     name: PackageJson['name'];
     version: PackageJson['version'];
@@ -32,6 +30,10 @@ interface IAppMetadata {
     environment: Environment['NODE_ENV'];
 }
 
+/**
+ * 🎨 Gets the application metadata
+ * @returns The application metadata
+ */
 export function getAppMetadata(): IAppMetadata {
     const currentDir = process.cwd()
     const packagePath = join(currentDir, 'package.json')
