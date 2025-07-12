@@ -23,13 +23,15 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import chalk from 'chalk'
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import Table from 'cli-table3'
-import type * as CliTable3 from 'cli-table3'
 import type { PrettyOptions } from 'pino-pretty'
 import terminalLink from 'terminal-link'
 import type { ReadonlyDeep } from 'type-fest'
 import { PackageJson } from 'zod-package-json'
 import env from '@/env.ts'
+
+// 🎯 Type definitions removed as they were unused
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎨 AWARD-WINNING UNIFIED COLOR PALETTE - TERMINAL HARMONY
@@ -68,9 +70,14 @@ const TERMINAL_COLORS = {
 /**
  * 🎯 Creates level-specific table configuration for CLI-Table3
  */
-function createTableConfig(level: string): CliTable3.TableConstructorOptions & { _borderColor: any } {
+function createTableConfig(level: string): {
+    chars: Record<string, string>;
+    style: Record<string, unknown>;
+    colWidths: number[];
+    borderColor: (text: string) => string;
+} {
     // 🎨 DYNAMIC BORDER COLOR - LEVEL-SPECIFIC COLORS
-    const getLevelColor = (level: string) => {
+    const getLevelColor = (level: string): (text: string) => string => {
         const levelConfig = {
             'INFO': TERMINAL_COLORS.success,
             'WARN': TERMINAL_COLORS.warning, 
@@ -80,13 +87,18 @@ function createTableConfig(level: string): CliTable3.TableConstructorOptions & {
             'FATAL': TERMINAL_COLORS.critical
         } as const
         
-        return levelConfig[level as keyof typeof levelConfig] || TERMINAL_COLORS.primary
+        const levelKey = level as keyof typeof levelConfig
+        if (levelKey in levelConfig) {
+            return levelConfig[levelKey]
+        }
+        return TERMINAL_COLORS.primary
     }
     
     const borderColor = getLevelColor(level)
     
     return {
         // 🎯 PROFESSIONAL UNICODE BORDERS - HONEYWELL STYLE
+        /* eslint-disable @typescript-eslint/naming-convention */
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -111,16 +123,17 @@ function createTableConfig(level: string): CliTable3.TableConstructorOptions & {
             head: [],
             border: []
         },
+        /* eslint-enable @typescript-eslint/naming-convention */
         colWidths: [13, 60, 20], // Label, Content, Type columns
         // 🎯 STORE BORDER COLOR FOR LATER USE
-        _borderColor: borderColor
+        borderColor: borderColor
     }
 }
 
 /**
  * 🎯 Applies level-specific colors to CLI-Table3 output
  */
-function applyTableColors(tableOutput: string, borderColor: any): string {
+function applyTableColors(tableOutput: string, borderColor: (text: string) => string): string {
     // Apply border colors to table characters while preserving content colors
     return tableOutput
         .split('\n')
@@ -139,12 +152,18 @@ function createDecoratorTable(
     method: string, 
     message: string, 
     level: string,
-    methodVisibility: { visibility: string; icon: string },
+    methodVisibility: { readonly visibility: string; readonly icon: string },
     decoratorHeader: string,
     logObj: ReadonlyDeep<Record<string, unknown>>
 ): string {
     const config = createTableConfig(level)
-    const table = new Table(config)
+     
+    const table = new Table({
+        chars: config.chars,
+        style: config.style,
+        colWidths: config.colWidths
+    })
+     
     
     // 🎯 INTEGRATED HEADER ROW - SPANS ALL COLUMNS
     table.push([
@@ -164,7 +183,11 @@ function createDecoratorTable(
         ],
         [
             getMethodLabel(methodVisibility.visibility),
-            TERMINAL_COLORS.success(logObj.methodSignature || method),
+            TERMINAL_COLORS.success(
+                typeof logObj.methodSignature === 'string' 
+                    ? logObj.methodSignature 
+                    : method
+            ),
             TERMINAL_COLORS.text(`${methodVisibility.visibility} Function`)
         ],
         [
@@ -178,7 +201,7 @@ function createDecoratorTable(
     
     // 🎯 ADD ARGUMENT TYPES ROW
     if (Array.isArray(logObj.argumentTypes)) {
-        const types = logObj.argumentTypes as string[]
+        const types = logObj.argumentTypes as readonly string[]
         const typesDisplay = types.map(type => TERMINAL_COLORS.accent(type)).join(', ')
         tableData.push([
             TERMINAL_COLORS.icon('📝') + ' ARG TYPES',
@@ -201,7 +224,7 @@ function createDecoratorTable(
     table.push(...tableData)
     
     const tableOutput = table.toString()
-    return applyTableColors(tableOutput, config._borderColor)
+    return applyTableColors(tableOutput, config.borderColor)
 }
 
 /**
@@ -221,7 +244,8 @@ function getMethodLabel(visibility: string): string {
  * 🎯 Creates professional result analytics table with CLI-Table3
  */
 function createResultAnalyticsTable(resultValue: unknown): string {
-    const config = {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    const table = new Table({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -246,9 +270,8 @@ function createResultAnalyticsTable(resultValue: unknown): string {
             border: []
         },
         colWidths: [35, 58] // Key, Value (MATCHED TO MAIN TABLE TOTAL WIDTH)
-    }
-    
-    const table = new Table(config)
+    })
+    /* eslint-enable @typescript-eslint/naming-convention */
     
     // 🎯 HEADER ROW
     table.push([
@@ -345,8 +368,9 @@ function analyzeResultValue(value: unknown): {
 /**
  * 🎯 Creates professional analytics table with CLI-Table3
  */
-function createAnalyticsTable(data: [string, string, string, string][], title: string): string {
-    const config = {
+function createAnalyticsTable(data: readonly (readonly [string, string, string, string])[]): string {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    const table = new Table({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -371,17 +395,16 @@ function createAnalyticsTable(data: [string, string, string, string][], title: s
             border: []
         },
         colWidths: [18, 12, 43, 20], // Icon+Label, Value, Progress, Description (MATCHED TO MAIN TABLE)
-        colAligns: ['left', 'right', 'center', 'left'] as CliTable3.HorizontalAlignment[]
-    }
-    
-    const table = new Table(config)
+        colAligns: ['left', 'right', 'center', 'left']
+    })
+    /* eslint-enable @typescript-eslint/naming-convention */
     
     // Add title row that spans all columns
-    table.push([{ colSpan: 4, content: TERMINAL_COLORS.icon('⚡') + ' ' + title, hAlign: 'center' }])
+    table.push([{ colSpan: 4, content: TERMINAL_COLORS.icon('⚡') + ' ' + 'PERFORMANCE ANALYTICS', hAlign: 'center' }])
     
     // Add data rows
     data.forEach(row => {
-        table.push(row)
+        table.push([...row])
     })
     
     const tableOutput = table.toString()
@@ -391,8 +414,9 @@ function createAnalyticsTable(data: [string, string, string, string][], title: s
 /**
  * 🎯 Creates professional metadata table with CLI-Table3
  */
-function createMetadataTable(entries: [string, string][]): string {
-    const config = {
+function createMetadataTable(entries: readonly (readonly [string, string])[]): string {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    const table = new Table({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -417,9 +441,8 @@ function createMetadataTable(entries: [string, string][]): string {
             border: []
         },
         colWidths: [35, 58] // Key, Value (MATCHED TO MAIN TABLE TOTAL WIDTH)
-    }
-    
-    const table = new Table(config)
+    })
+    /* eslint-enable @typescript-eslint/naming-convention */
     
     // Add title row
     table.push([{ colSpan: 2, content: TERMINAL_COLORS.icon('🔧') + ' METADATA', hAlign: 'center' }])
@@ -439,8 +462,9 @@ function createMetadataTable(entries: [string, string][]): string {
 /**
  * 🎯 Creates professional arguments table with CLI-Table3
  */
-function createArgumentsTable(argEntries: [string, unknown][]): string {
-    const config = {
+function createArgumentsTable(argEntries: readonly (readonly [string, unknown])[]): string {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    const table = new Table({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -465,10 +489,9 @@ function createArgumentsTable(argEntries: [string, unknown][]): string {
             border: []
         },
         colWidths: [13, 14, 66], // #01 arg0, Type (10% größer als Spalte 1), Value (größte Spalte)
-        colAligns: ['left', 'center', 'left'] as CliTable3.HorizontalAlignment[]
-    }
-    
-    const table = new Table(config)
+        colAligns: ['left', 'center', 'left']
+    })
+    /* eslint-enable @typescript-eslint/naming-convention */
     
     // Add title row
     table.push([{ colSpan: 3, content: TERMINAL_COLORS.icon('📥') + ' ARGUMENTS ANALYZER', hAlign: 'center' }])
@@ -485,6 +508,35 @@ function createArgumentsTable(argEntries: [string, unknown][]): string {
     
     const tableOutput = table.toString()
     return applyTableColors(tableOutput, TERMINAL_COLORS.border)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 INTELLIGENT TEXT TRUNCATION - PRESERVED FROM ORIGINAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 Type guards for safe type handling
+ */
+function isValidAuthorString(author: unknown): author is string {
+    return typeof author === 'string' && author.length > 0
+}
+
+/**
+ * Safely extracts author name from package.json author field
+ */
+function extractAuthorName(author: unknown): string {
+    if (isValidAuthorString(author)) {
+        return author
+    }
+    
+    if (typeof author === 'object' && author !== null) {
+        const authorObj = author as Record<string, unknown>
+        if (isValidAuthorString(authorObj.name)) {
+            return authorObj.name
+        }
+    }
+    
+    return 'Unknown Author'
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -541,21 +593,35 @@ interface IColors {
 function safeStringify(value: unknown): string {
     if (value === null || value === undefined) {return ''}
     if (typeof value === 'string') {return value}
-    return String(value)
+    if (typeof value === 'number') {return String(value)}
+    if (typeof value === 'boolean') {return String(value)}
+    if (typeof value === 'bigint') {return String(value)}
+    if (typeof value === 'symbol') {return value.toString()}
+    
+    // For objects, use JSON.stringify with fallback
+    try {
+        return JSON.stringify(value)
+    } catch {
+        return '[Object]'
+    }
 }
 
 function formatBytes(bytes: number): string {
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'] as const
     if (bytes === 0) {return '0 B'}
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     const value = Math.round(bytes / Math.pow(1024, i) * 100) / 100
-    return `${String(value)} ${sizes[i]}`
+    return `${String(value)} ${sizes[i] ?? 'B'}`
 }
 
 function formatDuration(ms: number): string {
-    if (ms < 1000) {return `${String(Math.round(ms))}ms`}
-    if (ms < 60000) {return `${String(Math.round(ms / 1000 * 100) / 100)}s`}
-    return `${String(Math.round(ms / 60000 * 100) / 100)}m`
+    const roundedMs = Math.round(ms)
+    const roundedSeconds = Math.round(ms / 1000 * 100) / 100
+    const roundedMinutes = Math.round(ms / 60000 * 100) / 100
+    
+    if (ms < 1000) {return `${roundedMs.toString()}ms`}
+    if (ms < 60000) {return `${roundedSeconds.toString()}s`}
+    return `${roundedMinutes.toString()}m`
 }
 
 function createProgressBar(value: number, max: number, width = 15): string {
@@ -582,14 +648,14 @@ function getMetadataIcon(key: string): string {
         mode: '🎚️'
     } as const
     
-    return iconMap[key as keyof typeof iconMap] || '📋'
+    return iconMap[key as keyof typeof iconMap] ?? '📋'
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 DYNAMIC APP METADATA EXTRACTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function getAppMetadata(): { name: string; version: string; author: string; environment: string } {
+function getAppMetadata(): { name: string; version: string; author: string; environment: string; company: string } {
     const currentDir = process.cwd()
     const packagePath = join(currentDir, 'package.json')
 
@@ -603,8 +669,9 @@ function getAppMetadata(): { name: string; version: string; author: string; envi
     return {
         name: packageJson.name,
         version: packageJson.version,
-        author: packageJson.author,
-        environment
+        author: extractAuthorName(packageJson.author),
+        environment,
+        company: 't33n Software'
     }
 }
 
@@ -625,14 +692,19 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
         return { type: 'string', icon: '📝', displayValue: `"${truncated}"` }
     }
     case 'number':
-        return { type: 'number', icon: '🔢', displayValue: String(value) }
+        return { type: 'number', icon: '🔢', displayValue: safeStringify(value) }
     case 'boolean':
-        return { type: 'boolean', icon: '☑️', displayValue: String(value) }
+        return { type: 'boolean', icon: '☑️', displayValue: safeStringify(value) }
     case 'function':
         return { type: 'function', icon: '⚡', displayValue: '[Function]' }
+    case 'bigint':
+        return { type: 'bigint', icon: '🔢', displayValue: safeStringify(value) }
+    case 'symbol':
+        return { type: 'symbol', icon: '🔣', displayValue: '[Symbol]' }
     case 'object': {
         if (Array.isArray(value)) {
-            return { type: 'array', icon: '📋', displayValue: `[Array(${value.length})]` }
+            const arrayLength = value.length.toString()
+            return { type: 'array', icon: '📋', displayValue: `[Array(${arrayLength})]` }
         }
         try {
             const objStr = JSON.stringify(value)
@@ -642,8 +714,12 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
             return { type: 'object', icon: '📦', displayValue: '[Object]' }
         }
     }
+    case 'undefined':
+        // This case is already handled above, but included for exhaustiveness
+        return { type: 'undefined', icon: '⚫', displayValue: 'undefined' }
     default:
-        return { type: 'unknown', icon: '❓', displayValue: String(value) }
+        // This handles any potential future types
+        return { type: 'unknown', icon: '❓', displayValue: safeStringify(value) }
     }
 }
 
@@ -651,6 +727,9 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
 // 🎯 METHOD VISIBILITY DETECTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/**
+ * 🎯 METHOD VISIBILITY DETECTION
+ */
 function getMethodVisibility(methodName: string): { visibility: string; icon: string } {
     if (methodName.startsWith('_') || methodName.startsWith('#')) {
         return { visibility: 'Private', icon: '🔒' }
@@ -681,15 +760,17 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     
     // 🎯 GET ACTUAL LEVEL FROM LOG OBJECT
     const rawLevel = Number(logObj.level)
+    /* eslint-disable @typescript-eslint/naming-convention */
     const levelMap = {
-        10: 'TRACE',
-        20: 'DEBUG',
-        30: 'INFO',
-        40: 'WARN',
-        50: 'ERROR',
-        60: 'FATAL'
+        '10': 'TRACE',
+        '20': 'DEBUG',
+        '30': 'INFO',
+        '40': 'WARN',
+        '50': 'ERROR',
+        '60': 'FATAL'
     } as const
-    const actualLevel = levelMap[rawLevel as keyof typeof levelMap] || 'INFO'
+    /* eslint-enable @typescript-eslint/naming-convention */
+    const actualLevel = levelMap[String(rawLevel) as keyof typeof levelMap] || 'INFO'
     
     // Get current timestamp for inline display
     const now = new Date()
@@ -713,7 +794,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     const levelInfo = levelConfig[actualLevel] || 
                      { icon: 'ℹ️', color: TERMINAL_COLORS.primary }
     
-    if (!prefix) {
+    if (prefix.length === 0) {
         // 📝 AWARD-WINNING SINGLE-LINE LOG FORMAT (NO DIVIDER)
         const timeDisplay = TERMINAL_COLORS.muted(timeStr)
         const levelDisplay = `${TERMINAL_COLORS.icon(levelInfo.icon)} ${levelInfo.color(`[${actualLevel}]`)}`
@@ -729,7 +810,7 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     const parts = prefix.split('::')
     if (parts.length >= 2) {
         const [className, methodPart] = parts
-        const method = methodPart.split('(')[0] || methodPart
+        const method = methodPart && methodPart.split('(')[0] || methodPart || ''
         const appMeta = getAppMetadata()
         const methodInfo = getMethodVisibility(method)
         
@@ -744,7 +825,15 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
                                TERMINAL_COLORS.muted(`[${appMeta.environment}]`)
         
         // 🎯 PROFESSIONAL TABLE CONSTRUCTION WITH CLI-TABLE3 - HEADER INTEGRATED
-        const decoratorTable = createDecoratorTable(className, method, msg, actualLevel, methodInfo, decoratorHeader, logObj)
+        const decoratorTable = createDecoratorTable(
+            className || '', 
+            method, 
+            msg, 
+            actualLevel, 
+            methodInfo, 
+            decoratorHeader, 
+            logObj
+        )
         result += decoratorTable + '\n'
         
         return result
@@ -783,7 +872,7 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         if (typeof perf !== 'object' || perf === null) {return ''}
         
         const perfObj = perf as Record<string, unknown>
-        const analyticsData: [string, string, string, string][] = []
+        const analyticsData: (readonly [string, string, string, string])[] = []
         
         // ⏱️ DURATION with Progress Bars
         if (typeof perfObj.duration === 'number') {
@@ -796,11 +885,11 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
                 TERMINAL_COLORS.text(durationFormatted),
                 bar,
                 'Response Time'
-            ])
+            ] as const)
         }
         
         // 🧠 MEMORY with Formatting
-        if (perfObj.memoryUsage) {
+        if (perfObj.memoryUsage !== null && typeof perfObj.memoryUsage === 'object') {
             const mem = perfObj.memoryUsage as Record<string, unknown>
             const heapBytes = Number(mem.heapUsed)
             const heapFormatted = formatBytes(heapBytes)
@@ -811,11 +900,11 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
                 TERMINAL_COLORS.text(heapFormatted),
                 bar,
                 'Memory Usage'
-            ])
+            ] as const)
         }
 
         // 🖥️ CPU with Styling
-        if (perfObj.cpuUsage) {
+        if (perfObj.cpuUsage !== null && typeof perfObj.cpuUsage === 'object') {
             const cpu = perfObj.cpuUsage as Record<string, unknown>
             if (typeof cpu.user === 'number') {
                 const userMs = Number(cpu.user) / 1000
@@ -827,14 +916,14 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
                     TERMINAL_COLORS.text(cpuFormatted),
                     bar,
                     'CPU Time'
-                ])
+                ] as const)
             }
         }
         
         if (analyticsData.length === 0) {return ''}
         
         // 🎯 OVERWRITE "performance:" LABEL AND ADD PROPER SPACING  
-        const tableOutput = createAnalyticsTable(analyticsData, 'PERFORMANCE ANALYTICS')
+        const tableOutput = createAnalyticsTable(analyticsData)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
     },
@@ -847,7 +936,8 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         if (metaEntries.length === 0) {return ''}
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
-        const tableOutput = createMetadataTable(metaEntries.map(([key, value]) => [key, String(value)]))
+        const typedEntries: (readonly [string, string])[] = metaEntries.map(([key, value]) => [key, String(value)] as const)
+        const tableOutput = createMetadataTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
     },
@@ -860,7 +950,8 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         if (argEntries.length === 0) {return ''}
         
         // 🎯 OVERWRITE "args:" LABEL AND ADD PROPER SPACING
-        const tableOutput = createArgumentsTable(argEntries)
+        const typedEntries: (readonly [string, unknown])[] = argEntries.map(([key, value]) => [key, value] as const)
+        const tableOutput = createArgumentsTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
     },
@@ -883,7 +974,8 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
 /**
  * 🎨 Creates award-winning terminal logging configuration
  */
-export function createEnterprisePrettyConfig(): Parameters<typeof import('pino-pretty')>[0] {
+export function createEnterprisePrettyConfig(): 
+    Parameters<typeof import('pino-pretty')>[0] {
     return {
         colorize: true,
         translateTime: 'HH:MM:ss.l',
@@ -924,7 +1016,10 @@ export {
 /**
  * 🎯 Log Level Enhancer
  */
-export function enhanceLogLevel(level: string, message: string): string {
+export function enhanceLogLevel(
+    level: string, 
+    message: string
+): string {
     const enhancers = {
         fatal: () => chalk.bold.redBright(message),
         error: () => chalk.red(message),
