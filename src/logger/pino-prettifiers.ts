@@ -24,14 +24,18 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import chalk from 'chalk'
 // eslint-disable-next-line @typescript-eslint/naming-convention
-import Table from 'cli-table3'
+import CliTable from 'cli-table3'
 import type { PrettyOptions } from 'pino-pretty'
 import terminalLink from 'terminal-link'
 import type { ReadonlyDeep } from 'type-fest'
-import { PackageJson } from 'zod-package-json'
 import env from '@/env.ts'
 
-// 🎯 Type definitions removed as they were unused
+// 🎯 ENTERPRISE TYPE-ASSERTION für cli-table3 (keine offizielle @types verfügbar)
+type CliTableConstructor = new (options?: Record<string, unknown>) => {
+    push(...rows: readonly unknown[]): void
+    toString(): string
+}
+const CLI_TABLE_TYPED = CliTable as CliTableConstructor
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎨 AWARD-WINNING UNIFIED COLOR PALETTE - TERMINAL HARMONY
@@ -157,8 +161,8 @@ function createDecoratorTable(
     logObj: ReadonlyDeep<Record<string, unknown>>
 ): string {
     const config = createTableConfig(level)
-     
-    const table = new Table({
+
+    const table = new CLI_TABLE_TYPED({
         chars: config.chars,
         style: config.style,
         colWidths: config.colWidths
@@ -245,7 +249,7 @@ function getMethodLabel(visibility: string): string {
  */
 function createResultAnalyticsTable(resultValue: unknown): string {
     /* eslint-disable @typescript-eslint/naming-convention */
-    const table = new Table({
+    const table = new CLI_TABLE_TYPED({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -370,7 +374,7 @@ function analyzeResultValue(value: unknown): {
  */
 function createAnalyticsTable(data: readonly (readonly [string, string, string, string])[]): string {
     /* eslint-disable @typescript-eslint/naming-convention */
-    const table = new Table({
+    const table = new CLI_TABLE_TYPED({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -416,7 +420,7 @@ function createAnalyticsTable(data: readonly (readonly [string, string, string, 
  */
 function createMetadataTable(entries: readonly (readonly [string, string])[]): string {
     /* eslint-disable @typescript-eslint/naming-convention */
-    const table = new Table({
+    const table = new CLI_TABLE_TYPED({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -464,7 +468,7 @@ function createMetadataTable(entries: readonly (readonly [string, string])[]): s
  */
 function createArgumentsTable(argEntries: readonly (readonly [string, unknown])[]): string {
     /* eslint-disable @typescript-eslint/naming-convention */
-    const table = new Table({
+    const table = new CLI_TABLE_TYPED({
         chars: {
             'top': '═',
             'top-mid': '╤',
@@ -514,30 +518,9 @@ function createArgumentsTable(argEntries: readonly (readonly [string, unknown])[
 // 🎯 INTELLIGENT TEXT TRUNCATION - PRESERVED FROM ORIGINAL
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/**
- * 🎯 Type guards for safe type handling
- */
-function isValidAuthorString(author: unknown): author is string {
-    return typeof author === 'string' && author.length > 0
-}
 
-/**
- * Safely extracts author name from package.json author field
- */
-function extractAuthorName(author: unknown): string {
-    if (isValidAuthorString(author)) {
-        return author
-    }
-    
-    if (typeof author === 'object' && author !== null) {
-        const authorObj = author as Record<string, unknown>
-        if (isValidAuthorString(authorObj.name)) {
-            return authorObj.name
-        }
-    }
-    
-    return 'Unknown Author'
-}
+
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 INTELLIGENT TEXT TRUNCATION - PRESERVED FROM ORIGINAL
@@ -591,18 +574,24 @@ interface IColors {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function safeStringify(value: unknown): string {
-    if (value === null || value === undefined) {return ''}
-    if (typeof value === 'string') {return value}
-    if (typeof value === 'number') {return String(value)}
-    if (typeof value === 'boolean') {return String(value)}
-    if (typeof value === 'bigint') {return String(value)}
-    if (typeof value === 'symbol') {return value.toString()}
+    if (value === null) {return 'null'}
+    if (value === undefined) {return 'undefined'}
     
-    // For objects, use JSON.stringify with fallback
     try {
-        return JSON.stringify(value)
+        if (typeof value === 'string') {return value}
+        if (typeof value === 'number') {return value.toString()}
+        if (typeof value === 'boolean') {return value.toString()}
+        if (typeof value === 'bigint') {return value.toString()}
+        if (typeof value === 'symbol') {return value.toString()}
+        
+        // Handle objects safely
+        if (typeof value === 'object') {
+            return JSON.stringify(value, null, 2)
+        }
+        
+        return String(value)
     } catch {
-        return '[Object]'
+        return '[Complex Object]'
     }
 }
 
@@ -611,7 +600,7 @@ function formatBytes(bytes: number): string {
     if (bytes === 0) {return '0 B'}
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     const value = Math.round(bytes / Math.pow(1024, i) * 100) / 100
-    return `${String(value)} ${sizes[i] ?? 'B'}`
+    return `${value.toString()} ${sizes[i] ?? 'B'}`
 }
 
 function formatDuration(ms: number): string {
@@ -655,23 +644,65 @@ function getMetadataIcon(key: string): string {
 // 🎯 DYNAMIC APP METADATA EXTRACTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function getAppMetadata(): { name: string; version: string; author: string; environment: string; company: string } {
-    const currentDir = process.cwd()
-    const packagePath = join(currentDir, 'package.json')
+interface IAppMetadata {
+    name: string;
+    version: string;
+    author: string;
+    company: string;
+    environment: string;
+}
 
-    const isDevelopment = env.NODE_ENV === 'development'
-    const isTest = env.NODE_ENV === 'test'
-    const environment = isDevelopment ? 'DEV' : isTest ? 'TEST' : env.NODE_ENV
+function getAppMetadata(): IAppMetadata {
+    let packageData: unknown
+    try {
+        // Safe package.json reading with proper error handling
+        packageData = JSON.parse(
+            readFileSync(join(process.cwd(), 'package.json'), 'utf8')
+        )
+    } catch {
+        packageData = {}
+    }
     
-    // 🎯 Professional package.json validation with zod-package-json
-    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
-        
+    // Type-safe extraction with validation
+    const isObject = (value: unknown): value is Record<string, unknown> => 
+        value !== null && typeof value === 'object'
+    
+    const extractStringField = (obj: Record<string, unknown>, field: string): string => {
+        const value = obj[field]
+        return typeof value === 'string' ? value : ''
+    }
+    
+    if (!isObject(packageData)) {
+        return {
+            name: 'Unknown App',
+            version: '0.0.0',
+            author: 'Unknown',
+            company: 'Enterprise Corp',
+            environment: env.NODE_ENV || 'development'
+        }
+    }
+    
+    const name = extractStringField(packageData, 'name')
+    const version = extractStringField(packageData, 'version')
+    
+    // Safe author extraction
+    let author = 'Unknown'
+    const authorField = packageData.author
+    if (typeof authorField === 'string') {
+        author = authorField
+    } else if (isObject(authorField)) {
+        const authorName = extractStringField(authorField, 'name')
+        if (authorName) {
+            author = authorName
+        }
+    }
+    
     return {
-        name: packageJson.name,
-        version: packageJson.version,
-        author: extractAuthorName(packageJson.author),
-        environment,
-        company: 't33n Software'
+        name: name || 'Unknown App',
+        version: version || '0.0.0', 
+        author,
+        company: 'Enterprise Corp',
+        environment: env.NODE_ENV || 'development'
     }
 }
 
@@ -706,13 +737,8 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
             const arrayLength = value.length.toString()
             return { type: 'array', icon: '📋', displayValue: `[Array(${arrayLength})]` }
         }
-        try {
-            const objStr = JSON.stringify(value)
-            const truncated = objStr.length > 25 ? objStr.slice(0, 22) + '...' : objStr
-            return { type: 'object', icon: '📦', displayValue: truncated }
-        } catch {
-            return { type: 'object', icon: '📦', displayValue: '[Object]' }
-        }
+        // Safe object stringification
+        return { type: 'object', icon: '📦', displayValue: '[Object]' }
     }
     case 'undefined':
         // This case is already handled above, but included for exhaustiveness
@@ -731,13 +757,16 @@ function analyzeArgumentType(value: unknown): { type: string; icon: string; disp
  * 🎯 METHOD VISIBILITY DETECTION
  */
 function getMethodVisibility(methodName: string): { visibility: string; icon: string } {
-    if (methodName.startsWith('_') || methodName.startsWith('#')) {
-        return { visibility: 'Private', icon: '🔒' }
+    if (methodName.startsWith('_')) {
+        return { visibility: 'private', icon: '🔒' }
     }
-    if (methodName.startsWith('$')) {
-        return { visibility: 'Internal', icon: '🔧' }
+    
+    if (methodName.startsWith('#')) {
+        return { visibility: 'private', icon: '🔐' }
     }
-    return { visibility: 'Public', icon: '🌐' }
+    
+    // Default to public
+    return { visibility: 'public', icon: '🌐' }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -936,7 +965,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         if (metaEntries.length === 0) {return ''}
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
-        const typedEntries: (readonly [string, string])[] = metaEntries.map(([key, value]) => [key, String(value)] as const)
+        const typedEntries: (readonly [string, string])[] = metaEntries.map(
+            ([key, value]) => [key, safeStringify(value)] as const
+        )
         const tableOutput = createMetadataTable(typedEntries)
         const leftAlignedTable = tableOutput.split('\n').map(line => '\u001b[0G' + line).join('\n')
         return '\u001b[1A\u001b[2K\u001b[0G\n' + leftAlignedTable + '\n'
@@ -1010,7 +1041,7 @@ export {
     formatDuration,
     chalk,
     intelligentTruncate,
-    Table
+    CliTable
 }
 
 /**
