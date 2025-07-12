@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "lint": "pnpm eslint --config eslint.config.mjs .",
+    "example": "tsx --watch --tsconfig tsconfig.base.json examples/app.ts",
     "test": "vitest",
     "test:only:linux": "bash test-only.sh",
     "test:only:windows": "powershell -ExecutionPolicy Bypass -File test-only.ps1",
