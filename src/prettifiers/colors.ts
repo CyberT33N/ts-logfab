@@ -16,16 +16,12 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎨 AWARD-WINNING UNIFIED COLOR PALETTE - TERMINAL HARMONY
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ==== Imports ====
 import chalk from 'chalk'
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎨 AWARD-WINNING UNIFIED COLOR PALETTE - TERMINAL HARMONY
-// ═══════════════════════════════════════════════════════════════════════════════
-
+/**
+ * 🎨 UNIFIED COLOR PALETTE - TERMINAL HARMONY
+ */
 export const TERMINAL_COLORS = {
     // 🎯 ELEGANT MONOCHROME PALETTE - WHITE, YELLOW, BLACK, GRAY
     primary: chalk.hex('#FFFFFF'),        // Pure White
@@ -54,6 +50,9 @@ export const TERMINAL_COLORS = {
 
 /**
  * 🎯 Log Level Enhancer
+ * @param level - The level of the log message
+ * @param message - The message to enhance
+ * @returns The enhanced log message
  */
 export function enhanceLogLevel(
     level: string, 
@@ -71,6 +70,3 @@ export function enhanceLogLevel(
     const enhancer = enhancers[level.toLowerCase() as keyof typeof enhancers]
     return enhancer()
 }
-
-// Re-export chalk for convenience
-export { chalk } 

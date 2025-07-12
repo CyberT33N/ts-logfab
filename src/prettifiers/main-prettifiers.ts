@@ -16,10 +16,8 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎪 AWARD-WINNING MESSAGE FORMAT - PROFESSIONAL CLI-TABLE3 POWERED DESIGN
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ==== Imports ====
+import is from '@sindresorhus/is'
 import type { PrettyOptions } from 'pino-pretty'
 import { configure } from 'safe-stable-stringify'
 import type { ReadonlyDeep } from 'type-fest'
@@ -35,7 +33,7 @@ import { getAppMetadata } from './metadata.ts'
 import { getMethodVisibility } from './type-analysis.ts'
 import { formatBytes, formatDuration, createProgressBar } from './utility-functions.ts'
 
-// 🎯 ENTERPRISE SAFE-STABLE-STRINGIFY CONFIGURATION
+// 🎯 SAFE-STABLE-STRINGIFY CONFIGURATION
 const stringify = configure({
     circularValue: '[Circular]',
     deterministic: true,
@@ -44,6 +42,10 @@ const stringify = configure({
     maximumBreadth: 100,
     strict: false
 })
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENTERPRISE-GRADE SINDRESORHUS TYPE GUARDS - NO TYPECASTING ANTI-PATTERNS
+// ═══════════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎨 PINO-COMPATIBLE COLOR TYPES FOR FUNCTIONAL ARCHITECTURE
@@ -69,7 +71,12 @@ export const createEnterpriseMessageFormat: PrettyOptions['messageFormat'] = (
     levelLabel: string, 
     { colors }: ReadonlyDeep<{ colors: IColors }>
 ) => {
-    const logObj = log as ReadonlyDeep<Record<string, unknown>>
+    // 🛡️ ENTERPRISE-GRADE SINDRESORHUS VALIDATION - NO TYPECASTING ANTI-PATTERNS
+    if (!is.plainObject(log)) {
+        return '[Invalid Log Object]'
+    }
+    
+    const logObj = log
     const msgValue = logObj[messageKey]
     const msg = stringify(msgValue) ?? '[Message]'
     const prefix = typeof logObj.prefix === 'string' ? logObj.prefix : ''
@@ -188,9 +195,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
     
     // 📊 PERFORMANCE ANALYTICS - PROFESSIONAL CLI-TABLE3 POWERED
     performance: (perf: unknown): string => {
-        if (typeof perf !== 'object' || perf === null) {return ''}
+        if (!is.plainObject(perf)) {return ''}
         
-        const perfObj = perf as Record<string, unknown>
+        const perfObj = perf
         const analyticsData: (readonly [string, string, string, string])[] = []
         
         // ⏱️ DURATION with Progress Bars
@@ -208,8 +215,8 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         }
         
         // 🧠 MEMORY with Formatting
-        if (perfObj.memoryUsage !== null && typeof perfObj.memoryUsage === 'object') {
-            const mem = perfObj.memoryUsage as Record<string, unknown>
+        if (is.plainObject(perfObj.memoryUsage)) {
+            const mem = perfObj.memoryUsage
             const heapBytes = Number(mem.heapUsed)
             const heapFormatted = formatBytes(heapBytes)
             const bar = createProgressBar(heapBytes, 100 * 1024 * 1024, 39)
@@ -223,8 +230,8 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
         }
 
         // 🖥️ CPU with Styling
-        if (perfObj.cpuUsage !== null && typeof perfObj.cpuUsage === 'object') {
-            const cpu = perfObj.cpuUsage as Record<string, unknown>
+        if (is.plainObject(perfObj.cpuUsage)) {
+            const cpu = perfObj.cpuUsage
             if (typeof cpu.user === 'number') {
                 const userMs = Number(cpu.user) / 1000
                 const cpuFormatted = formatDuration(userMs)
@@ -251,9 +258,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
     
     // 🔧 METADATA - PROFESSIONAL CLI-TABLE3
     metadata: (metadata: unknown): string => {
-        if (typeof metadata !== 'object' || metadata === null) {return ''}
+        if (!is.plainObject(metadata)) {return ''}
         
-        const metaEntries = Object.entries(metadata as Record<string, unknown>)
+        const metaEntries = Object.entries(metadata)
         if (metaEntries.length === 0) {return ''}
         
         // 🎯 OVERWRITE "metadata:" LABEL AND ADD PROPER SPACING
@@ -267,9 +274,9 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
     
     // 📥 ARGUMENTS ANALYZER - PROFESSIONAL CLI-TABLE3 POWERED
     args: (args: unknown): string => {
-        if (typeof args !== 'object' || args === null) {return ''}
+        if (!is.plainObject(args)) {return ''}
         
-        const argEntries = Object.entries(args as Record<string, unknown>)
+        const argEntries = Object.entries(args)
         if (argEntries.length === 0) {return ''}
         
         // 🎯 OVERWRITE "args:" LABEL AND ADD PROPER SPACING

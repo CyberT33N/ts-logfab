@@ -27,18 +27,46 @@ import { TERMINAL_COLORS } from './colors.ts'
 import { analyzeArgumentType } from './type-analysis.ts'
 import { analyzeResultValue, getMetadataIcon, intelligentTruncate } from './utility-functions.ts'
 
-// 🎯 ENTERPRISE TYPE-ASSERTION für cli-table3 (keine offizielle @types verfügbar)
+// 🎯 TYPE-ASSERTION für cli-table3 (keine offizielle @types verfügbar)
 type CliTableConstructor = new (options?: Record<string, unknown>) => {
     push(...rows: readonly unknown[]): void
     toString(): string
 }
+
 const CLI_TABLE_TYPED = CliTable as CliTableConstructor
 
 // Re-export CliTable for convenience
 export { CliTable }
 
 /**
+* 🎨 DYNAMIC BORDER COLOR - LEVEL-SPECIFIC COLORS
+* @param level - The level of the log message
+* @returns The color function for the level
+*/
+const getLevelColor = (level: string): (text: string) => string => {
+    const levelConfig = {
+        'INFO': TERMINAL_COLORS.success,
+        'WARN': TERMINAL_COLORS.warning, 
+        'ERROR': TERMINAL_COLORS.error,
+        'DEBUG': TERMINAL_COLORS.blue,
+        'TRACE': TERMINAL_COLORS.error,
+        'FATAL': TERMINAL_COLORS.critical
+    } as const
+     
+    const levelKey = level as keyof typeof levelConfig
+
+    if (levelKey in levelConfig) {
+        return levelConfig[levelKey]
+    }
+
+    return TERMINAL_COLORS.primary
+}
+ 
+
+/**
  * 🎯 Creates level-specific table configuration for CLI-Table3
+ * @param level - The level of the log message
+ * @returns The table configuration
  */
 export function createTableConfig(level: string): {
     chars: Record<string, string>;
@@ -46,24 +74,6 @@ export function createTableConfig(level: string): {
     colWidths: number[];
     borderColor: (text: string) => string;
 } {
-    // 🎨 DYNAMIC BORDER COLOR - LEVEL-SPECIFIC COLORS
-    const getLevelColor = (level: string): (text: string) => string => {
-        const levelConfig = {
-            'INFO': TERMINAL_COLORS.success,
-            'WARN': TERMINAL_COLORS.warning, 
-            'ERROR': TERMINAL_COLORS.error,
-            'DEBUG': TERMINAL_COLORS.blue,
-            'TRACE': TERMINAL_COLORS.error,
-            'FATAL': TERMINAL_COLORS.critical
-        } as const
-        
-        const levelKey = level as keyof typeof levelConfig
-        if (levelKey in levelConfig) {
-            return levelConfig[levelKey]
-        }
-        return TERMINAL_COLORS.primary
-    }
-    
     const borderColor = getLevelColor(level)
     
     return {
@@ -102,8 +112,14 @@ export function createTableConfig(level: string): {
 
 /**
  * 🎯 Applies level-specific colors to CLI-Table3 output
+ * @param tableOutput - The table output to color
+ * @param borderColor - The color function for the level
+ * @returns The colored table output
  */
-export function applyTableColors(tableOutput: string, borderColor: (text: string) => string): string {
+export function applyTableColors(
+    tableOutput: string, 
+    borderColor: (text: string) => string
+): string {
     // Apply border colors to table characters while preserving content colors
     return tableOutput
         .split('\n')
@@ -134,7 +150,6 @@ export function createDecoratorTable(
         colWidths: config.colWidths
     })
      
-    
     // 🎯 INTEGRATED HEADER ROW - SPANS ALL COLUMNS
     table.push([
         { 
@@ -167,12 +182,11 @@ export function createDecoratorTable(
         ]
     ]
     
-
-    
     // 🎯 ADD ARGUMENT TYPES ROW
     if (Array.isArray(logObj.argumentTypes)) {
-        const types = logObj.argumentTypes as readonly string[]
+        const types = logObj.argumentTypes
         const typesDisplay = types.map(type => TERMINAL_COLORS.accent(type)).join(', ')
+
         tableData.push([
             TERMINAL_COLORS.icon('📝') + ' ARG TYPES',
             typesDisplay,
@@ -184,6 +198,7 @@ export function createDecoratorTable(
     if (typeof logObj.argumentCount === 'number') {
         const count = logObj.argumentCount
         const countDisplay = TERMINAL_COLORS.success(count.toString())
+
         tableData.push([
             TERMINAL_COLORS.icon('🔢') + ' ARG COUNT',
             countDisplay,
@@ -199,6 +214,8 @@ export function createDecoratorTable(
 
 /**
  * 🎯 Gets method label based on visibility
+ * @param visibility - The visibility of the method
+ * @returns The method label
  */
 function getMethodLabel(visibility: string): string {
     const labels = {
@@ -212,6 +229,8 @@ function getMethodLabel(visibility: string): string {
 
 /**
  * 🎯 Creates professional result analytics table with CLI-Table3
+ * @param resultValue - The result value to analyze
+ * @returns The result analytics table
  */
 export function createResultAnalyticsTable(resultValue: unknown): string {
     /* eslint-disable @typescript-eslint/naming-convention */
@@ -241,8 +260,7 @@ export function createResultAnalyticsTable(resultValue: unknown): string {
         },
         colWidths: [35, 58] // Key, Value (MATCHED TO MAIN TABLE TOTAL WIDTH)
     })
-    /* eslint-enable @typescript-eslint/naming-convention */
-    
+
     // 🎯 HEADER ROW
     table.push([
         { 
@@ -282,12 +300,17 @@ export function createResultAnalyticsTable(resultValue: unknown): string {
 
 /**
  * 🎯 Creates professional analytics table with CLI-Table3
+ * @param data - The data to display in the table
+ * @returns The analytics table
  */
-export function createAnalyticsTable(data: readonly (readonly [string, string, string, string])[]): string {
+export function createAnalyticsTable(
+    data: readonly (readonly [string, string, string, string])[]
+): string {
     /* eslint-disable @typescript-eslint/naming-convention */
     const table = new CLI_TABLE_TYPED({
         chars: {
             'top': '═',
+
             'top-mid': '╤',
             'top-left': '╔',
             'top-right': '╗',
@@ -328,8 +351,12 @@ export function createAnalyticsTable(data: readonly (readonly [string, string, s
 
 /**
  * 🎯 Creates professional metadata table with CLI-Table3
+ * @param entries - The metadata entries to display in the table
+ * @returns The metadata table
  */
-export function createMetadataTable(entries: readonly (readonly [string, string])[]): string {
+export function createMetadataTable(
+    entries: readonly (readonly [string, string])[]
+): string {
     /* eslint-disable @typescript-eslint/naming-convention */
     const table = new CLI_TABLE_TYPED({
         chars: {
@@ -376,8 +403,12 @@ export function createMetadataTable(entries: readonly (readonly [string, string]
 
 /**
  * 🎯 Creates professional arguments table with CLI-Table3
+ * @param argEntries - The argument entries to display in the table
+ * @returns The arguments table
  */
-export function createArgumentsTable(argEntries: readonly (readonly [string, unknown])[]): string {
+export function createArgumentsTable(
+    argEntries: readonly (readonly [string, unknown])[]
+): string {
     /* eslint-disable @typescript-eslint/naming-convention */
     const table = new CLI_TABLE_TYPED({
         chars: {

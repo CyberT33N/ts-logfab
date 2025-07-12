@@ -21,7 +21,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // 🎨 Colors and Styling
-export { TERMINAL_COLORS, enhanceLogLevel, chalk } from './colors.ts'
+export { TERMINAL_COLORS, enhanceLogLevel } from './colors.ts'
 
 // 🎯 CLI-Table3 Functions
 export { 
