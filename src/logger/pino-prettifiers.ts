@@ -589,24 +589,17 @@ function getMetadataIcon(key: string): string {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function getAppMetadata(): { name: string; version: string; company: string; environment: string } {
-    try {
-        const currentDir = process.cwd()
-        const packagePath = join(currentDir, 'package.json')
-        const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'))
+    const currentDir = process.cwd()
+    const packagePath = join(currentDir, 'package.json')
+    const packageJsonRaw = readFileSync(packagePath, 'utf-8')
+
+    const packageJson = JSON.parse(packageJsonRaw)
         
-        return {
-            name: packageJson.name || 'unknown-app',
-            version: packageJson.version || '1.0.0',
-            company: packageJson.author || 'unknown-author',
-            environment: env.NODE_ENV === 'development' ? 'DEV' : env.NODE_ENV.toUpperCase()
-        }
-    } catch {
-        return {
-            name: 'app',
-            version: '1.0.0', 
-            company: 't33n Software',
-            environment: 'DEV'
-        }
+    return {
+        name: packageJson.name || 'unknown-app',
+        version: packageJson.version || '1.0.0',
+        company: packageJson.author || 'unknown-author',
+        environment: env.NODE_ENV === 'development' ? 'DEV' : env.NODE_ENV.toUpperCase()
     }
 }
 

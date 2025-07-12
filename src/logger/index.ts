@@ -19,7 +19,7 @@
 
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import pino from 'pino'
+import { pino } from 'pino'
 import pretty from 'pino-pretty'
 import type { ReadonlyDeep } from 'type-fest'
 import env from '@/env.ts'
@@ -29,53 +29,51 @@ import { createEnterprisePrettyConfig } from '@/logger/pino-prettifiers.ts'
 // ⚙️ ENTERPRISE PINO CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
+interface IPackageJson {
+    [key: string]: unknown
+    version?: string
+    name?: string
+}
+
+/**
+ * 🎯 Validates if the object is a valid package.json file
+ * @param obj - The object to validate
+ * @returns True if the object is a valid package.json file, false otherwise
+ */
+const isValidPackageJson = (obj: unknown): obj is IPackageJson => {
+    return typeof obj === 'object' && obj !== null
+}
+
+/**
+ * 🎯 Creates an enterprise logger instance
+ * @returns The logger instance
+ */
 const createEnterpriseLogger = (): pino.Logger => {
     const isDevelopment = env.NODE_ENV === 'development'
     const isTest = env.NODE_ENV === 'test'
-    const name = env.APP_NAME
 
     const currentDir = process.cwd()
     const packagePath = join(currentDir, 'package.json')
-    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'))
-    
-    
-    // 🎨 STREAM-BASED SOLUTION with modular prettifiers
-    if (isDevelopment || isTest) {
-        // 🎯 Create beautiful visual stream with enterprise styling
-        const stream = pretty(createEnterprisePrettyConfig())
+    const parsedPackage: unknown = JSON.parse(readFileSync(packagePath, 'utf-8'))
+    const packageJson: IPackageJson = isValidPackageJson(parsedPackage) ? parsedPackage : { version: '1.0.0' }
+
+    // 🎯 Create beautiful visual stream with enterprise styling
+    const stream = pretty(createEnterprisePrettyConfig())
         
-        return pino(
-            {
-                name,
-                level: isDevelopment ? 'debug' : (isTest ? 'debug' : 'info'), // AUCH für Tests debug!
-                
-                // 🏢 Enterprise Base Configuration
-                base: {
-                    service: 'ai-base-rules',
-                    version: packageJson.version || '1.0.0',
-                    environment: env.NODE_ENV,
-                    nodeVersion: process.version,
-                    platform: process.platform
-                }
-            },
-            stream
-        )
-    }
-    
-    // 🏭 Production: Simple JSON logging
-    return pino({
-        name: 'ai-base-rules',
-        level: 'info',
-        
-        // 🏢 Enterprise Base Configuration  
-        base: {
-            service: 'ai-base-rules',
-            version: packageJson.version || '1.0.0',
-            environment: env.NODE_ENV,
-            nodeVersion: process.version,
-            platform: process.platform
-        }
-    })
+    return pino(
+        {
+            name: packageJson.name ?? 'unknown-app',
+            level: isDevelopment ? 'debug' : (isTest ? 'debug' : 'info'),
+            base: {
+                author: packageJson.author ?? 'unknown-author',
+                version: packageJson.version ?? '1.0.0',
+                environment: env.NODE_ENV,
+                nodeVersion: process.version,
+                platform: process.platform
+            }
+        },
+        stream
+    )
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

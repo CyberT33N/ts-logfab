@@ -20,8 +20,7 @@ import { z } from 'zod'
 // 🎯 Single Source of Truth - satisfies Pattern (TypeScript 4.9+)
 const envSchema = z.object({
     // 🔧 ==== Application Environment ====
-    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    APP_NAME: z.string().min(1).default('ts-logfab')
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development')
 })
 
 const env = envSchema.parse(process.env)
