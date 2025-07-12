@@ -581,11 +581,8 @@ interface IColors {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 AWARD-WINNING UTILITY FUNCTIONS
+// 🎯 UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
-
-// 🎯 ENTERPRISE SAFE STRINGIFY mit safe-stable-stringify
-// Obsolete Function entfernt - stringify() behandelt alle Fälle direkt!
 
 function formatBytes(bytes: number): string {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'] as const
@@ -629,7 +626,7 @@ function getMetadataIcon(key: string): string {
         mode: '🎚️'
     } as const
     
-    return iconMap[key as keyof typeof iconMap] || '📋'
+    return iconMap[key as keyof typeof iconMap]
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -659,7 +656,7 @@ function getAppMetadata(): IAppMetadata {
     const isObject = (value: unknown): value is Record<string, unknown> => 
         value !== null && typeof value === 'object'
     
-    const extractStringField = (obj: Record<string, unknown>, field: string): string => {
+    const extractStringField = (obj: ReadonlyDeep<Record<string, unknown>>, field: string): string => {
         const value = obj[field]
         return typeof value === 'string' ? value : ''
     }
