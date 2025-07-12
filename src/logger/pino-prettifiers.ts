@@ -28,6 +28,7 @@ import type * as CliTable3 from 'cli-table3'
 import type { PrettyOptions } from 'pino-pretty'
 import terminalLink from 'terminal-link'
 import type { ReadonlyDeep } from 'type-fest'
+import { PackageJson } from 'zod-package-json'
 import env from '@/env.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -588,18 +589,22 @@ function getMetadataIcon(key: string): string {
 // 🎯 DYNAMIC APP METADATA EXTRACTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function getAppMetadata(): { name: string; version: string; company: string; environment: string } {
+function getAppMetadata(): { name: string; version: string; author: string; environment: string } {
     const currentDir = process.cwd()
     const packagePath = join(currentDir, 'package.json')
-    const packageJsonRaw = readFileSync(packagePath, 'utf-8')
 
-    const packageJson = JSON.parse(packageJsonRaw)
+    const isDevelopment = env.NODE_ENV === 'development'
+    const isTest = env.NODE_ENV === 'test'
+    const environment = isDevelopment ? 'DEV' : isTest ? 'TEST' : env.NODE_ENV
+    
+    // 🎯 Professional package.json validation with zod-package-json
+    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
         
     return {
-        name: packageJson.name || 'unknown-app',
-        version: packageJson.version || '1.0.0',
-        company: packageJson.author || 'unknown-author',
-        environment: env.NODE_ENV === 'development' ? 'DEV' : env.NODE_ENV.toUpperCase()
+        name: packageJson.name,
+        version: packageJson.version,
+        author: packageJson.author,
+        environment
     }
 }
 
