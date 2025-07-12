@@ -22,52 +22,38 @@ import { join } from 'path'
 import { pino } from 'pino'
 import pretty from 'pino-pretty'
 import type { ReadonlyDeep } from 'type-fest'
-import env from '@/env.ts'
+import { PackageJson } from 'zod-package-json'
 import { createEnterprisePrettyConfig } from '@/logger/pino-prettifiers.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ⚙️ ENTERPRISE PINO CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-interface IPackageJson {
-    [key: string]: unknown
-    version?: string
-    name?: string
-}
-
-/**
- * 🎯 Validates if the object is a valid package.json file
- * @param obj - The object to validate
- * @returns True if the object is a valid package.json file, false otherwise
- */
-const isValidPackageJson = (obj: unknown): obj is IPackageJson => {
-    return typeof obj === 'object' && obj !== null
-}
-
 /**
  * 🎯 Creates an enterprise logger instance
  * @returns The logger instance
  */
 const createEnterpriseLogger = (): pino.Logger => {
-    const isDevelopment = env.NODE_ENV === 'development'
-    const isTest = env.NODE_ENV === 'test'
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    const isTest = process.env.NODE_ENV === 'test'
 
     const currentDir = process.cwd()
     const packagePath = join(currentDir, 'package.json')
-    const parsedPackage: unknown = JSON.parse(readFileSync(packagePath, 'utf-8'))
-    const packageJson: IPackageJson = isValidPackageJson(parsedPackage) ? parsedPackage : { version: '1.0.0' }
+    
+    // 🎯 Professional package.json validation with zod-package-json
+    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
 
     // 🎯 Create beautiful visual stream with enterprise styling
     const stream = pretty(createEnterprisePrettyConfig())
         
     return pino(
         {
-            name: packageJson.name ?? 'unknown-app',
+            name: packageJson.name,
             level: isDevelopment ? 'debug' : (isTest ? 'debug' : 'info'),
             base: {
-                author: packageJson.author ?? 'unknown-author',
-                version: packageJson.version ?? '1.0.0',
-                environment: env.NODE_ENV,
+                author: packageJson.author,
+                version: packageJson.version,
+                environment: process.env.NODE_ENV,
                 nodeVersion: process.version,
                 platform: process.platform
             }
@@ -110,6 +96,10 @@ export const logger = createEnterpriseLogger()
 
 /**
  * 🎯 Creates a contextual prefix for decorator-based logging
+ * @param className - The name of the class
+ * @param methodName - The name of the method
+ * @param args - The arguments of the method
+ * @returns The contextual prefix
  */
 export function createDecoratorPrefix(
     className: string,
@@ -138,6 +128,9 @@ export function createDecoratorPrefix(
 
 /**
  * 🎯 Logs method start with beautiful formatting
+ * @param prefix - The prefix of the method
+ * @param context - The context of the method
+ * @param performance - The performance metrics of the method
  */
 export function logMethodStart(
     prefix: string,
@@ -154,6 +147,10 @@ export function logMethodStart(
 
 /**
  * 🎯 Logs method success with performance metrics
+ * @param prefix - The prefix of the method
+ * @param duration - The duration of the method
+ * @param context - The context of the method
+ * @param result - The result of the method
  */
 export function logMethodSuccess(
     prefix: string,
@@ -172,6 +169,10 @@ export function logMethodSuccess(
 
 /**
  * 🎯 Logs method error with detailed context
+ * @param prefix - The prefix of the method
+ * @param error - The error of the method
+ * @param duration - The duration of the method
+ * @param context - The context of the method
  */
 export function logMethodError(
     prefix: string,
@@ -194,6 +195,9 @@ export function logMethodError(
 
 /**
  * 🎯 Logs method debug information
+ * @param prefix - The prefix of the method
+ * @param message - The message of the method
+ * @param data - The data of the method
  */
 export function logMethodDebug(
     prefix: string,
@@ -209,6 +213,7 @@ export function logMethodDebug(
 
 /**
  * 🎯 Creates performance metrics snapshot
+ * @returns The performance metrics snapshot
  */
 export function createPerformanceSnapshot(): IPerformanceMetrics {
     return {
@@ -224,6 +229,8 @@ export function createPerformanceSnapshot(): IPerformanceMetrics {
 
 /**
  * 🎯 Extracts relevant arguments for logging (excludes large objects)
+ * @param args - The arguments of the method
+ * @returns The relevant arguments
  */
 export function extractLogRelevantArgs(args: readonly unknown[]): Record<string, unknown> {
     const relevantArgs: Record<string, unknown> = {}
