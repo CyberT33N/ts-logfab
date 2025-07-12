@@ -25,12 +25,15 @@ import { join } from 'path'
 import chalk from 'chalk'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import CliTable from 'cli-table3'
+import lodash from 'lodash'
 import type { PrettyOptions } from 'pino-pretty'
 import { configure } from 'safe-stable-stringify'
 import terminalLink from 'terminal-link'
 import type { ReadonlyDeep } from 'type-fest'
 import { PackageJson } from 'zod-package-json'
 import env, { Environment } from '@/env.ts'
+
+// 🎯 LODASH UTILITY IMPORTS - ENTERPRISE GRADE TYPE CHECKING
 
 // 🎯 ENTERPRISE TYPE-ASSERTION für cli-table3 (keine offizielle @types verfügbar)
 type CliTableConstructor = new (options?: Record<string, unknown>) => {
@@ -660,43 +663,66 @@ function getAppMetadata(): IAppMetadata {
 // 🎯 TYPE ANALYSIS FOR ARGUMENTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/**
+ * 🎯 ENTERPRISE-GRADE ARGUMENT TYPE ANALYSIS - LODASH POWERED
+ */
 function analyzeArgumentType(value: unknown): { type: string; icon: string; displayValue: string } {
-    if (value === null) {return { type: 'null', icon: '⚪', displayValue: 'null' }}
-    if (value === undefined) {return { type: 'undefined', icon: '⚫', displayValue: 'undefined' }}
+    if (value === null) {
+        return { 
+            type: 'null', 
+            icon: '⚪', 
+            displayValue: 'null'
+        }
+    }
+
+    if (value === undefined) {
+        return { 
+            type: 'undefined', 
+            icon: '⚫', 
+            displayValue: 'undefined' }
+    }
     
-    const type = typeof value
-    
-    switch (type) {
-    case 'string': {
-        const strVal = String(value)
-        const truncated = strVal.length > 25 ? strVal.slice(0, 22) + '...' : strVal
+    // 🎯 LODASH UTILITY FUNCTIONS - ENTERPRISE GRADE TYPE CHECKING
+    if (lodash.isString(value)) {
+        const truncated = value.length > 25 ? value.slice(0, 22) + '...' : value
         return { type: 'string', icon: '📝', displayValue: `"${truncated}"` }
     }
-    case 'number':
-        return { type: 'number', icon: '🔢', displayValue: stringify(value) }
-    case 'boolean':
-        return { type: 'boolean', icon: '☑️', displayValue: stringify(value) }
-    case 'function':
+    
+    if (lodash.isNumber(value)) {
+        const stringified = stringify(value)
+        return { type: 'number', icon: '🔢', displayValue: stringified }
+    }
+    
+    if (lodash.isBoolean(value)) {
+        const stringified = stringify(value)
+        return { type: 'boolean', icon: '☑️', displayValue: stringified }
+    }
+    
+    if (lodash.isFunction(value)) {
         return { type: 'function', icon: '⚡', displayValue: '[Function]' }
-    case 'bigint':
-        return { type: 'bigint', icon: '🔢', displayValue: stringify(value) }
-    case 'symbol':
+    }
+    
+    if (typeof value === 'bigint') {
+        const stringified = stringify(value)
+        return { type: 'bigint', icon: '🔢', displayValue: stringified ?? '0n' }
+    }
+    
+    if (lodash.isSymbol(value)) {
         return { type: 'symbol', icon: '🔣', displayValue: '[Symbol]' }
-    case 'object': {
-        if (Array.isArray(value)) {
-            const arrayLength = value.length.toString()
-            return { type: 'array', icon: '📋', displayValue: `[Array(${arrayLength})]` }
-        }
-        // Safe object stringification
+    }
+    
+    if (lodash.isArray(value)) {
+        const arrayLength = value.length.toString()
+        return { type: 'array', icon: '📋', displayValue: `[Array(${arrayLength})]` }
+    }
+    
+    if (lodash.isPlainObject(value)) {
         return { type: 'object', icon: '📦', displayValue: '[Object]' }
     }
-    case 'undefined':
-        // This case is already handled above, but included for exhaustiveness
-        return { type: 'undefined', icon: '⚫', displayValue: 'undefined' }
-    default:
-        // This handles any potential future types
-        return { type: 'unknown', icon: '❓', displayValue: stringify(value) }
-    }
+    
+    // Default fallback
+    const stringified = stringify(value)
+    return { type: 'unknown', icon: '❓', displayValue: stringified }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
