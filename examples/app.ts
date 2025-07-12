@@ -24,14 +24,14 @@ import { logger } from '@/logger/index.ts'
 // 📊 EXAMPLE DATA MODELS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-interface User {
+interface IUser {
     id: number
     name: string
     email: string
     age: number
 }
 
-interface Product {
+interface IProduct {
     id: string
     name: string
     price: number
@@ -43,13 +43,13 @@ interface Product {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export class ExampleService {
-    private readonly users: User[] = [
+    private readonly _users: IUser[] = [
         { id: 1, name: 'Alice', email: 'alice@example.com', age: 25 },
         { id: 2, name: 'Bob', email: 'bob@example.com', age: 30 },
         { id: 3, name: 'Charlie', email: 'charlie@example.com', age: 35 }
     ]
 
-    private readonly products: Product[] = [
+    private readonly _products: IProduct[] = [
         { id: 'prod-1', name: 'Laptop', price: 999.99, category: 'Electronics' },
         { id: 'prod-2', name: 'Book', price: 29.99, category: 'Education' },
         { id: 'prod-3', name: 'Coffee', price: 4.99, category: 'Food' }
@@ -60,13 +60,13 @@ export class ExampleService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     @log()
-    async getUserById(id: number): Promise<User | null> {
+    public async getUserById(id: Readonly<number>): Promise<IUser | null> {
         // Simuliere eine asynchrone Datenbankabfrage
-        await this.delay(100)
+        await this._delay(100)
         
-        const user = this.users.find(u => u.id === id)
+        const user = this._users.find((u: Readonly<IUser>) => u.id === id)
         if (!user) {
-            throw new Error(`User with id ${id} not found`)
+            throw new Error(`User with id ${String(id)} not found`)
         }
         
         return user
@@ -78,17 +78,17 @@ export class ExampleService {
         includePerformance: true,
         customContext: { operation: 'user-creation' }
     })
-    async createUser(name: string, email: string, age: number): Promise<User> {
-        await this.delay(150)
+    public async createUser(name: Readonly<string>, email: Readonly<string>, age: Readonly<number>): Promise<IUser> {
+        await this._delay(150)
         
-        const newUser: User = {
-            id: this.users.length + 1,
+        const newUser: IUser = {
+            id: this._users.length + 1,
             name,
             email,
             age
         }
         
-        this.users.push(newUser)
+        this._users.push(newUser)
         return newUser
     }
 
@@ -97,15 +97,15 @@ export class ExampleService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     @logDebug()
-    getAllUsers(): User[] {
-        return [...this.users]
+    public getAllUsers(): IUser[] {
+        return [...this._users]
     }
 
     @logDebug()
-    async searchUsersByName(searchTerm: string): Promise<User[]> {
-        await this.delay(50)
+    public async searchUsersByName(searchTerm: Readonly<string>): Promise<IUser[]> {
+        await this._delay(50)
         
-        return this.users.filter(user => 
+        return this._users.filter((user: Readonly<IUser>) => 
             user.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
     }
@@ -115,7 +115,7 @@ export class ExampleService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     @logPerformance()
-    async complexCalculation(iterations: number): Promise<number> {
+    public async complexCalculation(iterations: Readonly<number>): Promise<number> {
         let result = 0
         
         for (let i = 0; i < iterations; i++) {
@@ -123,7 +123,7 @@ export class ExampleService {
             
             // Simuliere CPU-intensive Berechnung
             if (i % 1000 === 0) {
-                await this.delay(1)
+                await this._delay(1)
             }
         }
         
@@ -131,14 +131,14 @@ export class ExampleService {
     }
 
     @logPerformance()
-    async batchProcessUsers(batchSize: number): Promise<User[]> {
-        const processedUsers: User[] = []
+    public async batchProcessUsers(batchSize: Readonly<number>): Promise<IUser[]> {
+        const processedUsers: IUser[] = []
         
-        for (let i = 0; i < this.users.length; i += batchSize) {
-            const batch = this.users.slice(i, i + batchSize)
+        for (let i = 0; i < this._users.length; i += batchSize) {
+            const batch = this._users.slice(i, i + batchSize)
             
             // Simuliere Batch-Verarbeitung
-            await this.delay(100)
+            await this._delay(100)
             
             for (const user of batch) {
                 processedUsers.push({
@@ -156,15 +156,15 @@ export class ExampleService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     @logSilent()
-    async sensitiveOperation(apiKey: string, secretData: string): Promise<boolean> {
-        await this.delay(200)
+    public async sensitiveOperation(apiKey: Readonly<string>, secretData: Readonly<string>): Promise<boolean> {
+        await this._delay(200)
         
         // Simuliere sensitive Operation
         return apiKey.length > 10 && secretData.length > 5
     }
 
     @logSilent()
-    getInternalSystemInfo(): Record<string, unknown> {
+    public getInternalSystemInfo(): Record<string, unknown> {
         return {
             systemUptime: process.uptime(),
             memoryUsage: process.memoryUsage(),
@@ -177,8 +177,8 @@ export class ExampleService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     @logErrorsOnly()
-    async riskyOperation(shouldFail: boolean): Promise<string> {
-        await this.delay(100)
+    public async riskyOperation(shouldFail: Readonly<boolean>): Promise<string> {
+        await this._delay(100)
         
         if (shouldFail) {
             throw new Error('This operation was designed to fail!')
@@ -188,34 +188,34 @@ export class ExampleService {
     }
 
     @logErrorsOnly()
-    async validateData(data: unknown): Promise<boolean> {
-        await this.delay(50)
+    public async validateData(data: unknown): Promise<boolean> {
+        await this._delay(50)
         
-        if (!data || typeof data !== 'object') {
+        if (data === null || data === undefined || typeof data !== 'object') {
             throw new Error('Invalid data provided')
         }
         
         return true
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🛠️ HELPER METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
-
-    private async delay(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms))
-    }
-
     @log({ logStart: false, logSuccess: false })
-    getUserCount(): number {
-        return this.users.length
+    public getUserCount(): number {
+        return this._users.length
     }
 
     @log({ customPrefix: 'PRODUCT_SERVICE' })
-    async getProductById(id: string): Promise<Product | null> {
-        await this.delay(75)
+    public async getProductById(id: Readonly<string>): Promise<IProduct | null> {
+        await this._delay(75)
         
-        return this.products.find(p => p.id === id) || null
+        return this._products.find((p: Readonly<IProduct>) => p.id === id) ?? null
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🛠️ HELPER METHODS (moved to bottom for member ordering)
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    private async _delay(ms: Readonly<number>): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms))
     }
 }
 
@@ -329,7 +329,7 @@ async function runDemo(): Promise<void> {
         } catch (error) {
             logger.info('✅ Expected validation error caught:', { error: (error as Error).message })
         }
-    } catch (error) {
+    } catch (error: unknown) {
         logger.error('❌ Demo failed:', { error })
     }
     
@@ -340,7 +340,7 @@ async function runDemo(): Promise<void> {
 // 🎬 START THE DEMO
 // ═══════════════════════════════════════════════════════════════════════════════
 
-runDemo().catch(error => {
+runDemo().catch((error: unknown) => {
     logger.error('💥 Fatal error in demo:', { error })
     process.exit(1)
 }) 
