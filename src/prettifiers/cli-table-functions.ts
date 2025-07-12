@@ -25,10 +25,7 @@ import CliTable from 'cli-table3'
 import type { ReadonlyDeep } from 'type-fest'
 import { TERMINAL_COLORS } from './colors.ts'
 import { analyzeArgumentType } from './type-analysis.ts'
-import { analyzeResultValue, getMetadataIcon } from './utility-functions.ts'
-
-// Import the intelligentTruncate function from utility functions
-import { intelligentTruncate } from './utility-functions.ts'
+import { analyzeResultValue, getMetadataIcon, intelligentTruncate } from './utility-functions.ts'
 
 // 🎯 ENTERPRISE TYPE-ASSERTION für cli-table3 (keine offizielle @types verfügbar)
 type CliTableConstructor = new (options?: Record<string, unknown>) => {

@@ -19,7 +19,7 @@ import { join } from 'path'
 import { pino } from 'pino'
 import pretty from 'pino-pretty'
 import { PackageJson } from 'zod-package-json'
-import { createEnterprisePrettyConfig } from '@/prettifiers/prettifiers.ts'
+import { createEnterprisePrettyConfig } from '@/prettifiers/index.ts'
 
 /**
  * 🎯 Creates an enterprise logger instance
