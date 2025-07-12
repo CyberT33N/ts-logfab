@@ -9,49 +9,40 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
+██                      🎨 AWARD-WINNING TERMINAL LOGGER                    ██
+██                         ENTERPRISE-GRADE • TABLE-POWERED                 ██
+██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ==== Imports ====
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 DYNAMIC APP METADATA EXTRACTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { pino } from 'pino'
-import pretty from 'pino-pretty'
 import { PackageJson } from 'zod-package-json'
-import { createEnterprisePrettyConfig } from '@/prettifiers/prettifiers.ts'
+import env, { Environment } from '@/env.ts'
 
-/**
- * 🎯 Creates an enterprise logger instance
- * @returns The logger instance
- */
-const createEnterpriseLogger = (): pino.Logger => {
-    const isDevelopment = process.env.NODE_ENV === 'development'
-    const isTest = process.env.NODE_ENV === 'test'
-
-    const currentDir = process.cwd()
-    const packagePath = join(currentDir, 'package.json')
-    
-    // 🎯 Professional package.json validation with zod-package-json
-    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
-
-    // 🎯 Create beautiful visual stream with enterprise styling
-    const stream = pretty(createEnterprisePrettyConfig())
-        
-    return pino(
-        {
-            name: packageJson.name,
-            level: isDevelopment ? 'debug' : (isTest ? 'debug' : 'info'),
-            base: {
-                author: packageJson.author,
-                version: packageJson.version,
-                environment: process.env.NODE_ENV,
-                nodeVersion: process.version,
-                platform: process.platform
-            }
-        },
-        stream
-    )
+interface IAppMetadata {
+    name: PackageJson['name'];
+    version: PackageJson['version'];
+    author: PackageJson['author'];
+    environment: Environment['NODE_ENV'];
 }
 
-export const logger = createEnterpriseLogger() 
+export function getAppMetadata(): IAppMetadata {
+    const currentDir = process.cwd()
+    const packagePath = join(currentDir, 'package.json')
+     
+    // 🎯 Professional package.json validation with zod-package-json
+    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
+        
+    return {
+        name: packageJson.name,
+        version: packageJson.version,
+        author:  packageJson.author,
+        environment: env.NODE_ENV
+    }
+} 

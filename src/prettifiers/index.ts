@@ -9,49 +9,55 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
+██                      🎨 AWARD-WINNING TERMINAL LOGGER                    ██
+██                         ENTERPRISE-GRADE • TABLE-POWERED                 ██
+██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ==== Imports ====
-import { readFileSync } from 'fs'
-import { join } from 'path'
-import { pino } from 'pino'
-import pretty from 'pino-pretty'
-import { PackageJson } from 'zod-package-json'
-import { createEnterprisePrettyConfig } from '@/prettifiers/prettifiers.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🏢 INTERNAL MODULE BARREL - ENTERPRISE ARCHITECTURE
+// ═══════════════════════════════════════════════════════════════════════════════
 
-/**
- * 🎯 Creates an enterprise logger instance
- * @returns The logger instance
- */
-const createEnterpriseLogger = (): pino.Logger => {
-    const isDevelopment = process.env.NODE_ENV === 'development'
-    const isTest = process.env.NODE_ENV === 'test'
+// 🎨 Colors and Styling
+export { TERMINAL_COLORS, enhanceLogLevel, chalk } from './colors.ts'
 
-    const currentDir = process.cwd()
-    const packagePath = join(currentDir, 'package.json')
-    
-    // 🎯 Professional package.json validation with zod-package-json
-    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
+// 🎯 CLI-Table3 Functions
+export { 
+    CliTable,
+    createTableConfig,
+    applyTableColors,
+    createDecoratorTable,
+    createResultAnalyticsTable,
+    createAnalyticsTable,
+    createMetadataTable,
+    createArgumentsTable
+} from './cli-table-functions.ts'
 
-    // 🎯 Create beautiful visual stream with enterprise styling
-    const stream = pretty(createEnterprisePrettyConfig())
-        
-    return pino(
-        {
-            name: packageJson.name,
-            level: isDevelopment ? 'debug' : (isTest ? 'debug' : 'info'),
-            base: {
-                author: packageJson.author,
-                version: packageJson.version,
-                environment: process.env.NODE_ENV,
-                nodeVersion: process.version,
-                platform: process.platform
-            }
-        },
-        stream
-    )
-}
+// 🔧 Utility Functions
+export { 
+    intelligentTruncate,
+    formatBytes,
+    formatDuration,
+    createProgressBar,
+    createTerminalLink,
+    getMetadataIcon,
+    analyzeResultValue
+} from './utility-functions.ts'
 
-export const logger = createEnterpriseLogger() 
+// 🎯 Type Analysis
+export { 
+    analyzeArgumentType,
+    getMethodVisibility
+} from './type-analysis.ts'
+
+// 📋 Metadata Functions
+export { getAppMetadata } from './metadata.ts'
+
+// 🎪 Main Prettifiers
+export { 
+    createEnterpriseMessageFormat,
+    createEnterpriseCustomPrettifiers,
+    createEnterprisePrettyConfig
+} from './main-prettifiers.ts' 
