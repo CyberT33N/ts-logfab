@@ -1,0 +1,55 @@
+{
+     /*
+     ✅ Verweist auf das TypeScript-Config-Schema.
+     - Hilft IDEs wie VS Code, bessere Autovervollständigung & Fehlerprüfung bereitzustellen.
+     */
+     "$schema": "https://json.schemastore.org/tsconfig",
+          /*
+     * Extend the base TypeScript configuration
+     */
+     "extends": "./tsconfig.base.json",
+     /*
+     ✅ Welche Dateien TypeScript verarbeiten soll.
+     - `electron.vite.config.*` → Erlaubt TypeScript, die Vite-Konfigurationsdatei zu laden.
+     - `eslint.config.mjs` → Erlaubt TypeScript, die eslint.config.mjs-Datei zu laden.
+     - `src/main` → Alle Dateien im `main`-Prozess (Backend-Logik von Electron).
+     - `src/preload` → Alle Dateien im `preload`-Skript (Brücke zwischen Renderer & Main-Prozess).
+     - `src/preload/*.d.ts` → Alle Typdefinitionsdateien für den Preload-Prozess.
+     */
+     "include": [
+          "src/**/*",
+          "global.d.ts"
+     ],
+     "compilerOptions": {
+          "baseUrl": ".",
+          "paths": {
+               "@/*": [
+                    "src/*"
+               ],
+               "@test/*": [
+                    "test/*"
+               ]
+          },
+
+          /*
+               ✅ Aktiviert "Composite Mode".
+               - Notwendig für "Project References" in TypeScript (z. B. bei monorepos oder geteilten Typen).
+               - Speichert zwischenergebnisse (`tsbuildinfo`-Dateien), um Builds zu beschleunigen.
+               - Sollte nur aktiviert sein, wenn es wirklich gebraucht wird.
+          */
+          "composite": true,
+          /*
+               ✅ Erlaubt die Verarbeitung von JavaScript-Dateien.
+               - Notwendig für .mjs-Dateien wie eslint.config.mjs.
+          */
+          "allowJs": true,
+          /*
+               ✅ Definiert globale Typen für das Projekt.
+               - `electron-vite/node` → Typen für `electron-vite`, um Vite-basierte Builds in Electron zu unterstützen.
+               - `node` → Standard-Node.js-Typen, notwendig für `require()`, `fs`, `path` usw.
+          */
+          "types": [
+               "node"
+          ]
+     }
+}
