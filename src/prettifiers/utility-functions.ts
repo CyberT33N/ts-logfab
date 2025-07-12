@@ -18,6 +18,7 @@
 
 // ==== Imports ====
 import is from '@sindresorhus/is'
+import cliProgress from 'cli-progress'
 import prettyBytes from 'pretty-bytes'
 import prettyMilliseconds from 'pretty-ms'
 import terminalLink from 'terminal-link'
@@ -78,6 +79,98 @@ export function formatDuration(ms: number): string {
     })
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 CLI-PROGRESS CONFIGURATION FOR ENTERPRISE-GRADE PROGRESS BARS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 Creates professional CLI-Progress bar for performance visualization
+ * @param value - The current value
+ * @param max - The maximum value
+ * @param width - The width of the progress bar
+ * @returns The formatted progress bar string
+ */
+export function createEnterpriseProgressBar(
+    value: number, 
+    max: number, 
+    width = 39
+): string {
+    const percentage = Math.max(0, Math.min(1, value / max))
+    const filled = Math.round(width * percentage)
+    const empty = width - filled
+    
+    // Build progress bar string manually using cli-progress style
+    const barChars = {
+        complete: '█',
+        incomplete: '░'
+    }
+    
+    const bar = barChars.complete.repeat(filled) + barChars.incomplete.repeat(empty)
+    const percentageText = `${Math.round(percentage * 100).toString()}%`
+    const barString = `${bar} ${percentageText}`
+    
+    // Apply color based on percentage
+    if (percentage > 0.8) {
+        return TERMINAL_COLORS.error(barString)
+    }
+    if (percentage > 0.6) {
+        return TERMINAL_COLORS.warning(barString)
+    }
+    
+    return TERMINAL_COLORS.success(barString)
+}
+
+/**
+ * 🎯 Creates a performance-optimized progress bar using CLI-Progress
+ * @param value - The current value
+ * @param max - The maximum value
+ * @param width - The width of the progress bar
+ * @returns The formatted progress bar string
+ */
+export function createPerformanceProgressBar(
+    value: number,
+    max: number,
+    width = 39
+): string {
+    const percentage = Math.max(0, Math.min(1, value / max))
+    const filled = Math.round(width * percentage)
+    const empty = width - filled
+    
+    // Use CLI-Progress formatting but return as string
+    const barChars = {
+        complete: '█',
+        incomplete: '░'
+    }
+    
+    const bar = barChars.complete.repeat(filled) + barChars.incomplete.repeat(empty)
+    
+    // Apply enterprise-grade color coding
+    if (percentage > 0.8) {
+        return TERMINAL_COLORS.error(bar)
+    }
+    if (percentage > 0.6) {
+        return TERMINAL_COLORS.warning(bar)
+    }
+    
+    return TERMINAL_COLORS.success(bar)
+}
+
+/**
+ * 🎯 Creates a multi-progress bar manager for complex operations
+ * @returns A configured MultiBar instance
+ */
+export function createMultiProgressManager(): cliProgress.MultiBar {
+    return new cliProgress.MultiBar({
+        clearOnComplete: false,
+        hideCursor: true,
+        format: ' {bar} | {label} | {value}/{total} | {percentage}%',
+        barCompleteChar: '█',
+        barIncompleteChar: '░',
+        stopOnComplete: false,
+        barsize: 30
+    }, cliProgress.Presets.shades_classic)
+}
+
 /**
  * 🎯 Creates a progress bar
  * @param value - The value of the progress bar
@@ -86,16 +179,7 @@ export function formatDuration(ms: number): string {
  * @returns The progress bar
  */
 export function createProgressBar(value: number, max: number, width = 15): string {
-    const percentage = Math.max(0, Math.min(1, value / max))
-    const filled = Math.round(width * percentage)
-    const empty = width - filled
-    
-    const bar = '█'.repeat(filled) + '░'.repeat(empty)
-    
-    if (percentage > 0.8) {return TERMINAL_COLORS.error(bar)}
-    if (percentage > 0.6) {return TERMINAL_COLORS.warning(bar)}
-    
-    return TERMINAL_COLORS.success(bar)
+    return createPerformanceProgressBar(value, max, width)
 }
 
 /**

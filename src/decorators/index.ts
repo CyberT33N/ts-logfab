@@ -463,9 +463,12 @@ export function log(config: ReadonlyDeep<ILogDecoratorConfig> = {}): MethodDecor
                 // 🎯 Execute the original method
                 const result = await originalMethod.apply(this, args as unknown[])
                 
-                // ⏱️ Calculate execution time
+                // ⏱️ Calculate execution time using consistent time base
+                const endTime = performanceSnapshot 
+                    ? performance.now()
+                    : Date.now()
                 const duration = performanceSnapshot 
-                    ? Date.now() - performanceSnapshot.startTime
+                    ? endTime - performanceSnapshot.startTime
                     : 0
                 
                 // 📤 Extract result metadata if enabled
@@ -485,9 +488,12 @@ export function log(config: ReadonlyDeep<ILogDecoratorConfig> = {}): MethodDecor
                 
                 return result
             } catch (error) {
-                // ⏱️ Calculate execution time for error case
+                // ⏱️ Calculate execution time for error case using consistent time base
+                const endTime = performanceSnapshot 
+                    ? performance.now()
+                    : Date.now()
                 const duration = performanceSnapshot 
-                    ? Date.now() - performanceSnapshot.startTime
+                    ? endTime - performanceSnapshot.startTime
                     : 0
                 
                 // 🚨 Ensure we have a proper Error object

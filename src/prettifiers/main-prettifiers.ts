@@ -252,6 +252,96 @@ export const createEnterpriseCustomPrettifiers = (): PrettyOptions['customPretti
                 ] as const)
             }
         }
+
+        // 🗑️ GARBAGE COLLECTION METRICS (NEW)
+        if (is.array(perfObj.gcPerformance)) {
+            const gcEntries = perfObj.gcPerformance
+
+            if (gcEntries.length > 0) {
+                const totalGCTime = gcEntries.reduce((sum: number, entry: unknown) => {
+                    if (is.plainObject(entry) && is.number(entry.duration)) {
+                        return sum + entry.duration
+                    }
+                    return sum
+                }, 0)
+                const gcFormatted = formatDuration(totalGCTime)
+                const bar = createProgressBar(totalGCTime, 100, 39)
+                
+                analyticsData.push([
+                    TERMINAL_COLORS.icon('🗑️') + '   GC TIME',
+                    TERMINAL_COLORS.text(gcFormatted),
+                    bar,
+                    `GC Cycles: ${gcEntries.length.toString()}`
+                ] as const)
+            }
+        }
+
+        // 📊 PERFORMANCE MARKS (NEW)
+        if (is.array(perfObj.markEntries)) {
+            const markEntries = perfObj.markEntries
+
+            if (markEntries.length > 0) {
+                const latestMark = markEntries[markEntries.length - 1]
+                if (is.plainObject(latestMark) && is.number(latestMark.startTime)) {
+                    const markTime = latestMark.startTime
+                    const markFormatted = formatDuration(markTime)
+                    const bar = createProgressBar(markTime, 1000, 39)
+                    
+                    analyticsData.push([
+                        TERMINAL_COLORS.icon('📊') + '  LATEST MARK',
+                        TERMINAL_COLORS.text(markFormatted),
+                        bar,
+                        `Total Marks: ${markEntries.length.toString()}`
+                    ] as const)
+                }
+            }
+        }
+
+        // 📏 PERFORMANCE MEASURES (NEW)
+        if (is.array(perfObj.measureEntries)) {
+            const measureEntries = perfObj.measureEntries
+            
+            if (measureEntries.length > 0) {
+                const totalMeasureTime = measureEntries.reduce((sum: number, entry: unknown) => {
+                    if (is.plainObject(entry) && is.number(entry.duration)) {
+                        return sum + entry.duration
+                    }
+                    return sum
+                }, 0)
+                const measureFormatted = formatDuration(totalMeasureTime)
+                const bar = createProgressBar(totalMeasureTime, 1000, 39)
+                
+                analyticsData.push([
+                    TERMINAL_COLORS.icon('📏') + ' MEASURES',
+                    TERMINAL_COLORS.text(measureFormatted),
+                    bar,
+                    `Total Measures: ${measureEntries.length.toString()}`
+                ] as const)
+            }
+        }
+
+        // 🌐 RESOURCE TIMINGS (NEW)
+        if (is.array(perfObj.resourceTimings)) {
+            const resourceEntries = perfObj.resourceTimings
+            if (resourceEntries.length > 0) {
+                const totalResourceTime = resourceEntries.reduce((sum: number, entry: unknown) => {
+                    if (is.plainObject(entry) && is.number(entry.duration)) {
+                        return sum + entry.duration
+                    }
+                    return sum
+                }, 0)
+                const avgResourceTime = totalResourceTime / resourceEntries.length
+                const resourceFormatted = formatDuration(avgResourceTime)
+                const bar = createProgressBar(avgResourceTime, 500, 39)
+                
+                analyticsData.push([
+                    TERMINAL_COLORS.icon('🌐') + ' AVG RESOURCE',
+                    TERMINAL_COLORS.text(resourceFormatted),
+                    bar,
+                    `Resources: ${resourceEntries.length.toString()}`
+                ] as const)
+            }
+        }
         
         if (analyticsData.length === 0) {
             return ''

@@ -29,4 +29,8 @@ export interface IPerformanceMetrics {
     readonly duration?: number
     readonly memoryUsage?: NodeJS.MemoryUsage
     readonly cpuUsage?: NodeJS.CpuUsage
+    readonly gcPerformance?: PerformanceEntry[]
+    readonly markEntries?: PerformanceEntry[]
+    readonly measureEntries?: PerformanceEntry[]
+    readonly resourceTimings?: PerformanceEntry[]
 } 
