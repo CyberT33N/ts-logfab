@@ -29,7 +29,8 @@ import type { PrettyOptions } from 'pino-pretty'
 import { configure } from 'safe-stable-stringify'
 import terminalLink from 'terminal-link'
 import type { ReadonlyDeep } from 'type-fest'
-import env from '@/env.ts'
+import { PackageJson } from 'zod-package-json'
+import env, { Environment } from '@/env.ts'
 
 // 🎯 ENTERPRISE TYPE-ASSERTION für cli-table3 (keine offizielle @types verfügbar)
 type CliTableConstructor = new (options?: Record<string, unknown>) => {
@@ -634,64 +635,24 @@ function getMetadataIcon(key: string): string {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 interface IAppMetadata {
-    name: string;
-    version: string;
-    author: string;
-    company: string;
-    environment: string;
+    name: PackageJson['name'];
+    version: PackageJson['version'];
+    author: PackageJson['author'];
+    environment: Environment['NODE_ENV'];
 }
 
 function getAppMetadata(): IAppMetadata {
-    let packageData: unknown
-    try {
-        // Safe package.json reading with proper error handling
-        packageData = JSON.parse(
-            readFileSync(join(process.cwd(), 'package.json'), 'utf8')
-        )
-    } catch {
-        packageData = {}
-    }
-    
-    // Type-safe extraction with validation
-    const isObject = (value: unknown): value is Record<string, unknown> => 
-        value !== null && typeof value === 'object'
-    
-    const extractStringField = (obj: ReadonlyDeep<Record<string, unknown>>, field: string): string => {
-        const value = obj[field]
-        return typeof value === 'string' ? value : ''
-    }
-    
-    if (!isObject(packageData)) {
-        return {
-            name: 'Unknown App',
-            version: '0.0.0',
-            author: 'Unknown',
-            company: 'Enterprise Corp',
-            environment: env.NODE_ENV || 'development'
-        }
-    }
-    
-    const name = extractStringField(packageData, 'name')
-    const version = extractStringField(packageData, 'version')
-    
-    // Safe author extraction
-    let author = 'Unknown'
-    const authorField = packageData.author
-    if (typeof authorField === 'string') {
-        author = authorField
-    } else if (isObject(authorField)) {
-        const authorName = extractStringField(authorField, 'name')
-        if (authorName) {
-            author = authorName
-        }
-    }
-    
+    const currentDir = process.cwd()
+    const packagePath = join(currentDir, 'package.json')
+     
+    // 🎯 Professional package.json validation with zod-package-json
+    const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
+        
     return {
-        name: name || 'Unknown App',
-        version: version || '0.0.0', 
-        author,
-        company: 'Enterprise Corp',
-        environment: env.NODE_ENV || 'development'
+        name: packageJson.name,
+        version: packageJson.version,
+        author:  packageJson.author,
+        environment: env.NODE_ENV
     }
 }
 
