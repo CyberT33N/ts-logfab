@@ -596,8 +596,8 @@ function getAppMetadata(): { name: string; version: string; company: string; env
         
         return {
             name: packageJson.name || 'unknown-app',
-            version: env.APP_VERSION || packageJson.version || '1.0.0',
-            company: 't33n Software',
+            version: packageJson.version || '1.0.0',
+            company: packageJson.author || 'unknown-author',
             environment: env.NODE_ENV === 'development' ? 'DEV' : env.NODE_ENV.toUpperCase()
         }
     } catch {

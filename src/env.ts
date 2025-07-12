@@ -21,8 +21,7 @@ import { z } from 'zod'
 const envSchema = z.object({
     // 🔧 ==== Application Environment ====
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    APP_NAME: z.string().min(1).default('ts-logfab'),
-    APP_VERSION: z.string().default('1.0.0')
+    APP_NAME: z.string().min(1).default('ts-logfab')
 })
 
 const env = envSchema.parse(process.env)

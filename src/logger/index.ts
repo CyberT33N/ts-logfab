@@ -17,6 +17,8 @@
 // 🚀 ENTERPRISE LOGGER ARCHITECTURE - DECORATOR OPTIMIZED
 // ═══════════════════════════════════════════════════════════════════════════════
 
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import pino from 'pino'
 import pretty from 'pino-pretty'
 import type { ReadonlyDeep } from 'type-fest'
@@ -31,6 +33,11 @@ const createEnterpriseLogger = (): pino.Logger => {
     const isDevelopment = env.NODE_ENV === 'development'
     const isTest = env.NODE_ENV === 'test'
     const name = env.APP_NAME
+
+    const currentDir = process.cwd()
+    const packagePath = join(currentDir, 'package.json')
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'))
+    
     
     // 🎨 STREAM-BASED SOLUTION with modular prettifiers
     if (isDevelopment || isTest) {
@@ -45,7 +52,7 @@ const createEnterpriseLogger = (): pino.Logger => {
                 // 🏢 Enterprise Base Configuration
                 base: {
                     service: 'ai-base-rules',
-                    version: env.APP_VERSION,
+                    version: packageJson.version || '1.0.0',
                     environment: env.NODE_ENV,
                     nodeVersion: process.version,
                     platform: process.platform
@@ -63,7 +70,7 @@ const createEnterpriseLogger = (): pino.Logger => {
         // 🏢 Enterprise Base Configuration  
         base: {
             service: 'ai-base-rules',
-            version: env.APP_VERSION,
+            version: packageJson.version || '1.0.0',
             environment: env.NODE_ENV,
             nodeVersion: process.version,
             platform: process.platform

@@ -36,8 +36,7 @@ export function bootstrapTestEnvironment(): void {
     
     // Erzwinge bestimmte Umgebungsvariablen für Tests
     process.env.NODE_ENV = 'test'
-    process.env.APP_VERSION = '1.0.0'
-    
+
     // Verhindere Benutzerinteraktion in Tests
     process.env.CI = 'true'
     
