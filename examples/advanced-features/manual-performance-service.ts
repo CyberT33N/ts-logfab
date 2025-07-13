@@ -467,7 +467,7 @@ export async function runManualPerformanceDemo(): Promise<void> {
         })
         
         // Run multiple operations to build baselines and trigger anomalies
-        const methods = ['algorithm-a', 'algorithm-b', 'algorithm-c']
+        const methods = ['processUserData', 'calculateOrderTotal', 'findProductInventory']
         
         for (let iteration = 0; iteration < 15; iteration++) {
             for (const method of methods) {
