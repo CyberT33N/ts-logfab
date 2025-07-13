@@ -10,14 +10,44 @@
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
+███████████████████████████████████████████████████████████████████████████████
 */
 
-/**
- * Anomaly detection module re-exports
- * 
- * This file maintains backward compatibility by re-exporting all functionality
- * from the modularized anomaly-detector directory.
- */
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🏭 ANOMALY DETECTION FACTORY - FACTORY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export all functionality from the anomaly-detector module
-export * from './anomaly-detector/index.ts' 
+import { ReadonlyDeep } from 'type-fest'
+import { AnomalyDetector } from './main-detector.ts'
+import { 
+    type IAnomalyConfig, type IPerformanceMetric, type ISemanticContext 
+} from './types.ts'
+
+/**
+ * 🏭 **Create anomaly detector with configuration**
+ */
+export function createAnomalyDetector(
+    config: ReadonlyDeep<Partial<IAnomalyConfig>> = {}
+): AnomalyDetector {
+    return new AnomalyDetector(config)
+}
+
+/**
+ * 📊 **Create performance metric object**
+ */
+export function createPerformanceMetric(
+    method: string,
+    duration: number,
+    memory = 0,
+    success = true,
+    semantic?: ISemanticContext
+): IPerformanceMetric {
+    return {
+        method,
+        duration,
+        memory,
+        timestamp: Date.now(),
+        success,
+        semantic
+    }
+} 
