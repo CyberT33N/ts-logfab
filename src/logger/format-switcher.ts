@@ -18,6 +18,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep, WritableDeep } from 'type-fest'
+import { toWritable } from '@/utils/data-utils.ts'
 import { ICorrelationContext } from './correlation-context/index.ts'
 import { ISemanticContext } from './semantic-detector.ts'
 
@@ -466,9 +467,9 @@ function createRawDataFields(
     jsonOptions: ReadonlyDeep<IFormatConfig['jsonOptions']>
 ): Partial<IJsonLogOutput> {
     const fields: WritableDeep<Partial<IJsonLogOutput>> = {}
-    
+     
     if (jsonOptions.includeArgs && entry.raw.args.length > 0) {
-        fields.args = entry.raw.args
+        fields.args = toWritable(entry.raw.args)
     }
     
     if (jsonOptions.includeResult && entry.raw.result !== undefined) {
