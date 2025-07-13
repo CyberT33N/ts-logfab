@@ -25,7 +25,7 @@ import {
     createPerformanceMetric,
     type IAnomalyDetection,
     type IAnomalyConfig
-} from './anomaly-detector.ts'
+} from './anomaly-detector/index.ts'
 import { detectSemanticContext, type ISemanticContext } from './semantic-detector.ts'
 import type { IPerformanceMetrics } from './types.ts'
 

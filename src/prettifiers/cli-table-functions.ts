@@ -23,7 +23,7 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import CliTable from 'cli-table3'
 import type { ReadonlyDeep } from 'type-fest'
-import type { IAnomalyDetection } from '../logger/anomaly-detector.ts'
+import type { IAnomalyDetection } from '../logger/anomaly-detector/index.ts'
 import type { IPerformanceBaseline } from '../logger/performance-utils.ts'
 import type { ISemanticContext } from '../logger/semantic-detector.ts'
 import { 

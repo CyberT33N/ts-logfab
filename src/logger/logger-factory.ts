@@ -27,7 +27,7 @@ import {
     type AnomalyDetector, 
     type IAnomalyDetection, 
     createPerformanceMetric 
-} from './anomaly-detector.ts'
+} from './anomaly-detector/index.ts'
 import { createPerformanceSnapshot } from './performance-utils.ts'
 import { type IPerformanceMetrics } from './types.ts'
 

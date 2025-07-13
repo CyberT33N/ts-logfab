@@ -18,7 +18,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep, WritableDeep } from 'type-fest'
-import { ICorrelationContext } from './correlation-context.ts'
+import { ICorrelationContext } from './correlation-context/index.ts'
 import { ISemanticContext } from './semantic-detector.ts'
 
 /**

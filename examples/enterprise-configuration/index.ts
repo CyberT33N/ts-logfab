@@ -74,7 +74,7 @@ export type {
     ISemanticContext,
     IAnomalyDetection
 } from '@/decorators/index.ts'
-export type { IAnomalyConfig } from '@/logger/anomaly-detector.ts'
+export type { IAnomalyConfig } from '@/logger/anomaly-detector/index.ts'
 
 // 🏃‍♂️ DEMO RUNNER
 // ═══════════════════════════════════════════════════════════════════════════════

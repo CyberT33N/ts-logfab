@@ -24,7 +24,7 @@ import {
     getCurrentCorrelationContext, 
     createCorrelationContext, 
     type ICorrelationContext 
-} from './correlation-context.ts'
+} from './correlation-context/index.ts'
 import { createHybridLogger, getCurrentLoggingFormat, isStructuredLoggingEnabled } from './hybrid-logger.ts'
 import { getLogger, startPerformanceTracking, endPerformanceTracking } from './logger-factory.ts'
 import { detectSemanticContext, type ISemanticContext } from './semantic-detector.ts'

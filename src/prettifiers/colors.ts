@@ -18,7 +18,7 @@
 
 // ==== Imports ====
 import chalk from 'chalk'
-import type { AnomalySeverity } from '../logger/anomaly-detector.ts'
+import type { AnomalySeverity } from '../logger/anomaly-detector/index.ts'
 import type { ISemanticContext } from '../logger/semantic-detector.ts'
 
 /**

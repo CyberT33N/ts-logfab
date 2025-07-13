@@ -23,8 +23,8 @@ import {
     createPerformanceMetric,
     type IAnomalyDetection,
     type IAnomalyConfig
-} from './anomaly-detector.ts'
-import { getCurrentCorrelationContext } from './correlation-context.ts'
+} from './anomaly-detector/index.ts'
+import { getCurrentCorrelationContext } from './correlation-context/index.ts'
 import { getLogger } from './logger-factory.ts'
 import { RingBuffer, type IRingBufferStats } from './ring-buffer.ts'
 import { type ISemanticContext, detectSemanticContext } from './semantic-detector.ts'

@@ -22,7 +22,7 @@
 
 import type { ReadonlyDeep } from 'type-fest'
 import { log, type ILogDecoratorConfig } from '@/decorators/index.ts'
-import { type IAnomalyConfig } from '@/logger/anomaly-detector.ts'
+import { type IAnomalyConfig } from '@/logger/anomaly-detector/index.ts'
 import { logger } from '@/logger/index.ts'
 import { 
     createUsers, createProducts, type IOrder, type IProduct, type ITransaction, type IUser 

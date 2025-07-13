@@ -18,7 +18,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep } from 'type-fest'
-import { createCorrelationContext, runWithCorrelationContext } from './correlation-context.ts'
+import { createCorrelationContext, runWithCorrelationContext } from './correlation-context/index.ts'
 import { formatLogEntry, autoConfigureFormat } from './format-switcher.ts'
 import { getGlobalPerformanceMonitor, IPerformanceSession } from './performance-monitor.ts'
 import { detectSemanticContext, ISemanticContext } from './semantic-detector.ts'
