@@ -21,48 +21,6 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Complete Decorator Configuration
-export {
-    EnterpriseDecoratorConfig,
-    EnterpriseDecoratorConfigService,
-    runCompleteDecoratorConfigDemo
-} from './complete-decorator-configuration.ts'
-
-// Advanced Monitoring & Alerting
-export {
-    EnterpriseMonitoringConfig,
-    EnterpriseAlertingConfig,
-    EnterpriseMonitoringService,
-    runAdvancedMonitoringDemo
-} from './advanced-monitoring-alerting.ts'
-
-// Prettifier & Semantic Configuration
-export {
-    EnterprisePrettifierConfig,
-    EnterpriseSemanticConfig,
-    EnterprisePrettifierSemanticService,
-    runPrettifierSemanticDemo
-} from './prettifier-semantic-configuration.ts'
-
-// Re-export enterprise configuration types
-export type {
-    ILogDecoratorConfig,
-    IAnomalyConfig,
-    ISemanticConfig,
-    ICorrelationContext,
-    ISemanticContext,
-    IPrettyConfig
-} from '@/decorators/index.ts'
-
-// Re-export enterprise utilities
-export {
-    configureEnhancedPerformanceMonitoring,
-    createEnhancedConfig,
-    getEnhancedLoggingStatus,
-    detectSemanticContext,
-    createHumanReadableFormat,
-    createMachineReadableFormat
-} from '@/logger/performance-utils.ts'
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 ENTERPRISE CONFIGURATION OVERVIEW
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -377,6 +335,48 @@ export {
 
 import { logger } from '@/logger/index.ts'
 
+export {
+    EnterpriseDecoratorConfig,
+    EnterpriseDecoratorConfigService,
+    runCompleteDecoratorConfigDemo
+} from './complete-decorator-configuration.ts'
+
+// Advanced Monitoring & Alerting
+export {
+    EnterpriseMonitoringConfig,
+    EnterpriseAlertingConfig,
+    EnterpriseMonitoringService,
+    runAdvancedMonitoringDemo
+} from './advanced-monitoring-alerting.ts'
+
+// Prettifier & Semantic Configuration
+export {
+    EnterprisePrettifierConfig,
+    EnterpriseSemanticConfig,
+    EnterprisePrettifierSemanticService,
+    runPrettifierSemanticDemo
+} from './prettifier-semantic-configuration.ts'
+
+// Re-export enterprise configuration types
+export type {
+    ILogDecoratorConfig,
+    IAnomalyConfig,
+    ISemanticConfig,
+    ICorrelationContext,
+    ISemanticContext,
+    IPrettyConfig
+} from '@/decorators/index.ts'
+
+// Re-export enterprise utilities
+export {
+    configureEnhancedPerformanceMonitoring,
+    createEnhancedConfig,
+    getEnhancedLoggingStatus,
+    detectSemanticContext,
+    createHumanReadableFormat,
+    createMachineReadableFormat
+} from '@/logger/performance-utils.ts'
+
 /**
  * 🎯 **Run All Enterprise Configuration Demos**
  * 
@@ -399,7 +399,6 @@ export async function runAllEnterpriseConfigurationDemos(): Promise<void> {
         await runPrettifierSemanticDemo()
         
         logger.info('✅ All Enterprise Configuration Demos completed successfully!')
-        
     } catch (error: unknown) {
         logger.error('❌ Enterprise Configuration Demo Suite failed:', { error })
         throw error
@@ -419,7 +418,7 @@ export function getEnterpriseConfigurationSummary(): {
     enterpriseFeatures: readonly string[]
     performanceFeatures: readonly string[]
     complianceFeatures: readonly string[]
-} {
+    } {
     return {
         configurationTypes: [
             'Complete Decorator Configuration',
@@ -500,7 +499,7 @@ export function getEnterpriseConfigurationStatistics(): {
         productionReadiness: string
         complianceLevel: string
     }
-} {
+    } {
     const summary = getEnterpriseConfigurationSummary()
     
     return {
@@ -544,7 +543,7 @@ export function performEnterpriseConfigurationHealthCheck(): {
     }
     overallHealth: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'
     recommendations: readonly string[]
-} {
+    } {
     // Simulate health check logic
     const configurationHealth = {
         decoratorConfigurations: 'HEALTHY' as const,
