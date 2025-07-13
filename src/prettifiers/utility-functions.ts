@@ -198,14 +198,50 @@ export function createTerminalLink(text: string, url: string): string {
  * @returns The icon for the metadata
  */
 export function getMetadataIcon(key: string): string {
+    const lowerKey = key.toLowerCase().replace(':', '')
+
     const iconMap = {
         focus: '🎯',
         operation: '⚙️',
         validation: '✅',
-        mode: '🎚️'
+        mode: '🎚️',
+        module: '📦',
+        version: '🏷️',
+        environment: '🌍',
+        signaturetype: '✍️',
+        intelligentsigning: '🧠',
+        correlationtype: '🔗',
+        distributedtracing: '🌐',
+        semantictype: '🎯',
+        businesscontext: '💼',
+        anomalytype: '🚨',
+        alertingenabled: '🔔',
+        runtimeconfig: '⚙️',
+        adaptivelogging: '🔄',
+        sensitivity: '🔒',
+        privacy: '🔒',
+        monitoringlevel: '📈',
+        dashboardintegration: '📊',
+        performancebaseline: '📉',
+        monitoringtype: '📈',
+        kpitracking: '📊',
+        analyticsintegration: '🔗',
+        businessimpactanalysis: '💼',
+        threatdetection: '🛡️',
+        compliancetracking: '📋',
+        auditlogging: '📜',
+        securityincidentresponse: '🚒',
+        queryoptimization: '🚀',
+        connectionpooling: '💧',
+        indexanalysis: '🔍',
+        routinganalysis: '🗺️',
+        loadbalancing: '⚖️',
+        ratelimiting: '🚦',
+        masterconfiguration: '👑',
+        comprehensivetracking: '🧿'
     } as const
     
-    return iconMap[key as keyof typeof iconMap]
+    return iconMap[lowerKey as keyof typeof iconMap] ?? '🔧'
 }
 
 /**
