@@ -17,11 +17,17 @@
 // 📊 PERFORMANCE MONITORING - INTEGRATED SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { ReadonlyDeep } from 'type-fest'
-import { AnomalyDetector, IAnomalyDetection, IAnomalyConfig, createPerformanceMetric } from './anomaly-detector.ts'
+import type { ReadonlyDeep } from 'type-fest'
+import {
+    AnomalyDetector,
+    createPerformanceMetric,
+    type IAnomalyDetection,
+    type IAnomalyConfig
+} from './anomaly-detector.ts'
 import { getCurrentCorrelationContext } from './correlation-context.ts'
-import { RingBuffer, IRingBufferStats } from './ring-buffer.ts'
-import { ISemanticContext, detectSemanticContext } from './semantic-detector.ts'
+import { getLogger } from './logger-factory.ts'
+import { RingBuffer, type IRingBufferStats } from './ring-buffer.ts'
+import { type ISemanticContext, detectSemanticContext } from './semantic-detector.ts'
 
 /**
  * 🏃 **Performance Session**
@@ -474,25 +480,35 @@ export class PerformanceMonitor {
     private _handleAutoLogging(result: ReadonlyDeep<IPerformanceResult>): void {
         // Log anomalies
         if (this._config.autoLogAnomalies && result.anomalies.length > 0) {
+            const logger = getLogger()
             for (const anomaly of result.anomalies) {
-                console.warn(`[PerformanceMonitor] Anomaly detected in ${result.session.method}:`, {
-                    type: anomaly.type,
-                    severity: anomaly.severity,
-                    current: anomaly.current,
-                    expected: anomaly.expected,
-                    confidence: anomaly.confidence
-                })
+                logger.warn(
+                    {
+                        anomaly: formatAnomalyForLog(anomaly),
+                        details: `Anomaly detected in ${result.session.method}`
+                    },
+                    `[PerformanceMonitor] Anomaly detected: ${anomaly.type}`
+                )
             }
         }
 
         // Log slow operations
-        if (this._config.autoLogSlowOperations && 
-            result.duration > this._config.slowOperationThreshold) {
-            console.warn(`[PerformanceMonitor] Slow operation detected in ${result.session.method}:`, {
-                duration: result.duration,
-                threshold: this._config.slowOperationThreshold,
-                memoryDelta: result.memoryDelta
-            })
+        if (
+            this._config.autoLogSlowOperations &&
+            result.duration > this._config.slowOperationThreshold
+        ) {
+            const logger = getLogger()
+            logger.warn(
+                {
+                    performance: {
+                        method: result.session.method,
+                        duration: result.duration,
+                        threshold: this._config.slowOperationThreshold,
+                        memoryDelta: result.memoryDelta
+                    }
+                },
+                `[PerformanceMonitor] Slow operation detected in ${result.session.method}`
+            )
         }
     }
 
@@ -553,6 +569,56 @@ export class PerformanceMonitor {
             }
         }
     }
+}
+
+/**
+ * 🎨 **Format anomaly for logging**
+ */
+function formatAnomalyForLog(anomaly: ReadonlyDeep<IAnomalyDetection>): Record<string, unknown> {
+    return {
+        type: anomaly.type,
+        severity: anomaly.severity,
+        confidence: Math.round(anomaly.confidence * 100),
+        method: anomaly.context.method,
+        current: anomaly.current,
+        expected: anomaly.expected,
+        deviation: Math.round(anomaly.deviation * 100) / 100,
+        threshold: anomaly.threshold,
+        timestamp: anomaly.context.timestamp,
+        sampleSize: anomaly.context.sampleSize
+    }
+}
+
+/**
+ * 🎯 **Performance Baseline Data**
+ * 
+ * This interface defines the expected structure of performance metrics
+ * that can be used to detect anomalies.
+ */
+export interface IPerformanceBaseline {
+    readonly method: string
+    readonly averageDuration: number
+    readonly medianDuration: number
+    readonly p95Duration: number
+    readonly averageMemory: number
+    readonly sampleSize: number
+    readonly lastUpdated: number
+    readonly semantic?: ISemanticContext
+}
+
+/**
+ * 🎯 **Enhanced Performance Snapshot**
+ * 
+ * This interface defines the structure of performance metrics
+ * that are collected and processed by the anomaly detector.
+ */
+export interface IPerformanceSnapshot {
+    readonly method: string;
+    readonly duration: number;
+    readonly memoryDelta: number;
+    readonly success: boolean;
+    readonly semantic: ISemanticContext;
+    readonly timestamp: number;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
