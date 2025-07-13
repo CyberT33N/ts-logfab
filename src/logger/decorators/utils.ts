@@ -19,14 +19,14 @@
 // ==== Imports ====
 import { randomUUID } from 'crypto'
 import { ReadonlyDeep } from 'type-fest'
-import { toWritable } from '@/utils/data-utils.ts'
+import { isStructuredLoggingEnabled } from '@/logger/AdaptiveLogging/index.ts'
 import { 
     getCurrentCorrelationContext, 
     createCorrelationContext, 
     type ICorrelationContext 
-} from '../correlation-context/index.ts'
-import { isStructuredLoggingEnabled } from '../hybrid-logger.ts'
-import { detectSemanticContext, type ISemanticContext } from '../semantic-detector.ts'
+} from '@/logger/correlation-context/index.ts'
+import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector.ts'
+import { toWritable } from '@/utils/data-utils.ts'
 import { type ILogContext } from '../types.ts'
 import { type IDecoratorLoggingConfig, DEFAULT_DECORATOR_CONFIG } from './config.ts'
 import { type IEnhancedLogContext } from './types.ts'

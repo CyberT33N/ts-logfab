@@ -9,14 +9,17 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                🎯 HYBRID LOGGER - ENVIRONMENT-ADAPTIVE LOGGING            ██
-██                         HUMAN vs MACHINE OUTPUT FORMATS                   ██
+██            🎯 ADAPTIVE LOGGING - LOGGER FACTORY & SINGLETON               ██
+██                    HYBRID LOGGER MANAGEMENT & CREATION                    ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ==== Imports ====
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 LOGGER FACTORY AND SINGLETON MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { pino } from 'pino'
@@ -25,67 +28,7 @@ import { ReadonlyDeep } from 'type-fest'
 import { PackageJson } from 'zod-package-json'
 import { resolveLoggingFormat, getLoggingConfig, type LoggingFormat } from '@/env.ts'
 import { createEnterprisePrettyConfig } from '@/prettifiers/index.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 HYBRID LOGGER INTERFACES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🎯 **Structured Log Entry for Machine Processing**
- * 
- * Optimized for ML parsing and production monitoring
- */
-export interface IStructuredLogEntry {
-    readonly timestamp: string
-    readonly level: string
-    readonly message: string
-    readonly service: string
-    readonly version: string
-    readonly environment: string
-    readonly nodeVersion: string
-    readonly platform: string
-    readonly pid: number
-    readonly hostname: string
-    readonly data?: Record<string, unknown>
-    readonly performance?: {
-        readonly method?: string
-        readonly duration?: number
-        readonly memoryUsage?: number
-        readonly success?: boolean
-        readonly anomalies?: readonly unknown[]
-    }
-    readonly anomaly?: {
-        readonly type?: string
-        readonly severity?: string
-        readonly confidence?: number
-        readonly method?: string
-        readonly current?: number
-        readonly expected?: number
-        readonly deviation?: number
-    }
-    readonly context?: {
-        readonly correlationId?: string
-        readonly requestId?: string
-        readonly workflowId?: string
-        readonly operationId?: string
-        readonly userId?: string
-    }
-    readonly metadata?: Record<string, unknown>
-}
-
-/**
- * 🎯 **Hybrid Logger Configuration**
- */
-export interface IHybridLoggerConfig {
-    readonly format: Exclude<LoggingFormat, 'auto'>
-    readonly name: string
-    readonly level: string
-    readonly base: Record<string, unknown>
-    readonly enableStructuredData: boolean
-    readonly outputStream: 'stdout' | 'stderr'
-    readonly enableColors: boolean
-    readonly enablePrettyPrint: boolean
-}
+import { type IStructuredLogEntry, type IHybridLoggerConfig } from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 SINGLETON LOGGER MANAGEMENT

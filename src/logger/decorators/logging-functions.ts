@@ -18,7 +18,9 @@
 
 // ==== Imports ====
 import { ReadonlyDeep } from 'type-fest'
-import { createHybridLogger, getCurrentLoggingFormat, isStructuredLoggingEnabled } from '../hybrid-logger.ts'
+import { 
+    createHybridLogger, getCurrentLoggingFormat, isStructuredLoggingEnabled 
+} from '@/logger/AdaptiveLogging/index.ts'
 import { getLogger, startPerformanceTracking, endPerformanceTracking } from '../logger-factory.ts'
 import { type IDecoratorLoggingConfig, DEFAULT_DECORATOR_CONFIG } from './config.ts'
 import { type IEnhancedLogContext } from './types.ts'

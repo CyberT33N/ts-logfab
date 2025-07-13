@@ -9,134 +9,27 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
+██         🔄 ADAPTIVE LOGGING - FORMAT MANAGEMENT & SWITCHING               ██
+██                    ENVIRONMENT-ADAPTIVE FORMAT LOGIC                      ██
+██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🔄 ENVIRONMENT FORMAT SWITCHING - HYBRID LOGGING FORMATS
+// 🔄 FORMAT SWITCHING AND MANAGEMENT
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep, WritableDeep } from 'type-fest'
 import { toWritable } from '@/utils/data-utils.ts'
-import { ICorrelationContext } from './correlation-context/index.ts'
-import { ISemanticContext } from './semantic-detector.ts'
-
-/**
- * 🌍 **Environment Types**
- * 
- * Different environments require different log formats
- */
-export type EnvironmentType = 'development' | 'staging' | 'production' | 'test'
-
-/**
- * 📝 **Log Format Types**
- * 
- * - human: Human-readable format with colors and visual elements
- * - json: Structured JSON for machine processing
- * - hybrid: Combination based on environment
- */
-export type LogFormatType = 'human' | 'json' | 'hybrid'
-
-/**
- * 📊 **Formatted Log Entry**
- * 
- * Complete log entry with all formatting applied
- */
-export interface IFormattedLogEntry {
-    readonly timestamp: string
-    readonly level: string
-    readonly message: string
-    readonly context: {
-        readonly method: string
-        readonly class?: string
-        readonly file: string
-        readonly line?: number
-    }
-    readonly correlation?: ICorrelationContext
-    readonly semantic?: ISemanticContext
-    readonly performance?: {
-        readonly duration: number
-        readonly memory: number
-    }
-    readonly metadata?: Record<string, unknown>
-    readonly raw: {
-        readonly args: readonly unknown[]
-        readonly result?: unknown
-        readonly error?: Error
-    }
-}
-
-/**
- * 📋 **Human-Readable Log Output**
- * 
- * Formatted string ready for console display
- */
-export interface IHumanLogOutput {
-    readonly formatted: string
-    readonly colorCode: string
-    readonly symbols: string
-    readonly layout: 'single-line' | 'multi-line' | 'table'
-}
-
-/**
- * 📋 **JSON Log Output**
- * 
- * Structured object ready for JSON serialization
- */
-export interface IJsonLogOutput {
-    readonly timestamp: string
-    readonly level: string
-    readonly msg: string
-    readonly method: string
-    readonly class?: string
-    readonly file: string
-    readonly line?: number
-    readonly correlationId?: string
-    readonly workflowId?: string
-    readonly requestId?: string
-    readonly operation?: string
-    readonly domain?: string
-    readonly complexity?: string
-    readonly duration?: number
-    readonly memory?: number
-    readonly args?: readonly unknown[]
-    readonly result?: unknown
-    readonly error?: string
-    readonly stack?: string
-    readonly metadata?: Record<string, unknown>
-}
-
-/**
- * ⚙️ **Format Configuration**
- * 
- * Controls how logs are formatted in different environments
- */
-export interface IFormatConfig {
-    readonly environment: EnvironmentType
-    readonly format: LogFormatType
-    readonly humanOptions: {
-        readonly useColors: boolean
-        readonly useSymbols: boolean
-        readonly layout: 'single-line' | 'multi-line' | 'table'
-        readonly includeStackTrace: boolean
-        readonly maxArgsLength: number
-        readonly timestampFormat: 'iso' | 'relative' | 'time-only'
-    }
-    readonly jsonOptions: {
-        readonly includeStackTrace: boolean
-        readonly includeArgs: boolean
-        readonly includeResult: boolean
-        readonly flattenMetadata: boolean
-        readonly customFields: Record<string, string>
-    }
-    readonly hybrid: {
-        readonly developmentFormat: LogFormatType
-        readonly productionFormat: LogFormatType
-        readonly errorAlwaysJson: boolean
-        readonly performanceThreshold: number // ms - log as JSON if slower
-    }
-}
+import { detectEnvironment } from './environment-detection.ts'
+import {
+    type EnvironmentType,
+    type IFormattedLogEntry,
+    type IHumanLogOutput,
+    type IJsonLogOutput,
+    type IFormatConfig
+} from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 📊 DEFAULT CONFIGURATION
@@ -169,57 +62,8 @@ const DEFAULT_FORMAT_CONFIG: IFormatConfig = {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🔧 ENVIRONMENT DETECTION
+// 🎛️ AUTO-CONFIGURATION FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🌍 **Detect current environment**
- * Checks NODE_ENV and other environment indicators
- */
-export function detectEnvironment(): EnvironmentType {
-    const nodeEnv = process.env.NODE_ENV?.toLowerCase()
-    
-    // Check explicit environment settings
-    if (nodeEnv === 'production' || nodeEnv === 'prod') {
-        return 'production'
-    }
-    
-    if (nodeEnv === 'staging' || nodeEnv === 'stage') {
-        return 'staging'
-    }
-    
-    if (nodeEnv === 'test' || nodeEnv === 'testing') {
-        return 'test'
-    }
-    
-    // Check for production cloud indicators
-    if (hasProductionIndicators()) {
-        return 'production'
-    }
-    
-    // Default to development
-    return 'development'
-}
-
-/**
- * 🔍 **Check for production cloud indicators**
- * Helper function to detect cloud production environments
- */
-function hasProductionIndicators(): boolean {
-    const nodeEnv = process.env.NODE_ENV
-    const vercel = process.env.VERCEL
-    const netlify = process.env.NETLIFY  
-    const heroku = process.env.HEROKU
-    const awsLambda = process.env.AWS_LAMBDA_FUNCTION_NAME
-    
-    return Boolean(
-        nodeEnv === 'production' ||
-        (vercel !== undefined && vercel !== '') ||
-        (netlify !== undefined && netlify !== '') ||
-        (heroku !== undefined && heroku !== '') ||
-        (awsLambda !== undefined && awsLambda !== '')
-    )
-}
 
 /**
  * 🎛️ **Auto-configure format based on environment**
@@ -303,6 +147,20 @@ export function autoConfigureFormat(
         ...baseConfig,
         ...overrides
     } as IFormatConfig
+}
+
+/**
+ * 🎯 **Create format configuration factory**
+ * Convenience function for creating custom configurations
+ */
+export function createFormatConfig(
+    environment: EnvironmentType,
+    overrides: ReadonlyDeep<Partial<IFormatConfig>> = {}
+): IFormatConfig {
+    return autoConfigureFormat({
+        environment,
+        ...overrides
+    })
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -394,6 +252,51 @@ export function createJsonOutput(
     
     return output as IJsonLogOutput
 }
+
+/**
+ * 🔄 **Main format switching function**
+ * Decides format based on configuration and context
+ */
+export function formatLogEntry(
+    entry: ReadonlyDeep<IFormattedLogEntry>,
+    config: ReadonlyDeep<IFormatConfig> = autoConfigureFormat()
+): IHumanLogOutput | IJsonLogOutput {
+    let formatType = config.format
+    
+    // Hybrid format logic
+    if (config.format === 'hybrid') {
+        const isError = entry.level === 'error' || Boolean(entry.raw.error)
+        const isSlowOperation = Boolean(entry.performance?.duration) && 
+            (entry.performance?.duration ?? 0) > config.hybrid.performanceThreshold
+        
+        if (isError && config.hybrid.errorAlwaysJson) {
+            formatType = 'json'
+        } else if (isSlowOperation) {
+            formatType = 'json'
+        } else if (config.environment === 'production') {
+            formatType = config.hybrid.productionFormat
+        } else {
+            formatType = config.hybrid.developmentFormat
+        }
+    }
+    
+    // Generate output
+    switch (formatType) {
+    case 'human':
+        return createHumanOutput(entry, config)
+    case 'json':
+        return createJsonOutput(entry, config)
+    case 'hybrid':
+        // Hybrid should have been resolved above, fallback to human
+        return createHumanOutput(entry, config)
+    default:
+        return createHumanOutput(entry, config)
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🏗️ FIELD CREATION FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
 
 /**
  * 🏗️ **Create context fields**
@@ -515,47 +418,6 @@ function createMetadataFields(
     return jsonOptions.flattenMetadata ? entry.metadata : { metadata: entry.metadata }
 }
 
-/**
- * 🔄 **Main format switching function**
- * Decides format based on configuration and context
- */
-export function formatLogEntry(
-    entry: ReadonlyDeep<IFormattedLogEntry>,
-    config: ReadonlyDeep<IFormatConfig> = autoConfigureFormat()
-): IHumanLogOutput | IJsonLogOutput {
-    let formatType = config.format
-    
-    // Hybrid format logic
-    if (config.format === 'hybrid') {
-        const isError = entry.level === 'error' || Boolean(entry.raw.error)
-        const isSlowOperation = Boolean(entry.performance?.duration) && 
-            (entry.performance?.duration ?? 0) > config.hybrid.performanceThreshold
-        
-        if (isError && config.hybrid.errorAlwaysJson) {
-            formatType = 'json'
-        } else if (isSlowOperation) {
-            formatType = 'json'
-        } else if (config.environment === 'production') {
-            formatType = config.hybrid.productionFormat
-        } else {
-            formatType = config.hybrid.developmentFormat
-        }
-    }
-    
-    // Generate output
-    switch (formatType) {
-    case 'human':
-        return createHumanOutput(entry, config)
-    case 'json':
-        return createJsonOutput(entry, config)
-    case 'hybrid':
-        // Hybrid should have been resolved above, fallback to human
-        return createHumanOutput(entry, config)
-    default:
-        return createHumanOutput(entry, config)
-    }
-}
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🔧 PRIVATE UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -638,8 +500,8 @@ function createMultiLineFormat(
     
     // Performance info
     if (entry.performance) {
-        const performanceLine = `  ⏱️  ${entry.performance.duration.toString()}ms |
-         💾 ${entry.performance.memory.toString()}MB`
+        // eslint-disable-next-line max-len
+        const performanceLine = `  ⏱️  ${entry.performance.duration.toString()}ms | 💾 ${entry.performance.memory.toString()}MB`
         lines.push(performanceLine)
     }
     
@@ -691,18 +553,4 @@ function createTableFormat(
     rows.push('└─────────────────────')
     
     return rows.join('\n')
-}
-
-/**
- * 🎯 **Create format configuration factory**
- * Convenience function for creating custom configurations
- */
-export function createFormatConfig(
-    environment: EnvironmentType,
-    overrides: ReadonlyDeep<Partial<IFormatConfig>> = {}
-): IFormatConfig {
-    return autoConfigureFormat({
-        environment,
-        ...overrides
-    })
 } 
