@@ -38,4 +38,4 @@ async function main(): Promise<void> {
 main().catch((error: unknown) => {
     logger.error('💥 Fatal error in enhanced decorator demo application:', { error })
     process.exit(1)
-}) 
+})
