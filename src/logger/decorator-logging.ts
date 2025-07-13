@@ -19,6 +19,7 @@
 // ==== Imports ====
 import { randomUUID } from 'crypto'
 import { ReadonlyDeep } from 'type-fest'
+import { toWritable } from '@/utils/data-utils.ts'
 import { 
     getCurrentCorrelationContext, 
     createCorrelationContext, 
@@ -89,9 +90,13 @@ function createEnhancedContext(
         methodSignature: `${className}.${methodName}`,
         operationId: randomUUID(),
         args: Array.isArray(args) ? args.reduce<Record<string, unknown>>(
-            (acc: ReadonlyDeep<Record<string, unknown>>, arg: unknown, index: number) => {
-                acc[`arg${String(index)}`] = arg
-                return acc
+            (acc: Readonly<Record<string, unknown>>, arg: unknown, index: number) => {
+                const mutableAcc = toWritable(acc)
+
+                const key = `arg${String(index)}`
+                mutableAcc[key] = arg
+                
+                return mutableAcc
             }, {}) : {}
     }
 
