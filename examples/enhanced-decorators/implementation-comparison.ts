@@ -680,12 +680,18 @@ export async function runImplementationComparisonDemo(): Promise<void> {
 
         const highImportanceFeatures = Object.entries(featureMatrix)
             .filter(([, feature]: ReadonlyDeep<[string, { importance: string }]>) => feature.importance === 'HIGH')
-            .map(([name, feature]) => ({
-                name,
-                standard: feature.standard,
-                enhanced: feature.enhanced,
-                description: feature.description
-            }))
+            .map(
+                ([name, feature]: readonly [string, { 
+                    readonly description: string; 
+                    readonly enhanced: boolean; 
+                    readonly standard: boolean 
+               }]
+                ) => ({
+                    name,
+                    standard: feature.standard,
+                    enhanced: feature.enhanced,
+                    description: feature.description
+                }))
 
         logger.info('✅ High importance features:', {
             totalFeatures: Object.keys(featureMatrix).length,
