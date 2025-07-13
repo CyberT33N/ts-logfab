@@ -431,7 +431,7 @@ export function createEnterprisePrettyConfig():
         
         // 🎯 FUNCTIONAL: Essential properties for clean logs
         // eslint-disable-next-line max-len
-        ignore: 'pid,hostname,name,service,version,environment,nodeVersion,platform,prefix,className,methodName,argumentTypes,argumentCount',
+        ignore: 'pid,hostname,name,service,version,environment,nodeVersion,platform,prefix,className,methodName,argumentTypes,argumentCount,methodSignature',
         
         // 🌈 PROFESSIONAL COLOR SCHEME  
         customColors: 'info:blue,warn:yellow,error:red,debug:cyan,trace:magenta,fatal:brightRed',

@@ -37,7 +37,7 @@ export interface ICorrelationContext {
     readonly parentId?: string
     readonly startTime: number
     readonly depth: number
-    readonly metadata: Record<string, unknown>
+    metadata: Record<string, unknown>
 }
 
 /**

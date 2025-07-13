@@ -361,7 +361,7 @@ function createLoggingContext(
     const logContext: ILogContext = {
         className,
         methodName,
-        ...(relevantArgs && { args: relevantArgs }),
+        ...((relevantArgs && Object.keys(relevantArgs).length > 0) && { args: relevantArgs }),
         ...(config.customContext && { metadata: config.customContext }),
         // 🎯 **ENTERPRISE SIGNATURE INJECTION**
         methodSignature: buildIntelligentMethodSignature(methodName, args, config)
@@ -491,16 +491,17 @@ function logSuccessWithMetrics(
     prefix: string,
     duration: number,
     logContext: ReadonlyDeep<ILogContext>,
-    resultMetadata: ReadonlyDeep<ReturnType<typeof extractResultMetadata>> | undefined,
+    result: unknown,
     config: ReadonlyDeep<Required<Omit<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>>> & 
            ReadonlyDeep<Pick<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>>,
     performanceSnapshot?: ReadonlyDeep<ReturnType<typeof createPerformanceSnapshot>>
 ): void {
     if (config.logSuccess) {
-        logMethodSuccess(prefix, duration, logContext, resultMetadata)
+        logMethodSuccess(prefix, duration, logContext, result)
     }
     
     if (config.logDebug) {
+        const resultMetadata = result !== undefined ? extractResultMetadata(result) : undefined
         logMethodDebug(
             prefix,
             'Method execution completed with detailed metrics',
@@ -662,17 +663,12 @@ export function log(config: ReadonlyDeep<ILogDecoratorConfig> = {}): MethodDecor
                     ? endTime - performanceSnapshot.startTime
                     : 0
                 
-                // 📤 Extract result metadata if enabled
-                const resultMetadata = finalConfig.includeResult 
-                    ? extractResultMetadata(result)
-                    : undefined
-                
                 // ✅ Log successful completion with metrics
                 logSuccessWithMetrics(
                     prefix, 
                     duration, 
                     logContext, 
-                    resultMetadata, 
+                    finalConfig.includeResult ? result : undefined, 
                     finalConfig, 
                     performanceSnapshot
                 )

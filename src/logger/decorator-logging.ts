@@ -414,7 +414,7 @@ export function logMethodSuccess(
     prefix: string,
     duration: number,
     context?: ReadonlyDeep<ILogContext>,
-    result?: ReadonlyDeep<{ type: string; size?: number }>
+    result?: unknown
 ): void {
     const logger = getLogger()
     logger.info({
