@@ -250,6 +250,7 @@ async function executeWithLogging(
     semantic?: ISemanticContext
 ): Promise<unknown> {
     const startTime = performance.now()
+    const startMemory = process.memoryUsage().heapUsed
     let result: unknown
     let error: Error | undefined
     let success = true
@@ -263,7 +264,9 @@ async function executeWithLogging(
         throw err
     } finally {
         const endTime = performance.now()
+        const endMemory = process.memoryUsage().heapUsed
         const duration = endTime - startTime
+        const memoryDelta = (endMemory - startMemory) / (1024 * 1024) // Convert to MB
 
         // End performance session if enabled
         if (session !== undefined && config.enablePerformanceTracking) {
@@ -286,12 +289,12 @@ async function executeWithLogging(
                     : `Method ${methodName} failed: ${error?.message ?? 'Unknown error'}`,
                 context: {
                     method: methodName,
-                    file: 'unknown',
+                    file: 'enhanced-decorator.ts',
                     class: methodName.split('.')[0]
                 },
                 performance: {
                     duration,
-                    memory: 0
+                    memory: memoryDelta
                 },
                 raw: {
                     args: config.includeArguments 
