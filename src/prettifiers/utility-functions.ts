@@ -241,7 +241,11 @@ export function getMetadataIcon(key: string): string {
         comprehensivetracking: '🧿'
     } as const
     
-    return iconMap[lowerKey as keyof typeof iconMap] ?? '🔧'
+    // Safe type check instead of unsafe type assertion
+    if (lowerKey in iconMap) {
+        return iconMap[lowerKey as keyof typeof iconMap]
+    }
+    return '🔧'
 }
 
 /**
