@@ -17,7 +17,25 @@
 // 🚀 EXAMPLE APP - LOGGER DECORATOR TESTING
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { log, logDebug, logPerformance, logSilent, logErrorsOnly } from '@/decorators/index.ts'
+import { ReadonlyDeep } from 'type-fest'
+import { 
+    log, 
+    logDebug, 
+    logPerformance, 
+    logSilent, 
+    logErrorsOnly,
+    // 🚀 NEW: Enhanced Decorator Variants
+    logWithCorrelation,
+    logWithSemantics,
+    logWithAnomalyDetection,
+    logForProduction,
+    logForDevelopment,
+    logFinancialOperation,
+    logUserOperation,
+    logOrderOperation,
+    logHighPerformance,
+    logComprehensive
+} from '@/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -36,6 +54,25 @@ interface IProduct {
     name: string
     price: number
     category: string
+}
+
+interface IOrder {
+    id: string
+    userId: number
+    products: readonly IProduct[]
+    total: number
+    status: 'pending' | 'processing' | 'completed' | 'cancelled'
+    createdAt: Date
+}
+
+interface ITransaction {
+    id: string
+    orderId: string
+    amount: number
+    currency: 'USD' | 'EUR' | 'GBP'
+    type: 'payment' | 'refund' | 'transfer'
+    status: 'pending' | 'completed' | 'failed'
+    timestamp: Date
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -212,6 +249,236 @@ export class ExampleService {
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // 🛠️ HELPER METHODS (moved to bottom for member ordering)
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    private async _delay(ms: Readonly<number>): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 ENHANCED SERVICE CLASS WITH NEW DECORATOR VARIANTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class EnhancedService {
+    private readonly _orders: IOrder[] = []
+    private readonly _transactions: ITransaction[] = []
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🔗 CORRELATION LOGGING DECORATORS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    @logWithCorrelation({ 
+        workflowId: 'user-authentication', 
+        userId: 'demo-user-123' 
+    })
+    public async authenticateUser(
+        username: Readonly<string>, 
+        password: Readonly<string>
+    ): Promise<boolean> {
+        await this._delay(200)
+        return username.length > 3 && password.length > 6
+    }
+
+    @logWithCorrelation()
+    public async trackUserActivity(
+        action: Readonly<string>, 
+        metadata: Readonly<Record<string, unknown>>
+    ): Promise<void> {
+        await this._delay(50)
+        logger.info(`User activity tracked: ${action}`, metadata)
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🎯 SEMANTIC CONTEXT DECORATORS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    @logWithSemantics({ 
+        domain: 'USER', 
+        operation: 'WRITE', 
+        businessKey: 'user-profile-update',
+        tags: ['profile', 'sensitive'] 
+    })
+    public async updateUserProfile(userId: Readonly<number>, updates: Readonly<Partial<IUser>>): Promise<IUser> {
+        await this._delay(150)
+        return { id: userId, name: 'Updated User', email: 'updated@example.com', age: 30, ...updates }
+    }
+
+    @logWithSemantics({ 
+        domain: 'PRODUCT', 
+        operation: 'READ', 
+        tags: ['inventory', 'catalog'] 
+    })
+    public async searchProducts(
+        query: Readonly<string>, 
+        category?: Readonly<string>
+    ): Promise<readonly IProduct[]> {
+        await this._delay(100)
+        return [
+            { 
+                id: 'prod-search-1', 
+                name: `Found: ${query}`, 
+                price: 99.99, 
+                category: category ?? 'General' 
+            }
+        ]
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🚨 ANOMALY DETECTION DECORATORS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    @logWithAnomalyDetection({ 
+        thresholdMultiplier: 2.0, 
+        enableCriticalAlerts: true,
+        customMethodKey: 'critical-data-processing'
+    })
+    public async processCriticalData(data: readonly unknown[]): Promise<number> {
+        // Simulate variable performance to trigger anomaly detection
+        const processingTime = Math.random() > 0.7 ? 500 : 100
+        await this._delay(processingTime)
+        
+        return data.length * 42
+    }
+
+    @logWithAnomalyDetection({ minSamples: 3, thresholdMultiplier: 1.5 })
+    public async performanceTestMethod(iterations: Readonly<number>): Promise<string> {
+        // Variable performance for anomaly testing
+        const randomDelay = Math.floor(Math.random() * 300) + 50
+        await this._delay(randomDelay)
+        
+        const iterationsStr = String(iterations)
+        const delayStr = String(randomDelay)
+        return `Processed ${iterationsStr} iterations in ${delayStr}ms`
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🌍 ENVIRONMENT-SPECIFIC DECORATORS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    @logForProduction()
+    public async productionApiCall(
+        endpoint: Readonly<string>, payload: Readonly<Record<string, unknown>>
+    ): Promise<unknown> {
+        await this._delay(200)
+        return { status: 'success', endpoint, payloadSize: Object.keys(payload).length }
+    }
+
+    @logForDevelopment()
+    public async developmentDebugMethod(debugInfo: Readonly<Record<string, unknown>>): Promise<void> {
+        await this._delay(100)
+        logger.debug('Development debugging info processed', debugInfo)
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🏢 DOMAIN-SPECIFIC DECORATORS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    @logFinancialOperation({ 
+        operation: 'WRITE', 
+        businessKey: 'payment-processing',
+        userId: 'financial-user-789'
+    })
+    public async processPayment(
+        amount: Readonly<number>, 
+        currency: Readonly<'USD' | 'EUR' | 'GBP'>
+    ): Promise<ITransaction> {
+        await this._delay(300) // Financial operations are typically slower
+        
+        const timestamp = Date.now()
+        const timestampStr = String(timestamp)
+        const transaction: ITransaction = {
+            id: `txn-${timestampStr}`,
+            orderId: `order-${timestampStr}`,
+            amount,
+            currency,
+            type: 'payment',
+            status: 'completed',
+            timestamp: new Date()
+        }
+        
+        this._transactions.push(transaction)
+        return transaction
+    }
+
+    @logUserOperation({ 
+        operation: 'UPDATE', 
+        userId: 'user-456',
+        includeUserData: false // Privacy protection
+    })
+    public async updateUserPreferences(
+        userId: Readonly<number>, preferences: Readonly<Record<string, unknown>>
+    ): Promise<boolean> {
+        await this._delay(120)
+        return Object.keys(preferences).length > 0
+    }
+
+    @logOrderOperation({ 
+        operation: 'WRITE', 
+        orderId: 'order-123',
+        userId: 'customer-789'
+    })
+    public async createOrder(userId: Readonly<number>, products: ReadonlyDeep<IProduct[]>): Promise<IOrder> {
+        await this._delay(250)
+        
+        const total = products.reduce((sum, p) => sum + p.price, 0)
+        const order: IOrder = {
+            id: `order-${String(Date.now())}`,
+            userId,
+            products,
+            total,
+            status: 'pending',
+            createdAt: new Date()
+        }
+        
+        this._orders.push(order)
+        return order
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // ⚡ PERFORMANCE-CRITICAL DECORATORS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    @logHighPerformance()
+    public highFrequencyOperation(data: readonly number[]): number {
+        // Minimal logging for performance-critical code
+        return data.reduce((sum, n) => sum + n, 0)
+    }
+
+    @logComprehensive({ 
+        domain: 'SYSTEM', 
+        operation: 'COMPUTE',
+        businessKey: 'comprehensive-analysis'
+    })
+    public async comprehensiveAnalysis(input: Readonly<Record<string, unknown>>): Promise<Record<string, unknown>> {
+        await this._delay(180)
+        
+        return {
+            inputKeys: Object.keys(input),
+            analysisTimestamp: new Date().toISOString(),
+            processingMetrics: {
+                complexity: 'HIGH',
+                confidence: 0.95,
+                recommendations: ['optimize', 'monitor', 'scale']
+            }
+        }
+    }
+
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 📊 GETTER METHODS FOR DEMO
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    public getOrderCount(): number {
+        return this._orders.length
+    }
+
+    public getTransactionCount(): number {
+        return this._transactions.length
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🛠️ HELPER METHODS
     // ═══════════════════════════════════════════════════════════════════════════════
 
     private async _delay(ms: Readonly<number>): Promise<void> {

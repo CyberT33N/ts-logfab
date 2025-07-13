@@ -9,37 +9,377 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
+██              🎯 ENHANCED DECORATOR LOGGING - ENTERPRISE EDITION           ██
+██          CORRELATION • SEMANTIC CONTEXT • ANOMALY DETECTION              ██
+██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ==== Imports ====
-import type { ReadonlyDeep } from 'type-fest'
-import { logger } from './logger-factory.ts'
-import type { ILogContext, IPerformanceMetrics } from './types.ts'
+import { randomUUID } from 'crypto'
+import { ReadonlyDeep } from 'type-fest'
+import { 
+    getCurrentCorrelationContext, 
+    createCorrelationContext, 
+    type ICorrelationContext 
+} from './correlation-context.ts'
+import { createHybridLogger, getCurrentLoggingFormat, isStructuredLoggingEnabled } from './hybrid-logger.ts'
+import { getLogger, startPerformanceTracking, endPerformanceTracking } from './logger-factory.ts'
+import { detectSemanticContext, type ISemanticContext } from './semantic-detector.ts'
+import { type ILogContext, type IPerformanceMetrics } from './types.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED LOGGING INTERFACES
+// ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 Creates a contextual prefix for decorator-based logging
- * @param className - The name of the class
- * @param methodName - The name of the method
- * @param args - The arguments of the method
- * @returns The contextual prefix
+ * 🎯 **Enhanced Log Context with Correlation and Semantic Data**
+ */
+export interface IEnhancedLogContext extends ILogContext {
+    readonly correlation?: ICorrelationContext
+    readonly semantic?: ISemanticContext
+    readonly performance?: IPerformanceMetrics
+    readonly anomalyDetection?: boolean
+}
+
+/**
+ * 🎯 **Decorator Logging Configuration**
+ */
+export interface IDecoratorLoggingConfig {
+    readonly enableCorrelation: boolean
+    readonly enableSemanticDetection: boolean
+    readonly enableAnomalyDetection: boolean
+    readonly enablePerformanceTracking: boolean
+    readonly useHybridLogger: boolean
+    readonly logLevel: 'debug' | 'info' | 'warn' | 'error'
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 DEFAULT CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const DEFAULT_DECORATOR_CONFIG: IDecoratorLoggingConfig = {
+    enableCorrelation: true,
+    enableSemanticDetection: true,
+    enableAnomalyDetection: true,
+    enablePerformanceTracking: true,
+    useHybridLogger: true,
+    logLevel: 'info'
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED LOGGING FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Create enhanced context for decorator logging**
+ * 
+ * Automatically adds correlation and semantic context
+ */
+function createEnhancedContext(
+    className: string,
+    methodName: string,
+    args: ReadonlyDeep<unknown[]>,
+    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
+): IEnhancedLogContext {
+    const baseContext: ILogContext = {
+        className,
+        methodName,
+        methodSignature: `${className}.${methodName}`,
+        operationId: randomUUID(),
+        args: Array.isArray(args) ? args.reduce<Record<string, unknown>>(
+            (acc: ReadonlyDeep<Record<string, unknown>>, arg: unknown, index: number) => {
+                acc[`arg${String(index)}`] = arg
+                return acc
+            }, {}) : {}
+    }
+
+    // Add correlation context if enabled
+    let correlation: ICorrelationContext | undefined
+    if (config.enableCorrelation) {
+        correlation = getCurrentCorrelationContext()
+        correlation ??= createCorrelationContext({
+            requestId: randomUUID(),
+            metadata: {
+                className,
+                methodName,
+                origin: 'decorator'
+            }
+        })
+    }
+
+    // Add semantic context if enabled
+    let semantic: ISemanticContext | undefined
+    if (config.enableSemanticDetection) {
+        semantic = detectSemanticContext(methodName, args)
+    }
+
+    return {
+        ...baseContext,
+        correlation,
+        semantic,
+        anomalyDetection: config.enableAnomalyDetection
+    }
+}
+
+/**
+ * 🎯 **Creates a contextual prefix for enhanced decorator-based logging**
+ */
+export function createEnhancedDecoratorPrefix(
+    className: string,
+    methodName: string,
+    context: ReadonlyDeep<IEnhancedLogContext>
+): string {
+    const parts = [className, methodName]
+    
+    // Add semantic context indicators
+    if (context.semantic) {
+        const semanticIcon = getSemanticIcon(context.semantic)
+        parts.push(semanticIcon)
+    }
+    
+    // Add correlation info in structured format
+    if (context.correlation && isStructuredLoggingEnabled()) {
+        parts.push(`[${context.correlation.correlationId.slice(0, 8)}]`)
+    }
+    
+    return parts.join('::')
+}
+
+/**
+ * 🎯 **Get semantic context icon**
+ */
+function getSemanticIcon(semantic: ReadonlyDeep<ISemanticContext>): string {
+    const domainIcons = {
+        USER: '👤',
+        ORDER: '📦', 
+        PRODUCT: '🛍️',
+        FINANCE: '💰',
+        SYSTEM: '⚙️',
+        AUTH: '🔐',
+        NOTIFICATION: '🔔',
+        ANALYTICS: '📊',
+        INTEGRATION: '🔗',
+        GENERAL: '📄'
+    }
+    
+    const operationIcons = {
+        read: '📖',
+        WRITE: '✏️',
+        UPDATE: '🔄',
+        DELETE: '🗑️',
+        COMPUTE: '🧮',
+        VALIDATE: '✅',
+        TRANSFORM: '🔄',
+        SEARCH: '🔍',
+        AGGREGATE: '📊',
+        UNKNOWN: '❓'
+    }
+    
+    const domainIcon = domainIcons[semantic.domain]
+    const operationKey = semantic.operation.toLowerCase() as keyof typeof operationIcons
+    const operationIcon = operationIcons[operationKey]
+    
+    return `${domainIcon || '📄'}${operationIcon || '❓'}`
+}
+
+/**
+ * 🎯 **Enhanced method start logging with correlation and semantic context**
+ */
+export function logEnhancedMethodStart(
+    className: string,
+    methodName: string,
+    args: ReadonlyDeep<unknown[]> = [],
+    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
+): { context: IEnhancedLogContext; performanceContext?: ReturnType<typeof startPerformanceTracking> } {
+    const context = createEnhancedContext(className, methodName, args, config)
+    const prefix = createEnhancedDecoratorPrefix(className, methodName, context)
+    
+    // Choose appropriate logger
+    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
+    
+    // Start performance tracking if enabled
+    let performanceContext: ReturnType<typeof startPerformanceTracking> | undefined
+    if (config.enablePerformanceTracking) {
+        performanceContext = startPerformanceTracking(`${className}.${methodName}`)
+    }
+    
+    // Log method start with enhanced context
+    logger.info({
+        decorator: {
+            phase: 'start',
+            className,
+            methodName,
+            prefix
+        },
+        correlation: context.correlation,
+        semantic: context.semantic,
+        performance: performanceContext ? {
+            startTime: performanceContext.startTime,
+            method: performanceContext.method
+        } : undefined,
+        anomalyDetection: {
+            enabled: config.enableAnomalyDetection,
+            tracking: config.enablePerformanceTracking
+        },
+        environment: {
+            loggingFormat: getCurrentLoggingFormat(),
+            structuredLogging: isStructuredLoggingEnabled()
+        },
+        args: context.args
+    }, `🚀 Enhanced Method: ${prefix} started`)
+    
+    return { context, performanceContext }
+}
+
+/**
+ * 🎯 **Enhanced method success logging with anomaly detection**
+ */
+export function logEnhancedMethodSuccess(
+    startResult: ReadonlyDeep<{ 
+        readonly context: IEnhancedLogContext; 
+        readonly performanceContext?: ReturnType<typeof startPerformanceTracking> 
+    }>,
+    result?: ReadonlyDeep<{ type: string; size?: number }>,
+    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
+): void {
+    const { context, performanceContext } = startResult
+    const prefix = createEnhancedDecoratorPrefix(context.className ?? '', context.methodName ?? '', context)
+    
+    // Choose appropriate logger
+    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
+    
+    // End performance tracking and anomaly detection if enabled
+    if (config.enablePerformanceTracking && performanceContext) {
+        endPerformanceTracking(performanceContext, true, logger)
+    }
+    
+    // Log success with enhanced context
+    logger.info({
+        decorator: {
+            phase: 'success',
+            className: context.className,
+            methodName: context.methodName,
+            prefix
+        },
+        correlation: context.correlation,
+        semantic: context.semantic,
+        result: result ? {
+            type: result.type,
+            size: result.size,
+            complexity: context.semantic?.complexity
+        } : undefined,
+        performance: performanceContext ? {
+            method: performanceContext.method,
+            completed: true
+        } : undefined
+    }, `✅ Enhanced Method: ${prefix} completed successfully`)
+}
+
+/**
+ * 🎯 **Enhanced method error logging with correlation and anomaly context**
+ */
+export function logEnhancedMethodError(
+    startResult: ReadonlyDeep<{ 
+        readonly context: IEnhancedLogContext; 
+        readonly performanceContext?: ReturnType<typeof startPerformanceTracking> 
+    }>,
+    error: ReadonlyDeep<Error>,
+    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
+): void {
+    const { context, performanceContext } = startResult
+    const prefix = createEnhancedDecoratorPrefix(context.className ?? '', context.methodName ?? '', context)
+    
+    // Choose appropriate logger
+    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
+    
+    // End performance tracking with error flag if enabled
+    if (config.enablePerformanceTracking && performanceContext) {
+        endPerformanceTracking(performanceContext, false, logger)
+    }
+    
+    // Log error with enhanced context and potential anomaly information
+    logger.error({
+        decorator: {
+            phase: 'error',
+            className: context.className,
+            methodName: context.methodName,
+            prefix
+        },
+        correlation: context.correlation,
+        semantic: context.semantic,
+        error: {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            type: 'method_execution_error'
+        },
+        performance: performanceContext ? {
+            method: performanceContext.method,
+            failed: true
+        } : undefined,
+        anomalyContext: {
+            errorOccurred: true,
+            potentialAnomaly: config.enableAnomalyDetection,
+            semanticContext: context.semantic
+        }
+    }, `❌ Enhanced Method: ${prefix} failed with error: ${error.message}`)
+}
+
+/**
+ * 🎯 **Enhanced debug logging with semantic context**
+ */
+export function logEnhancedMethodDebug(
+    context: ReadonlyDeep<IEnhancedLogContext>,
+    message: string,
+    data?: ReadonlyDeep<Record<string, unknown>>,
+    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
+): void {
+    const prefix = createEnhancedDecoratorPrefix(context.className ?? '', context.methodName ?? '', context)
+    
+    // Choose appropriate logger
+    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
+    
+    logger.debug({
+        decorator: {
+            phase: 'debug',
+            className: context.className,
+            methodName: context.methodName,
+            prefix
+        },
+        correlation: context.correlation,
+        semantic: context.semantic,
+        debug: {
+            message,
+            data,
+            timestamp: Date.now()
+        }
+    }, `🔍 Enhanced Debug: ${prefix} - ${message}`)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 BACKWARD COMPATIBILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Legacy prefix creation (backward compatibility)**
  */
 export function createDecoratorPrefix(
     className: string,
     methodName: string,
-    args?: Readonly<Record<string, unknown>>
+    args?: ReadonlyDeep<Record<string, unknown>>
 ): string {
     const parts = [className, methodName]
     
     if (args && Object.keys(args).length > 0) {
         const argStrings = Object.entries(args)
-            .filter(([, value]: Readonly<[string, unknown]>) => 
+            .filter(([, value]: readonly [string, unknown]) => 
                 typeof value === 'string' || 
                 typeof value === 'number' || 
                 typeof value === 'boolean'
             )
-            .map(([key, value]: Readonly<[string, unknown]>) => `${key}=${String(value)}`)
+            .map(([key, value]: readonly [string, unknown]) => `${key}=${String(value)}`)
             .slice(0, 3) // Limit to 3 most relevant args
         
         if (argStrings.length > 0) {
@@ -51,16 +391,14 @@ export function createDecoratorPrefix(
 }
 
 /**
- * 🎯 Logs method start with beautiful formatting
- * @param prefix - The prefix of the method
- * @param context - The context of the method
- * @param performance - The performance metrics of the method
+ * 🎯 **Legacy method start logging (backward compatibility)**
  */
 export function logMethodStart(
     prefix: string,
     context?: ReadonlyDeep<ILogContext>,
     performance?: ReadonlyDeep<IPerformanceMetrics>
 ): void {
+    const logger = getLogger()
     logger.info({
         prefix,
         ...context,
@@ -70,18 +408,15 @@ export function logMethodStart(
 }
 
 /**
- * 🎯 Logs method success with performance metrics
- * @param prefix - The prefix of the method
- * @param duration - The duration of the method
- * @param context - The context of the method
- * @param result - The result of the method
+ * 🎯 **Legacy method success logging (backward compatibility)**
  */
 export function logMethodSuccess(
     prefix: string,
     duration: number,
     context?: ReadonlyDeep<ILogContext>,
-    result?: Readonly<{ type: string; size?: number }>
+    result?: ReadonlyDeep<{ type: string; size?: number }>
 ): void {
+    const logger = getLogger()
     logger.info({
         prefix,
         ...context,
@@ -92,18 +427,15 @@ export function logMethodSuccess(
 }
 
 /**
- * 🎯 Logs method error with detailed context
- * @param prefix - The prefix of the method
- * @param error - The error of the method
- * @param duration - The duration of the method
- * @param context - The context of the method
+ * 🎯 **Legacy method error logging (backward compatibility)**
  */
 export function logMethodError(
     prefix: string,
-    error: Readonly<Error>,
+    error: ReadonlyDeep<Error>,
     duration: number,
     context?: ReadonlyDeep<ILogContext>
 ): void {
+    const logger = getLogger()
     logger.error({
         prefix,
         ...context,
@@ -118,19 +450,40 @@ export function logMethodError(
 }
 
 /**
- * 🎯 Logs method debug information
- * @param prefix - The prefix of the method
- * @param message - The message of the method
- * @param data - The data of the method
+ * 🎯 **Legacy debug logging (backward compatibility)**
  */
 export function logMethodDebug(
     prefix: string,
     message: string,
-    data?: Readonly<Record<string, unknown>>
+    data?: ReadonlyDeep<Record<string, unknown>>
 ): void {
+    const logger = getLogger()
     logger.debug({
         prefix,
         ...data,
         msg: `🔍 ${message}`
     })
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 CONFIGURATION MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Create decorator logging configuration**
+ */
+export function createDecoratorLoggingConfig(
+    overrides: ReadonlyDeep<Partial<IDecoratorLoggingConfig>> = {}
+): IDecoratorLoggingConfig {
+    return {
+        ...DEFAULT_DECORATOR_CONFIG,
+        ...overrides
+    }
+}
+
+/**
+ * 🎯 **Get default decorator logging configuration**
+ */
+export function getDefaultDecoratorConfig(): IDecoratorLoggingConfig {
+    return { ...DEFAULT_DECORATOR_CONFIG }
 } 

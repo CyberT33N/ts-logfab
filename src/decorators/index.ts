@@ -120,6 +120,154 @@ export interface ILogDecoratorConfig {
          */
         readonly fullSignature?: string
     }
+    
+    // ==== 🚀 ENHANCED FEATURES (NEW) ====
+    
+    /**
+     * 🔗 **CORRELATION CONTEXT CONFIG** - Automatic correlation ID management
+     */
+    readonly correlationContext?: {
+        /**
+         * 📝 Enable automatic correlation context injection
+         * @default true
+         */
+        readonly enabled?: boolean
+        
+        /**
+         * 🆔 Custom correlation ID override
+         * @example 'user-session-123'
+         */
+        readonly correlationId?: string
+        
+        /**
+         * 🔗 Custom workflow ID override
+         * @example 'checkout-process'
+         */
+        readonly workflowId?: string
+        
+        /**
+         * 📨 Custom request ID override
+         * @example 'req-456'
+         */
+        readonly requestId?: string
+        
+        /**
+         * 👤 Custom user ID override
+         * @example 'user-789'
+         */
+        readonly userId?: string
+        
+        /**
+         * 🔄 Inherit correlation context from parent
+         * @default true
+         */
+        readonly inheritFromParent?: boolean
+    }
+    
+    /**
+     * 🎯 **SEMANTIC CONTEXT CONFIG** - Business domain and operation detection
+     */
+    readonly semanticContext?: {
+        /**
+         * 📝 Enable semantic context detection
+         * @default true
+         */
+        readonly enabled?: boolean
+        
+        /**
+         * 🏢 Manual domain override
+         * @example 'USER'
+         */
+        readonly domain?: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL'
+        
+        /**
+         * ⚙️ Manual operation override
+         * @example 'WRITE'
+         */
+        readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'COMPUTE' | 'UNKNOWN'
+        
+        /**
+         * 🎚️ Manual complexity override
+         * @example 'HIGH'
+         */
+        readonly complexity?: 'LOW' | 'MEDIUM' | 'HIGH'
+        
+        /**
+         * 🔑 Business key for tracking
+         * @example 'order-12345'
+         */
+        readonly businessKey?: string
+        
+        /**
+         * 🏷️ Custom tags for categorization
+         * @example ['payment', 'critical']
+         */
+        readonly tags?: readonly string[]
+    }
+    
+    /**
+     * 🚨 **ANOMALY DETECTION CONFIG** - Performance anomaly monitoring
+     */
+    readonly anomalyDetection?: {
+        /**
+         * 📝 Enable anomaly detection for this method
+         * @default true
+         */
+        readonly enabled?: boolean
+        
+        /**
+         * 📊 Custom baseline samples count override
+         * @default 10
+         */
+        readonly minSamples?: number
+        
+        /**
+         * 🎚️ Custom threshold multiplier override
+         * @default 2.5
+         */
+        readonly thresholdMultiplier?: number
+        
+        /**
+         * 🚨 Enable critical anomaly alerts
+         * @default true
+         */
+        readonly enableCriticalAlerts?: boolean
+        
+        /**
+         * ⚠️ Enable warning anomaly alerts
+         * @default true
+         */
+        readonly enableWarningAlerts?: boolean
+        
+        /**
+         * 📝 Custom method key for anomaly tracking
+         * @example 'UserService::createUser'
+         */
+        readonly customMethodKey?: string
+    }
+    
+    /**
+     * 🌍 **ENVIRONMENT CONFIG** - Environment-specific behavior
+     */
+    readonly environment?: {
+        /**
+         * 📝 Override auto-detected environment
+         * @example 'production'
+         */
+        readonly forceEnvironment?: 'development' | 'staging' | 'production' | 'test'
+        
+        /**
+         * 🎨 Override auto-detected logging format
+         * @example 'machine'
+         */
+        readonly forceFormat?: 'human' | 'machine' | 'auto'
+        
+        /**
+         * 🔇 Disable logging entirely in certain environments
+         * @default []
+         */
+        readonly disableInEnvironments?: readonly ('development' | 'staging' | 'production' | 'test')[]
+    }
 }
 
 /**
@@ -132,7 +280,22 @@ const DEFAULT_LOG_CONFIG: Required<Omit<ILogDecoratorConfig, 'customContext' | '
     includeResult: true,
     logSuccess: true,
     logStart: true,
-    logDebug: false
+    logDebug: false,
+    correlationContext: {
+        enabled: true,
+        inheritFromParent: true
+    },
+    semanticContext: {
+        enabled: true
+    },
+    anomalyDetection: {
+        enabled: true,
+        enableCriticalAlerts: true,
+        enableWarningAlerts: true
+    },
+    environment: {
+        disableInEnvironments: []
+    }
 } as const
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -576,4 +739,252 @@ export const logErrorsOnly = (): MethodDecorator => log({
     includeArgs: true,
     includeResult: false,
     logDebug: true
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 ENHANCED DECORATOR VARIANTS (NEW)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🔗 **CORRELATION LOG DECORATOR**
+ * Automatic correlation context tracking with enhanced ID management
+ */
+export const logWithCorrelation = (options?: {
+    readonly correlationId?: string
+    readonly workflowId?: string
+    readonly requestId?: string
+    readonly userId?: string
+}): MethodDecorator => log({
+    level: 'info',
+    includePerformance: true,
+    correlationContext: {
+        enabled: true,
+        inheritFromParent: true,
+        ...options
+    },
+    customContext: { focus: 'correlation-tracking' }
+})
+
+/**
+ * 🎯 **SEMANTIC LOG DECORATOR**
+ * Business context and domain-specific logging
+ */
+export const logWithSemantics = (options?: {
+    readonly domain?: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL'
+    readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'COMPUTE' | 'UNKNOWN'
+    readonly businessKey?: string
+    readonly tags?: readonly string[]
+}): MethodDecorator => log({
+    level: 'info',
+    includePerformance: true,
+    semanticContext: {
+        enabled: true,
+        ...options
+    },
+    customContext: { focus: 'semantic-analysis' }
+})
+
+/**
+ * 🚨 **ANOMALY DETECTION LOG DECORATOR**
+ * Enhanced performance monitoring with anomaly detection
+ */
+export const logWithAnomalyDetection = (options?: {
+    readonly minSamples?: number
+    readonly thresholdMultiplier?: number
+    readonly enableCriticalAlerts?: boolean
+    readonly customMethodKey?: string
+}): MethodDecorator => log({
+    level: 'info',
+    includePerformance: true,
+    anomalyDetection: {
+        enabled: true,
+        enableWarningAlerts: true,
+        ...options
+    },
+    customContext: { focus: 'anomaly-monitoring' }
+})
+
+/**
+ * 🌍 **PRODUCTION LOG DECORATOR**
+ * Production-optimized logging with minimal output
+ */
+export const logForProduction = (): MethodDecorator => log({
+    level: 'info',
+    includeArgs: false,
+    includeResult: false,
+    logDebug: false,
+    environment: {
+        forceFormat: 'machine',
+        disableInEnvironments: ['test']
+    },
+    correlationContext: { enabled: true },
+    anomalyDetection: { enabled: true },
+    customContext: { environment: 'production-optimized' }
+})
+
+/**
+ * 🛠️ **DEVELOPMENT LOG DECORATOR**
+ * Development-optimized logging with detailed output
+ */
+export const logForDevelopment = (): MethodDecorator => log({
+    level: 'debug',
+    includeArgs: true,
+    includeResult: true,
+    logDebug: true,
+    environment: {
+        forceFormat: 'human',
+        forceEnvironment: 'development'
+    },
+    correlationContext: { enabled: true },
+    semanticContext: { enabled: true },
+    anomalyDetection: { enabled: false },
+    customContext: { environment: 'development-verbose' }
+})
+
+/**
+ * 💰 **FINANCIAL OPERATION LOG DECORATOR**
+ * Specialized for financial domain operations
+ */
+export const logFinancialOperation = (options?: {
+    readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'COMPUTE'
+    readonly businessKey?: string
+    readonly userId?: string
+}): MethodDecorator => log({
+    level: 'info',
+    includePerformance: true,
+    includeArgs: false, // Privacy for financial data
+    includeResult: false, // Privacy for financial data
+    correlationContext: {
+        enabled: true,
+        userId: options?.userId
+    },
+    semanticContext: {
+        enabled: true,
+        domain: 'FINANCE',
+        operation: options?.operation ?? 'COMPUTE',
+        businessKey: options?.businessKey,
+        tags: ['financial', 'privacy-sensitive']
+    },
+    anomalyDetection: {
+        enabled: true,
+        enableCriticalAlerts: true,
+        thresholdMultiplier: 1.5 // Stricter for financial operations
+    },
+    customContext: { domain: 'financial', sensitivity: 'high' }
+})
+
+/**
+ * 👤 **USER OPERATION LOG DECORATOR**
+ * Specialized for user domain operations
+ */
+export const logUserOperation = (options?: {
+    readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE'
+    readonly userId?: string
+    readonly includeUserData?: boolean
+}): MethodDecorator => {
+    const includeUserData = options?.includeUserData ?? false
+    return log({
+        level: 'info',
+        includePerformance: true,
+        includeArgs: includeUserData,
+        includeResult: includeUserData,
+        correlationContext: {
+            enabled: true,
+            userId: options?.userId
+        },
+        semanticContext: {
+            enabled: true,
+            domain: 'USER',
+            operation: options?.operation ?? 'READ',
+            tags: ['user-management']
+        },
+        anomalyDetection: { enabled: true },
+        customContext: { domain: 'user', privacy: includeUserData ? 'normal' : 'enhanced' }
+    })
+}
+
+/**
+ * 📦 **ORDER OPERATION LOG DECORATOR**
+ * Specialized for order/commerce domain operations
+ */
+export const logOrderOperation = (options?: {
+    readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE'
+    readonly orderId?: string
+    readonly userId?: string
+}): MethodDecorator => log({
+    level: 'info',
+    includePerformance: true,
+    includeArgs: true,
+    includeResult: true,
+    correlationContext: {
+        enabled: true,
+        userId: options?.userId,
+        workflowId: 'order-processing'
+    },
+    semanticContext: {
+        enabled: true,
+        domain: 'ORDER',
+        operation: options?.operation ?? 'WRITE',
+        businessKey: options?.orderId,
+        tags: ['commerce', 'order-management']
+    },
+    anomalyDetection: {
+        enabled: true,
+        enableCriticalAlerts: true
+    },
+    customContext: { domain: 'commerce', workflow: 'order-processing' }
+})
+
+/**
+ * ⚡ **HIGH-PERFORMANCE LOG DECORATOR**
+ * Minimal logging for performance-critical operations
+ */
+export const logHighPerformance = (): MethodDecorator => log({
+    level: 'warn', // Only log warnings and errors
+    includeArgs: false,
+    includeResult: false,
+    logStart: false,
+    logSuccess: false,
+    logDebug: false,
+    correlationContext: { enabled: true },
+    anomalyDetection: {
+        enabled: true,
+        enableCriticalAlerts: true,
+        enableWarningAlerts: false
+    },
+    customContext: { mode: 'high-performance', verbosity: 'minimal' }
+})
+
+/**
+ * 🔍 **COMPREHENSIVE LOG DECORATOR**
+ * Maximum logging with all enhanced features enabled
+ */
+export const logComprehensive = (options?: {
+    readonly domain?: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL'
+    readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'COMPUTE' | 'UNKNOWN'
+    readonly userId?: string
+    readonly businessKey?: string
+}): MethodDecorator => log({
+    level: 'debug',
+    includePerformance: true,
+    includeArgs: true,
+    includeResult: true,
+    logDebug: true,
+    correlationContext: {
+        enabled: true,
+        userId: options?.userId
+    },
+    semanticContext: {
+        enabled: true,
+        domain: options?.domain ?? 'GENERAL',
+        operation: options?.operation ?? 'UNKNOWN',
+        businessKey: options?.businessKey,
+        tags: ['comprehensive-logging']
+    },
+    anomalyDetection: {
+        enabled: true,
+        enableCriticalAlerts: true,
+        enableWarningAlerts: true
+    },
+    customContext: { mode: 'comprehensive', verbosity: 'maximum' }
 })

@@ -23,7 +23,19 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import CliTable from 'cli-table3'
 import type { ReadonlyDeep } from 'type-fest'
-import { TERMINAL_COLORS } from './colors.ts'
+import type { IAnomalyDetection } from '../logger/anomaly-detector.ts'
+import type { IPerformanceBaseline } from '../logger/performance-utils.ts'
+import type { ISemanticContext } from '../logger/semantic-detector.ts'
+import { 
+    TERMINAL_COLORS, 
+    PERFORMANCE_COLORS,
+    ANOMALY_COLORS,
+    CONTEXT_COLORS,
+    getOperationColor,
+    getPerformanceColor,
+    getAnomalyColor,
+    getSemanticColors
+} from './colors.ts'
 import { analyzeArgumentType } from './type-analysis.ts'
 import { analyzeResultValue, getMetadataIcon, intelligentTruncate } from './utility-functions.ts'
 
@@ -38,11 +50,60 @@ const CLI_TABLE_TYPED = CliTable as CliTableConstructor
 // Re-export CliTable for convenience
 export { CliTable }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED TABLE OUTPUT INTERFACES & TYPES
+// ═══════════════════════════════════════════════════════════════════════════════
+
 /**
-* 🎨 DYNAMIC BORDER COLOR - LEVEL-SPECIFIC COLORS
-* @param level - The level of the log message
-* @returns The color function for the level
-*/
+ * 🔗 **Enhanced Context Data for Tables**
+ * 
+ * Extended context information for enhanced table displays
+ */
+export interface IEnhancedTableContext {
+    readonly correlationId?: string
+    readonly workflowId?: string
+    readonly requestId?: string
+    readonly sessionId?: string
+    readonly userId?: string
+    readonly semantic?: ISemanticContext
+    readonly performance?: {
+        readonly duration: number
+        readonly memoryDelta: number
+        readonly baseline?: IPerformanceBaseline
+    }
+    readonly anomalies?: readonly IAnomalyDetection[]
+    readonly thresholdViolations?: readonly string[]
+}
+
+/**
+ * 🎯 **Enhanced Table Configuration**
+ * 
+ * Extended table configuration with semantic context support
+ */
+export interface IEnhancedTableConfig {
+    readonly showCorrelationContext: boolean
+    readonly showSemanticContext: boolean
+    readonly showPerformanceIndicators: boolean
+    readonly showAnomalyWarnings: boolean
+    readonly compactMode: boolean
+}
+
+/**
+ * 🎯 **Default Enhanced Table Configuration**
+ */
+export const DEFAULT_ENHANCED_TABLE_CONFIG: IEnhancedTableConfig = {
+    showCorrelationContext: true,
+    showSemanticContext: true,
+    showPerformanceIndicators: true,
+    showAnomalyWarnings: true,
+    compactMode: false
+} as const
+
+/**
+ * 🎨 DYNAMIC BORDER COLOR - LEVEL-SPECIFIC COLORS
+ * @param level - The level of the log message
+ * @returns The color function for the level
+ */
 const getLevelColor = (level: string): (text: string) => string => {
     const levelConfig = {
         'INFO': TERMINAL_COLORS.success,
@@ -61,10 +122,283 @@ const getLevelColor = (level: string): (text: string) => string => {
 
     return TERMINAL_COLORS.primary
 }
- 
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED CORRELATION CONTEXT TABLES
+// ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 Creates level-specific table configuration for CLI-Table3
+ * 🔗 **Creates Correlation Context Table**
+ * 
+ * @param context - The enhanced context data
+ * @returns The correlation context table
+ */
+export function createCorrelationContextTable(context: IEnhancedTableContext): string {
+    // Helper function to check if ID is valid
+    const isValidId = (id: string | undefined): id is string => {
+        return id !== undefined && id.trim() !== ''
+    }
+
+    const validIds = [
+        context.correlationId,
+        context.workflowId,
+        context.requestId,
+        context.sessionId,
+        context.userId
+    ].filter(isValidId)
+
+    if (validIds.length === 0) {
+        return ''
+    }
+
+    const table = new CLI_TABLE_TYPED({
+        chars: createTableChars(),
+        style: createTableStyle(),
+        colWidths: [35, 58] // Key, Value
+    })
+
+    // Header
+    table.push([
+        { 
+            colSpan: 2, 
+            content: CONTEXT_COLORS.correlationId('🔗 CORRELATION CONTEXT'), 
+            hAlign: 'center' 
+        }
+    ])
+
+    // Add context entries
+    const contextEntries: (readonly [string, string, typeof CONTEXT_COLORS[keyof typeof CONTEXT_COLORS]])[] = []
+    
+    if (isValidId(context.correlationId)) {
+        contextEntries.push(['CORRELATION ID', context.correlationId, CONTEXT_COLORS.correlationId] as const)
+    }
+    if (isValidId(context.workflowId)) {
+        contextEntries.push(['WORKFLOW ID', context.workflowId, CONTEXT_COLORS.workflowId] as const)
+    }
+    if (isValidId(context.requestId)) {
+        contextEntries.push(['REQUEST ID', context.requestId, CONTEXT_COLORS.requestId] as const)
+    }
+    if (isValidId(context.sessionId)) {
+        contextEntries.push(['SESSION ID', context.sessionId, CONTEXT_COLORS.sessionId] as const)
+    }
+    if (isValidId(context.userId)) {
+        contextEntries.push(['USER ID', context.userId, CONTEXT_COLORS.userId] as const)
+    }
+
+    for (const entry of contextEntries) {
+        const [label, value, color] = entry
+        table.push([
+            TERMINAL_COLORS.icon('🔑') + ' ' + TERMINAL_COLORS.accent(label),
+            color(intelligentTruncate(value, 50))
+        ])
+    }
+
+    return applyTableColors(table.toString(), CONTEXT_COLORS.correlationId)
+}
+
+/**
+ * 🏢 **Creates Semantic Context Table**
+ * 
+ * @param context - The enhanced context data
+ * @returns The semantic context table
+ */
+export function createSemanticContextTable(context: IEnhancedTableContext): string {
+    if (!context.semantic) {
+        return ''
+    }
+
+    const { semantic } = context
+    const colors = getSemanticColors(semantic)
+
+    const table = new CLI_TABLE_TYPED({
+        chars: createTableChars(),
+        style: createTableStyle(),
+        colWidths: [35, 58] // Key, Value
+    })
+
+    // Header
+    table.push([
+        { 
+            colSpan: 2, 
+            content: colors.domain('🏢 SEMANTIC CONTEXT'), 
+            hAlign: 'center' 
+        }
+    ])
+
+    // Domain
+    table.push([
+        TERMINAL_COLORS.icon('🏢') + ' ' + TERMINAL_COLORS.accent('DOMAIN'),
+        colors.domain(`${semantic.domain} Domain`)
+    ])
+
+    // Operation
+    table.push([
+        TERMINAL_COLORS.icon('⚡') + ' ' + TERMINAL_COLORS.accent('OPERATION'),
+        colors.operation(`${semantic.operation} Operation`)
+    ])
+
+    // Complexity (always present as it's a required field)
+    const complexityColor = semantic.complexity === 'HIGH' 
+        ? PERFORMANCE_COLORS.CRITICAL 
+        : semantic.complexity === 'MEDIUM' 
+            ? PERFORMANCE_COLORS.SLOW 
+            : PERFORMANCE_COLORS.FAST
+
+    table.push([
+        TERMINAL_COLORS.icon('🧮') + ' ' + TERMINAL_COLORS.accent('COMPLEXITY'),
+        complexityColor(`${semantic.complexity} Complexity`)
+    ])
+
+    return applyTableColors(table.toString(), colors.domain)
+}
+
+/**
+ * 🚀 **Creates Performance Indicators Table**
+ * 
+ * @param context - The enhanced context data
+ * @returns The performance indicators table
+ */
+export function createPerformanceIndicatorsTable(context: IEnhancedTableContext): string {
+    if (!context.performance) {
+        return ''
+    }
+
+    const { performance } = context
+    const performanceColor = getPerformanceColor(performance.duration)
+
+    const table = new CLI_TABLE_TYPED({
+        chars: createTableChars(),
+        style: createTableStyle(),
+        colWidths: [35, 58] // Key, Value
+    })
+
+    // Header
+    table.push([
+        { 
+            colSpan: 2, 
+            content: performanceColor('🚀 PERFORMANCE INDICATORS'), 
+            hAlign: 'center' 
+        }
+    ])
+
+    // Duration
+    table.push([
+        TERMINAL_COLORS.icon('⏱️') + ' ' + TERMINAL_COLORS.accent('DURATION'),
+        performanceColor(`${performance.duration.toFixed(2)}ms`)
+    ])
+
+    // Memory Delta
+    if (performance.memoryDelta !== 0) {
+        const memoryMB = (performance.memoryDelta / 1024 / 1024).toFixed(2)
+        const memoryColor = performance.memoryDelta > 0 
+            ? PERFORMANCE_COLORS.SLOW 
+            : PERFORMANCE_COLORS.FAST
+
+        table.push([
+            TERMINAL_COLORS.icon('💾') + ' ' + TERMINAL_COLORS.accent('MEMORY DELTA'),
+            memoryColor(`${memoryMB}MB`)
+        ])
+    }
+
+    // Baseline Comparison
+    if (performance.baseline) {
+        const baseline = performance.baseline
+        const comparisonRatio = performance.duration / baseline.averageDuration
+        const comparisonColor = comparisonRatio > 1.5 
+            ? PERFORMANCE_COLORS.CRITICAL 
+            : comparisonRatio > 1.2 
+                ? PERFORMANCE_COLORS.SLOW 
+                : PERFORMANCE_COLORS.FAST
+
+        const comparisonText = comparisonRatio > 1 
+            ? `${(comparisonRatio * 100 - 100).toFixed(1)}% slower than baseline`
+            : `${(100 - comparisonRatio * 100).toFixed(1)}% faster than baseline`
+
+        table.push([
+            TERMINAL_COLORS.icon('📊') + ' ' + TERMINAL_COLORS.accent('BASELINE'),
+            comparisonColor(comparisonText)
+        ])
+
+        table.push([
+            TERMINAL_COLORS.icon('🎯') + ' ' + TERMINAL_COLORS.accent('SAMPLES'),
+            TERMINAL_COLORS.text(`${String(baseline.sampleSize)} samples`)
+        ])
+    }
+
+    return applyTableColors(table.toString(), performanceColor)
+}
+
+/**
+ * 🚨 **Creates Anomaly Warnings Table**
+ * 
+ * @param context - The enhanced context data
+ * @returns The anomaly warnings table
+ */
+export function createAnomalyWarningsTable(context: IEnhancedTableContext): string {
+    const hasAnomalies = Boolean(context.anomalies && context.anomalies.length > 0)
+    const hasViolations = Boolean(context.thresholdViolations && context.thresholdViolations.length > 0)
+
+    if (!hasAnomalies && !hasViolations) {
+        return ''
+    }
+
+    const table = new CLI_TABLE_TYPED({
+        chars: createTableChars(),
+        style: createTableStyle(),
+        colWidths: [35, 58] // Key, Value
+    })
+
+    // Header
+    table.push([
+        { 
+            colSpan: 2, 
+            content: ANOMALY_COLORS.CRITICAL('🚨 ANOMALY WARNINGS'), 
+            hAlign: 'center' 
+        }
+    ])
+
+    // Anomalies
+    if (hasAnomalies && context.anomalies) {
+        context.anomalies.forEach((anomaly, index) => {
+            const severityColor = getAnomalyColor(anomaly.severity)
+            const typeColor = getOperationColor(anomaly.type)
+
+            table.push([
+                TERMINAL_COLORS.icon('⚠️') + ' ' + TERMINAL_COLORS.accent(`ANOMALY #${String(index + 1)}`),
+                severityColor(`[${anomaly.severity}] `) + typeColor(anomaly.type)
+            ])
+
+            table.push([
+                TERMINAL_COLORS.icon('🎯') + ' ' + TERMINAL_COLORS.accent('CONFIDENCE'),
+                TERMINAL_COLORS.text(`${String((anomaly.confidence * 100).toFixed(1))}%`)
+            ])
+
+            table.push([
+                TERMINAL_COLORS.icon('📈') + ' ' + TERMINAL_COLORS.accent('DEVIATION'),
+                TERMINAL_COLORS.text(`${String(anomaly.deviation.toFixed(2))}σ`)
+            ])
+        })
+    }
+
+    // Threshold Violations
+    if (hasViolations && context.thresholdViolations) {
+        context.thresholdViolations.forEach((violation, index) => {
+            const severityColor = violation.includes('CRITICAL') 
+                ? ANOMALY_COLORS.CRITICAL 
+                : ANOMALY_COLORS.MEDIUM
+
+            table.push([
+                TERMINAL_COLORS.icon('🚫') + ' ' + TERMINAL_COLORS.accent(`VIOLATION #${String(index + 1)}`),
+                severityColor(intelligentTruncate(violation, 45))
+            ])
+        })
+    }
+
+    return applyTableColors(table.toString(), ANOMALY_COLORS.CRITICAL)
+}
+
+/**
+ * 🎯 PROFESSIONAL CLI-TABLE3 CONFIGURATION WITH LEVEL-BASED STYLING
  * @param level - The level of the log message
  * @returns The table configuration
  */
@@ -454,4 +788,128 @@ export function createArgumentsTable(
     
     const tableOutput = table.toString()
     return applyTableColors(tableOutput, TERMINAL_COLORS.border)
+} 
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED DECORATOR TABLE WITH ALL NEW FEATURES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Creates Enhanced Decorator Table with all new features**
+ * 
+ * @param className - The class name
+ * @param method - The method name
+ * @param message - The log message
+ * @param level - The log level
+ * @param methodVisibility - Method visibility info
+ * @param decoratorHeader - The decorator header
+ * @param logObj - The log object
+ * @param enhancedContext - Enhanced context data
+ * @param config - Enhanced table configuration
+ * @returns Combined enhanced table output
+ */
+export function createEnhancedDecoratorTable(
+    className: string,
+    method: string,
+    message: string,
+    level: string,
+    methodVisibility: { readonly visibility: string; readonly icon: string },
+    decoratorHeader: string,
+    logObj: ReadonlyDeep<Record<string, unknown>>,
+    enhancedContext?: IEnhancedTableContext,
+    config: IEnhancedTableConfig = DEFAULT_ENHANCED_TABLE_CONFIG
+): string {
+    const tables: string[] = []
+
+    // Main decorator table (always shown)
+    tables.push(createDecoratorTable(
+        className, 
+        method, 
+        message, 
+        level, 
+        methodVisibility, 
+        decoratorHeader, 
+        logObj
+    ))
+
+    if (enhancedContext) {
+        // Correlation Context Table
+        if (config.showCorrelationContext) {
+            const correlationTable = createCorrelationContextTable(enhancedContext)
+            if (correlationTable) {
+                tables.push(correlationTable)
+            }
+        }
+
+        // Semantic Context Table
+        if (config.showSemanticContext) {
+            const semanticTable = createSemanticContextTable(enhancedContext)
+            if (semanticTable) {
+                tables.push(semanticTable)
+            }
+        }
+
+        // Performance Indicators Table
+        if (config.showPerformanceIndicators) {
+            const performanceTable = createPerformanceIndicatorsTable(enhancedContext)
+            if (performanceTable) {
+                tables.push(performanceTable)
+            }
+        }
+
+        // Anomaly Warnings Table
+        if (config.showAnomalyWarnings) {
+            const anomalyTable = createAnomalyWarningsTable(enhancedContext)
+            if (anomalyTable) {
+                tables.push(anomalyTable)
+            }
+        }
+    }
+
+    return tables.join('\n\n')
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 UTILITY FUNCTIONS FOR TABLE CREATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Creates standard table characters**
+ * @returns Standard table character configuration
+ */
+function createTableChars(): Record<string, string> {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    return {
+        'top': '═',
+        'top-mid': '╤',
+        'top-left': '╔',
+        'top-right': '╗',
+        'bottom': '═',
+        'bottom-mid': '╧',
+        'bottom-left': '╚',
+        'bottom-right': '╝',
+        'left': '║',
+        'left-mid': '╟',
+        'mid': '─',
+        'mid-mid': '┼',
+        'right': '║',
+        'right-mid': '╢',
+        'middle': '│'
+    }
+    /* eslint-enable @typescript-eslint/naming-convention */
+}
+
+/**
+ * 🎯 **Creates standard table style**
+ * @returns Standard table style configuration
+ */
+function createTableStyle(): Record<string, unknown> {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    return {
+        'padding-left': 1,
+        'padding-right': 1,
+        head: [],
+        border: []
+    }
+    /* eslint-enable @typescript-eslint/naming-convention */
 } 
