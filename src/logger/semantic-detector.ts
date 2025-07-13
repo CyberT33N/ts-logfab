@@ -538,9 +538,10 @@ function getComplexityAdjustment(complexity: ComplexityLevel): number {
 function detectEntityType(methodName: Readonly<string>): string | undefined {
     // Common entity patterns in method names
     const entityPatterns = [
-        /(?:get|create|update|delete|find|save|load)([A-Z][a-zA-Z]*)/,
+        /(?:get|create|update|delete|find|save|load|process|calculate)([A-Z][a-zA-Z]*)/,
         /([A-Z][a-zA-Z]*)(?:Service|Repository|Manager|Controller)$/,
-        /^([a-z]+)(?:By|With|For|From)/i
+        /^([a-z]+)(?:By|With|For|From)/i,
+        /^(?:process|calculate|find)([A-Z][a-zA-Z]+)/
     ]
 
     for (const pattern of entityPatterns) {
