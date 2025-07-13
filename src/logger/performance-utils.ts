@@ -26,7 +26,7 @@ import {
     type IAnomalyDetection,
     type IAnomalyConfig
 } from './anomaly-detector.ts'
-import type { ISemanticContext } from './semantic-detector.ts'
+import { detectSemanticContext, type ISemanticContext } from './semantic-detector.ts'
 import type { IPerformanceMetrics } from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -314,7 +314,7 @@ export function trackMethodPerformance(
     duration: number,
     memoryDelta = 0,
     success = true,
-    semantic?: ISemanticContext
+    semanticContext?: ISemanticContext
 ): {
     readonly anomalies: readonly IAnomalyDetection[]
     readonly baseline?: IPerformanceBaseline
@@ -323,6 +323,7 @@ export function trackMethodPerformance(
     let anomalies: readonly IAnomalyDetection[] = []
     let baseline: IPerformanceBaseline | undefined
     const thresholdViolations: string[] = []
+    const finalSemanticContext = semanticContext ?? detectSemanticContext(method, [])
 
     // Check threshold violations
     if (duration > enhancedPerformanceConfig.thresholds.slowMethodCritical) {
@@ -341,13 +342,13 @@ export function trackMethodPerformance(
 
     // Anomaly detection
     if (anomalyDetector && enhancedPerformanceConfig.anomalyDetection.enabled) {
-        const metric = createPerformanceMetric(method, duration, memoryDelta, success, semantic)
+        const metric = createPerformanceMetric(method, duration, memoryDelta, success, finalSemanticContext)
         anomalies = anomalyDetector.addMetricAndDetect(metric)
     }
 
     // Baseline tracking
     if (enhancedPerformanceConfig.baseline.trackingEnabled) {
-        baseline = updatePerformanceBaseline(method, duration, memoryDelta, semantic)
+        baseline = updatePerformanceBaseline(method, duration, memoryDelta, finalSemanticContext)
     }
 
     // Logging
@@ -387,6 +388,7 @@ function updatePerformanceBaseline(
 ): IPerformanceBaseline {
     const existing = performanceBaselines.get(method)
     const timestamp = Date.now()
+    const validMemoryDelta = Math.max(0, memory) // Ensure memory delta is not negative for averaging
 
     if (!existing) {
         const newBaseline: IPerformanceBaseline = {
@@ -394,7 +396,7 @@ function updatePerformanceBaseline(
             averageDuration: duration,
             medianDuration: duration,
             p95Duration: duration,
-            averageMemory: memory,
+            averageMemory: validMemoryDelta,
             sampleSize: 1,
             lastUpdated: timestamp,
             semantic
@@ -412,7 +414,7 @@ function updatePerformanceBaseline(
         averageDuration: existing.averageDuration + alpha * (duration - existing.averageDuration),
         medianDuration: existing.medianDuration, // Keep existing for now (complex to update incrementally)
         p95Duration: Math.max(existing.p95Duration, duration), // Simplified P95 approximation
-        averageMemory: existing.averageMemory + alpha * (memory - existing.averageMemory),
+        averageMemory: existing.averageMemory + alpha * (validMemoryDelta - existing.averageMemory),
         sampleSize: newSampleSize,
         lastUpdated: timestamp,
         semantic: semantic ?? existing.semantic
