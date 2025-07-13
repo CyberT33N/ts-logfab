@@ -304,8 +304,8 @@ export class EnterpriseConfigurationService {
 
 	    return this._users
 	        .filter(user => {
-	            if (searchCriteria.name && !user.name.toLowerCase().includes(searchCriteria.name.toLowerCase())) {
-	                return false
+	            if (typeof searchCriteria.name === 'string' && searchCriteria.name.length > 0) {
+	                return user.name.toLowerCase().includes(searchCriteria.name.toLowerCase())
 	            }
 	            return true
 	        })
