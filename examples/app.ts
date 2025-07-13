@@ -487,17 +487,180 @@ export class EnhancedService {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎪 MAIN DEMO FUNCTION
+// 🎪 ENHANCED DEMO FUNCTION - SHOWS ALL ENHANCED FEATURES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function runEnhancedDemo(): Promise<void> {
+    logger.info('🚀 Starting ENHANCED Logger Decorator Demo - All Features')
+    
+    const enhancedService = new EnhancedService()
+    
+    try {
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🔗 CORRELATION CONTEXT TRACKING DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('🔗 Testing Enhanced Feature: CORRELATION CONTEXT TRACKING')
+        
+        const authResult = await enhancedService.authenticateUser('admin', 'securePassword123')
+        logger.info('✅ Correlation tracking result:', { authenticated: authResult })
+        
+        await enhancedService.trackUserActivity('login', { 
+            timestamp: Date.now(), 
+            source: 'web-app',
+            deviceType: 'desktop' 
+        })
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🎯 SEMANTIC CONTEXT ANALYSIS DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('🎯 Testing Enhanced Feature: SEMANTIC CONTEXT ANALYSIS')
+        
+        const userProfile = await enhancedService.updateUserProfile(12345, { 
+            name: 'Enhanced User',
+            email: 'enhanced@ts-logfab.com'
+        })
+        logger.info('✅ Semantic analysis result (USER domain):', { profile: userProfile })
+        
+        const productSearch = await enhancedService.searchProducts('laptop', 'Electronics')
+        logger.info('✅ Semantic analysis result (PRODUCT domain):', { 
+            found: productSearch.length,
+            products: productSearch 
+        })
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🚨 ANOMALY DETECTION DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('🚨 Testing Enhanced Feature: ANOMALY DETECTION')
+        
+        // Run multiple times to build baseline and trigger anomalies
+        for (let i = 0; i < 15; i++) {
+            const criticalResult = await enhancedService.processCriticalData([
+                { id: i, data: 'sample-data' },
+                { id: i + 1, data: 'more-data' }
+            ])
+            
+            if (i % 5 === 0) {
+                logger.info(`🔄 Anomaly detection iteration ${String(i + 1)}/15:`, { result: criticalResult })
+            }
+        }
+        
+        // Run performance test method to trigger anomaly detection
+        for (let i = 0; i < 8; i++) {
+            const perfResult = await enhancedService.performanceTestMethod(1000 + (i * 100))
+            if (i % 3 === 0) {
+                logger.info(`⚡ Performance test ${String(i + 1)}/8:`, { result: perfResult })
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🌍 ENVIRONMENT-SPECIFIC DECORATORS DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('🌍 Testing Enhanced Feature: ENVIRONMENT-SPECIFIC DECORATORS')
+        
+        const prodApiResult = await enhancedService.productionApiCall('/api/v1/users', {
+            operation: 'get-all',
+            filters: { active: true },
+            pagination: { page: 1, limit: 50 }
+        })
+        logger.info('✅ Production decorator result:', { apiResponse: prodApiResult })
+        
+        await enhancedService.developmentDebugMethod({
+            debugLevel: 'verbose',
+            traceId: 'debug-12345',
+            memoryUsage: process.memoryUsage(),
+            nodeVersion: process.version
+        })
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🏢 DOMAIN-SPECIFIC DECORATORS DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('🏢 Testing Enhanced Feature: DOMAIN-SPECIFIC DECORATORS')
+        
+        // Financial domain
+        const paymentTransaction = await enhancedService.processPayment(1299.99, 'USD')
+        logger.info('💰 Financial operation result:', { 
+            transactionId: paymentTransaction.id,
+            amount: paymentTransaction.amount,
+            status: paymentTransaction.status 
+        })
+        
+        // User domain  
+        const userPrefResult = await enhancedService.updateUserPreferences(98765, {
+            theme: 'dark',
+            notifications: true,
+            language: 'en-US',
+            timezone: 'America/New_York'
+        })
+        logger.info('👤 User operation result:', { success: userPrefResult })
+        
+        // Order domain
+        const orderResult = await enhancedService.createOrder(98765, [
+            { id: 'prod-laptop-1', name: 'Gaming Laptop', price: 1299.99, category: 'Electronics' },
+            { id: 'prod-mouse-1', name: 'Gaming Mouse', price: 79.99, category: 'Accessories' }
+        ])
+        logger.info('📦 Order operation result:', { 
+            orderId: orderResult.id,
+            total: orderResult.total,
+            status: orderResult.status 
+        })
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // ⚡ PERFORMANCE-CRITICAL DECORATORS DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('⚡ Testing Enhanced Feature: PERFORMANCE-CRITICAL DECORATORS')
+        
+        // High performance operation (minimal logging)
+        const numbers = Array.from({ length: 10000 }, (_, i) => i + 1)
+        const highPerfResult = enhancedService.highFrequencyOperation(numbers)
+        logger.info('🚀 High-performance result:', { sum: highPerfResult })
+        
+        // Comprehensive logging operation (maximum logging)
+        const comprehensiveResult = await enhancedService.comprehensiveAnalysis({
+            dataSource: 'enhanced-demo',
+            analysisType: 'full-spectrum',
+            requestedBy: 'demo-user',
+            priority: 'high',
+            constraints: {
+                timeLimit: '30s',
+                memoryLimit: '500MB',
+                accuracyTarget: 0.95
+            }
+        })
+        logger.info('🔍 Comprehensive analysis result:', comprehensiveResult)
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 📊 ENHANCED SERVICE STATISTICS
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('📊 Enhanced Service Statistics:', {
+            ordersCreated: enhancedService.getOrderCount(),
+            transactionsProcessed: enhancedService.getTransactionCount()
+        })
+    } catch (error: unknown) {
+        logger.error('❌ Enhanced Demo failed:', { error })
+    }
+    
+    logger.info('🎉 Enhanced Logger Decorator Demo completed - All Features Demonstrated!')
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎪 MAIN DEMO FUNCTION (UPDATED)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 async function runDemo(): Promise<void> {
-    logger.info('🚀 Starting Logger Decorator Demo')
+    logger.info('🚀 Starting Complete Logger Decorator Demo')
     
     const service = new ExampleService()
     
     try {
         // ═══════════════════════════════════════════════════════════════════════════════
-        // 📊 STANDARD LOGGING TESTS
+        // 📊 STANDARD LOGGING TESTS (ORIGINAL)
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('📊 Testing Standard Logging Decorator')
@@ -509,7 +672,7 @@ async function runDemo(): Promise<void> {
         logger.info('✅ Created user:', { user: newUser })
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // 🔍 DEBUG LOGGING TESTS
+        // 🔍 DEBUG LOGGING TESTS (ORIGINAL)
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('🔍 Testing Debug Logging Decorator')
@@ -521,7 +684,7 @@ async function runDemo(): Promise<void> {
         logger.info('✅ Search results:', { count: searchResults.length })
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // ⚡ PERFORMANCE LOGGING TESTS
+        // ⚡ PERFORMANCE LOGGING TESTS (ORIGINAL)
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('⚡ Testing Performance Logging Decorator')
@@ -533,7 +696,7 @@ async function runDemo(): Promise<void> {
         logger.info('✅ Batch processing result:', { count: batchResult.length })
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // 🔇 SILENT LOGGING TESTS
+        // 🔇 SILENT LOGGING TESTS (ORIGINAL)
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('🔇 Testing Silent Logging Decorator')
@@ -545,7 +708,7 @@ async function runDemo(): Promise<void> {
         logger.info('✅ System info retrieved:', { keys: Object.keys(systemInfo) })
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // 🚨 ERROR-ONLY LOGGING TESTS
+        // 🚨 ERROR-ONLY LOGGING TESTS (ORIGINAL)  
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('🚨 Testing Error-Only Logging Decorator')
@@ -559,7 +722,7 @@ async function runDemo(): Promise<void> {
         logger.info('✅ Validation success:', { result: validationResult })
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // 🔧 CUSTOM CONFIGURATION TESTS
+        // 🔧 CUSTOM CONFIGURATION TESTS (ORIGINAL)
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('🔧 Testing Custom Configuration')
@@ -571,7 +734,7 @@ async function runDemo(): Promise<void> {
         logger.info('✅ Product retrieved:', { product })
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // 🚨 ERROR SCENARIOS
+        // 🚨 ERROR SCENARIOS (ORIGINAL)
         // ═══════════════════════════════════════════════════════════════════════════════
         
         logger.info('🚨 Testing Error Scenarios')
@@ -596,11 +759,23 @@ async function runDemo(): Promise<void> {
         } catch (error) {
             logger.info('✅ Expected validation error caught:', { error: (error as Error).message })
         }
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🌟 RUN ENHANCED FEATURES DEMO
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        logger.info('')
+        logger.info('=' .repeat(80))
+        logger.info('🌟 NOW RUNNING ENHANCED FEATURES DEMONSTRATION')
+        logger.info('=' .repeat(80))
+        logger.info('')
+        
+        await runEnhancedDemo()
     } catch (error: unknown) {
         logger.error('❌ Demo failed:', { error })
     }
     
-    logger.info('🎉 Logger Decorator Demo completed successfully!')
+    logger.info('🎉 Complete Logger Decorator Demo finished successfully!')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
