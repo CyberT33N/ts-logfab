@@ -606,11 +606,10 @@ export function createResultAnalyticsTable(resultValue: unknown): string {
     
     // 🎯 RESULT VALUE ROW - FULL RESULT DISPLAY WITH PROPER FORMATTING
     const resultDisplay = JSON.stringify(resultValue, null, 4)
-    const truncatedResult = intelligentTruncate(resultDisplay, 50)
     
     table.push([
         TERMINAL_COLORS.icon('📦') + ' RESULT VALUE',
-        TERMINAL_COLORS.text(truncatedResult)
+        TERMINAL_COLORS.text(resultDisplay)
     ])
     
     // 🎯 ANALYZE RESULT TYPE AND SIZE
