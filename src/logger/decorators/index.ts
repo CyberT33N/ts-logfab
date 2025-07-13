@@ -9,46 +9,67 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 ENHANCED DECORATOR LOGGING - ENTERPRISE EDITION           ██
-██          CORRELATION • SEMANTIC CONTEXT • ANOMALY DETECTION              ██
+██              🎯 DECORATOR LOGGING BARREL FILE                             ██
+██          UNIFIED EXPORTS FOR ALL DECORATOR LOGGING MODULES               ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 RE-EXPORTS FROM DECORATOR LOGGING MODULE
-// ═══════════════════════════════════════════════════════════════════════════════
-// 
-// This file has been modularized for better organization and maintainability.
-// All original functionality is preserved through re-exports from the new 
-// decorators module structure.
+// 🎯 CONFIGURATION EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export all types
+export type {
+    IDecoratorLoggingConfig,
+    IEnhancedDecoratorConfig
+} from './config.ts'
+
+export {
+    DEFAULT_DECORATOR_CONFIG,
+    DEFAULT_ENHANCED_CONFIG,
+    createDecoratorLoggingConfig,
+    createEnhancedConfig,
+    getDefaultDecoratorConfig,
+    getEnhancedLoggingStatus
+} from './config.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 TYPES EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
 export type {
     IEnhancedLogContext
-} from './decorators/types.ts'
+} from './types.ts'
 
-export type {
-    IDecoratorLoggingConfig
-} from './decorators/config.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 UTILITY FUNCTIONS EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export configuration functions
 export {
-    createDecoratorLoggingConfig,
-    getDefaultDecoratorConfig
-} from './decorators/config.ts'
+    createEnhancedContext,
+    createEnhancedDecoratorPrefix,
+    getSemanticIcon
+} from './utils.ts'
 
-// Re-export utility functions
-export {
-    createEnhancedDecoratorPrefix
-} from './decorators/utils.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 LOGGING FUNCTIONS EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export logging functions
 export {
     logEnhancedMethodStart,
     logEnhancedMethodSuccess,
     logEnhancedMethodError,
     logEnhancedMethodDebug
-} from './decorators/logging-functions.ts' 
+} from './logging-functions.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 DECORATOR IMPLEMENTATIONS EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    log,
+    performanceLog,
+    debugLog,
+    errorLog
+} from './decorator-implementations.ts' 

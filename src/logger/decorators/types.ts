@@ -9,46 +9,28 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 ENHANCED DECORATOR LOGGING - ENTERPRISE EDITION           ██
-██          CORRELATION • SEMANTIC CONTEXT • ANOMALY DETECTION              ██
+██              🎯 DECORATOR LOGGING TYPES MODULE                            ██
+██          SHARED TYPES AND INTERFACES FOR DECORATOR LOGGING               ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
+// ==== Imports ====
+import { type ICorrelationContext } from '../correlation-context/index.ts'
+import { type ISemanticContext } from '../semantic-detector.ts'
+import { type ILogContext, type IPerformanceMetrics } from '../types.ts'
+
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 RE-EXPORTS FROM DECORATOR LOGGING MODULE
-// ═══════════════════════════════════════════════════════════════════════════════
-// 
-// This file has been modularized for better organization and maintainability.
-// All original functionality is preserved through re-exports from the new 
-// decorators module structure.
+// 🎯 ENHANCED LOGGING INTERFACES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export all types
-export type {
-    IEnhancedLogContext
-} from './decorators/types.ts'
-
-export type {
-    IDecoratorLoggingConfig
-} from './decorators/config.ts'
-
-// Re-export configuration functions
-export {
-    createDecoratorLoggingConfig,
-    getDefaultDecoratorConfig
-} from './decorators/config.ts'
-
-// Re-export utility functions
-export {
-    createEnhancedDecoratorPrefix
-} from './decorators/utils.ts'
-
-// Re-export logging functions
-export {
-    logEnhancedMethodStart,
-    logEnhancedMethodSuccess,
-    logEnhancedMethodError,
-    logEnhancedMethodDebug
-} from './decorators/logging-functions.ts' 
+/**
+ * 🎯 **Enhanced Log Context with Correlation and Semantic Data**
+ */
+export interface IEnhancedLogContext extends ILogContext {
+    readonly correlation?: ICorrelationContext
+    readonly semantic?: ISemanticContext
+    readonly performance?: IPerformanceMetrics
+    readonly anomalyDetection?: boolean
+} 
