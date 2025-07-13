@@ -25,90 +25,12 @@ import { logFinancialOperation, logUserOperation, logWithSemantics } from '@/dec
 import { logger } from '@/logger/index.ts'
 import {
     detectSemanticContext,
+    type ISemanticConfig,
     type ISemanticContext
 } from '@/logger/semantic-detector.ts'
+import { type IPrettyConfig } from '@/prettifiers/main-prettifiers.ts'
 import { toWritable } from '@/utils/data-utils.ts'
-import { 
-    createProducts, 
-    createUsers, 
-    type ITransaction, 
-    type IUser, 
-    type IProduct,
-    type IOrder 
-} from '../core/models.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎨 PRETTIFIER CONFIGURATION TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🎨 **Prettifier Configuration Interface**
- * 
- * Configuration for prettifier output formatting
- */
-export interface IPrettyConfig {
-    readonly colorOutput: boolean
-    readonly showTimestamp: boolean
-    readonly showLogLevel: boolean
-    readonly showContextInfo: boolean
-    readonly showPerformanceMetrics: boolean
-    readonly showArguments: boolean
-    readonly showResults: boolean
-    readonly maxArgumentLength: number
-    readonly maxResultLength: number
-    readonly indentLevel: number
-    readonly tableFormat: 'simple' | 'fancy' | 'csv'
-    readonly highlightErrors: boolean
-    readonly highlightWarnings: boolean
-    readonly showMethodSignature: boolean
-    readonly showCorrelationId: boolean
-    readonly showSemanticContext: boolean
-    readonly compactMode: boolean
-    readonly customFormatters: {
-        readonly timestamp: (date: Readonly<Date>) => string
-        readonly logLevel: (level: string) => string
-        readonly methodName: (name: string) => string
-        readonly arguments: (args: ReadonlyDeep<readonly unknown[]>) => string
-        readonly result: (result: unknown) => string
-        readonly performance: (time: number) => string
-        readonly correlation: (id: string) => string
-        readonly semantic: (context: ReadonlyDeep<ISemanticContext>) => string
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 SEMANTIC CONFIGURATION TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🎯 **Semantic Configuration Interface**
- * 
- * Configuration for semantic analysis patterns
- */
-export interface ISemanticConfig {
-    readonly domainPatterns: Readonly<Record<string, {
-            readonly patterns: readonly RegExp[]
-            readonly operations: Readonly<Record<string, readonly RegExp[]>>
-        }>>
-    readonly complexityPatterns: Readonly<Record<string, readonly RegExp[]>>
-    readonly businessKeyPatterns?: Readonly<Record<string, readonly RegExp[]>>
-    readonly tagPatterns?: Readonly<Record<string, readonly RegExp[]>>
-}
-
-/**
- * 🎯 **Pattern Configuration Interface**
- * 
- * Configuration for pattern matching
- */
-export interface IPatternConfig {
-    readonly domainPatterns: Readonly<Record<string, {
-            readonly patterns: readonly RegExp[]
-            readonly operations: Readonly<Record<string, readonly RegExp[]>>
-        }>>
-    readonly complexityPatterns: Readonly<Record<string, readonly RegExp[]>>
-    readonly businessKeyPatterns?: Readonly<Record<string, readonly RegExp[]>>
-    readonly tagPatterns?: Readonly<Record<string, readonly RegExp[]>>
-}
+import { createProducts, createUsers, type ITransaction, type IUser } from '../core/models.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎨 ENTERPRISE PRETTIFIER CONFIGURATION
@@ -142,8 +64,7 @@ export function getDevelopmentPrettifierConfig(): IPrettyConfig {
             timestamp: (date: Readonly<Date>): string => `[${date.toISOString()}]`,
             logLevel: (level: string): string => `[${level.toUpperCase()}]`,
             methodName: (name: string): string => `🎯 ${name}`,
-            arguments: (args: ReadonlyDeep<readonly unknown[]>): string => 
-                `📥 Args: ${JSON.stringify(args, null, 2)}`,
+            arguments: (args: ReadonlyDeep<readonly unknown[]>): string => `📥 Args: ${JSON.stringify(args, null, 2)}`,
             result: (result: unknown): string => `📤 Result: ${JSON.stringify(result, null, 2)}`,
             performance: (time: number): string => `⏱️ ${time.toFixed(2)}ms`,
             correlation: (id: string): string => `🔗 ${id}`,
@@ -185,8 +106,7 @@ export function getProductionPrettifierConfig(): IPrettyConfig {
             result: (result: unknown): string => JSON.stringify(result),
             performance: (time: number): string => String(time),
             correlation: (id: string): string => id,
-            semantic: (context: ReadonlyDeep<ISemanticContext>): string => 
-                `${context.domain}:${context.operation}`
+            semantic: (context: ReadonlyDeep<ISemanticContext>): string => `${context.domain}:${context.operation}`
         }
     }
 }
@@ -219,8 +139,7 @@ export function getDebugPrettifierConfig(): IPrettyConfig {
             timestamp: (date: Readonly<Date>): string => `🕐 ${date.toISOString()}`,
             logLevel: (level: string): string => `🏷️ ${level.toUpperCase()}`,
             methodName: (name: string): string => `🔧 ${name}`,
-            arguments: (args: ReadonlyDeep<readonly unknown[]>): string => 
-                `📊 Arguments:\n${JSON.stringify(args, null, 4)}`,
+            arguments: (args: ReadonlyDeep<readonly unknown[]>): string => `📊 Arguments:\n${JSON.stringify(args, null, 4)}`,
             result: (result: unknown): string => `📋 Result:\n${JSON.stringify(result, null, 4)}`,
             performance: (time: number): string => `⏱️ Execution Time: ${time.toFixed(3)}ms`,
             correlation: (id: string): string => `🔗 Correlation ID: ${id}`,
@@ -295,17 +214,14 @@ export function getMasterPrettifierConfig(): IPrettyConfig {
         showSemanticContext: true,
         compactMode: isProduction,
         customFormatters: {
-            timestamp: (date: Readonly<Date>): string => 
-                (isProduction ? date.toISOString() : `[${date.toISOString()}]`),
-            logLevel: (level: string): string => 
-                (isProduction ? level.toUpperCase() : `[${level.toUpperCase()}]`),
+            timestamp: (date: Readonly<Date>): string => (isProduction ? date.toISOString() : `[${date.toISOString()}]`),
+            logLevel: (level: string): string => (isProduction ? level.toUpperCase() : `[${level.toUpperCase()}]`),
             methodName: (name: string): string => (isProduction ? name : `🎯 ${name}`),
             arguments: (args: ReadonlyDeep<readonly unknown[]>): string =>
                 isProduction ? JSON.stringify(args) : `📥 Args: ${JSON.stringify(args, null, 2)}`,
             result: (result: unknown): string =>
                 isProduction ? JSON.stringify(result) : `📤 Result: ${JSON.stringify(result, null, 2)}`,
-            performance: (time: number): string => 
-                (isProduction ? String(time) : `⏱️ ${time.toFixed(2)}ms`),
+            performance: (time: number): string => (isProduction ? String(time) : `⏱️ ${time.toFixed(2)}ms`),
             correlation: (id: string): string => (isProduction ? id : `🔗 ${id}`),
             semantic: (context: ReadonlyDeep<ISemanticContext>): string =>
                 isProduction
@@ -647,140 +563,6 @@ export class EnterprisePrettifierSemanticService {
 	private readonly _transactions: ITransaction[] = []
 
 	// ═══════════════════════════════════════════════════════════════════════════════
-	// 🎯 SEMANTIC ANALYSIS DEMONSTRATIONS (MUST BE FIRST DUE TO DECORATORS)
-	// ═══════════════════════════════════════════════════════════════════════════════
-
-	@logWithSemantics({
-	    domain: 'USER',
-	    operation: 'WRITE',
-	    businessKey: 'user-registration-semantic',
-	    tags: ['user-management', 'registration', 'business-critical']
-	})
-	public async businessSemanticDemo(
-	    businessData: ReadonlyDeep<{
-			customerName: string
-			productCatalog: readonly string[]
-			orderProcessing: boolean
-			paymentValidation: boolean
-		}>
-	): Promise<{
-		semanticAnalysis: ISemanticContext
-		businessInsights: Record<string, unknown>
-		operationSummary: Record<string, unknown>
-	}> {
-	    await this._delay(150)
-
-	    // Perform semantic analysis
-	    const semanticAnalysis = detectSemanticContext(
-	        'processBusinessUserProductOrderPayment', 
-	        [businessData]
-	    )
-
-	    return {
-	        semanticAnalysis,
-	        businessInsights: {
-	            domainDetected: semanticAnalysis.domain,
-	            operationInferred: semanticAnalysis.operation,
-	            complexityLevel: semanticAnalysis.complexity,
-	            businessImpact: semanticAnalysis.metadata.detectedPatterns.includes('business-critical') 
-	                ? 'HIGH' 
-	                : 'MEDIUM',
-	            automatedClassification: true
-	        },
-	        operationSummary: {
-	            customerProcessed: Boolean(businessData.customerName),
-	            productsAnalyzed: businessData.productCatalog.length,
-	            orderingEnabled: businessData.orderProcessing,
-	            paymentReady: businessData.paymentValidation
-	        }
-	    }
-	}
-
-	@logFinancialOperation({
-	    operation: 'COMPUTE',
-	    businessKey: 'financial-transaction-processing',
-	    userId: 'financial-demo-user'
-	})
-	public async financialSemanticDemo(
-	    financialData: ReadonlyDeep<{
-			transactionAmount: number
-			currency: string
-			paymentMethod: string
-			invoiceGeneration: boolean
-			complianceValidation: boolean
-		}>
-	): Promise<{
-		financialAnalysis: ISemanticContext
-		complianceCheck: Record<string, unknown>
-		riskAssessment: Record<string, unknown>
-	}> {
-	    await this._delay(180)
-
-	    // Perform financial semantic analysis
-	    const financialAnalysis = detectSemanticContext(
-	        'processFinancialTransactionPaymentInvoiceCompliance',
-	        [financialData]
-	    )
-
-	    return {
-	        financialAnalysis,
-	        complianceCheck: {
-	            regulatoryCompliance: financialData.complianceValidation,
-	            auditTrail: `audit-${String(Date.now())}`,
-	            documentationGenerated: financialData.invoiceGeneration,
-	            complianceScore: Math.floor(Math.random() * 100)
-	        },
-	        riskAssessment: {
-	            transactionRisk: financialData.transactionAmount > 10_000 ? 'HIGH' : 'LOW',
-	            currencyRisk: financialData.currency !== 'USD' ? 'MEDIUM' : 'LOW',
-	            paymentMethodRisk: financialData.paymentMethod === 'credit-card' ? 'LOW' : 'MEDIUM',
-	            overallRisk: 'MEDIUM'
-	        }
-	    }
-	}
-
-	@logUserOperation({
-	    operation: 'READ',
-	    userId: 'user-operation-demo'
-	})
-	public async userOperationSemanticDemo(
-	    userOperationData: ReadonlyDeep<{
-			userId: number
-			operationType: 'authentication' | 'authorization' | 'profile-update' | 'session-management'
-			securityLevel: 'LOW' | 'MEDIUM' | 'HIGH'
-			auditRequired: boolean
-		}>
-	): Promise<{
-		userOperationAnalysis: ISemanticContext
-		securityAssessment: Record<string, unknown>
-		auditInformation: Record<string, unknown>
-	}> {
-	    await this._delay(100)
-
-	    // Perform user operation semantic analysis
-	    const userOperationAnalysis = detectSemanticContext(
-	        'userOperationAuthenticationAuthorizationProfileSecurity',
-	        [userOperationData]
-	    )
-
-	    return {
-	        userOperationAnalysis,
-	        securityAssessment: {
-	            securityLevel: userOperationData.securityLevel,
-	            operationRisk: userOperationData.operationType === 'authentication' ? 'HIGH' : 'MEDIUM',
-	            accessGranted: true,
-	            securityScore: Math.floor(Math.random() * 100)
-	        },
-	        auditInformation: {
-	            auditRequired: userOperationData.auditRequired,
-	            auditTrail: `user-audit-${String(Date.now())}`,
-	            complianceStatus: 'COMPLIANT',
-	            documentationGenerated: userOperationData.auditRequired
-	        }
-	    }
-	}
-
-	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎨 PRETTIFIER CONFIGURATION DEMONSTRATIONS
 	// ═══════════════════════════════════════════════════════════════════════════════
 
@@ -875,6 +657,160 @@ export class EnterprisePrettifierSemanticService {
 	}
 
 	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🎯 SEMANTIC ANALYSIS DEMONSTRATIONS
+	// ═══════════════════════════════════════════════════════════════════════════════
+
+	@logWithSemantics({
+	    level: 'info',
+	    includePerformance: true,
+	    includeArgs: true,
+	    includeResult: true,
+	    semanticContext: {
+	        enabled: true,
+	        domain: 'USER',
+	        operation: 'WRITE',
+	        complexity: 'MEDIUM',
+	        businessKey: 'user-registration-semantic',
+	        tags: ['user-management', 'registration', 'business-critical']
+	    },
+	    customContext: {
+	        semanticConfig: getBusinessDomainConfig(),
+	        demonstrationType: 'business-semantic-analysis'
+	    }
+	})
+	public async businessSemanticDemo(
+	    businessData: ReadonlyDeep<{
+			customerName: string
+			productCatalog: readonly string[]
+			orderProcessing: boolean
+			paymentValidation: boolean
+		}>
+	): Promise<{
+		semanticAnalysis: ISemanticContext
+		businessInsights: Record<string, unknown>
+		operationSummary: Record<string, unknown>
+	}> {
+	    await this._delay(150)
+
+	    // Perform semantic analysis
+	    const semanticAnalysis = detectSemanticContext('processBusinessUserProductOrderPayment', [businessData], getBusinessDomainConfig())
+
+	    return {
+	        semanticAnalysis,
+	        businessInsights: {
+	            domainDetected: semanticAnalysis.domain,
+	            operationInferred: semanticAnalysis.operation,
+	            complexityLevel: semanticAnalysis.complexity,
+	            businessImpact: semanticAnalysis.metadata.detectedPatterns.includes('business-critical') ? 'HIGH' : 'MEDIUM',
+	            automatedClassification: true
+	        },
+	        operationSummary: {
+	            customerProcessed: Boolean(businessData.customerName),
+	            productsAnalyzed: businessData.productCatalog.length,
+	            orderingEnabled: businessData.orderProcessing,
+	            paymentReady: businessData.paymentValidation
+	        }
+	    }
+	}
+
+	@logFinancialOperation({
+	    level: 'info',
+	    includePerformance: true,
+	    includeArgs: true,
+	    includeResult: true,
+	    customContext: {
+	        semanticConfig: getBusinessDomainConfig(),
+	        demonstrationType: 'financial-semantic-analysis'
+	    }
+	})
+	public async financialSemanticDemo(
+	    financialData: ReadonlyDeep<{
+			transactionAmount: number
+			currency: string
+			paymentMethod: string
+			invoiceGeneration: boolean
+			complianceValidation: boolean
+		}>
+	): Promise<{
+		financialAnalysis: ISemanticContext
+		complianceCheck: Record<string, unknown>
+		riskAssessment: Record<string, unknown>
+	}> {
+	    await this._delay(180)
+
+	    // Perform financial semantic analysis
+	    const financialAnalysis = detectSemanticContext(
+	        'processFinancialTransactionPaymentInvoiceCompliance',
+	        [financialData],
+	        getBusinessDomainConfig()
+	    )
+
+	    return {
+	        financialAnalysis,
+	        complianceCheck: {
+	            regulatoryCompliance: financialData.complianceValidation,
+	            auditTrail: `audit-${String(Date.now())}`,
+	            documentationGenerated: financialData.invoiceGeneration,
+	            complianceScore: Math.floor(Math.random() * 100)
+	        },
+	        riskAssessment: {
+	            transactionRisk: financialData.transactionAmount > 10_000 ? 'HIGH' : 'LOW',
+	            currencyRisk: financialData.currency !== 'USD' ? 'MEDIUM' : 'LOW',
+	            paymentMethodRisk: financialData.paymentMethod === 'credit-card' ? 'LOW' : 'MEDIUM',
+	            overallRisk: 'MEDIUM'
+	        }
+	    }
+	}
+
+	@logUserOperation({
+	    level: 'info',
+	    includePerformance: true,
+	    includeArgs: true,
+	    includeResult: true,
+	    customContext: {
+	        semanticConfig: getDebugSemanticConfig(),
+	        demonstrationType: 'user-operation-semantic-analysis'
+	    }
+	})
+	public async userOperationSemanticDemo(
+	    userOperationData: ReadonlyDeep<{
+			userId: number
+			operationType: 'authentication' | 'authorization' | 'profile-update' | 'session-management'
+			securityLevel: 'LOW' | 'MEDIUM' | 'HIGH'
+			auditRequired: boolean
+		}>
+	): Promise<{
+		userOperationAnalysis: ISemanticContext
+		securityAssessment: Record<string, unknown>
+		auditInformation: Record<string, unknown>
+	}> {
+	    await this._delay(100)
+
+	    // Perform user operation semantic analysis
+	    const userOperationAnalysis = detectSemanticContext(
+	        'userOperationAuthenticationAuthorizationProfileSecurity',
+	        [userOperationData],
+	        getDebugSemanticConfig()
+	    )
+
+	    return {
+	        userOperationAnalysis,
+	        securityAssessment: {
+	            securityLevel: userOperationData.securityLevel,
+	            operationRisk: userOperationData.operationType === 'authentication' ? 'HIGH' : 'MEDIUM',
+	            accessGranted: true,
+	            securityScore: Math.floor(Math.random() * 100)
+	        },
+	        auditInformation: {
+	            auditRequired: userOperationData.auditRequired,
+	            auditTrail: `user-audit-${String(Date.now())}`,
+	            complianceStatus: 'COMPLIANT',
+	            documentationGenerated: userOperationData.auditRequired
+	        }
+	    }
+	}
+
+	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 MASTER CONFIGURATION DEMO
 	// ═══════════════════════════════════════════════════════════════════════════════
 
@@ -897,7 +833,8 @@ export class EnterprisePrettifierSemanticService {
 	    // Analyze configuration with semantic detection
 	    const semanticAnalysis = detectSemanticContext(
 	        'masterConfigurationPrettifierSemanticSystemEnvironment',
-	        [masterData]
+	        [masterData],
+	        getBusinessDomainConfig()
 	    )
 
 	    const configurationId = `master-config-${String(Date.now())}`
@@ -1116,11 +1053,8 @@ export async function runPrettifierSemanticDemo(): Promise<void> {
             totalConfigurations: 8
         })
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            logger.error('❌ Prettifier & Semantic Demo failed:', { error: error.message })
-        } else {
-            logger.error('❌ Prettifier & Semantic Demo failed:', { error: String(error) })
-        }
+        const err = error instanceof Error ? error : new Error(String(error))
+        logger.error('❌ Prettifier & Semantic Demo failed:', { error: err.message })
     }
 
     logger.info('🎉 Prettifier & Semantic Analysis Demo completed!')
