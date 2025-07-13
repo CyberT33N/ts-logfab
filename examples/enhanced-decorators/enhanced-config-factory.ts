@@ -20,199 +20,193 @@
 // 🎯 ENHANCED DECORATOR CONFIGURATION FACTORY
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { ReadonlyDeep } from 'type-fest'
-import { 
-    createEnhancedConfig, 
-    log, 
-    performanceLog, 
-    debugLog, 
+import type { ReadonlyDeep, WritableDeep } from 'type-fest'
+import env from '@/env.ts'
+import {
+    createEnhancedConfig,
+    debugLog,
     errorLog,
     getEnhancedLoggingStatus,
+    log,
+    performanceLog,
     type IEnhancedDecoratorConfig
 } from '@/logger/enhanced-decorator.ts'
 import { logger } from '@/logger/index.ts'
-import { IUser, IProduct, createUsers, createProducts } from '../core/models.ts'
+import { createProducts, createUsers, type IProduct, type IUser } from '../core/models.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🏭 ENTERPRISE CONFIG FACTORY PATTERNS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **Enterprise Configuration Factory**
- * 
- * Centralized configuration management for enhanced decorators
+ * 🚀 **Development Configuration**
+ *
+ * Optimized for development environments with maximum visibility
  */
-export class EnhancedConfigFactory {
-    /**
-     * 🚀 **Development Configuration**
-     * 
-     * Optimized for development environments with maximum visibility
-     */
-    static createDevelopmentConfig(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig({
-            enablePerformanceTracking: true,
-            enableAnomalyDetection: true,
-            enableSemanticAnalysis: true,
-            enableCorrelationTracking: true,
-            enableAutoFormatSwitching: true,
-            logLevel: 'debug',
-            includeStackTrace: true,
-            includeArguments: true,
-            includeResult: true,
-            maxArgumentsLength: 500
-        })
-    }
+export function createDevelopmentConfig(): IEnhancedDecoratorConfig {
+    return createEnhancedConfig({
+        enablePerformanceTracking: true,
+        enableAnomalyDetection: true,
+        enableSemanticAnalysis: true,
+        enableCorrelationTracking: true,
+        enableAutoFormatSwitching: true,
+        logLevel: 'debug',
+        includeStackTrace: true,
+        includeArguments: true,
+        includeResult: true,
+        maxArgumentsLength: 500
+    })
+}
 
-    /**
-     * 🏭 **Production Configuration**
-     * 
-     * Optimized for production environments with performance focus
-     */
-    static createProductionConfig(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig({
-            enablePerformanceTracking: true,
-            enableAnomalyDetection: true,
-            enableSemanticAnalysis: false, // Disabled for performance
-            enableCorrelationTracking: true,
-            enableAutoFormatSwitching: true,
-            logLevel: 'info',
-            includeStackTrace: false,
-            includeArguments: false,
-            includeResult: false,
-            maxArgumentsLength: 100
-        })
-    }
+/**
+ * 🏭 **Production Configuration**
+ *
+ * Optimized for production environments with performance focus
+ */
+export function createProductionConfig(): IEnhancedDecoratorConfig {
+    return createEnhancedConfig({
+        enablePerformanceTracking: true,
+        enableAnomalyDetection: true,
+        enableSemanticAnalysis: false, // Disabled for performance
+        enableCorrelationTracking: true,
+        enableAutoFormatSwitching: true,
+        logLevel: 'info',
+        includeStackTrace: false,
+        includeArguments: false,
+        includeResult: false,
+        maxArgumentsLength: 100
+    })
+}
 
-    /**
-     * 🔍 **Debug Configuration**
-     * 
-     * Maximum verbosity for debugging scenarios
-     */
-    static createDebugConfig(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig({
-            enablePerformanceTracking: true,
-            enableAnomalyDetection: true,
-            enableSemanticAnalysis: true,
-            enableCorrelationTracking: true,
-            enableAutoFormatSwitching: true,
-            logLevel: 'debug',
-            includeStackTrace: true,
-            includeArguments: true,
-            includeResult: true,
-            maxArgumentsLength: 1000
-        })
-    }
+/**
+ * 🔍 **Debug Configuration**
+ *
+ * Maximum verbosity for debugging scenarios
+ */
+export function createDebugConfig(): IEnhancedDecoratorConfig {
+    return createEnhancedConfig({
+        enablePerformanceTracking: true,
+        enableAnomalyDetection: true,
+        enableSemanticAnalysis: true,
+        enableCorrelationTracking: true,
+        enableAutoFormatSwitching: true,
+        logLevel: 'debug',
+        includeStackTrace: true,
+        includeArguments: true,
+        includeResult: true,
+        maxArgumentsLength: 1000
+    })
+}
 
-    /**
-     * ⚡ **Performance Configuration**
-     * 
-     * Minimal logging for performance-critical operations
-     */
-    static createPerformanceConfig(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig({
-            enablePerformanceTracking: true,
-            enableAnomalyDetection: false,
-            enableSemanticAnalysis: false,
-            enableCorrelationTracking: false,
-            enableAutoFormatSwitching: false,
-            logLevel: 'warn',
-            includeStackTrace: false,
-            includeArguments: false,
-            includeResult: false,
-            maxArgumentsLength: 50
-        })
-    }
+/**
+ * ⚡ **Performance Configuration**
+ *
+ * Minimal logging for performance-critical operations
+ */
+export function createPerformanceConfig(): IEnhancedDecoratorConfig {
+    return createEnhancedConfig({
+        enablePerformanceTracking: true,
+        enableAnomalyDetection: false,
+        enableSemanticAnalysis: false,
+        enableCorrelationTracking: false,
+        enableAutoFormatSwitching: false,
+        logLevel: 'warn',
+        includeStackTrace: false,
+        includeArguments: false,
+        includeResult: false,
+        maxArgumentsLength: 50
+    })
+}
 
-    /**
-     * 🧪 **Testing Configuration**
-     * 
-     * Specialized for testing environments
-     */
-    static createTestingConfig(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig({
-            enablePerformanceTracking: false,
-            enableAnomalyDetection: false,
-            enableSemanticAnalysis: false,
-            enableCorrelationTracking: true,
-            enableAutoFormatSwitching: true,
-            logLevel: 'error',
-            includeStackTrace: true,
-            includeArguments: true,
-            includeResult: true,
-            maxArgumentsLength: 200
-        })
-    }
+/**
+ * 🧪 **Testing Configuration**
+ *
+ * Specialized for testing environments
+ */
+export function createTestingConfig(): IEnhancedDecoratorConfig {
+    return createEnhancedConfig({
+        enablePerformanceTracking: false,
+        enableAnomalyDetection: false,
+        enableSemanticAnalysis: false,
+        enableCorrelationTracking: true,
+        enableAutoFormatSwitching: true,
+        logLevel: 'error',
+        includeStackTrace: true,
+        includeArguments: true,
+        includeResult: true,
+        maxArgumentsLength: 200
+    })
+}
 
-    /**
-     * 🎯 **Custom Configuration Builder**
-     * 
-     * Fluent API for building custom configurations
-     */
-    static createCustomConfig(): ConfigBuilder {
-        return new ConfigBuilder()
-    }
+/**
+ * 🎯 **Custom Configuration Builder**
+ *
+ * Fluent API for building custom configurations
+ */
+export function createCustomConfig(): ConfigBuilder {
+    return new ConfigBuilder()
 }
 
 /**
  * 🎯 **Configuration Builder Pattern**
- * 
+ *
  * Fluent API for creating custom enhanced decorator configurations
  */
 export class ConfigBuilder {
-    private readonly config: Partial<IEnhancedDecoratorConfig> = {}
+    private readonly _config: WritableDeep<Partial<IEnhancedDecoratorConfig>> = {}
 
-    enablePerformanceTracking(enabled = true): this {
-        this.config.enablePerformanceTracking = enabled
+    public enablePerformanceTracking(enabled = true): this {
+        this._config.enablePerformanceTracking = enabled
         return this
     }
 
-    enableAnomalyDetection(enabled = true): this {
-        this.config.enableAnomalyDetection = enabled
+    public enableAnomalyDetection(enabled = true): this {
+        this._config.enableAnomalyDetection = enabled
         return this
     }
 
-    enableSemanticAnalysis(enabled = true): this {
-        this.config.enableSemanticAnalysis = enabled
+    public enableSemanticAnalysis(enabled = true): this {
+        this._config.enableSemanticAnalysis = enabled
         return this
     }
 
-    enableCorrelationTracking(enabled = true): this {
-        this.config.enableCorrelationTracking = enabled
+    public enableCorrelationTracking(enabled = true): this {
+        this._config.enableCorrelationTracking = enabled
         return this
     }
 
-    enableAutoFormatSwitching(enabled = true): this {
-        this.config.enableAutoFormatSwitching = enabled
+    public enableAutoFormatSwitching(enabled = true): this {
+        this._config.enableAutoFormatSwitching = enabled
         return this
     }
 
-    setLogLevel(level: 'trace' | 'debug' | 'info' | 'warn' | 'error'): this {
-        this.config.logLevel = level
+    public setLogLevel(level: 'trace' | 'debug' | 'info' | 'warn' | 'error'): this {
+        this._config.logLevel = level
         return this
     }
 
-    includeStackTrace(enabled = true): this {
-        this.config.includeStackTrace = enabled
+    public includeStackTrace(enabled = true): this {
+        this._config.includeStackTrace = enabled
         return this
     }
 
-    includeArguments(enabled = true): this {
-        this.config.includeArguments = enabled
+    public includeArguments(enabled = true): this {
+        this._config.includeArguments = enabled
         return this
     }
 
-    includeResult(enabled = true): this {
-        this.config.includeResult = enabled
+    public includeResult(enabled = true): this {
+        this._config.includeResult = enabled
         return this
     }
 
-    setMaxArgumentsLength(length: number): this {
-        this.config.maxArgumentsLength = length
+    public setMaxArgumentsLength(length: number): this {
+        this._config.maxArgumentsLength = length
         return this
     }
 
-    build(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig(this.config)
+    public build(): IEnhancedDecoratorConfig {
+        return createEnhancedConfig(this._config)
     }
 }
 
@@ -222,10 +216,11 @@ export class ConfigBuilder {
 
 /**
  * 🏢 **Enterprise Configuration Service**
- * 
+ *
  * Demonstrates all configuration patterns and factory usage
  */
 export class EnterpriseConfigService {
+    [key: string]: unknown
     private readonly _users: IUser[] = createUsers(10)
     private readonly _products: IProduct[] = createProducts(15)
 
@@ -233,143 +228,143 @@ export class EnterpriseConfigService {
     // 🚀 DEVELOPMENT ENVIRONMENT METHODS
     // ═══════════════════════════════════════════════════════════════════════════════
 
-    @log(EnhancedConfigFactory.createDevelopmentConfig())
+	@log(createDevelopmentConfig())
     public async developmentMethod(
-        data: readonly unknown[], 
-        options: { verbose: boolean; traceId: string }
+        data: ReadonlyDeep<readonly unknown[]>,
+        options: ReadonlyDeep<{ verbose: boolean; traceId: string }>
     ): Promise<{ processed: number; timestamp: Date }> {
         await this._delay(150)
-        
+
+        logger.info('Development method executed', { options })
+
         return {
             processed: data.length,
             timestamp: new Date()
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🏭 PRODUCTION ENVIRONMENT METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🏭 PRODUCTION ENVIRONMENT METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
 
-    @log(EnhancedConfigFactory.createProductionConfig())
-    public async productionMethod(userId: number): Promise<IUser | null> {
-        await this._delay(100)
-        
-        return this._users.find(user => user.id === userId) || null
-    }
+	@log(createProductionConfig())
+	public async productionMethod(userId: number): Promise<IUser | null> {
+	    await this._delay(100)
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🔍 DEBUG ENVIRONMENT METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	    return this._users.find(user => user.id === userId) ?? null
+	}
 
-    @debugLog(EnhancedConfigFactory.createDebugConfig())
-    public async debugMethod(
-        input: { query: string; filters: Record<string, unknown> }
-    ): Promise<{ results: IProduct[]; metadata: Record<string, unknown> }> {
-        await this._delay(200)
-        
-        const results = this._products.filter(product => 
-            product.name.toLowerCase().includes(input.query.toLowerCase())
-        )
-        
-        return {
-            results,
-            metadata: {
-                totalProducts: this._products.length,
-                matchedProducts: results.length,
-                searchQuery: input.query,
-                appliedFilters: Object.keys(input.filters)
-            }
-        }
-    }
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🔍 DEBUG ENVIRONMENT METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // ⚡ PERFORMANCE-CRITICAL METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	@debugLog(createDebugConfig())
+	public async debugMethod(
+	    input: ReadonlyDeep<{ query: string; filters: Record<string, unknown> }>
+	): Promise<{ results: IProduct[]; metadata: Record<string, unknown> }> {
+	    await this._delay(200)
 
-    @performanceLog(EnhancedConfigFactory.createPerformanceConfig())
-    public performanceCriticalMethod(data: readonly number[]): number {
-        // High-performance operation with minimal logging
-        return data.reduce((sum, num) => sum + num, 0)
-    }
+	    const results = this._products.filter(product =>
+	        product.name.toLowerCase().includes(input.query.toLowerCase())
+	    )
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🧪 TESTING ENVIRONMENT METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	    return {
+	        results,
+	        metadata: {
+	            totalProducts: this._products.length,
+	            matchedProducts: results.length,
+	            searchQuery: input.query,
+	            appliedFilters: Object.keys(input.filters)
+	        }
+	    }
+	}
 
-    @errorLog(EnhancedConfigFactory.createTestingConfig())
-    public async testingMethod(shouldFail: boolean): Promise<string> {
-        await this._delay(50)
-        
-        if (shouldFail) {
-            throw new Error('Testing error scenario')
-        }
-        
-        return 'Testing successful'
-    }
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// ⚡ PERFORMANCE-CRITICAL METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🎯 CUSTOM CONFIGURATION METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	@performanceLog(createPerformanceConfig())
+	public performanceCriticalMethod(data: readonly number[]): number {
+	    // High-performance operation with minimal logging
+	    return data.reduce((sum, num) => sum + num, 0)
+	}
 
-    @log(
-        EnhancedConfigFactory.createCustomConfig()
-            .enablePerformanceTracking(true)
-            .enableAnomalyDetection(true)
-            .enableSemanticAnalysis(false)
-            .enableCorrelationTracking(true)
-            .setLogLevel('info')
-            .includeArguments(true)
-            .includeResult(false)
-            .setMaxArgumentsLength(300)
-            .build()
-    )
-    public async customConfigMethod(
-        request: { id: string; payload: Record<string, unknown> }
-    ): Promise<{ success: boolean; id: string; timestamp: Date }> {
-        await this._delay(120)
-        
-        return {
-            success: true,
-            id: request.id,
-            timestamp: new Date()
-        }
-    }
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🧪 TESTING ENVIRONMENT METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🎚️ RUNTIME CONFIGURATION METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	@errorLog(createTestingConfig())
+	public async testingMethod(shouldFail: boolean): Promise<string> {
+	    await this._delay(50)
 
-    @log((() => {
-        const isDev = process.env.NODE_ENV === 'development'
-        return isDev 
-            ? EnhancedConfigFactory.createDevelopmentConfig()
-            : EnhancedConfigFactory.createProductionConfig()
-    })())
-    public async adaptiveConfigMethod(data: readonly string[]): Promise<string[]> {
-        await this._delay(80)
-        
-        return data.map(item => item.toUpperCase())
-    }
+	    if (shouldFail) {
+	        throw new Error('Testing error scenario')
+	    }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🛠️ UTILITY METHODS
-    // ═══════════════════════════════════════════════════════════════════════════════
+	    return 'Testing successful'
+	}
 
-    private async _delay(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms))
-    }
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🎯 CUSTOM CONFIGURATION METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
 
-    public getServiceStatistics(): {
-        totalUsers: number
-        totalProducts: number
-        enhancedLoggingStatus: ReturnType<typeof getEnhancedLoggingStatus>
-        } {
-        return {
-            totalUsers: this._users.length,
-            totalProducts: this._products.length,
-            enhancedLoggingStatus: getEnhancedLoggingStatus()
-        }
-    }
+	@log(
+	    createCustomConfig()
+	        .enablePerformanceTracking(true)
+	        .enableAnomalyDetection(true)
+	        .enableSemanticAnalysis(false)
+	        .enableCorrelationTracking(true)
+	        .setLogLevel('info')
+	        .includeArguments(true)
+	        .includeResult(false)
+	        .setMaxArgumentsLength(300)
+	        .build()
+	)
+	public async customConfigMethod(
+	    request: ReadonlyDeep<{ id: string; payload: Record<string, unknown> }>
+	): Promise<{ success: boolean; id: string; timestamp: Date }> {
+	    await this._delay(120)
+
+	    return {
+	        success: true,
+	        id: request.id,
+	        timestamp: new Date()
+	    }
+	}
+
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🎚️ RUNTIME CONFIGURATION METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
+
+	@log(((): IEnhancedDecoratorConfig => {
+	    const isDev = env.NODE_ENV === 'development'
+	    return isDev ? createDevelopmentConfig() : createProductionConfig()
+	})())
+	public async adaptiveConfigMethod(data: readonly string[]): Promise<string[]> {
+	    await this._delay(80)
+
+	    return data.map(item => item.toUpperCase())
+	}
+
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🛠️ UTILITY METHODS
+	// ═══════════════════════════════════════════════════════════════════════════════
+
+	public getServiceStatistics(): {
+		totalUsers: number
+		totalProducts: number
+		enhancedLoggingStatus: ReturnType<typeof getEnhancedLoggingStatus>
+		} {
+	    return {
+	        totalUsers: this._users.length,
+	        totalProducts: this._products.length,
+	        enhancedLoggingStatus: getEnhancedLoggingStatus()
+	    }
+	}
+
+	private async _delay(ms: number): Promise<void> {
+	    return new Promise(resolve => setTimeout(resolve, ms))
+	}
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -378,30 +373,30 @@ export class EnterpriseConfigService {
 
 /**
  * 🎯 **Enhanced Config Factory Demo**
- * 
+ *
  * Demonstrates all configuration patterns and factory usage
  */
 export async function runEnhancedConfigDemo(): Promise<void> {
     logger.info('🎯 Starting Enhanced Config Factory Demo')
-    
+
     const service = new EnterpriseConfigService()
-    
+
     try {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🚀 DEVELOPMENT CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🚀 Testing Development Configuration')
-        const devResult = await service.developmentMethod(
-            [1, 2, 3, 4, 5], 
-            { verbose: true, traceId: 'dev-trace-12345' }
-        )
+        const devResult = await service.developmentMethod([1, 2, 3, 4, 5], {
+            verbose: true,
+            traceId: 'dev-trace-12345'
+        })
         logger.info('✅ Development result:', devResult)
 
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🏭 PRODUCTION CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🏭 Testing Production Configuration')
         const prodResult = await service.productionMethod(1)
         logger.info('✅ Production result:', { found: Boolean(prodResult) })
@@ -409,21 +404,21 @@ export async function runEnhancedConfigDemo(): Promise<void> {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🔍 DEBUG CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🔍 Testing Debug Configuration')
         const debugResult = await service.debugMethod({
             query: 'laptop',
             filters: { category: 'Electronics', maxPrice: 1000 }
         })
-        logger.info('✅ Debug result:', { 
+        logger.info('✅ Debug result:', {
             foundItems: debugResult.results.length,
-            metadata: debugResult.metadata 
+            metadata: debugResult.metadata
         })
 
         // ═══════════════════════════════════════════════════════════════════════════════
         // ⚡ PERFORMANCE CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('⚡ Testing Performance Configuration')
         const perfResult = service.performanceCriticalMethod([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         logger.info('✅ Performance result:', { sum: perfResult })
@@ -431,7 +426,7 @@ export async function runEnhancedConfigDemo(): Promise<void> {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🧪 TESTING CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🧪 Testing Configuration (Success)')
         const testSuccessResult = await service.testingMethod(false)
         logger.info('✅ Test success result:', { result: testSuccessResult })
@@ -446,7 +441,7 @@ export async function runEnhancedConfigDemo(): Promise<void> {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🎯 CUSTOM CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🎯 Testing Custom Configuration')
         const customResult = await service.customConfigMethod({
             id: 'custom-12345',
@@ -457,7 +452,7 @@ export async function runEnhancedConfigDemo(): Promise<void> {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🎚️ ADAPTIVE CONFIGURATION DEMO
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🎚️ Testing Adaptive Configuration')
         const adaptiveResult = await service.adaptiveConfigMethod(['hello', 'world', 'enhanced', 'logging'])
         logger.info('✅ Adaptive result:', { transformed: adaptiveResult })
@@ -465,7 +460,7 @@ export async function runEnhancedConfigDemo(): Promise<void> {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 📊 SERVICE STATISTICS
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('📊 Service Statistics')
         const stats = service.getServiceStatistics()
         logger.info('✅ Final statistics:', stats)
@@ -473,38 +468,38 @@ export async function runEnhancedConfigDemo(): Promise<void> {
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🎯 CONFIGURATION COMPARISON
         // ═══════════════════════════════════════════════════════════════════════════════
-        
+
         logger.info('🎯 Configuration Comparison')
         const configs = {
-            development: EnhancedConfigFactory.createDevelopmentConfig(),
-            production: EnhancedConfigFactory.createProductionConfig(),
-            debug: EnhancedConfigFactory.createDebugConfig(),
-            performance: EnhancedConfigFactory.createPerformanceConfig(),
-            testing: EnhancedConfigFactory.createTestingConfig()
+            development: createDevelopmentConfig(),
+            production: createProductionConfig(),
+            debug: createDebugConfig(),
+            performance: createPerformanceConfig(),
+            testing: createTestingConfig()
         }
-        
+
         logger.info('✅ Configuration comparison:', {
-            development: { 
+            development: {
                 logLevel: configs.development.logLevel,
                 performanceTracking: configs.development.enablePerformanceTracking,
                 arguments: configs.development.includeArguments
             },
-            production: { 
+            production: {
                 logLevel: configs.production.logLevel,
                 performanceTracking: configs.production.enablePerformanceTracking,
                 arguments: configs.production.includeArguments
             },
-            debug: { 
+            debug: {
                 logLevel: configs.debug.logLevel,
                 performanceTracking: configs.debug.enablePerformanceTracking,
                 arguments: configs.debug.includeArguments
             },
-            performance: { 
+            performance: {
                 logLevel: configs.performance.logLevel,
                 performanceTracking: configs.performance.enablePerformanceTracking,
                 arguments: configs.performance.includeArguments
             },
-            testing: { 
+            testing: {
                 logLevel: configs.testing.logLevel,
                 performanceTracking: configs.testing.enablePerformanceTracking,
                 arguments: configs.testing.includeArguments
@@ -513,6 +508,6 @@ export async function runEnhancedConfigDemo(): Promise<void> {
     } catch (error: unknown) {
         logger.error('❌ Enhanced Config Demo failed:', { error })
     }
-    
+
     logger.info('🎉 Enhanced Config Factory Demo completed!')
 } 
