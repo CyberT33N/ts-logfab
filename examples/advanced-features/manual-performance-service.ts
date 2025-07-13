@@ -36,7 +36,7 @@ import {
     getAnomalyDetectionStatistics,
     clearAnomalyDetectionData
 } from '@/logger/performance-utils.ts'
-import { SampleDataFactory } from '../core/models.ts'
+import { createUsers } from '../core/models.ts'
 
 /**
  * ⚡ **Manual Performance Service**
@@ -365,7 +365,7 @@ export class ManualPerformanceService {
     }
 
     private async _processLargeDataset(size: number): Promise<{ processed: number; checksum: number }> {
-        const data = SampleDataFactory.createUsers(size)
+        const data = createUsers(size)
         let checksum = 0
         
         for (const user of data) {

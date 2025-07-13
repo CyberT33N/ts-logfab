@@ -27,7 +27,7 @@ import {
     getEnhancedLoggingStatus
 } from '@/logger/enhanced-decorator.ts'
 import { logger } from '@/logger/index.ts'
-import { IUser, IProduct, SampleDataFactory } from '../core/models.ts'
+import { IUser, IProduct, createUsers, createProducts } from '../core/models.ts'
 
 /**
  * 🔥 **Enhanced Decorator Service**
@@ -36,8 +36,9 @@ import { IUser, IProduct, SampleDataFactory } from '../core/models.ts'
  * This is the alternative implementation that was NOT being tested!
  */
 export class EnhancedDecoratorService {
-    private readonly _users: IUser[] = SampleDataFactory.createUsers(8)
-    private readonly _products: IProduct[] = SampleDataFactory.createProducts(15)
+    [key: string]: unknown
+    private readonly _users: IUser[] = createUsers(8)
+    private readonly _products: IProduct[] = createProducts(15)
     private readonly _analytics: { event: string; timestamp: Date; data: unknown }[] = []
 
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -333,6 +334,10 @@ export class EnhancedDecoratorService {
         const errorsEncountered: string[] = []
         let processedItems = 0
         
+        // Use options for configuration
+        const strictMode = options.strict === true
+        const maxErrors = typeof options.maxErrors === 'number' ? options.maxErrors : Infinity
+        
         for (const [index, item] of data.entries()) {
             try {
                 if (item === null) {
@@ -343,9 +348,19 @@ export class EnhancedDecoratorService {
                     throw new Error(`Invalid type '${typeof item}' at index ${String(index)}`)
                 }
                 
+                // In strict mode, perform additional validation
+                if (strictMode && typeof item === 'object' && Object.keys(item).length === 0) {
+                    throw new Error(`Empty object at index ${String(index)} (strict mode)`)
+                }
+                
                 processedItems++
             } catch (error) {
                 errorsEncountered.push((error as Error).message)
+                
+                // Stop processing if max errors reached
+                if (errorsEncountered.length >= maxErrors) {
+                    break
+                }
             }
         }
         
