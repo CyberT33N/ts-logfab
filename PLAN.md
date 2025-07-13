@@ -5,9 +5,9 @@
 - [x] ~~**1.2. Definition der Migrationsstrategie** ([Details](./.plan/1-analysis-and-setup.md))~~
 
 ## Phase 2: Refactoring des Haupt-Dekorators
-- [ ] **2.1. Konfigurations-Adapter für Abwärtskompatibilität erstellen** ([Details](./.plan/2-refactor-main-decorator.md))
-- [ ] **2.2. Kernlogik des `@log`-Dekorators auf Enhanced-Funktionen umstellen** ([Details](./.plan/2-refactor-main-decorator.md))
-- [ ] **2.3. Spezialisierte Dekorator-Varianten (`@logDebug`, etc.) anpassen** ([Details](./.plan/2-refactor-main-decorator.md))
+- [x] **2.1. Konfigurations-Adapter für Abwärtskompatibilität erstellen** ([Details](./.plan/2-refactor-main-decorator.md))
+- [x] **2.2. Kernlogik des `@log`-Dekorators auf Enhanced-Funktionen umstellen** ([Details](./.plan/2-refactor-main-decorator.md))
+- [x] **2.3. Spezialisierte Dekorator-Varianten (`@logDebug`, etc.) anpassen** ([Details](./.plan/2-refactor-main-decorator.md))
 
 ## Phase 3: Anpassung der Beispielanwendungen
 - [ ] **3.1. Refactoring der `BaseService` und zugehöriger Beispiele** ([Details](./.plan/3-refactor-example-services.md))

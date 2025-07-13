@@ -88,6 +88,51 @@ export interface IHybridLoggerConfig {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 SINGLETON LOGGER MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Singleton Logger Cache**
+ * 
+ * Prevents EventEmitter memory leaks by reusing logger instances
+ */
+const loggerCache = new Map<string, pino.Logger>()
+
+/**
+ * 🎯 **Singleton Stream Cache**
+ * 
+ * Prevents EventEmitter memory leaks by reusing streams
+ */
+const streamCache = new Map<string, NodeJS.WritableStream>()
+
+/**
+ * 🎯 **Get or create cached stream**
+ * 
+ * Reuses existing streams to prevent EventEmitter memory leaks
+ */
+function getCachedStream(format: Exclude<LoggingFormat, 'auto'>): NodeJS.WritableStream {
+    const cacheKey = `stream-${format}`
+    
+    const cachedStream = streamCache.get(cacheKey)
+    if (cachedStream) {
+        return cachedStream
+    }
+    
+    const stream = format === 'human' ? createHumanStream() : createMachineStream()
+    streamCache.set(cacheKey, stream)
+    return stream
+}
+
+/**
+ * 🎯 **Generate logger cache key**
+ * 
+ * Creates unique cache key for logger configuration
+ */
+function generateLoggerCacheKey(config: ReadonlyDeep<IHybridLoggerConfig>): string {
+    return `${config.format}-${config.name}-${config.level}-${String(config.enableStructuredData)}`
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 STREAM CREATION FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -184,6 +229,7 @@ export function createHybridLoggerConfig(): IHybridLoggerConfig {
  * 🎯 **Create hybrid logger instance**
  * 
  * Creates environment-adaptive logger with appropriate output format
+ * Uses singleton pattern to prevent EventEmitter memory leaks
  */
 export function createHybridLogger(
     config: ReadonlyDeep<Partial<IHybridLoggerConfig>> = {}
@@ -192,6 +238,13 @@ export function createHybridLogger(
     const finalConfig: IHybridLoggerConfig = {
         ...defaultConfig,
         ...config
+    }
+    
+    // Check if we already have a cached logger for this configuration
+    const cacheKey = generateLoggerCacheKey(finalConfig)
+    const cachedLogger = loggerCache.get(cacheKey)
+    if (cachedLogger) {
+        return cachedLogger
     }
     
     // Load package.json information
@@ -211,10 +264,8 @@ export function createHybridLogger(
         structuredData: finalConfig.enableStructuredData
     }
     
-    // Create appropriate stream based on format
-    const stream = finalConfig.format === 'human' 
-        ? createHumanStream()
-        : createMachineStream()
+    // Create appropriate stream based on format (cached to prevent leaks)
+    const stream = getCachedStream(finalConfig.format)
     
     // Create pino logger
     const logger = pino(
@@ -278,6 +329,9 @@ export function createHybridLogger(
             prettyPrint: finalConfig.enablePrettyPrint
         }
     }, `🎯 Hybrid Logger initialized (${finalConfig.format} format)`)
+    
+    // Cache the logger to prevent EventEmitter memory leaks
+    loggerCache.set(cacheKey, logger)
     
     return logger
 }

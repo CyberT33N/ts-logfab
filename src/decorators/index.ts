@@ -15,15 +15,14 @@
 
 import type { ReadonlyDeep } from 'type-fest'
 import {
-    createDecoratorPrefix,
-    logMethodStart,
-    logMethodSuccess,
-    logMethodError,
-    logMethodDebug,
-    createPerformanceSnapshot,
-    extractLogRelevantArgs,
-    extractResultMetadata,
-    type ILogContext
+    logEnhancedMethodStart,
+    logEnhancedMethodSuccess,
+    logEnhancedMethodError,
+    getDefaultDecoratorConfig,
+    type IDecoratorLoggingConfig
+} from '@/logger/decorator-logging.ts'
+import {
+    extractResultMetadata
 } from '@/logger/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -327,7 +326,7 @@ const DEFAULT_LOG_CONFIG: Required<Omit<ILogDecoratorConfig, 'customContext' | '
 } as const
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🛠️ HELPER TYPES FOR PROPER METHOD TYPING
+// 🔧 HELPER TYPES FOR PROPER METHOD TYPING
 // ═══════════════════════════════════════════════════════════════════════════════
 
 type AsyncMethod = (...args: readonly unknown[]) => Promise<unknown>
@@ -335,214 +334,28 @@ type SyncMethod = (...args: readonly unknown[]) => unknown
 type AnyMethod = AsyncMethod | SyncMethod
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🔧 HELPER FUNCTIONS FOR COMPLEXITY REDUCTION
+// 🔄 ENHANCED CONFIGURATION ADAPTER
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🏗️ Creates the logging context for a method execution
+ * 🔄 **Configuration Adapter for Enhanced Logging**
+ * 
+ * Converts the legacy ILogDecoratorConfig to the new IDecoratorLoggingConfig
+ * for backward compatibility while enabling enhanced features.
  */
-function createLoggingContext(
-    className: string,
-    methodName: string,
-    args: readonly unknown[],
-    config: Required<Omit<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>> & 
-           Pick<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>
-): { prefix: string; logContext: ILogContext; relevantArgs?: Record<string, unknown> } {
-    const relevantArgs = config.includeArgs 
-        ? extractLogRelevantArgs(args)
-        : undefined
+function convertToEnhancedConfig(config: ReadonlyDeep<ILogDecoratorConfig>): IDecoratorLoggingConfig {
+    const defaults = getDefaultDecoratorConfig()
     
-    const prefix = config.customPrefix ?? createDecoratorPrefix(
-        className,
-        methodName,
-        relevantArgs
-    )
+    // Map trace level to debug since enhanced config doesn't support trace
+    const mappedLogLevel = config.level === 'trace' ? 'debug' : config.level
     
-    const logContext: ILogContext = {
-        className,
-        methodName,
-        ...((relevantArgs && Object.keys(relevantArgs).length > 0) && { args: relevantArgs }),
-        ...(config.customContext && { metadata: config.customContext }),
-        // 🎯 **ENTERPRISE SIGNATURE INJECTION**
-        methodSignature: buildIntelligentMethodSignature(methodName, args, config)
-    }
-    
-    return { prefix, logContext, relevantArgs }
-}
-
-/**
- * 🎯 **ENTERPRISE SIGNATURE BUILDER** - Constructs intelligent method signatures with multi-line support
- */
-function buildIntelligentMethodSignature(
-    methodName: string,
-    args: readonly unknown[],
-    config: Pick<ILogDecoratorConfig, 'methodSignature'>
-): string {
-    // 🔥 **PRIORITY 1**: Full signature override
-    if (config.methodSignature?.fullSignature !== undefined) {
-        return formatMethodSignatureForTable(config.methodSignature.fullSignature, 54)
-    }
-    
-    // 🔥 **PRIORITY 2**: Build from individual components
-    const isAsync = config.methodSignature?.isAsync ?? true // Default to async since decorator treats all as async
-    const asyncPrefix = isAsync ? 'async ' : ''
-    
-    // 🎯 **PARAMETER CONSTRUCTION**
-    const parameterNames = config.methodSignature?.parameterNames
-    const parameterTypes = config.methodSignature?.parameterTypes ?? args.map(arg => typeof arg)
-    
-    let parametersDisplay = ''
-    if (parameterNames) {
-        // **ENTERPRISE MODE**: Full parameter info available
-        parametersDisplay = parameterNames
-            .map((name, i) => `${name}: ${parameterTypes[i] || 'unknown'}`)
-            .join(', ')
-    } else {
-        // **INTELLIGENT FALLBACK**: Use runtime type information
-        parametersDisplay = args
-            .map((arg, i) => `arg${String(i)}: ${typeof arg}`)
-            .join(', ')
-    }
-    
-    // 🎯 **RETURN TYPE CONSTRUCTION**
-    const returnType = config.methodSignature?.returnType ?? 'Promise<unknown>'
-    
-    const fullSignature = `${asyncPrefix}${methodName}(${parametersDisplay}): ${returnType}`
-    
-    // 🎯 **INTELLIGENT MULTI-LINE FORMATTING**
-    return formatMethodSignatureForTable(fullSignature, 54)
-}
-
-/**
- * 🎯 **ENTERPRISE MULTI-LINE FORMATTER** - Formats method signatures for optimal table display
- */
-function formatMethodSignatureForTable(signature: string, maxWidth: number): string {
-    // 🎯 **QUICK CHECK**: If signature fits, return as-is
-    if (signature.length <= maxWidth) {
-        return signature
-    }
-    
-    // 🎯 **INTELLIGENT PARSING**: Break down the signature
-    const asyncMatch = /^(async\s+)?(.+)/.exec(signature)
-    if (!asyncMatch) {
-        return signature
-    }
-    
-    const asyncPrefix = asyncMatch[1] || ''
-    const restOfSignature = asyncMatch[2]
-    
-    // 🎯 **METHOD AND PARAMETERS PARSING**
-    const methodMatch = /^([^(]+)\(([^)]*)\)(.*)$/.exec(restOfSignature)
-    
-    if (!methodMatch) {
-        return signature
-    }
-    
-    const [, methodName, parametersStr, returnPart] = methodMatch
-    
-    // 🎯 **PARAMETER BREAKDOWN**
-    const parameters = parametersStr.split(',').map(p => p.trim()).filter(p => p.length > 0)
-    
-    if (parameters.length === 0) {
-        return signature // No parameters, keep as-is
-    }
-    
-    // 🎯 **MULTI-LINE CONSTRUCTION**
-    const lines = []
-    
-    // **LINE 1**: Method name + opening parenthesis
-    lines.push(`${asyncPrefix}${methodName}(`)
-    
-    // **LINE 2-N**: Parameters (one per line with proper indentation)
-    parameters.forEach((param, index) => {
-        const isLast = index === parameters.length - 1
-        const comma = isLast ? '' : ','
-        lines.push(`    ${param}${comma}`)
-    })
-    
-    // **LAST LINE**: Closing parenthesis + return type
-    lines.push(`)${returnPart}`)
-    
-    return lines.join('\n')
-}
-
-/**
- * 🔍 Handles debug logging for method signatures
- */
-function logMethodSignature(
-    prefix: string, 
-    methodName: string, 
-    args: readonly unknown[]
-): void {
-    logMethodDebug(
-        prefix,
-        `Method signature: ${methodName}(${args.map((_, i) => `arg${String(i)}`).join(', ')})`,
-        {
-            argumentTypes: args.map(arg => typeof arg),
-            argumentCount: args.length
-        }
-    )
-}
-
-/**
- * 📊 Handles success logging with metrics
- */
-function logSuccessWithMetrics(
-    prefix: string,
-    duration: number,
-    logContext: ReadonlyDeep<ILogContext>,
-    result: unknown,
-    config: ReadonlyDeep<Required<Omit<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>>> & 
-           ReadonlyDeep<Pick<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>>,
-    performanceSnapshot?: ReadonlyDeep<ReturnType<typeof createPerformanceSnapshot>>
-): void {
-    if (config.logSuccess) {
-        logMethodSuccess(prefix, duration, logContext, result)
-    }
-    
-    if (config.logDebug) {
-        const resultMetadata = result !== undefined ? extractResultMetadata(result) : undefined
-        logMethodDebug(
-            prefix,
-            'Method execution completed with detailed metrics',
-            {
-                executionTime: `${String(duration)}ms`,
-                resultType: resultMetadata?.type,
-                resultSize: resultMetadata?.size,
-                memoryUsage: performanceSnapshot?.memoryUsage,
-                successfulExecution: true
-            }
-        )
-    }
-}
-
-/**
- * 🚨 Handles error logging with metrics
- */
-function logErrorWithMetrics(
-    prefix: string,
-    error: Readonly<Error>,
-    duration: number,
-    logContext: ReadonlyDeep<ILogContext>,
-    config: Required<Omit<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>> & 
-           Pick<ILogDecoratorConfig, 'customContext' | 'customPrefix' | 'methodSignature'>,
-    performanceSnapshot?: ReadonlyDeep<ReturnType<typeof createPerformanceSnapshot>>
-): void {
-    logMethodError(prefix, error, duration, logContext)
-    
-    if (config.logDebug) {
-        logMethodDebug(
-            prefix,
-            'Method execution failed with detailed metrics',
-            {
-                executionTime: `${String(duration)}ms`,
-                errorType: error.name,
-                errorMessage: error.message,
-                memoryUsage: performanceSnapshot?.memoryUsage,
-                successfulExecution: false,
-                stackTrace: error.stack?.split('\n').slice(0, 5).join(' | ')
-            }
-        )
+    return {
+        enableCorrelation: config.correlationContext?.enabled ?? defaults.enableCorrelation,
+        enableSemanticDetection: config.semanticContext?.enabled ?? defaults.enableSemanticDetection,
+        enableAnomalyDetection: config.anomalyDetection?.enabled ?? defaults.enableAnomalyDetection,
+        enablePerformanceTracking: config.includePerformance ?? defaults.enablePerformanceTracking,
+        useHybridLogger: true, // Always use hybrid logger for enhanced features
+        logLevel: mappedLogLevel ?? defaults.logLevel
     }
 }
 
@@ -629,74 +442,38 @@ export function log(config: ReadonlyDeep<ILogDecoratorConfig> = {}): MethodDecor
             // 🏗️ Setup logging context
             const className = this.constructor.name
             const methodName = String(propertyKey)
-            const { prefix, logContext } = createLoggingContext(
+            
+            // 🔄 Convert configuration to enhanced format
+            const enhancedConfig = convertToEnhancedConfig(finalConfig)
+            
+            // 🚀 Enhanced method start logging
+            const startResult = logEnhancedMethodStart(
                 className, 
                 methodName, 
                 args, 
-                finalConfig
+                enhancedConfig
             )
-            
-            // ⚡ Start performance monitoring
-            const performanceSnapshot = finalConfig.includePerformance 
-                ? createPerformanceSnapshot()
-                : undefined
-            
-            // 🚀 Log method start
-            if (finalConfig.logStart) {
-                logMethodStart(prefix, logContext, performanceSnapshot)
-            }
-            
-            // 🔍 Log debug information if enabled
-            if (finalConfig.logDebug) {
-                logMethodSignature(prefix, methodName, args)
-            }
             
             try {
                 // 🎯 Execute the original method
                 const result = await originalMethod.apply(this, args as unknown[])
                 
-                // ⏱️ Calculate execution time using consistent time base
-                const endTime = performanceSnapshot 
-                    ? performance.now()
-                    : Date.now()
-                const duration = performanceSnapshot 
-                    ? endTime - performanceSnapshot.startTime
-                    : 0
-                
-                // ✅ Log successful completion with metrics
-                logSuccessWithMetrics(
-                    prefix, 
-                    duration, 
-                    logContext, 
-                    finalConfig.includeResult ? result : undefined, 
-                    finalConfig, 
-                    performanceSnapshot
+                // ✅ Enhanced success logging
+                logEnhancedMethodSuccess(
+                    startResult,
+                    finalConfig.includeResult ? extractResultMetadata(result) : undefined,
+                    enhancedConfig
                 )
                 
                 return result
             } catch (error) {
-                // ⏱️ Calculate execution time for error case using consistent time base
-                const endTime = performanceSnapshot 
-                    ? performance.now()
-                    : Date.now()
-                const duration = performanceSnapshot 
-                    ? endTime - performanceSnapshot.startTime
-                    : 0
-                
                 // 🚨 Ensure we have a proper Error object
                 const errorObj = error instanceof Error 
                     ? error 
                     : new Error(String(error))
                 
-                // ❌ Log method failure with detailed context
-                logErrorWithMetrics(
-                    prefix, 
-                    errorObj, 
-                    duration, 
-                    logContext, 
-                    finalConfig, 
-                    performanceSnapshot
-                )
+                // ❌ Enhanced error logging
+                logEnhancedMethodError(startResult, errorObj, enhancedConfig)
                 
                 // 🔄 Re-throw the error to maintain normal error flow
                 throw error
@@ -717,19 +494,23 @@ export function log(config: ReadonlyDeep<ILogDecoratorConfig> = {}): MethodDecor
 
 /**
  * 🔍 **DEBUG LOG DECORATOR**
- * Pre-configured for debug-level logging with detailed information
+ * Pre-configured for debug-level logging with detailed information and all Enhanced features
  */
 export const logDebug = (): MethodDecorator => log({
     level: 'debug',
     logDebug: true,
     includePerformance: true,
     includeArgs: true,
-    includeResult: true
+    includeResult: true,
+    // Enhanced Features for maximum debug information
+    correlationContext: { enabled: true },
+    semanticContext: { enabled: true },
+    anomalyDetection: { enabled: true }
 })
 
 /**
  * ⚡ **PERFORMANCE LOG DECORATOR**
- * Focused on performance metrics and execution timing
+ * Focused on performance metrics and execution timing with Enhanced monitoring
  */
 export const logPerformance = (): MethodDecorator => log({
     level: 'info',
@@ -737,24 +518,37 @@ export const logPerformance = (): MethodDecorator => log({
     includeArgs: false,
     includeResult: true,
     logDebug: false,
+    // Enhanced Features for performance monitoring
+    correlationContext: { enabled: true },
+    semanticContext: { enabled: false }, // Minimal semantic overhead for performance focus
+    anomalyDetection: { 
+        enabled: true,
+        enableCriticalAlerts: true,
+        enableWarningAlerts: true,
+        thresholdMultiplier: 2.0 // Stricter performance monitoring
+    },
     customContext: { focus: 'performance' }
 })
 
 /**
  * 🔒 **SILENT LOG DECORATOR**
- * Minimal logging for sensitive operations
+ * Minimal logging for sensitive operations with reduced Enhanced features
  */
 export const logSilent = (): MethodDecorator => log({
     level: 'info',
     includeArgs: false,
     includeResult: false,
     logDebug: false,
+    // Minimal Enhanced Features for silent operations
+    correlationContext: { enabled: true }, // Keep correlation for tracing
+    semanticContext: { enabled: false }, // Disable semantic analysis
+    anomalyDetection: { enabled: false }, // Disable anomaly detection
     customContext: { mode: 'silent' }
 })
 
 /**
  * 🚨 **ERROR-ONLY LOG DECORATOR**
- * Only logs when methods fail
+ * Only logs when methods fail with Enhanced error analysis
  */
 export const logErrorsOnly = (): MethodDecorator => log({
     level: 'error',
@@ -762,7 +556,15 @@ export const logErrorsOnly = (): MethodDecorator => log({
     logSuccess: false,
     includeArgs: true,
     includeResult: false,
-    logDebug: true
+    logDebug: true,
+    // Enhanced Features for error analysis
+    correlationContext: { enabled: true },
+    semanticContext: { enabled: true }, // Help categorize error types
+    anomalyDetection: { 
+        enabled: true,
+        enableCriticalAlerts: true,
+        enableWarningAlerts: false // Only critical for error-only mode
+    }
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════

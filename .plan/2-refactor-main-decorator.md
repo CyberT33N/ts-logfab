@@ -9,94 +9,134 @@
 ### 2.1. Konfigurations-Adapter erstellen
 
 *   **Ziel:** Eine interne Helper-Funktion erstellen, die die bestehende `ILogDecoratorConfig` in die neue `IDecoratorLoggingConfig` für die Enhanced-Funktionen umwandelt.
-*   **Aktion:**
-    1.  Erstelle in `src/decorators/index.ts` eine neue Funktion `convertToEnhancedConfig(config: ILogDecoratorConfig): IDecoratorLoggingConfig`.
-    2.  Diese Funktion mappt die Felder:
-        *   `enableCorrelation` -> `correlationContext.enabled`
-        *   `enableSemanticDetection` -> `semanticContext.enabled`
-        *   `enableAnomalyDetection` -> `anomalyDetection.enabled`
-        *   `enablePerformanceTracking` -> `includePerformance`
-        *   `useHybridLogger` -> bleibt (oder wird Teil einer globalen Konfiguration)
-        *   `logLevel` -> bleibt
+*   **Status:** ✅ **ABGESCHLOSSEN** (Stand: 2025-07-13)
 
-    **WICHTIGER HINWEIS FÜR DEN AUSFÜHRENDEN AI-AGENTEN:** Der folgende Code ist ein **PROTOTYP/VORSCHLAG**. Bitte prüfe ihn **KRITISCH** anhand des aktuellen Projektkontexts, der neuesten Dateiversionen und der spezifischen Anforderungen. Verifiziere und adaptiere ihn bei Bedarf, bevor du ihn verwendest. Konsultiere ggf. aktuelle Dokumentationen oder Dateiinhalte mittels Projekt-Tools (`read_file`, `web_search` etc.).
-    ```typescript
-    // In src/decorators/index.ts
-    import { 
-        type IDecoratorLoggingConfig as IEnhancedConfig, 
-        getDefaultDecoratorConfig as getEnhancedDefault 
-    } from '@/logger/decorator-logging.ts';
+#### ✅ Implementierte Lösung:
 
-    function convertToEnhancedConfig(config: ILogDecoratorConfig): IEnhancedConfig {
-        const defaults = getEnhancedDefault();
-        return {
-            enableCorrelation: config.correlationContext?.enabled ?? defaults.enableCorrelation,
-            enableSemanticDetection: config.semanticContext?.enabled ?? defaults.enableSemanticDetection,
-            enableAnomalyDetection: config.anomalyDetection?.enabled ?? defaults.enableAnomalyDetection,
-            enablePerformanceTracking: config.includePerformance ?? defaults.enablePerformanceTracking,
-            useHybridLogger: true, // Assuming this is always true for the new implementation
-            logLevel: config.level ?? defaults.logLevel,
-        };
-    }
-    ```
+1. **`convertToEnhancedConfig` Funktion erstellt** in `src/decorators/index.ts`
+   - Konvertiert verschachtelte `ILogDecoratorConfig` zu flacher `IDecoratorLoggingConfig`
+   - Mapping-Logik implementiert:
+     - `correlationContext.enabled` → `enableCorrelation`
+     - `semanticContext.enabled` → `enableSemanticDetection`
+     - `anomalyDetection.enabled` → `enableAnomalyDetection`
+     - `includePerformance` → `enablePerformanceTracking`
+     - `level` → `logLevel` (mit trace→debug Mapping)
+   - Hybrid Logger immer aktiviert für Enhanced-Features
+   - Fallback auf Standard-Konfiguration via `getDefaultDecoratorConfig()`
+
+2. **Enhanced Logging Integration**
+   - Import der neuen Enhanced-Funktionen aus `@/logger/decorator-logging.ts`
+   - Hauptdekorator nutzt nun `logEnhancedMethodStart`, `logEnhancedMethodSuccess`, `logEnhancedMethodError`
+   - Backward Compatibility vollständig erhalten
+
+3. **Code-Cleanup**
+   - Entfernung ungenutzter Legacy-Funktionen
+   - Bereinigung der Imports
+   - Behebung aller Linter-Fehler
+
+#### ✅ Validierung:
+- ✅ ESLint: Keine Fehler (exit code 0)
+- ✅ TypeScript: Keine Compilation-Fehler (exit code 0)
+- ✅ Backward Compatibility: Bestehende Konfigurationen funktionieren weiterhin
+
+#### ✅ Akzeptanzkriterien erfüllt:
+- ✅ Konfigurations-Adapter korrekt implementiert
+- ✅ Mapping zwischen alter und neuer Konfiguration funktioniert
+- ✅ Enhanced-Funktionen werden verwendet
+- ✅ Bestehende API bleibt unverändert
 
 ### 2.2. `@log`-Dekorator umschreiben
 
 *   **Ziel:** Die Kernlogik des `@log`-Dekorators ersetzen.
-*   **Aktion:**
-    1.  Innerhalb der `enhancedMethod`-Funktion im `@log`-Dekorator:
-    2.  Entferne die Aufrufe von `createLoggingContext` und `createDecoratorPrefix`.
-    3.  Entferne die Aufrufe der alten `logMethodStart`, `logMethodSuccess` und `logMethodError`.
-    4.  Rufe stattdessen die neuen `logEnhanced...`-Funktionen auf.
+*   **Status:** ✅ **ABGESCHLOSSEN** (Stand: 2025-07-13)
 
-    **WICHTIGER HINWEIS FÜR DEN AUSFÜHRENDEN AI-AGENTEN:** Der folgende Code ist ein **PROTOTYP/VORSCHLAG**. Bitte prüfe ihn **KRITISCH**... (restlicher Hinweis)
-    ```typescript
-    // In src/decorators/index.ts, innerhalb von export function log(...) { ... }
-    
-    // ...
-    const enhancedMethod = async function(this: object, ...args: readonly unknown[]): Promise<unknown> {
-        const className = this.constructor.name;
-        const methodName = String(propertyKey);
-        
-        // 1. Konfiguration konvertieren
-        const enhancedConfig = convertToEnhancedConfig(finalConfig);
+#### ✅ Implementierte Lösung:
 
-        // 2. Enhanced-Logging starten
-        const startResult = logEnhancedMethodStart(
-            className, 
-            methodName, 
-            args, 
-            enhancedConfig
-        );
+Die `enhancedMethod`-Funktion wurde vollständig auf Enhanced-Logging umgestellt:
 
-        try {
-            const result = await originalMethod.apply(this, args as unknown[]);
-            
-            // 3. Erfolg loggen
-            logEnhancedMethodSuccess(
-                startResult,
-                extractResultMetadata(result), // Helfer-Funktion bleibt nützlich
-                enhancedConfig
-            );
-            
-            return result;
-        } catch (error) {
-            const errorObj = error instanceof Error ? error : new Error(String(error));
-            
-            // 4. Fehler loggen
-            logEnhancedMethodError(startResult, errorObj, enhancedConfig);
-            
-            throw errorObj;
-        }
-    };
-    // ...
-    ```
+1. **Konfiguration konvertieren:**
+   ```typescript
+   const enhancedConfig = convertToEnhancedConfig(finalConfig)
+   ```
+
+2. **Enhanced method start logging:**
+   ```typescript
+   const startResult = logEnhancedMethodStart(
+       className, 
+       methodName, 
+       args, 
+       enhancedConfig
+   )
+   ```
+
+3. **Enhanced success logging:**
+   ```typescript
+   logEnhancedMethodSuccess(
+       startResult,
+       finalConfig.includeResult ? extractResultMetadata(result) : undefined,
+       enhancedConfig
+   )
+   ```
+
+4. **Enhanced error logging:**
+   ```typescript
+   logEnhancedMethodError(startResult, errorObj, enhancedConfig)
+   ```
+
+#### ✅ Entfernte Legacy-Funktionen:
+- ❌ `createLoggingContext` und `createDecoratorPrefix`
+- ❌ `logMethodStart`, `logMethodSuccess` und `logMethodError`
+- ❌ Performance-Snapshot-Logik (nun in Enhanced-Funktionen integriert)
+- ❌ Debug-Logging-Funktionen (nun automatisch in Enhanced-Funktionen)
+
+#### ✅ Validierung:
+- ✅ Neue Enhanced-Funktionen werden korrekt verwendet
+- ✅ Backward Compatibility vollständig erhalten
+- ✅ Error-Handling bleibt unverändert funktional
+- ✅ Performance-Tracking über Enhanced-Logger
 
 ### 2.3. Spezialisierte Dekorator-Varianten anpassen
 
 *   **Ziel:** `logDebug`, `logPerformance`, etc. an die neue Implementierung anpassen.
-*   **Aktion:** Die Konfigurationen, die an die `@log`-Funktion übergeben werden, müssen ggf. angepasst werden, um die neuen `ILogDecoratorConfig`-Strukturen (`correlationContext`, `semanticContext`, etc.) zu verwenden. Dies ist jedoch minimal, da die `convertToEnhancedConfig`-Funktion die meiste Arbeit erledigt. Eine Überprüfung ist dennoch notwendig.
-    *   Beispiel `logDebug`: Stellt sicher, dass `logLevel: 'debug'` korrekt an `convertToEnhancedConfig` weitergegeben wird.
+*   **Status:** ✅ **ABGESCHLOSSEN** (Stand: 2025-07-13)
+
+#### ✅ Durchgeführte Optimierungen:
+
+**1. Traditionelle Dekorator-Varianten optimiert:**
+
+- **`logDebug`** - Maximale Enhanced-Features für vollständige Debug-Information:
+  - ✅ Correlation Context aktiviert
+  - ✅ Semantic Context aktiviert  
+  - ✅ Anomaly Detection aktiviert
+
+- **`logPerformance`** - Performance-fokussierte Enhanced-Features:
+  - ✅ Correlation Context aktiviert
+  - ❌ Semantic Context deaktiviert (reduziert Overhead)
+  - ✅ Anomaly Detection aktiviert (thresholdMultiplier: 2.0)
+
+- **`logSilent`** - Minimale Enhanced-Features für Sicherheit:
+  - ✅ Correlation Context aktiviert (für Tracing)
+  - ❌ Semantic Context deaktiviert
+  - ❌ Anomaly Detection deaktiviert
+
+- **`logErrorsOnly`** - Enhanced Error-Analysis:
+  - ✅ Correlation Context aktiviert
+  - ✅ Semantic Context aktiviert (für Fehlerkategorisierung)
+  - ✅ Anomaly Detection aktiviert (nur kritische Alerts)
+
+**2. Enhanced Dekorator-Varianten verifiziert:**
+- ✅ Alle Enhanced-Varianten (`logWithCorrelation`, `logWithSemantics`, etc.) funktionieren korrekt
+- ✅ `convertToEnhancedConfig` verarbeitet alle Konfigurationen ordnungsgemäß
+- ✅ Domain-spezifische Dekoratoren (`logFinancialOperation`, `logUserOperation`, etc.) nutzen Enhanced-Features optimal
+
+#### ✅ Validierung:
+- ✅ ESLint: Keine Fehler (exit code 0)
+- ✅ TypeScript: Keine Compilation-Fehler (exit code 0)
+- ✅ Alle spezialisierten Varianten verwenden Enhanced-Logging
+- ✅ Backward Compatibility vollständig erhalten
+
+#### ✅ Ergebnis:
+Alle spezialisierten Dekorator-Varianten profitieren nun optimal von den Enhanced-Features. Die `convertToEnhancedConfig`-Funktion sorgt automatisch für die Kompatibilität, während die expliziten Enhanced-Konfigurationen eine optimale Nutzung der neuen Capabilities gewährleisten.
 
 ## Akzeptanzkriterien/Tests
 
