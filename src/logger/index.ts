@@ -19,13 +19,16 @@ export type { ILogContext, IPerformanceMetrics } from './types.ts'
 // Re-export logger instance
 export { logger } from './logger-factory.ts'
 
-// Re-export all decorator-optimized logging functions
+// Re-export all Enhanced decorator logging functions and types
 export {
-    createDecoratorPrefix,
-    logMethodStart,
-    logMethodSuccess,
-    logMethodError,
-    logMethodDebug
+    logEnhancedMethodStart,
+    logEnhancedMethodSuccess,
+    logEnhancedMethodError,
+    logEnhancedMethodDebug,
+    createDecoratorLoggingConfig,
+    getDefaultDecoratorConfig,
+    type IEnhancedLogContext,
+    type IDecoratorLoggingConfig
 } from './decorator-logging.ts'
 
 // Re-export performance utilities

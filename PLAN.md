@@ -10,13 +10,14 @@
 - [x] **2.3. Spezialisierte Dekorator-Varianten (`@logDebug`, etc.) anpassen** ([Details](./.plan/2-refactor-main-decorator.md))
 
 ## Phase 3: Anpassung der Beispielanwendungen
-- [ ] **3.1. Refactoring der `BaseService` und zugehöriger Beispiele** ([Details](./.plan/3-refactor-example-services.md))
-- [ ] **3.2. Anpassung der `EnterpriseConfigurationService`** ([Details](./.plan/3-refactor-example-services.md))
-- [ ] **3.3. Sicherstellen, dass alle Beispiele (`app-*.ts`) lauffähig sind** ([Details](./.plan/3-refactor-example-services.md))
+- [x] **3.1. Analyse der `examples/` und Validierung der Lauffähigkeit** ([Details](./.plan/3-refactor-example-services.md))
+- [x] **3.2. Anpassung von `examples/core/base-service.ts`** ([Details](./.plan/3-refactor-example-services.md))
+- [x] **3.3. Anpassung der Enterprise-Konfigurationen** ([Details](./.plan/3-refactor-example-services.md))
+- [x] **3.4. Überprüfung der alternativen Implementierung** ([Details](./.plan/3-refactor-example-services.md))
 
 ## Phase 4: API-Bereinigung
-- [ ] **4.1. Legacy-Funktionen aus `decorator-logging.ts` entfernen** ([Details](./.plan/4-update-public-api.md))
-- [ ] **4.2. Exporte in `src/logger/index.ts` bereinigen** ([Details](./.plan/4-update-public-api.md))
+- [x] **4.1. Legacy-Funktionen aus `decorator-logging.ts` entfernen** ([Details](./.plan/4-update-public-api.md))
+- [x] **4.2. Exporte in `src/logger/index.ts` bereinigen** ([Details](./.plan/4-update-public-api.md))
 
 ## Phase 5: Testing und Validierung
 - [ ] **5.1. Bestehende Unit- und Integrationstests anpassen** ([Details](./.plan/5-testing-and-validation.md))

@@ -258,6 +258,54 @@ export function getMasterConfig(): ILogDecoratorConfig {
     }
 }
 
+/**
+ * 🎯 **New Enhanced Features Configuration (2024)**
+ *
+ * Demonstrates the latest Enhanced features with explicit configuration
+ */
+export function getEnhancedFeaturesConfig(): ILogDecoratorConfig {
+    return {
+        level: 'info',
+        includePerformance: true,
+        includeArgs: true,
+        includeResult: true,
+        
+        // 🔥 **NEW ENHANCED FEATURES - Direct Configuration**
+        correlationContext: {
+            enabled: true,
+            correlationId: 'enhanced-2024-correlation',
+            workflowId: 'enhanced-workflow-demo',
+            requestId: 'enhanced-req-demo-123',
+            userId: 'enhanced-user-demo',
+            inheritFromParent: true
+        },
+        
+        semanticContext: {
+            enabled: true,
+            domain: 'SYSTEM',
+            operation: 'COMPUTE',
+            complexity: 'MEDIUM',
+            businessKey: 'enhanced-analytics-2024',
+            tags: ['enhanced', 'analytics', '2024', 'demo']
+        },
+        
+        anomalyDetection: {
+            enabled: true,
+            minSamples: 10,
+            thresholdMultiplier: 2.0,
+            enableCriticalAlerts: true,
+            enableWarningAlerts: true,
+            customMethodKey: 'EnhancedDemo::analyticsMethod'
+        },
+        
+        customContext: {
+            enhancedFeatures: true,
+            demonstrationType: 'enhanced-analytics-2024',
+            newCapabilities: ['correlation', 'semantic', 'anomaly']
+        }
+    }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🏢 ENTERPRISE CONFIGURATION SHOWCASE SERVICE
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -528,6 +576,7 @@ export class EnterpriseConfigurationService {
 	        }
 	    })()
 	)
+     
 	public async runtimeConfigurationShowcase(
 	    adaptiveData: ReadonlyDeep<{
 			requestType: string
@@ -582,6 +631,43 @@ export class EnterpriseConfigurationService {
 	}
 	private async _delay(ms: number): Promise<void> {
 	    return new Promise(resolve => setTimeout(resolve, ms))
+	}
+
+	// ═══════════════════════════════════════════════════════════════════════════════
+	// 🔥 NEW ENHANCED FEATURES SHOWCASE (2024)
+	// ═══════════════════════════════════════════════════════════════════════════════
+
+	@log(getEnhancedFeaturesConfig())
+	public async enhancedFeaturesShowcase(
+	    analyticsData: ReadonlyDeep<{
+			dataPoints: readonly number[]
+			analysisType: 'trend' | 'correlation' | 'prediction'
+			metadata: Record<string, unknown>
+		}>
+	): Promise<{
+		analysisCompleted: boolean
+		enhancedCorrelation: string
+		semanticTags: readonly string[]
+		anomalyDetected: boolean
+		resultSummary: Record<string, unknown>
+	}> {
+	    await this._delay(150)
+
+	    const sum = analyticsData.dataPoints.reduce((acc, val) => acc + val, 0)
+	    const average = sum / analyticsData.dataPoints.length
+
+	    return {
+	        analysisCompleted: true,
+	        enhancedCorrelation: 'enhanced-2024-correlation',
+	        semanticTags: ['enhanced', 'analytics', '2024', 'demo'],
+	        anomalyDetected: average > 50, // Simple anomaly simulation
+	        resultSummary: {
+	            dataPointsProcessed: analyticsData.dataPoints.length,
+	            analysisType: analyticsData.analysisType,
+	            averageValue: average,
+	            enhancedFeaturesActive: true
+	        }
+	    }
 	}
 }
 
@@ -701,6 +787,18 @@ export async function runCompleteConfigurationDemo(): Promise<void> {
             }
         )
         logger.info('✅ Master configuration result:', masterResult)
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🔥 NEW ENHANCED FEATURES DEMO (2024)
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        logger.info('🔥 Testing New Enhanced Features (2024)')
+        const enhancedResult = await service.enhancedFeaturesShowcase({
+            dataPoints: [25, 30, 45, 60, 35, 40, 55],
+            analysisType: 'trend',
+            metadata: { source: 'enhanced-demo', version: '2024' }
+        })
+        logger.info('✅ Enhanced features result:', enhancedResult)
 
         // ═══════════════════════════════════════════════════════════════════════════════
         // 🎚️ RUNTIME CONFIGURATION DEMO
