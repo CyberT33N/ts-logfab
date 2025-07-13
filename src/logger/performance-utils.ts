@@ -18,8 +18,8 @@
 
 // ==== Imports ====
 import { performance, PerformanceObserver } from 'perf_hooks'
-import type { IPerformanceMetrics } from './types.ts'
 import { ReadonlyDeep } from 'type-fest'
+import type { IPerformanceMetrics } from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 PERFORMANCE OBSERVER FOR ENTERPRISE-GRADE MONITORING
