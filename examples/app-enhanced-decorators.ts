@@ -24,7 +24,7 @@ import { runAllEnhancedDecoratorDemos } from './enhanced-decorators/index.ts'
  * 🚀 **Enhanced Decorator Application Entry Point**
  * 
  * This file serves as the entry point for demonstrating the enhanced
- * decorator implementation from `@/logger/enhanced-decorator.ts`.
+ * decorator implementation from `@/logger/decorators/index.ts`.
  */
 async function main(): Promise<void> {
     logger.info('🚀 Starting Enhanced Decorator Implementation Demo')

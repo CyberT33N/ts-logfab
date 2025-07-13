@@ -15,12 +15,12 @@
 
 import type { ReadonlyDeep } from 'type-fest'
 import {
+    getDefaultDecoratorConfig,
+    logEnhancedMethodError,
     logEnhancedMethodStart,
     logEnhancedMethodSuccess,
-    logEnhancedMethodError,
-    getDefaultDecoratorConfig,
     type IDecoratorLoggingConfig
-} from '@/logger/decorator-logging.ts'
+} from '@/logger/decorators/index.ts'
 import {
     extractResultMetadata
 } from '@/logger/index.ts'

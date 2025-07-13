@@ -35,7 +35,7 @@ import {
     debugLog as enhancedDebugLog,
     log as enhancedLog,
     performanceLog as enhancedPerformanceLog
-} from '@/logger/enhanced-decorator.ts'
+} from '@/logger/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
 
 import { createProducts, createUsers, type IProduct, type IUser } from '../core/models.ts'
@@ -202,7 +202,7 @@ export class StandardDecoratorService {
 /**
  * 🔧 **Enhanced Decorator Implementation**
  *
- * Demonstrates the alternative implementation from /logger/enhanced-decorator.ts
+ * Demonstrates the alternative implementation from /logger/decorators/index.ts
  */
 export class EnhancedDecoratorService {
     [key: string]: unknown

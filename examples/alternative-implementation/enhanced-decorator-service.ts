@@ -25,7 +25,7 @@ import {
     errorLog,
     createEnhancedConfig,
     getEnhancedLoggingStatus
-} from '@/logger/enhanced-decorator.ts'
+} from '@/logger/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
 import { IUser, IProduct, createUsers, createProducts } from '../core/models.ts'
 

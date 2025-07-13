@@ -53,12 +53,15 @@ export {
 // 🚀 Re-export relevant types and decorators for convenience
 export type {
     ILogDecoratorConfig,
-    IEnhancedDecoratorConfig,
     IMethodSignature,
     ICorrelationContext,
     ISemanticContext,
     IAnomalyDetection
 } from '@/decorators/index.ts'
+
+export type {
+    IEnhancedDecoratorConfig
+} from '@/logger/decorators/index.ts'
 
 export {
     log,
@@ -84,10 +87,10 @@ export {
     performanceLog,
     debugLog as enhancedDebugLog,
     errorLog
-} from '@/logger/enhanced-decorator.ts'
+} from '@/logger/decorators/index.ts'
 
 // 🛠️ Re-export utility functions
-export { createEnhancedConfig, getEnhancedLoggingStatus } from '@/logger/enhanced-decorator.ts'
+export { createEnhancedConfig, getEnhancedLoggingStatus } from '@/logger/decorators/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 DEMO RUNNERS & SUMMARIES

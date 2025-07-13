@@ -30,7 +30,7 @@ import {
     log,
     performanceLog,
     type IEnhancedDecoratorConfig
-} from '@/logger/enhanced-decorator.ts'
+} from '@/logger/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
 import { createProducts, createUsers, type IProduct, type IUser } from '../core/models.ts'
 

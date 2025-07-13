@@ -29,7 +29,7 @@ export {
     getDefaultDecoratorConfig,
     type IEnhancedLogContext,
     type IDecoratorLoggingConfig
-} from './decorator-logging.ts'
+} from './decorators/index.ts'
 
 // Re-export performance utilities
 export { createPerformanceSnapshot } from './performance-utils.ts'
