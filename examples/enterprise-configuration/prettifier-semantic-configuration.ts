@@ -20,15 +20,15 @@
 // 🎨 PRETTIFIER & SEMANTIC ANALYSIS CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import type { ReadonlyDeep, WritableDeep } from 'type-fest'
+import type { ReadonlyDeep } from 'type-fest'
 import { logFinancialOperation, logUserOperation, logWithSemantics } from '@/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
 import {
     detectSemanticContext,
-    type IPrettyConfig,
     type ISemanticConfig,
     type ISemanticContext
 } from '@/logger/semantic-detector.ts'
+import { type IPrettyConfig } from '@/prettifiers/main-prettifiers.ts'
 import { toWritable } from '@/utils/data-utils.ts'
 import { createProducts, createUsers, type ITransaction, type IUser } from '../core/models.ts'
 
@@ -68,7 +68,8 @@ export function getDevelopmentPrettifierConfig(): IPrettyConfig {
             result: (result: unknown): string => `📤 Result: ${JSON.stringify(result, null, 2)}`,
             performance: (time: number): string => `⏱️ ${time.toFixed(2)}ms`,
             correlation: (id: string): string => `🔗 ${id}`,
-            semantic: (context: ReadonlyDeep<ISemanticContext>): string => `🎯 ${context.domain}::${context.operation}`
+            semantic: (context: ReadonlyDeep<ISemanticContext>): string =>
+                `🎯 ${context.domain}::${context.operation}`
         }
     }
 }
@@ -138,9 +139,7 @@ export function getDebugPrettifierConfig(): IPrettyConfig {
             timestamp: (date: Readonly<Date>): string => `🕐 ${date.toISOString()}`,
             logLevel: (level: string): string => `🏷️ ${level.toUpperCase()}`,
             methodName: (name: string): string => `🔧 ${name}`,
-            arguments: (
-                args: ReadonlyDeep<readonly unknown[]>
-            ): string => `📊 Arguments:\n${JSON.stringify(args, null, 4)}`,
+            arguments: (args: ReadonlyDeep<readonly unknown[]>): string => `📊 Arguments:\n${JSON.stringify(args, null, 4)}`,
             result: (result: unknown): string => `📋 Result:\n${JSON.stringify(result, null, 4)}`,
             performance: (time: number): string => `⏱️ Execution Time: ${time.toFixed(3)}ms`,
             correlation: (id: string): string => `🔗 Correlation ID: ${id}`,
@@ -215,9 +214,7 @@ export function getMasterPrettifierConfig(): IPrettyConfig {
         showSemanticContext: true,
         compactMode: isProduction,
         customFormatters: {
-            timestamp: (
-                date: Readonly<Date>
-            ): string => (isProduction ? date.toISOString() : `[${date.toISOString()}]`),
+            timestamp: (date: Readonly<Date>): string => (isProduction ? date.toISOString() : `[${date.toISOString()}]`),
             logLevel: (level: string): string => (isProduction ? level.toUpperCase() : `[${level.toUpperCase()}]`),
             methodName: (name: string): string => (isProduction ? name : `🎯 ${name}`),
             arguments: (args: ReadonlyDeep<readonly unknown[]>): string =>
@@ -684,7 +681,7 @@ export class EnterprisePrettifierSemanticService {
 	public async businessSemanticDemo(
 	    businessData: ReadonlyDeep<{
 			customerName: string
-			productCatalog: string[]
+			productCatalog: readonly string[]
 			orderProcessing: boolean
 			paymentValidation: boolean
 		}>
@@ -757,7 +754,7 @@ export class EnterprisePrettifierSemanticService {
 	            complianceScore: Math.floor(Math.random() * 100)
 	        },
 	        riskAssessment: {
-	            transactionRisk: financialData.transactionAmount > 10000 ? 'HIGH' : 'LOW',
+	            transactionRisk: financialData.transactionAmount > 10_000 ? 'HIGH' : 'LOW',
 	            currencyRisk: financialData.currency !== 'USD' ? 'MEDIUM' : 'LOW',
 	            paymentMethodRisk: financialData.paymentMethod === 'credit-card' ? 'LOW' : 'MEDIUM',
 	            overallRisk: 'MEDIUM'
@@ -877,10 +874,10 @@ export class EnterprisePrettifierSemanticService {
 		totalOrders: number
 		totalTransactions: number
 		configurationsSample: {
-			prettifierConfigs: readonly string[]
-			semanticConfigs: readonly string[]
-			supportedDomains: readonly string[]
-			supportedOperations: readonly string[]
+			readonly prettifierConfigs: readonly string[]
+			readonly semanticConfigs: readonly string[]
+			readonly supportedDomains: readonly string[]
+			readonly supportedOperations: readonly string[]
 		}
 		} {
 	    const businessConfig = getBusinessDomainConfig()
