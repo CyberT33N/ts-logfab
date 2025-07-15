@@ -9,8 +9,6 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                      🎨 AWARD-WINNING TERMINAL LOGGER                    ██
-██                         ENTERPRISE-GRADE • TABLE-POWERED                 ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
@@ -27,7 +25,7 @@ import {
     createMetadataTable, 
     createArgumentsTable, 
     createResultAnalyticsTable 
-} from './cli-table-functions.ts'
+} from './cli-table-functions/index.ts'
 import { TERMINAL_COLORS } from './colors.ts'
 import { getAppMetadata } from './metadata.ts'
 import { getMethodVisibility } from './type-analysis.ts'

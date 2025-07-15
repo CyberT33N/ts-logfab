@@ -9,55 +9,45 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                      🎨 AWARD-WINNING TERMINAL LOGGER                    ██
-██                         ENTERPRISE-GRADE • TABLE-POWERED                 ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🏢 INTERNAL MODULE BARREL - ENTERPRISE ARCHITECTURE
+// 🎯 CLI-TABLE-FUNCTIONS MODULE - INTERNAL BARREL FILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// 🎨 Colors and Styling
-export { TERMINAL_COLORS, enhanceLogLevel } from './colors.ts'
+// Types and interfaces
+export type { IEnhancedTableContext, IEnhancedTableConfig } from './types.ts'
+export { DEFAULT_ENHANCED_TABLE_CONFIG } from './types.ts'
 
-// 🎯 CLI-Table3 Functions
+// Core table configuration and utilities
 export { 
-    CliTable,
-    createTableConfig,
-    applyTableColors,
+    CliTable, 
+    createTableConfig, 
+    applyTableColors, 
+    createTableChars, 
+    createTableStyle, 
+    getMethodLabel 
+} from './core-table-config.ts'
+
+// Basic table creators
+export { 
     createDecoratorTable,
     createResultAnalyticsTable,
     createAnalyticsTable,
     createMetadataTable,
     createArgumentsTable
-} from './cli-table-functions/index.ts'
+} from './basic-table-creators.ts'
 
-// 🔧 Utility Functions
+// Enhanced context tables
 export { 
-    intelligentTruncate,
-    formatBytes,
-    formatDuration,
-    createProgressBar,
-    createTerminalLink,
-    getMetadataIcon,
-    analyzeResultValue
-} from './utility-functions.ts'
+    createCorrelationContextTable,
+    createSemanticContextTable,
+    createPerformanceIndicatorsTable,
+    createAnomalyWarningsTable
+} from './enhanced-context-tables.ts'
 
-// 🎯 Type Analysis
-export { 
-    analyzeArgumentType,
-    getMethodVisibility
-} from './type-analysis.ts'
-
-// 📋 Metadata Functions
-export { getAppMetadata } from './metadata.ts'
-
-// 🎪 Main Prettifiers
-export { 
-    createEnterpriseMessageFormat,
-    createEnterpriseCustomPrettifiers,
-    createEnterprisePrettyConfig
-} from './main-prettifiers.ts' 
+// Main enhanced decorator table function
+export { createEnhancedDecoratorTable } from './enhanced-decorator-table.ts' 
