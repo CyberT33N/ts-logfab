@@ -9,83 +9,80 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                    🚀 ENHANCED DECORATORS INDEX                           ██
-██              COMPREHENSIVE ENHANCED DECORATOR EXAMPLES                    ██
+██                    🚀 ENHANCED DECORATORS CORE INDEX                      ██
+██              BARREL FILE FOR ALL ENHANCED DECORATOR MODULES               ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🚀 ENHANCED DECORATORS INDEX - BARREL FILE
+// 🚀 ENHANCED DECORATORS CORE INDEX
 // ═══════════════════════════════════════════════════════════════════════════════
-// This file has been modularized. All implementation moved to ./core/ modules.
-// This file now serves as a pure re-export barrel to maintain API compatibility.
+// This index file consolidates and re-exports all functionalities from the
+// enhanced decorators core modules, providing a single entry point.
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// 🏭 Configuration Factories
 export {
     createDevelopmentConfig,
     createProductionConfig,
     createDebugConfig,
     createPerformanceConfig,
     createTestingConfig,
-    createCustomConfig,
-    ConfigBuilder,
-    EnterpriseConfigService,
-    runEnhancedConfigDemo
-} from './core/index.ts'
+    createAdaptiveConfig
+} from './config-factories.ts'
 
+// 🎯 Configuration Builder
+export {
+    ConfigBuilder,
+    createCustomConfig
+} from './config-builder.ts'
+
+// 🏢 Enterprise Service
+export {
+    EnterpriseConfigService
+} from './enterprise-service.ts'
+
+// 🔍 Comparison Services
 export {
     StandardDecoratorService,
-    EnhancedDecoratorService, // Note: This service is the one from the alternative implementation
+    EnhancedDecoratorService,
+    type IImplementationMetrics
+} from './comparison-services.ts'
+
+// 📊 Performance Analysis
+export {
     measureStandardDecorator,
     measureEnhancedDecorator,
     compareImplementations,
+    runComprehensivePerformanceAnalysis,
+    type IPerformanceComparison,
+    type IComparisonResult
+} from './performance-analysis.ts'
+
+// 🎯 Feature Analysis
+export {
     getFeatureMatrix,
     getRecommendations,
-    runImplementationComparisonDemo
-} from './core/index.ts'
+    analyzeFeatureGaps,
+    getHighImportanceFeatures,
+    calculateFeatureScore,
+    type IFeatureMatrix,
+    type IRecommendations
+} from './feature-analysis.ts'
 
-// 🚀 Re-export relevant types and decorators for convenience (from types.ts)
-export type {
-    ILogDecoratorConfig,
-    IMethodSignature,
-    ICorrelationContext,
-    ISemanticContext,
-    IAnomalyDetection,
-    IEnhancedDecoratorConfig
-} from './types.ts'
-
+// 🎪 Demo Runners
 export {
-    log,
-    logDebug,
-    logPerformance,
-    logSilent,
-    logErrorsOnly,
-    logWithCorrelation,
-    logWithSemantics,
-    logWithAnomalyDetection,
-    logForProduction,
-    logForDevelopment,
-    logFinancialOperation,
-    logUserOperation,
-    logOrderOperation,
-    logHighPerformance,
-    logComprehensive,
-    enhancedLog,
-    performanceLog,
-    enhancedDebugLog,
-    errorLog,
-    createEnhancedConfig, 
-    getEnhancedLoggingStatus
-} from './types.ts'
+    runEnhancedConfigDemo,
+    runImplementationComparisonDemo
+} from './demo-runners.ts'
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DEMO RUNNERS & SUMMARIES (from summary utilities)
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// 📊 Summary Utilities
 export {
     runAllEnhancedDecoratorDemos,
     getEnhancedDecoratorsSummary,
-    getEnhancedDecoratorsStatistics
-} from './core/summary-utilities.ts' 
+    getEnhancedDecoratorsStatistics,
+    type IEnhancedDecoratorsSummary,
+    type IEnhancedDecoratorsStatistics
+} from './summary-utilities.ts' 

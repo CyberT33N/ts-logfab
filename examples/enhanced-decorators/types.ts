@@ -9,52 +9,29 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                    🚀 ENHANCED DECORATORS INDEX                           ██
-██              COMPREHENSIVE ENHANCED DECORATOR EXAMPLES                    ██
+██                    🎯 ENHANCED DECORATORS TYPES INDEX                     ██
+██              CENTRAL TYPE DEFINITIONS AND RE-EXPORTS                      ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🚀 ENHANCED DECORATORS INDEX - BARREL FILE
-// ═══════════════════════════════════════════════════════════════════════════════
-// This file has been modularized. All implementation moved to ./core/ modules.
-// This file now serves as a pure re-export barrel to maintain API compatibility.
+// 🎯 ENHANCED DECORATORS TYPES INDEX
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export {
-    createDevelopmentConfig,
-    createProductionConfig,
-    createDebugConfig,
-    createPerformanceConfig,
-    createTestingConfig,
-    createCustomConfig,
-    ConfigBuilder,
-    EnterpriseConfigService,
-    runEnhancedConfigDemo
-} from './core/index.ts'
-
-export {
-    StandardDecoratorService,
-    EnhancedDecoratorService, // Note: This service is the one from the alternative implementation
-    measureStandardDecorator,
-    measureEnhancedDecorator,
-    compareImplementations,
-    getFeatureMatrix,
-    getRecommendations,
-    runImplementationComparisonDemo
-} from './core/index.ts'
-
-// 🚀 Re-export relevant types and decorators for convenience (from types.ts)
+// 🚀 Re-export relevant types and decorators for convenience
 export type {
     ILogDecoratorConfig,
     IMethodSignature,
     ICorrelationContext,
     ISemanticContext,
-    IAnomalyDetection,
+    IAnomalyDetection
+} from '@/decorators/index.ts'
+
+export type {
     IEnhancedDecoratorConfig
-} from './types.ts'
+} from '@/logger/decorators/index.ts'
 
 export {
     log,
@@ -71,21 +48,27 @@ export {
     logUserOperation,
     logOrderOperation,
     logHighPerformance,
-    logComprehensive,
-    enhancedLog,
-    performanceLog,
-    enhancedDebugLog,
-    errorLog,
-    createEnhancedConfig, 
-    getEnhancedLoggingStatus
-} from './types.ts'
+    logComprehensive
+} from '@/decorators/index.ts'
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DEMO RUNNERS & SUMMARIES (from summary utilities)
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ✨ Re-export enhanced decorator implementation from the alternative path
 export {
-    runAllEnhancedDecoratorDemos,
-    getEnhancedDecoratorsSummary,
-    getEnhancedDecoratorsStatistics
-} from './core/summary-utilities.ts' 
+    log as enhancedLog,
+    performanceLog,
+    debugLog as enhancedDebugLog,
+    errorLog
+} from '@/logger/decorators/index.ts'
+
+// 🛠️ Re-export utility functions
+export { createEnhancedConfig, getEnhancedLoggingStatus } from '@/logger/decorators/index.ts'
+
+// 🎯 Re-export core module types
+export type {
+    IImplementationMetrics,
+    IPerformanceComparison,
+    IComparisonResult,
+    IFeatureMatrix,
+    IRecommendations,
+    IEnhancedDecoratorsSummary,
+    IEnhancedDecoratorsStatistics
+} from './core/index.ts' 

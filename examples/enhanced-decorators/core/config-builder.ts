@@ -9,83 +9,95 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                    🚀 ENHANCED DECORATORS INDEX                           ██
-██              COMPREHENSIVE ENHANCED DECORATOR EXAMPLES                    ██
+██              🎯 ENHANCED DECORATOR CONFIGURATION BUILDER                  ██
+██                    FLUENT API FOR CUSTOM CONFIGURATIONS                   ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🚀 ENHANCED DECORATORS INDEX - BARREL FILE
-// ═══════════════════════════════════════════════════════════════════════════════
-// This file has been modularized. All implementation moved to ./core/ modules.
-// This file now serves as a pure re-export barrel to maintain API compatibility.
+// 🎯 ENHANCED DECORATOR CONFIGURATION BUILDER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export {
-    createDevelopmentConfig,
-    createProductionConfig,
-    createDebugConfig,
-    createPerformanceConfig,
-    createTestingConfig,
-    createCustomConfig,
-    ConfigBuilder,
-    EnterpriseConfigService,
-    runEnhancedConfigDemo
-} from './core/index.ts'
-
-export {
-    StandardDecoratorService,
-    EnhancedDecoratorService, // Note: This service is the one from the alternative implementation
-    measureStandardDecorator,
-    measureEnhancedDecorator,
-    compareImplementations,
-    getFeatureMatrix,
-    getRecommendations,
-    runImplementationComparisonDemo
-} from './core/index.ts'
-
-// 🚀 Re-export relevant types and decorators for convenience (from types.ts)
-export type {
-    ILogDecoratorConfig,
-    IMethodSignature,
-    ICorrelationContext,
-    ISemanticContext,
-    IAnomalyDetection,
-    IEnhancedDecoratorConfig
-} from './types.ts'
-
-export {
-    log,
-    logDebug,
-    logPerformance,
-    logSilent,
-    logErrorsOnly,
-    logWithCorrelation,
-    logWithSemantics,
-    logWithAnomalyDetection,
-    logForProduction,
-    logForDevelopment,
-    logFinancialOperation,
-    logUserOperation,
-    logOrderOperation,
-    logHighPerformance,
-    logComprehensive,
-    enhancedLog,
-    performanceLog,
-    enhancedDebugLog,
-    errorLog,
-    createEnhancedConfig, 
-    getEnhancedLoggingStatus
-} from './types.ts'
+import type { WritableDeep } from 'type-fest'
+import {
+    createEnhancedConfig,
+    type IEnhancedDecoratorConfig
+} from '@/logger/decorators/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DEMO RUNNERS & SUMMARIES (from summary utilities)
+// 🎯 CONFIGURATION BUILDER PATTERN
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export {
-    runAllEnhancedDecoratorDemos,
-    getEnhancedDecoratorsSummary,
-    getEnhancedDecoratorsStatistics
-} from './core/summary-utilities.ts' 
+/**
+ * 🎯 **Configuration Builder Pattern**
+ *
+ * Fluent API for creating custom enhanced decorator configurations
+ */
+export class ConfigBuilder {
+    private readonly _config: WritableDeep<Partial<IEnhancedDecoratorConfig>> = {}
+
+    public enablePerformanceTracking(enabled = true): this {
+        this._config.enablePerformanceTracking = enabled
+        return this
+    }
+
+    public enableAnomalyDetection(enabled = true): this {
+        this._config.enableAnomalyDetection = enabled
+        return this
+    }
+
+    public enableSemanticAnalysis(enabled = true): this {
+        this._config.enableSemanticAnalysis = enabled
+        return this
+    }
+
+    public enableCorrelationTracking(enabled = true): this {
+        this._config.enableCorrelationTracking = enabled
+        return this
+    }
+
+    public enableAutoFormatSwitching(enabled = true): this {
+        this._config.enableAutoFormatSwitching = enabled
+        return this
+    }
+
+    public setLogLevel(level: 'trace' | 'debug' | 'info' | 'warn' | 'error'): this {
+        this._config.logLevel = level
+        return this
+    }
+
+    public includeStackTrace(enabled = true): this {
+        this._config.includeStackTrace = enabled
+        return this
+    }
+
+    public includeArguments(enabled = true): this {
+        this._config.includeArguments = enabled
+        return this
+    }
+
+    public includeResult(enabled = true): this {
+        this._config.includeResult = enabled
+        return this
+    }
+
+    public setMaxArgumentsLength(length: number): this {
+        this._config.maxArgumentsLength = length
+        return this
+    }
+
+    public build(): IEnhancedDecoratorConfig {
+        return createEnhancedConfig(this._config)
+    }
+}
+
+/**
+ * 🎯 **Custom Configuration Builder Factory**
+ *
+ * Fluent API for building custom configurations
+ */
+export function createCustomConfig(): ConfigBuilder {
+    return new ConfigBuilder()
+} 
