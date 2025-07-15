@@ -21,9 +21,9 @@ import type { ReadonlyDeep } from 'type-fest'
 import { 
     AnomalyDetector, 
     createAnomalyDetector
-} from '../../anomaly-detector/index.ts'
-import type { ISemanticContext } from '../../semantic-detector.ts'
-import type { IEnhancedPerformanceConfig, IPerformanceBaseline } from '../types.ts'
+} from '@/logger/anomaly-detector/index.ts'
+import type { IEnhancedPerformanceConfig, IPerformanceBaseline } from '@/logger/performance/types.ts'
+import type { ISemanticContext } from '@/logger/semantic-detector/index.ts'
 
 /**
  * 🎯 **Default Enhanced Performance Configuration**

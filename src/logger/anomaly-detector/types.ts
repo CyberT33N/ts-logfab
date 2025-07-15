@@ -17,8 +17,8 @@
 // 🚨 ANOMALY DETECTION TYPES - TYPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { type IRingBufferStats } from '../ring-buffer.ts'
-import { type ISemanticContext } from '../semantic-detector.ts'
+import { type IRingBufferStats } from '@/logger/ring-buffer.ts'
+import { type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 export type { IRingBufferStats }
 export type { ISemanticContext }
 

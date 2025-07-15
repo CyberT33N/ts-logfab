@@ -21,8 +21,8 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { type LoggingFormat } from '@/env.ts'
-import { ICorrelationContext } from '../correlation-context/index.ts'
-import { ISemanticContext } from '../semantic-detector.ts'
+import { ICorrelationContext } from '@/logger/correlation-context/index.ts'
+import { ISemanticContext } from '@/logger/semantic-detector.ts'
 
 /**
  * 🌍 **Environment Types**

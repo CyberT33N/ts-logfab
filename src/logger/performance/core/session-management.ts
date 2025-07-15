@@ -18,9 +18,9 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import type { ReadonlyDeep } from 'type-fest'
-import { getCurrentCorrelationContext } from '../../correlation-context/index.ts'
-import { detectSemanticContext, type ISemanticContext } from '../../semantic-detector.ts'
-import type { IPerformanceSession, IPerformanceMonitorConfig } from '../types.ts'
+import { getCurrentCorrelationContext } from '@/logger/correlation-context/index.ts'
+import type { IPerformanceSession, IPerformanceMonitorConfig } from '@/logger/performance/types.ts'
+import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 
 /**
  * 🏃 **Performance Session Manager**

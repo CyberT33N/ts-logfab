@@ -26,7 +26,7 @@ import { logger } from '@/logger/index.ts'
 import {
     detectSemanticContext,
     type ISemanticContext
-} from '@/logger/semantic-detector.ts'
+} from '@/logger/semantic-detector/index.ts'
 import { toWritable } from '@/utils/data-utils.ts'
 import { 
     createProducts, 

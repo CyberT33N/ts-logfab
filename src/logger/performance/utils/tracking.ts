@@ -20,9 +20,9 @@
 import { 
     createPerformanceMetric,
     type IAnomalyDetection
-} from '../../anomaly-detector/index.ts'
-import { detectSemanticContext, type ISemanticContext } from '../../semantic-detector.ts'
-import type { IPerformanceBaseline } from '../types.ts'
+} from '@/logger/anomaly-detector/index.ts'
+import type { IPerformanceBaseline } from '@/logger/performance/types.ts'
+import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 import { 
     getEnhancedPerformanceConfiguration,
     updatePerformanceBaseline,

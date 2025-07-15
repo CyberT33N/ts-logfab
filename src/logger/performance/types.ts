@@ -18,10 +18,10 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import type { ReadonlyDeep } from 'type-fest'
-import type { IAnomalyDetection, IAnomalyConfig } from '../anomaly-detector/index.ts'
-import type { IRingBufferStats } from '../ring-buffer.ts'
-import type { ISemanticContext } from '../semantic-detector.ts'
-import type { IPerformanceMetrics } from '../types.ts'
+import type { IAnomalyDetection, IAnomalyConfig } from '@/logger/anomaly-detector/index.ts'
+import type { IRingBufferStats } from '@/logger/ring-buffer.ts'
+import type { ISemanticContext } from '@/logger/semantic-detector/index.ts'
+import type { IPerformanceMetrics } from '@/logger/types.ts'
 
 /**
  * 🏃 **Performance Session**

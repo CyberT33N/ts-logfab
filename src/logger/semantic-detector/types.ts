@@ -9,28 +9,98 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 DECORATOR LOGGING TYPES MODULE                            ██
-██          SHARED TYPES AND INTERFACES FOR DECORATOR LOGGING               ██
-██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ==== Imports ====
-import { type ICorrelationContext } from '@/logger/correlation-context/index.ts'
-import { type ISemanticContext } from '@/logger/semantic-detector/index.ts'
-import { type ILogContext, type IPerformanceMetrics } from '@/logger/types.ts'
-
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED LOGGING INTERFACES
+// 🧠 SEMANTIC CONTEXT DETECTION - TYPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **Enhanced Log Context with Correlation and Semantic Data**
+ * 🎯 **Semantic Context Interface**
+ * 
+ * Provides business context extracted from method names and arguments
+ * - operation: Type of operation being performed
+ * - domain: Business domain the operation belongs to
+ * - complexity: Complexity level based on arguments and patterns
+ * - confidence: How confident we are in the detection (0-1)
  */
-export interface IEnhancedLogContext extends ILogContext {
-    readonly correlation?: ICorrelationContext
-    readonly semantic?: ISemanticContext
-    readonly performance?: IPerformanceMetrics
-    readonly anomalyDetection?: boolean
+export interface ISemanticContext {
+    readonly operation: OperationType
+    readonly domain: DomainType
+    readonly complexity: ComplexityLevel
+    readonly confidence: number
+    readonly metadata: {
+        readonly detectedPatterns: readonly string[]
+        readonly entityType?: string
+        readonly estimatedCost: CostLevel
+    }
+}
+
+/**
+ * 🔄 **Operation Types**
+ * 
+ * CRUD and computational operations
+ */
+export type OperationType = 
+    | 'READ' 
+    | 'WRITE' 
+    | 'UPDATE' 
+    | 'DELETE' 
+    | 'COMPUTE' 
+    | 'VALIDATE'
+    | 'TRANSFORM'
+    | 'SEARCH'
+    | 'AGGREGATE'
+    | 'UNKNOWN'
+
+/**
+ * 🏢 **Domain Types**
+ * 
+ * Business domains for better log categorization
+ */
+export type DomainType = 
+    | 'USER' 
+    | 'ORDER' 
+    | 'PRODUCT' 
+    | 'FINANCE' 
+    | 'SYSTEM' 
+    | 'AUTH'
+    | 'NOTIFICATION'
+    | 'ANALYTICS'
+    | 'INTEGRATION'
+    | 'GENERAL'
+
+/**
+ * 📊 **Complexity Levels**
+ * 
+ * Based on argument count, types, and detected patterns
+ */
+export type ComplexityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME'
+
+/**
+ * 💰 **Cost Levels**
+ * 
+ * Estimated resource cost for operations
+ */
+export type CostLevel = 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'EXPENSIVE'
+
+/**
+ * 🔍 **Pattern Configuration**
+ * 
+ * Configurable patterns for operation and domain detection
+ */
+export interface IPatternConfig {
+    readonly operations: Record<OperationType, readonly RegExp[]>
+    readonly domains: Record<DomainType, readonly string[]>
+    readonly complexityIndicators: {
+        readonly high: readonly string[]
+        readonly medium: readonly string[]
+    }
+    readonly costIndicators: {
+        readonly expensive: readonly string[]
+        readonly high: readonly string[]
+        readonly medium: readonly string[]
+    }
 } 

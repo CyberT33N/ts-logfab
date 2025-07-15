@@ -9,28 +9,15 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 DECORATOR LOGGING TYPES MODULE                            ██
-██          SHARED TYPES AND INTERFACES FOR DECORATOR LOGGING               ██
-██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ==== Imports ====
-import { type ICorrelationContext } from '@/logger/correlation-context/index.ts'
-import { type ISemanticContext } from '@/logger/semantic-detector/index.ts'
-import { type ILogContext, type IPerformanceMetrics } from '@/logger/types.ts'
-
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED LOGGING INTERFACES
+// 🧠 SEMANTIC CONTEXT DETECTION - INTERNAL BARREL FILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/**
- * 🎯 **Enhanced Log Context with Correlation and Semantic Data**
- */
-export interface IEnhancedLogContext extends ILogContext {
-    readonly correlation?: ICorrelationContext
-    readonly semantic?: ISemanticContext
-    readonly performance?: IPerformanceMetrics
-    readonly anomalyDetection?: boolean
-} 
+export * from './types.ts'
+export * from './config.ts'
+export * from './detection-functions.ts'
+export * from './utils.ts' 
