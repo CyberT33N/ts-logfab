@@ -11,6 +11,7 @@
     "example:enhanced": "tsx --tsconfig tsconfig.base.json examples/app-enhanced-decorators.ts",
     "example:performance": "tsx --tsconfig tsconfig.base.json examples/app-manual-performance.ts",
     "example:enterprise": "tsx --tsconfig tsconfig.base.json examples/app-enterprise-config.ts",
+    "example:alternative": "tsx --tsconfig tsconfig.base.json examples/app-alternative-enhanced-decorator.ts",
     "test": "vitest",
     "test:only:linux": "bash test-only.sh",
     "test:only:windows": "powershell -ExecutionPolicy Bypass -File test-only.ps1",
