@@ -24,7 +24,7 @@ import { runManualPerformanceDemo } from './advanced-features/manual-performance
  * 🚀 **Manual Performance Utils Application Entry Point**
  * 
  * This file serves as the entry point for demonstrating the manual performance
- * tracking utilities from `@/logger/performance-utils.ts`.
+ * tracking utilities from `@/logger/performance/utils/index.ts`.
  */
 async function main(): Promise<void> {
     logger.info('🚀 Starting Manual Performance Utilities Demo')

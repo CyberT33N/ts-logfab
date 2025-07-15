@@ -35,7 +35,7 @@ import {
     clearPerformanceBaselines,
     getAnomalyDetectionStatistics,
     clearAnomalyDetectionData
-} from '@/logger/performance-utils.ts'
+} from '@/logger/performance/utils/index.ts'
 import { createUsers } from '../core/models.ts'
 
 /**

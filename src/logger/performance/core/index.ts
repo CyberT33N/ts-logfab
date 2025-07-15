@@ -13,26 +13,15 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// Re-export all types and interfaces
-export type { ILogContext, IPerformanceMetrics } from './types.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📊 PERFORMANCE MONITORING - CORE MODULE EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export logger instance
-export { logger } from './logger-factory.ts'
+// Main Performance Monitor Class
+export { PerformanceMonitor } from './monitor-class.ts'
 
-// Re-export all Enhanced decorator logging functions and types
-export {
-    logEnhancedMethodStart,
-    logEnhancedMethodSuccess,
-    logEnhancedMethodError,
-    logEnhancedMethodDebug,
-    createDecoratorLoggingConfig,
-    getDefaultDecoratorConfig,
-    type IEnhancedLogContext,
-    type IDecoratorLoggingConfig
-} from './decorators/index.ts'
+// Session Management
+export { PerformanceSessionManager } from './session-management.ts'
 
-// Re-export performance utilities
-export { createPerformanceSnapshot } from './performance/utils/index.ts'
-
-// Re-export logging utilities
-export { extractLogRelevantArgs, extractResultMetadata } from './logging-utils.ts'
+// Statistics Management
+export { PerformanceStatisticsManager } from './statistics.ts' 

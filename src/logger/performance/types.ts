@@ -1,0 +1,167 @@
+/*
+███████████████████████████████████████████████████████████████████████████████
+██******************** PRESENTED BY t33n Software ***************************██
+██                                                                           ██
+██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
+██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
+██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
+██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
+██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
+██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
+██                                                                           ██
+███████████████████████████████████████████████████████████████████████████████
+███████████████████████████████████████████████████████████████████████████████
+*/
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📊 PERFORMANCE MONITORING - SHARED TYPE DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import type { ReadonlyDeep } from 'type-fest'
+import type { IAnomalyDetection, IAnomalyConfig } from '../anomaly-detector/index.ts'
+import type { IRingBufferStats } from '../ring-buffer.ts'
+import type { ISemanticContext } from '../semantic-detector.ts'
+import type { IPerformanceMetrics } from '../types.ts'
+
+/**
+ * 🏃 **Performance Session**
+ * 
+ * Represents an active performance monitoring session
+ */
+export interface IPerformanceSession {
+    readonly sessionId: string
+    readonly method: string
+    readonly className?: string
+    readonly startTime: number
+    readonly startMemory: number
+    readonly args: readonly unknown[]
+    readonly semantic: ISemanticContext
+    readonly correlationId?: string
+}
+
+/**
+ * 📊 **Performance Result**
+ * 
+ * Complete performance analysis result
+ */
+export interface IPerformanceResult {
+    readonly session: IPerformanceSession
+    readonly endTime: number
+    readonly duration: number
+    readonly endMemory: number
+    readonly memoryDelta: number
+    readonly success: boolean
+    readonly error?: Error
+    readonly result?: unknown
+    readonly anomalies: readonly IAnomalyDetection[]
+    readonly stats: IRingBufferStats
+}
+
+/**
+ * ⚙️ **Performance Monitor Configuration**
+ * 
+ * Configuration for performance monitoring
+ */
+export interface IPerformanceMonitorConfig {
+    readonly enabled: boolean
+    readonly enableMemoryTracking: boolean
+    readonly enableAnomalyDetection: boolean
+    readonly enableSemanticAnalysis: boolean
+    readonly autoLogAnomalies: boolean
+    readonly autoLogSlowOperations: boolean
+    readonly slowOperationThreshold: number // ms
+    readonly memoryTrackingInterval: number // ms
+    readonly maxConcurrentSessions: number
+    readonly sessionTimeout: number // ms
+    readonly ringBufferSize: number
+    readonly anomalyConfig: Partial<IAnomalyConfig>
+}
+
+/**
+ * 📈 **Performance Statistics Summary**
+ * 
+ * Aggregated performance statistics
+ */
+export interface IPerformanceStatsSummary {
+    readonly totalMethods: number
+    readonly totalSessions: number
+    readonly activeSessions: number
+    readonly averageDuration: number
+    readonly slowestMethod: {
+        readonly method: string
+        readonly averageDuration: number
+        readonly worstDuration: number
+    }
+    readonly mostActiveMethod: {
+        readonly method: string
+        readonly callCount: number
+        readonly totalDuration: number
+    }
+    readonly anomalyCount: {
+        readonly total: number
+        readonly bySeverity: Record<string, number>
+        readonly byType: Record<string, number>
+    }
+    readonly memoryStats: {
+        readonly averageUsage: number
+        readonly peakUsage: number
+        readonly totalAllocated: number
+    }
+}
+
+/**
+ * 🎯 **Enhanced Performance Configuration**
+ * 
+ * Configuration for performance monitoring with anomaly detection
+ */
+export interface IEnhancedPerformanceConfig {
+    readonly anomalyDetection: {
+        readonly enabled: boolean
+        readonly config?: ReadonlyDeep<Partial<IAnomalyConfig>>
+    }
+    readonly baseline: {
+        readonly trackingEnabled: boolean
+        readonly minSampleSize: number
+        readonly maxHistoryDays: number
+    }
+    readonly thresholds: {
+        readonly slowMethodWarning: number // ms
+        readonly slowMethodCritical: number // ms
+        readonly memoryWarning: number // bytes
+        readonly memoryCritical: number // bytes
+        readonly cpuWarning: number // percentage
+        readonly cpuCritical: number // percentage
+    }
+    readonly reporting: {
+        readonly logAnomalies: boolean
+        readonly logBaselines: boolean
+        readonly logThresholdViolations: boolean
+    }
+}
+
+/**
+ * 🎯 **Performance Baseline Data**
+ * 
+ * Baseline performance metrics for a specific method
+ */
+export interface IPerformanceBaseline {
+    readonly method: string
+    readonly averageDuration: number
+    readonly medianDuration: number
+    readonly p95Duration: number
+    readonly averageMemory: number
+    readonly sampleSize: number
+    readonly lastUpdated: number
+    readonly semantic?: ISemanticContext
+}
+
+/**
+ * 🎯 **Enhanced Performance Snapshot**
+ * 
+ * Extended performance snapshot with anomaly detection results
+ */
+export interface IEnhancedPerformanceSnapshot extends IPerformanceMetrics {
+    readonly anomalies?: readonly IAnomalyDetection[]
+    readonly baseline?: IPerformanceBaseline
+    readonly thresholdViolations?: readonly string[]
+} 

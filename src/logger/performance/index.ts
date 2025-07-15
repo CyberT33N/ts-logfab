@@ -9,67 +9,105 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██                    🎯 ENTERPRISE-GRADE PERFORMANCE MONITORING             ██
-██                         POWERED BY NODE.JS PERF_HOOKS                     ██
-██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 PERFORMANCE UTILS - RE-EXPORT BARREL FILE (API STABILITY)
+// 📊 PERFORMANCE MONITORING - MAIN MODULE EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// This file maintains 100% API compatibility by re-exporting all original exports
-// from the modularized performance monitoring system
-
+// Core Performance Monitor
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🔄 RE-EXPORTS FROM MODULARIZED PERFORMANCE SYSTEM
+// 🏭 FACTORY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Enhanced Performance Configuration Types
+import type { ReadonlyDeep } from 'type-fest'
+import { PerformanceMonitor } from './core/index.ts'
+import type { IPerformanceMonitorConfig } from './types.ts'
+
+export { PerformanceMonitor } from './core/index.ts'
+
+// All Types
 export type {
+    IPerformanceSession,
+    IPerformanceResult,
+    IPerformanceMonitorConfig,
+    IPerformanceStatsSummary,
     IEnhancedPerformanceConfig,
     IPerformanceBaseline,
     IEnhancedPerformanceSnapshot
-} from './performance/index.ts'
+} from './types.ts'
 
-// Enhanced Performance Configuration Functions
+// Utils - Enhanced Performance Monitoring
 export {
     configureEnhancedPerformanceMonitoring,
     getEnhancedPerformanceConfiguration,
-    initializeEnhancedPerformanceMonitoring
-} from './performance/index.ts'
-
-// Performance Tracking Functions
-export { trackMethodPerformance } from './performance/index.ts'
-
-// Performance Baseline Management
-export {
+    initializeEnhancedPerformanceMonitoring,
+    updatePerformanceBaseline,
     getPerformanceBaseline,
     getAllPerformanceBaselines,
-    clearPerformanceBaselines
-} from './performance/index.ts'
-
-// Anomaly Detection Statistics
-export {
+    clearPerformanceBaselines,
     getAnomalyDetectionStatistics,
-    clearAnomalyDetectionData
-} from './performance/index.ts'
-
-// Performance Snapshots & Metrics
-export {
+    clearAnomalyDetectionData,
+    trackMethodPerformance,
     createEnhancedPerformanceSnapshot,
     createPerformanceSnapshot,
-    calculatePerformanceDifference
-} from './performance/index.ts'
-
-// Performance Marks & Measures
-export {
+    calculatePerformanceDifference,
     createPerformanceMark,
     createPerformanceMeasure,
     getGCPerformanceData,
     getPerformanceMarks,
     getPerformanceMeasures,
+    getResourceTimings,
     clearPerformanceData
-} from './performance/index.ts' 
+} from './utils/index.ts'
+
+/**
+ * 🏭 **Create performance monitor instance**
+ * 
+ * Factory function for creating configured performance monitor
+ */
+export function createPerformanceMonitor(
+    config: ReadonlyDeep<Partial<IPerformanceMonitorConfig>> = {}
+): PerformanceMonitor {
+    return new PerformanceMonitor(config)
+}
+
+/**
+ * 🌐 **Global performance monitor singleton**
+ * 
+ * Shared instance for use across the application
+ */
+let globalPerformanceMonitor: PerformanceMonitor | undefined
+
+/**
+ * 🔗 **Get global performance monitor**
+ * 
+ * Returns the global singleton instance
+ */
+export function getGlobalPerformanceMonitor(): PerformanceMonitor {
+    globalPerformanceMonitor ??= new PerformanceMonitor()
+    return globalPerformanceMonitor
+}
+
+/**
+ * ⚙️ **Configure global performance monitor**
+ * 
+ * Updates the configuration of the global instance
+ */
+export function configureGlobalPerformanceMonitor(
+    config: ReadonlyDeep<Partial<IPerformanceMonitorConfig>>
+): void {
+    const monitor = getGlobalPerformanceMonitor()
+    monitor.updateConfig(config)
+}
+
+/**
+ * 🔄 **Reset global performance monitor**
+ * 
+ * Resets the global instance
+ */
+export function resetGlobalPerformanceMonitor(): void {
+    globalPerformanceMonitor = undefined
+} 

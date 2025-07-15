@@ -13,26 +13,41 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// Re-export all types and interfaces
-export type { ILogContext, IPerformanceMetrics } from './types.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📊 PERFORMANCE MONITORING - UTILS MODULE EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export logger instance
-export { logger } from './logger-factory.ts'
-
-// Re-export all Enhanced decorator logging functions and types
+// Enhanced Configuration & Baseline Management
 export {
-    logEnhancedMethodStart,
-    logEnhancedMethodSuccess,
-    logEnhancedMethodError,
-    logEnhancedMethodDebug,
-    createDecoratorLoggingConfig,
-    getDefaultDecoratorConfig,
-    type IEnhancedLogContext,
-    type IDecoratorLoggingConfig
-} from './decorators/index.ts'
+    configureEnhancedPerformanceMonitoring,
+    getEnhancedPerformanceConfiguration,
+    initializeEnhancedPerformanceMonitoring,
+    updatePerformanceBaseline,
+    getPerformanceBaseline,
+    getAllPerformanceBaselines,
+    clearPerformanceBaselines,
+    getAnomalyDetectionStatistics,
+    clearAnomalyDetectionData,
+    getGlobalAnomalyDetector
+} from './enhanced-config.ts'
 
-// Re-export performance utilities
-export { createPerformanceSnapshot } from './performance/utils/index.ts'
+// Performance Tracking
+export { trackMethodPerformance } from './tracking.ts'
 
-// Re-export logging utilities
-export { extractLogRelevantArgs, extractResultMetadata } from './logging-utils.ts'
+// Performance Snapshots
+export {
+    createEnhancedPerformanceSnapshot,
+    createPerformanceSnapshot,
+    calculatePerformanceDifference
+} from './snapshots.ts'
+
+// Performance Observer & perf_hooks
+export {
+    createPerformanceMark,
+    createPerformanceMeasure,
+    getGCPerformanceData,
+    getPerformanceMarks,
+    getPerformanceMeasures,
+    getResourceTimings,
+    clearPerformanceData
+} from './perf-hooks.ts' 

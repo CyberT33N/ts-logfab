@@ -23,7 +23,7 @@
 import { ReadonlyDeep } from 'type-fest'
 import { formatLogEntry, autoConfigureFormat } from '@/logger/AdaptiveLogging/index.ts'
 import { createCorrelationContext, runWithCorrelationContext } from '../correlation-context/index.ts'
-import { getGlobalPerformanceMonitor, IPerformanceSession } from '../performance-monitor.ts'
+import { getGlobalPerformanceMonitor, type IPerformanceSession } from '../performance/index.ts'
 import { detectSemanticContext, ISemanticContext } from '../semantic-detector.ts'
 import { type IEnhancedDecoratorConfig, DEFAULT_ENHANCED_CONFIG } from './config.ts'
 
