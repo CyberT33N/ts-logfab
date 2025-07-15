@@ -18,7 +18,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { logger } from '@/logger/index.ts'
-import { runEnhancedDecoratorDemo } from './alternative-implementation/enhanced-decorator-service.ts'
+import { runEnhancedDecoratorDemo } from './alternative-implementation/enhanced-decorator-service/DemoService.ts'
 
 /**
  * 🔥 **Alternative Enhanced Decorator Service Application Entry Point**
