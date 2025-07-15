@@ -25,7 +25,7 @@ import {
     createCorrelationContext, 
     type ICorrelationContext 
 } from '@/logger/correlation-context/index.ts'
-import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector.ts'
+import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 import { toWritable } from '@/utils/data-utils.ts'
 import { type ILogContext } from '../types.ts'
 import { type IDecoratorLoggingConfig, DEFAULT_DECORATOR_CONFIG } from './config.ts'

@@ -18,7 +18,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { logger } from '@/logger/index.ts'
-import { runManualPerformanceDemo } from './advanced-features/manual-performance-service.ts'
+import { runManualPerformanceDemo } from './advanced-features/manual-performance-service/DemoRunner.ts'
 
 /**
  * 🚀 **Manual Performance Utils Application Entry Point**
