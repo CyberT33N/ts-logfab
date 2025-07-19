@@ -21,7 +21,64 @@ import { logger } from '@/logger/index.ts'
 import { EnhancedDecoratorService } from './index.ts'
 
 /**
- * 🔥 **Demo Function for Enhanced Decorator Service**
+ * 🎭 Orchestrates comprehensive demonstration of all Enhanced Decorator Service capabilities and features.
+ * 
+ * @remarks
+ * This function provides a complete showcase of the Enhanced Decorator Service implementation,
+ * executing systematic tests across all decorator types and configurations. It demonstrates
+ * real-world usage patterns, error handling scenarios, and performance characteristics
+ * through a structured sequence of operations with comprehensive logging and validation.
+ * 
+ * 🔥 **Demo Test Sequence:**
+ * - Enhanced @log decorator tests with various configurations
+ * - Performance monitoring with @performanceLog decorator variations
+ * - Debugging capabilities using @debugLog decorator features
+ * - Error handling and recovery with @errorLog decorator scenarios
+ * - System status reporting and configuration management
+ * - Comprehensive service statistics and analytics reporting
+ * 
+ * 🧪 **Test Coverage:**
+ * - Default decorator configurations for baseline functionality
+ * - Enhanced configurations with full feature sets enabled
+ * - Minimal configurations optimized for performance scenarios
+ * - Error conditions and recovery mechanisms
+ * - Data validation and type inspection capabilities
+ * - Matrix operations and computational workload testing
+ * 
+ * 📊 **Validation & Reporting:**
+ * Each test scenario includes comprehensive logging of inputs, outputs, and
+ * performance characteristics, providing detailed insights into decorator
+ * behavior and system performance under various operational conditions.
+ * 
+ * @returns Promise that resolves when all demonstration scenarios complete successfully
+ * @throws {Error} When any critical demonstration scenario fails or encounters unrecoverable errors
+ * 
+ * @example
+ * Running the complete Enhanced Decorator Service demonstration:
+ * ```typescript
+ * import { runEnhancedDecoratorDemo } from './DemoService.ts';
+ * 
+ * async function demonstrateEnhancedDecorators() {
+ *     try {
+ *         await runEnhancedDecoratorDemo();
+ *         console.log('All Enhanced Decorator demonstrations completed successfully');
+ *         
+ *         // The demo will have logged comprehensive results for:
+ *         // - User profile operations with different logging levels
+ *         // - Performance monitoring of computational tasks
+ *         // - Debug analysis of complex data structures
+ *         // - Error handling across various failure scenarios
+ *         // - Recovery operations and resilience testing
+ *         
+ *     } catch (error) {
+ *         console.error('Enhanced Decorator demo failed:', error);
+ *         // Handle demonstration failure
+ *     }
+ * }
+ * 
+ * // Run demonstration
+ * demonstrateEnhancedDecorators();
+ * ```
  */
 export async function runEnhancedDecoratorDemo(): Promise<void> {
     logger.info('🔥 Starting Enhanced Decorator Demo (Alternative Implementation)')

@@ -22,9 +22,29 @@ import { performanceLog } from '@/logger/decorators/index.ts'
 import { UtilityService } from './UtilityService.ts'
 
 /**
- * 🔥 **Performance Decorator Test Service**
+ * 🔥 Specialized test service demonstrating @performanceLog decorator
+ *  configurations for performance monitoring scenarios.
  * 
- * Tests the enhanced @performanceLog() decorator implementation
+ * @remarks
+ * This service provides comprehensive examples of the enhanced @performanceLog decorator across
+ * different computational scenarios. It focuses specifically on performance measurement, anomaly
+ * detection, and resource usage tracking for CPU-intensive and memory-intensive operations,
+ * showcasing how performance logging adapts to different workload characteristics.
+ * 
+ * 🧪 **Performance Test Scenarios:**
+ * - Intensive computational tasks with iterative processing
+ * - Matrix operations with mathematical complexity
+ * - Batch processing operations with configurable workload sizes
+ * - Memory usage tracking across different operation types
+ * 
+ * 📊 **Performance Monitoring Features:**
+ * - Execution time measurement with high precision
+ * - Memory usage tracking and anomaly detection
+ * - Semantic analysis for performance pattern recognition
+ * - Configurable logging levels for different monitoring needs
+ * 
+ * @see {@link UtilityService} for shared utilities and data
+ * @see {@link performanceLog} for the performance decorator implementation
  */
 export class PerformanceDecoratorTestService {
     [key: string]: unknown
@@ -38,6 +58,41 @@ export class PerformanceDecoratorTestService {
     // 🔥 ENHANCED DECORATOR 'performanceLog' IMPLEMENTATION
     // ═══════════════════════════════════════════════════════════════════════════════
 
+    /**
+     * ⚡ Executes intensive computational task with default @performanceLog monitoring.
+     * 
+     * @remarks
+     * This method demonstrates CPU-intensive operations with mathematical computations
+     * using the @performanceLog decorator with default configuration. It combines
+     * trigonometric functions with iterative processing to create realistic computational
+     * load while measuring execution time and memory consumption.
+     * 
+     * 🔢 **Computational Complexity:**
+     * - Square root, sine, and cosine operations per iteration
+     * - Configurable iteration count for scalable workload testing
+     * - Periodic async delays to simulate I/O bound mixed workloads
+     * - Memory allocation tracking throughout execution
+     * 
+     * @decorator `@performanceLog()` - Default performance monitoring configuration
+     * 
+     * @param iterations - Number of computational iterations to execute
+     * @returns Promise resolving to computation results with performance metrics
+     * 
+     * @example
+     * Running intensive computation with performance monitoring:
+     * ```typescript
+     * const perfService = new PerformanceDecoratorTestService(utilityService);
+     * 
+     * // Test with moderate workload
+     * const result = await perfService.intensiveComputationTask(50000);
+     * 
+     * console.log(`Computation result: ${result.result}`);
+     * console.log(`Processing time: ${result.processingTime}ms`);
+     * console.log(`Memory used: ${result.memoryUsed} bytes`);
+     * 
+     * // Performance logs will automatically capture execution metrics
+     * ```
+     */
     @performanceLog() // DEFAULT PERFORMANCE CONFIGURATION
     public async intensiveComputationTask(iterations: Readonly<number>): Promise<{
         result: number
@@ -67,6 +122,43 @@ export class PerformanceDecoratorTestService {
         }
     }
 
+    /**
+     * 🔢 Performs matrix multiplication with enhanced @performanceLog monitoring and anomaly detection.
+     * 
+     * @remarks
+     * This method demonstrates mathematically intensive matrix operations with enhanced
+     * performance monitoring including anomaly detection and semantic analysis. The
+     * implementation uses standard matrix multiplication algorithm with O(n³) complexity,
+     * making it ideal for performance pattern analysis and resource usage tracking.
+     * 
+     * 📊 **Enhanced Performance Features:**
+     * - Anomaly detection for unusual execution patterns
+     * - Semantic analysis for mathematical operation categorization
+     * - Debug-level logging for detailed performance insights
+     * - Result inclusion for output validation tracking
+     * 
+     * @decorator `@performanceLog({ enableAnomalyDetection: true, enableSemanticAnalysis: true, 
+     * logLevel: 'debug', includeResult: true })`
+     * 
+     * @param matrixA - First matrix for multiplication (read-only deep)
+     * @param matrixB - Second matrix for multiplication (read-only deep)
+     * @returns Promise resolving to the resulting matrix from multiplication
+     * 
+     * @example
+     * Performing matrix multiplication with enhanced monitoring:
+     * ```typescript
+     * const perfService = new PerformanceDecoratorTestService(utilityService);
+     * 
+     * const matrixA = [[1, 2], [3, 4]];
+     * const matrixB = [[5, 6], [7, 8]];
+     * 
+     * const result = await perfService.matrixMultiplication(matrixA, matrixB);
+     * 
+     * console.log('Matrix multiplication result:', result);
+     * // Enhanced performance logs will include anomaly detection results
+     * // and semantic categorization of the mathematical operation
+     * ```
+     */
     @performanceLog({
         enableAnomalyDetection: true,
         enableSemanticAnalysis: true,
@@ -98,6 +190,41 @@ export class PerformanceDecoratorTestService {
         return result
     }
 
+    /**
+     * 📦 Executes batch data processing with optimized @performanceLog configuration for production monitoring.
+     * 
+     * @remarks
+     * This method demonstrates batch processing operations with performance monitoring
+     * optimized for production environments. It processes data in configurable batch sizes
+     * while tracking throughput metrics and processing efficiency, using a configuration
+     * that balances monitoring depth with performance overhead.
+     * 
+     * 🚀 **Production-Optimized Features:**
+     * - Performance tracking enabled for throughput monitoring
+     * - Anomaly detection for identifying processing bottlenecks
+     * - Info-level logging for operational visibility
+     * - Arguments and results excluded for privacy and performance
+     * 
+     * @decorator `@performanceLog({ enablePerformanceTracking: true, enableAnomalyDetection: true, 
+     * logLevel: 'info', includeArguments: false, includeResult: false })`
+     * 
+     * @param batchSize - Number of items to process in each batch
+     * @returns Promise resolving to batch processing statistics and performance metrics
+     * 
+     * @example
+     * Processing data in batches with performance monitoring:
+     * ```typescript
+     * const perfService = new PerformanceDecoratorTestService(utilityService);
+     * 
+     * const stats = await perfService.batchProcessData(10);
+     * 
+     * console.log(`Processed ${stats.processed} items in ${stats.batches} batches`);
+     * console.log(`Average processing time per batch: ${stats.averageTime}ms`);
+     * 
+     * // Performance monitoring will track throughput and identify
+     * // any anomalies in batch processing times
+     * ```
+     */
     @performanceLog({
         enablePerformanceTracking: true,
         enableAnomalyDetection: true,
