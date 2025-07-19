@@ -20,6 +20,33 @@
 // 🎪 ENHANCED DECORATORS DEMO RUNNERS
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/**
+ * 🎪 **Enhanced Decorators Demo Runners**
+ * 
+ * Comprehensive demonstration functions showcasing the full capabilities and
+ * configuration patterns of the enhanced decorator system. This module provides
+ * end-to-end demonstrations of configuration factories, implementation comparisons,
+ * performance analysis, and feature matrix evaluation for educational and
+ * evaluation purposes.
+ * 
+ * @fileoverview Comprehensive demo runners for enhanced decorator system evaluation
+ * @module DemoRunners
+ * @version 1.0.0
+ * @since 1.0.0
+ * 
+ * @example
+ * ```typescript
+ * // Run comprehensive configuration demonstration
+ * await runEnhancedConfigDemo();
+ * 
+ * // Execute implementation comparison analysis
+ * await runImplementationComparisonDemo();
+ * ```
+ * 
+ * @see {@link runEnhancedConfigDemo} Configuration factory demonstrations
+ * @see {@link runImplementationComparisonDemo} Implementation comparison analysis
+ */
+
 import type { ReadonlyDeep } from 'type-fest'
 import { logger } from '@/logger/index.ts'
 import { StandardDecoratorService, EnhancedDecoratorService } from './comparison-services.ts'
@@ -39,9 +66,70 @@ import { runComprehensivePerformanceAnalysis } from './performance-analysis.ts'
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **Enhanced Config Factory Demo**
+ * 🎯 **Enhanced Configuration Factory Demonstration**
  *
- * Demonstrates all configuration patterns and factory usage
+ * Executes a comprehensive demonstration of all enhanced decorator configuration
+ * patterns, factory functions, and enterprise-grade service implementations.
+ * This function showcases development, production, debug, performance, testing,
+ * custom, and adaptive configuration scenarios with real-world usage patterns
+ * and detailed result analysis.
+ * 
+ * @returns Promise that resolves when the complete demonstration is finished
+ * 
+ * @example
+ * ```typescript
+ * // Execute complete configuration factory demo
+ * await runEnhancedConfigDemo();
+ * 
+ * // The demo will automatically run through all configuration types:
+ * // - Development configuration with verbose logging
+ * // - Production configuration with optimized settings
+ * // - Debug configuration with detailed troubleshooting
+ * // - Performance configuration with minimal overhead
+ * // - Testing configuration with error simulation
+ * // - Custom configuration with specialized settings
+ * // - Adaptive configuration with environment awareness
+ * ```
+ * 
+ * @remarks
+ * **Demonstration Scope:**
+ * - **Configuration Factories**: All 5 predefined configuration types tested
+ * - **Enterprise Service**: Real-world service usage patterns demonstrated
+ * - **Error Handling**: Both success and failure scenarios covered
+ * - **Performance Analysis**: Timing and memory usage patterns shown
+ * - **Configuration Comparison**: Side-by-side feature comparison provided
+ * 
+ * **Configuration Types Demonstrated:**
+ * 1. **Development Configuration**: Verbose logging, full argument capture, debug features
+ * 2. **Production Configuration**: Optimized performance, essential logging only
+ * 3. **Debug Configuration**: Maximum detail, troubleshooting features enabled
+ * 4. **Performance Configuration**: Minimal overhead, critical metrics only
+ * 5. **Testing Configuration**: Error simulation, test-specific features
+ * 6. **Custom Configuration**: User-defined settings, specialized use cases
+ * 7. **Adaptive Configuration**: Environment-aware, auto-adjusting settings
+ * 
+ * **Demo Flow Architecture:**
+ * - Each configuration type is tested with realistic data scenarios
+ * - Service statistics are collected and analyzed throughout execution
+ * - Configuration comparison matrix provides decision-making insights
+ * - Error scenarios are safely demonstrated without interrupting flow
+ * - Performance characteristics are measured and reported
+ * 
+ * **Output Analysis:**
+ * - Detailed logging of each configuration's behavior and results
+ * - Service statistics showing method execution patterns
+ * - Configuration comparison highlighting key differences
+ * - Performance metrics for optimization guidance
+ * - Error handling demonstration for robustness validation
+ * 
+ * @async
+ * @since 1.0.0
+ * @see {@link EnterpriseConfigService} Service implementation used in demos
+ * @see {@link createDevelopmentConfig} Development configuration factory
+ * @see {@link createProductionConfig} Production configuration factory
+ * @see {@link createDebugConfig} Debug configuration factory
+ * @see {@link createPerformanceConfig} Performance configuration factory
+ * @see {@link createTestingConfig} Testing configuration factory
  */
 export async function runEnhancedConfigDemo(): Promise<void> {
     logger.info('🎯 Starting Enhanced Config Factory Demo')
@@ -184,9 +272,78 @@ export async function runEnhancedConfigDemo(): Promise<void> {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎪 **Implementation Comparison Demo**
+ * 🎪 **Implementation Comparison Demonstration**
  *
- * Comprehensive demonstration of both implementations
+ * Executes a comprehensive side-by-side comparison of Standard and Enhanced
+ * decorator implementations including metrics analysis, functional testing,
+ * performance benchmarking, feature matrix evaluation, and architectural
+ * recommendations. This demonstration provides decision-making insights for
+ * choosing the optimal decorator implementation strategy.
+ * 
+ * @returns Promise that resolves when the complete comparison analysis is finished
+ * 
+ * @example
+ * ```typescript
+ * // Execute comprehensive implementation comparison
+ * await runImplementationComparisonDemo();
+ * 
+ * // The demo will automatically perform:
+ * // - Implementation metrics comparison
+ * // - Functional behavior testing
+ * // - Performance benchmarking analysis
+ * // - Feature matrix evaluation
+ * // - Architectural recommendations
+ * ```
+ * 
+ * @remarks
+ * **Comparison Scope:**
+ * - **Metrics Analysis**: Configuration complexity, feature count, performance overhead
+ * - **Functional Testing**: Identical operations executed with both implementations
+ * - **Performance Benchmarking**: Execution time, memory usage, throughput comparison
+ * - **Feature Matrix**: Capability analysis across different use case scenarios
+ * - **Decision Framework**: Recommendations based on application requirements
+ * 
+ * **Analysis Dimensions:**
+ * 1. **Implementation Metrics**: Quantitative comparison of capabilities and complexity
+ * 2. **Functional Equivalence**: Verification of identical behavior under standard operations
+ * 3. **Performance Characteristics**: Execution time, memory footprint, resource usage
+ * 4. **Feature Availability**: Matrix analysis of supported features and capabilities
+ * 5. **Use Case Alignment**: Recommendations for different application scenarios
+ * 
+ * **Benchmarking Methodology:**
+ * - **Controlled Environment**: Identical test data and execution conditions
+ * - **Statistical Sampling**: Multiple iterations for reliable performance metrics
+ * - **Memory Profiling**: Heap usage analysis and garbage collection impact
+ * - **Feature Coverage**: Comprehensive testing of all major decorator features
+ * - **Real-World Scenarios**: Business logic simulation with realistic data patterns
+ * 
+ * **Decision Framework Output:**
+ * - **Standard Decorator Advantages**: Complex enterprise scenarios, full feature set
+ * - **Enhanced Decorator Advantages**: Performance-critical applications, simplified setup
+ * - **Hybrid Approach**: Method-level implementation selection based on requirements
+ * - **Migration Strategy**: Path for evolving from Enhanced to Standard as needs grow
+ * 
+ * **Performance Analysis Includes:**
+ * - Execution time comparison across different operation types
+ * - Memory usage patterns and optimization characteristics
+ * - Feature enablement impact on performance metrics
+ * - Scalability characteristics under load conditions
+ * - Resource utilization efficiency analysis
+ * 
+ * **Feature Matrix Evaluation:**
+ * - High-importance feature availability comparison
+ * - Configuration complexity vs capability trade-offs
+ * - Enterprise readiness assessment
+ * - Development velocity impact analysis
+ * - Maintenance overhead considerations
+ * 
+ * @async
+ * @since 1.0.0
+ * @see {@link StandardDecoratorService} Standard implementation service
+ * @see {@link EnhancedDecoratorService} Enhanced implementation service
+ * @see {@link runComprehensivePerformanceAnalysis} Performance benchmarking function
+ * @see {@link getFeatureMatrix} Feature capability analysis
+ * @see {@link getRecommendations} Implementation recommendation engine
  */
 export async function runImplementationComparisonDemo(): Promise<void> {
     logger.info('🔍 Starting Implementation Comparison Demo')
