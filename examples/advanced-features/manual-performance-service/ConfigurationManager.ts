@@ -19,12 +19,116 @@ import {
     getEnhancedPerformanceConfiguration
 } from '@/logger/performance/utils/index.ts'
 
+/**
+ * ⚙️ Result structure for performance monitoring configuration changes.
+ * 
+ * @remarks
+ * This interface provides a before-and-after snapshot of performance monitoring
+ * configuration, allowing for comparison and verification of configuration changes.
+ * 
+ * 🔄 **Configuration Tracking:** Captures both the previous configuration state
+ * and the newly applied configuration to enable rollback scenarios and change auditing.
+ * 
+ * @see {@link getEnhancedPerformanceConfiguration} for configuration retrieval
+ * @see {@link configureEnhancedPerformanceMonitoring} for configuration application
+ */
 export interface IConfigurationResult {
     previousConfig: ReturnType<typeof getEnhancedPerformanceConfiguration>
     newConfig: ReturnType<typeof getEnhancedPerformanceConfiguration>
 }
 
+/**
+ * 🔧 Advanced configuration manager for performance monitoring systems.
+ * 
+ * @remarks
+ * This manager class provides centralized configuration management for enhanced performance
+ * monitoring, including anomaly detection, baseline tracking, threshold management, and
+ * comprehensive reporting capabilities.
+ * 
+ * ⚙️ **Configuration Categories:**
+ * - **Anomaly Detection:** Configures sensitivity thresholds and detector types
+ * - **Baseline Tracking:** Manages historical performance data collection
+ * - **Performance Thresholds:** Sets warning and critical limits for various metrics
+ * - **Reporting:** Controls logging and notification behavior
+ * 
+ * 🛡️ **Anomaly Detection Features:**
+ * - Performance-based detection (slow/fast execution patterns)
+ * - Memory usage monitoring with configurable thresholds
+ * - Statistical outlier detection using standard deviation analysis
+ * - Rate limiting for anomaly notifications
+ * 
+ * @example
+ * Configuring enhanced performance monitoring:
+ * ```typescript
+ * const configManager = new ConfigurationManager();
+ * 
+ * const result = configManager.configurePerformanceMonitoring();
+ * 
+ * console.log('Previous anomaly detection:', result.previousConfig.anomalyDetection.enabled);
+ * console.log('New anomaly detection:', result.newConfig.anomalyDetection.enabled);
+ * console.log('Configured detectors:', result.newConfig.anomalyDetection.config.global.enabledDetectors);
+ * 
+ * // Access specific threshold configurations
+ * console.log('Slow method warning:', result.newConfig.thresholds.slowMethodWarning);
+ * console.log('Memory warning threshold:', result.newConfig.thresholds.memoryWarning);
+ * ```
+ * 
+ * @see {@link IConfigurationResult} for return value structure
+ * @see {@link configureEnhancedPerformanceMonitoring} for underlying configuration utility
+ */
 export class ConfigurationManager {
+    /**
+     * ⚙️ Configures comprehensive performance monitoring with advanced anomaly detection.
+     * 
+     * @remarks
+     * This method applies a predefined set of enhanced performance monitoring configurations,
+     * including sophisticated anomaly detection algorithms, baseline tracking, and multi-tier
+     * threshold management for various performance metrics.
+     * 
+     * 🛡️ **Anomaly Detection Configuration:**
+     * - **Performance Detectors:** Configures slow/fast execution detection with 2.0s/0.2s thresholds
+     * - **Memory Detectors:** Sets up memory usage monitoring with 1.5x/0.2x baseline thresholds
+     * - **Statistical Analysis:** Enables outlier detection using standard deviation analysis
+     * - **Rate Limiting:** Prevents alert flooding with max 5 anomalies per second
+     * 
+     * 📊 **Threshold Configuration:**
+     * - Method execution warnings at 500ms, critical at 2000ms
+     * - Memory usage warnings at 25MB, critical at 50MB
+     * - CPU utilization warnings at 70%, critical at 90%
+     * 
+     * 📈 **Baseline Tracking:**
+     * - Minimum 10 samples required for baseline establishment
+     * - 7-day historical data retention for trend analysis
+     * - Automatic baseline updates for performance drift detection
+     * 
+     * @returns Configuration result containing both previous and newly applied
+     * performance monitoring configurations for comparison and auditing
+     * 
+     * @example
+     * Applying and verifying performance monitoring configuration:
+     * ```typescript
+     * const manager = new ConfigurationManager();
+     * const result = manager.configurePerformanceMonitoring();
+     * 
+     * // Verify anomaly detection is enabled
+     * if (result.newConfig.anomalyDetection.enabled) {
+     *   console.log('Anomaly detection successfully enabled');
+     *   console.log('Enabled detectors:', result.newConfig.anomalyDetection.config.global.enabledDetectors);
+     * }
+     * 
+     * // Check threshold configuration
+     * const thresholds = result.newConfig.thresholds;
+     * console.log(`Method thresholds: ${thresholds.slowMethodWarning}ms warning,
+     *  ${thresholds.slowMethodCritical}ms critical`);
+     * 
+     * // Verify baseline tracking
+     * console.log('Baseline tracking enabled:', result.newConfig.baseline.trackingEnabled);
+     * console.log('Min sample size:', result.newConfig.baseline.minSampleSize);
+     * ```
+     * 
+     * @see {@link IConfigurationResult} for detailed return value structure
+     * @see {@link getEnhancedPerformanceConfiguration} for configuration state retrieval
+     */
     public configurePerformanceMonitoring(): IConfigurationResult {
         // Get current configuration
         const previousConfig = getEnhancedPerformanceConfiguration()
