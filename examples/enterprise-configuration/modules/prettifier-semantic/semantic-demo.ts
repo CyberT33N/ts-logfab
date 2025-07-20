@@ -43,6 +43,16 @@ import { EnterprisePrettifierSemanticService } from './semantic-service.ts'
  * 🎯 **Prettifier & Semantic Configuration Demo**
  *
  * Demonstrates all prettifier and semantic analysis configurations
+ *
+ * @returns Promise that resolves when demo completes
+ *
+ * @example
+ * ```typescript
+ * await runPrettifierSemanticDemo();
+ * console.log('Demo completed!');
+ * ```
+ *
+ * @throws {Error} When prettifier or semantic operations fail
  */
 export async function runPrettifierSemanticDemo(): Promise<void> {
     logger.info('🎨 Starting Prettifier & Semantic Analysis Demo')

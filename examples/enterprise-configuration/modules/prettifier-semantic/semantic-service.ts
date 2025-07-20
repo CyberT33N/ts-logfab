@@ -41,6 +41,9 @@ import { getBusinessDomainConfig } from './semantic-configs.ts'
  * 🏢 **Enterprise Prettifier & Semantic Service**
  *
  * Demonstrates prettifier and semantic configurations in enterprise scenarios
+ *
+ * @see {@link EnterprisePrettifierSemanticService.businessSemanticDemo} for business semantics
+ * @see {@link EnterprisePrettifierSemanticService.masterConfigurationDemo} for master configuration
  */
 export class EnterprisePrettifierSemanticService {
 	[key: string]: unknown
@@ -52,6 +55,25 @@ export class EnterprisePrettifierSemanticService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 SEMANTIC ANALYSIS DEMONSTRATIONS (MUST BE FIRST DUE TO DECORATORS)
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎯 **Business Semantic Analysis Demo**
+	 *
+	 * Demonstrates semantic analysis with business domain patterns
+	 *
+	 * @param businessData - Business operation data for semantic analysis
+	 *
+	 * @returns Promise resolving to semantic analysis results
+	 *
+	 * @throws {Error} When semantic analysis fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.businessSemanticDemo({
+	 *   customerName: 'Enterprise Customer',
+	 *   productCatalog: ['laptop', 'monitor']
+	 * });
+	 * ```
+	 */
 
 	@logWithSemantics({
 	    domain: 'USER',
@@ -98,6 +120,25 @@ export class EnterprisePrettifierSemanticService {
 	        }
 	    }
 	}
+	/**
+	 * 💰 **Financial Semantic Analysis Demo**
+	 *
+	 * Demonstrates financial semantic analysis with compliance tracking
+	 *
+	 * @param financialData - Financial operation data for analysis
+	 *
+	 * @returns Promise resolving to financial analysis results
+	 *
+	 * @throws {Error} When financial analysis fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.financialSemanticDemo({
+	 *   transactionAmount: 25000,
+	 *   currency: 'USD'
+	 * });
+	 * ```
+	 */
 
 	@logFinancialOperation({
 	    operation: 'COMPUTE',
@@ -141,6 +182,25 @@ export class EnterprisePrettifierSemanticService {
 	        }
 	    }
 	}
+	/**
+	 * 👤 **User Operation Semantic Demo**
+	 *
+	 * Demonstrates user operation semantic analysis with security assessment
+	 *
+	 * @param userOperationData - User operation data for analysis
+	 *
+	 * @returns Promise resolving to user operation analysis results
+	 *
+	 * @throws {Error} When user operation analysis fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.userOperationSemanticDemo({
+	 *   userId: 123,
+	 *   operationType: 'authentication'
+	 * });
+	 * ```
+	 */
 
 	@logUserOperation({
 	    operation: 'READ',
@@ -186,6 +246,23 @@ export class EnterprisePrettifierSemanticService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎨 PRETTIFIER CONFIGURATION DEMONSTRATIONS
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎨 **Development Prettifier Demo**
+	 *
+	 * Demonstrates development-optimized prettifier configuration
+	 *
+	 * @param userData - User data for prettifier demonstration
+	 *
+	 * @returns Promise resolving to user creation results
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.developmentPrettifierDemo({
+	 *   name: 'Alice Johnson',
+	 *   email: 'alice@enterprise.com'
+	 * });
+	 * ```
+	 */
 
 	public async developmentPrettifierDemo(
 	    userData: ReadonlyDeep<{ name: string; email: string; department: string }>
@@ -214,6 +291,23 @@ export class EnterprisePrettifierSemanticService {
 	        }
 	    }
 	}
+	/**
+	 * 🏭 **Production Prettifier Demo**
+	 *
+	 * Demonstrates production-optimized prettifier configuration
+	 *
+	 * @param transactionData - Transaction data for prettifier demonstration
+	 *
+	 * @returns Promise resolving to transaction processing results
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.productionPrettifierDemo({
+	 *   amount: 1500.75,
+	 *   currency: 'USD'
+	 * });
+	 * ```
+	 */
 
 	public async productionPrettifierDemo(
 	    transactionData: ReadonlyDeep<{ amount: number; currency: string; type: string }>
@@ -238,6 +332,25 @@ export class EnterprisePrettifierSemanticService {
 	        status: 'completed'
 	    }
 	}
+	/**
+	 * 🔍 **Debug Prettifier Demo**
+	 *
+	 * Demonstrates debug-optimized prettifier configuration with verbose output
+	 *
+	 * @param debugData - Debug operation data
+	 *
+	 * @returns Promise resolving to debug operation results
+	 *
+	 * @throws {Error} When debug operation fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.debugPrettifierDemo({
+	 *   operationId: 'debug-op-12345',
+	 *   debugLevel: 'VERBOSE'
+	 * });
+	 * ```
+	 */
 
 	public async debugPrettifierDemo(
 	    debugData: ReadonlyDeep<{
@@ -280,6 +393,24 @@ export class EnterprisePrettifierSemanticService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 MASTER CONFIGURATION DEMO
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎯 **Master Configuration Demo**
+	 *
+	 * Demonstrates comprehensive master configuration with adaptive settings
+	 *
+	 * @param masterData - Master configuration data
+	 *
+	 * @returns Promise resolving to master configuration results
+	 *
+	 * @throws {Error} When master configuration fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.masterConfigurationDemo({
+	 *   configurationName: 'enterprise-master-config'
+	 * });
+	 * ```
+	 */
 
 	public async masterConfigurationDemo(
 	    masterData: ReadonlyDeep<{
@@ -333,6 +464,19 @@ export class EnterprisePrettifierSemanticService {
 	        }
 	    }
 	}
+	/**
+	 * 📊 **Get Service Statistics**
+	 *
+	 * Retrieves comprehensive service statistics and configuration information
+	 *
+	 * @returns Service statistics including totals and configuration samples
+	 *
+	 * @example
+	 * ```typescript
+	 * const stats = service.getServiceStatistics();
+	 * console.log(stats.totalUsers);
+	 * ```
+	 */
 
 	public getServiceStatistics(): {
 		totalUsers: number

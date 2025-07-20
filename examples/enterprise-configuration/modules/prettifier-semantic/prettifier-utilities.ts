@@ -31,6 +31,9 @@ import type { ISemanticContext } from '@/logger/semantic-detector/index.ts'
  * 🎨 **Prettifier Configuration Interface**
  * 
  * Configuration for prettifier output formatting
+ *
+ * @see {@link IPrettyConfig.customFormatters} for custom formatting functions
+ * @see {@link IPrettyConfig.tableFormat} for table format options
  */
 export interface IPrettyConfig {
     readonly colorOutput: boolean
@@ -70,6 +73,9 @@ export interface IPrettyConfig {
  * 🎯 **Semantic Configuration Interface**
  * 
  * Configuration for semantic analysis patterns
+ *
+ * @see {@link ISemanticConfig.domainPatterns} for domain pattern configuration
+ * @see {@link ISemanticConfig.complexityPatterns} for complexity detection
  */
 export interface ISemanticConfig {
     readonly domainPatterns: Readonly<Record<string, {
@@ -85,6 +91,9 @@ export interface ISemanticConfig {
  * 🎯 **Pattern Configuration Interface**
  * 
  * Configuration for pattern matching
+ *
+ * @see {@link IPatternConfig.domainPatterns} for domain pattern matching
+ * @see {@link IPatternConfig.businessKeyPatterns} for business key detection
  */
 export interface IPatternConfig {
     readonly domainPatterns: Readonly<Record<string, {

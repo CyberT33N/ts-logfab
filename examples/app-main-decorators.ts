@@ -26,6 +26,15 @@ import { BaseService, runBaseServiceDemo } from './core/base-service.ts'
  * This file serves as the primary entry point for demonstrating the main
  * decorator implementation from `@/decorators/index.ts`. It utilizes the
  * BaseService to showcase all core functionalities.
+ *
+ * @returns Promise that resolves when demo completes
+ *
+ * @example
+ * ```typescript
+ * await main();
+ * ```
+ *
+ * @throws {Error} When demo execution fails
  */
 async function main(): Promise<void> {
     logger.info('🚀 Starting Main Decorator Implementation Demo')

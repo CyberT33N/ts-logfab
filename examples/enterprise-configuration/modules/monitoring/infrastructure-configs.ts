@@ -30,6 +30,16 @@ import { type ILogDecoratorConfig } from '@/decorators/index.ts'
  * 🛡️ **Security Monitoring**
  *
  * Configuration for security event monitoring and alerting
+ *
+ * @returns Security monitoring configuration with threat detection
+ *
+ * @example
+ * ```typescript
+ * const config = getSecurityMonitoringConfig();
+ * console.log(config.customContext.threatDetection); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getSecurityMonitoringConfig(): ILogDecoratorConfig {
     return {
@@ -68,6 +78,16 @@ export function getSecurityMonitoringConfig(): ILogDecoratorConfig {
  * 💾 **Database Performance Monitoring**
  *
  * Configuration for database operation monitoring
+ *
+ * @returns Database performance monitoring configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getDatabasePerformanceConfig();
+ * console.log(config.anomalyDetection.minSamples); // 15
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getDatabasePerformanceConfig(): ILogDecoratorConfig {
     return {
@@ -107,6 +127,16 @@ export function getDatabasePerformanceConfig(): ILogDecoratorConfig {
  * 🌐 **API Gateway Monitoring**
  *
  * Configuration for API gateway and microservices monitoring
+ *
+ * @returns API gateway monitoring configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getAPIGatewayConfig();
+ * console.log(config.customContext.loadBalancing); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getAPIGatewayConfig(): ILogDecoratorConfig {
     return {
@@ -151,6 +181,16 @@ export function getAPIGatewayConfig(): ILogDecoratorConfig {
  * 🎯 **Master Monitoring Configuration**
  *
  * Complete monitoring configuration with all features
+ *
+ * @returns Comprehensive monitoring configuration with all features
+ *
+ * @example
+ * ```typescript
+ * const config = getMasterMonitoringConfig();
+ * console.log(config.anomalyDetection.minSamples); // 25
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getMasterMonitoringConfig(): ILogDecoratorConfig {
     return {

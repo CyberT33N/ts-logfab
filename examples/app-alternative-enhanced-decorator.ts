@@ -28,6 +28,15 @@ import { runEnhancedDecoratorDemo } from './alternative-implementation/enhanced-
  * `examples/alternative-implementation/enhanced-decorator-service.ts`.
  * 
  * This was the MISSING app-level test for the alternative implementation!
+ *
+ * @returns Promise that resolves when demo completes
+ *
+ * @example
+ * ```typescript
+ * await main();
+ * ```
+ *
+ * @throws {Error} When demo execution fails
  */
 async function main(): Promise<void> {
     logger.info('🔥 Starting Alternative Enhanced Decorator Service Demo')

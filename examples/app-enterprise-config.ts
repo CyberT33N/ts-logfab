@@ -41,6 +41,15 @@ import {
  * 
  * Executes all enterprise demo functions in sequence, providing comprehensive
  * coverage of all enterprise logging features and configurations.
+ *
+ * @returns Promise that resolves when all demos complete
+ *
+ * @example
+ * ```typescript
+ * await runAllEnterpriseConfigurationDemos();
+ * ```
+ *
+ * @throws {Error} When any demo execution fails
  */
 async function runAllEnterpriseConfigurationDemos(): Promise<void> {
     logger.info('=' .repeat(80))
@@ -80,6 +89,13 @@ async function runAllEnterpriseConfigurationDemos(): Promise<void> {
 
 /**
  * 🚀 **Main Application Entry Point**
+ *
+ * @returns Promise that resolves when application completes
+ *
+ * @example
+ * ```typescript
+ * await main();
+ * ```
  */
 async function main(): Promise<void> {
     logger.info('🚀 Starting Enterprise Configuration Demo Suite')

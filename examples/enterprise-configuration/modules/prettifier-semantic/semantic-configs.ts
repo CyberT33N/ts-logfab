@@ -31,6 +31,16 @@ import type { ISemanticConfig } from './prettifier-utilities.ts'
  * 💼 **Business Domain Configuration**
  *
  * Semantic patterns for business operations
+ *
+ * @returns Comprehensive business domain semantic configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getBusinessDomainConfig();
+ * console.log(Object.keys(config.domainPatterns)); // ['USER', 'PRODUCT', ...]
+ * ```
+ *
+ * @see {@link ISemanticConfig} for configuration structure
  */
 export function getBusinessDomainConfig(): ISemanticConfig {
     return {
@@ -230,6 +240,16 @@ export function getBusinessDomainConfig(): ISemanticConfig {
  * 🏭 **Production Semantic Configuration**
  *
  * Optimized semantic detection for production environments
+ *
+ * @returns Performance-optimized semantic configuration for production
+ *
+ * @example
+ * ```typescript
+ * const config = getProductionSemanticConfig();
+ * console.log(config.domainPatterns.USER.patterns.length); // reduced patterns
+ * ```
+ *
+ * @see {@link ISemanticConfig} for configuration structure
  */
 export function getProductionSemanticConfig(): ISemanticConfig {
     const baseConfig = getBusinessDomainConfig()
@@ -278,6 +298,16 @@ export function getProductionSemanticConfig(): ISemanticConfig {
  * 🔍 **Debug Semantic Configuration**
  *
  * Comprehensive semantic detection for debugging
+ *
+ * @returns Extended semantic configuration for debugging scenarios
+ *
+ * @example
+ * ```typescript
+ * const config = getDebugSemanticConfig();
+ * console.log(config.domainPatterns.DEBUG); // debug-specific patterns
+ * ```
+ *
+ * @see {@link ISemanticConfig} for configuration structure
  */
 export function getDebugSemanticConfig(): ISemanticConfig {
     const baseConfig = getBusinessDomainConfig()

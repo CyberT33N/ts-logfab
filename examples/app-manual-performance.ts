@@ -25,6 +25,15 @@ import { runManualPerformanceDemo } from './advanced-features/manual-performance
  * 
  * This file serves as the entry point for demonstrating the manual performance
  * tracking utilities from `@/logger/performance/utils/index.ts`.
+ *
+ * @returns Promise that resolves when demo completes
+ *
+ * @example
+ * ```typescript
+ * await main();
+ * ```
+ *
+ * @throws {Error} When demo execution fails
  */
 async function main(): Promise<void> {
     logger.info('🚀 Starting Manual Performance Utilities Demo')

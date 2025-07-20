@@ -32,6 +32,16 @@ import type { IPrettyConfig } from './prettifier-utilities.ts'
  * 🎨 **Development Prettifier Configuration**
  *
  * Human-readable format optimized for development
+ *
+ * @returns Development-optimized prettifier configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getDevelopmentPrettifierConfig();
+ * console.log(config.colorOutput); // true
+ * ```
+ *
+ * @see {@link IPrettyConfig} for configuration structure
  */
 export function getDevelopmentPrettifierConfig(): IPrettyConfig {
     return {
@@ -71,6 +81,16 @@ export function getDevelopmentPrettifierConfig(): IPrettyConfig {
  * 🏭 **Production Prettifier Configuration**
  *
  * Machine-readable format optimized for production
+ *
+ * @returns Production-optimized prettifier configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getProductionPrettifierConfig();
+ * console.log(config.compactMode); // true
+ * ```
+ *
+ * @see {@link IPrettyConfig} for configuration structure
  */
 export function getProductionPrettifierConfig(): IPrettyConfig {
     return {
@@ -109,6 +129,16 @@ export function getProductionPrettifierConfig(): IPrettyConfig {
  * 🔍 **Debug Prettifier Configuration**
  *
  * Verbose format for debugging scenarios
+ *
+ * @returns Debug-optimized prettifier configuration with verbose output
+ *
+ * @example
+ * ```typescript
+ * const config = getDebugPrettifierConfig();
+ * console.log(config.maxArgumentLength); // 1000
+ * ```
+ *
+ * @see {@link IPrettyConfig} for configuration structure
  */
 export function getDebugPrettifierConfig(): IPrettyConfig {
     return {
@@ -148,6 +178,16 @@ export function getDebugPrettifierConfig(): IPrettyConfig {
  * 📊 **Analytics Prettifier Configuration**
  *
  * Structured format for analytics and reporting
+ *
+ * @returns Analytics-optimized prettifier configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getAnalyticsPrettifierConfig();
+ * console.log(config.tableFormat); // 'csv'
+ * ```
+ *
+ * @see {@link IPrettyConfig} for configuration structure
  */
 export function getAnalyticsPrettifierConfig(): IPrettyConfig {
     return {
@@ -186,6 +226,16 @@ export function getAnalyticsPrettifierConfig(): IPrettyConfig {
  * 🎯 **Master Prettifier Configuration**
  *
  * Comprehensive prettifier configuration
+ *
+ * @returns Environment-adaptive prettifier configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getMasterPrettifierConfig();
+ * console.log(config.colorOutput); // depends on NODE_ENV
+ * ```
+ *
+ * @see {@link IPrettyConfig} for configuration structure
  */
 export function getMasterPrettifierConfig(): IPrettyConfig {
     const isProduction = process.env.NODE_ENV === 'production'

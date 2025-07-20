@@ -32,6 +32,16 @@ import { EnterpriseMonitoringService } from './monitoring-service.ts'
  * 🎯 **Advanced Monitoring & Alerting Demo**
  *
  * Demonstrates all monitoring and alerting configurations
+ *
+ * @returns Promise that resolves when demo completes
+ *
+ * @example
+ * ```typescript
+ * await runAdvancedMonitoringDemo();
+ * console.log('Demo completed!');
+ * ```
+ *
+ * @throws {Error} When monitoring service operations fail
  */
 export async function runAdvancedMonitoringDemo(): Promise<void> {
     logger.info('🔔 Starting Advanced Monitoring & Alerting Demo')

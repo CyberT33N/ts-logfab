@@ -23,10 +23,7 @@
 import type { ReadonlyDeep } from 'type-fest'
 import { log } from '@/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
-import { 
-    createUsers, createProducts, type IOrder, 
-    type IProduct, type ITransaction, type IUser 
-} from '../../../core/models.ts'
+
 import { 
     getSecurityMonitoringConfig, 
     getDatabasePerformanceConfig, 
@@ -47,13 +44,12 @@ import {
  * 🏢 **Enterprise Monitoring & Alerting Service**
  *
  * Comprehensive monitoring and alerting service implementation
+ *
+ * @see {@link EnterpriseMonitoringService.criticalPerformanceOperation} for critical monitoring
+ * @see {@link EnterpriseMonitoringService.masterMonitoringOperation} for comprehensive monitoring
  */
 export class EnterpriseMonitoringService {
 	[key: string]: unknown
-	private readonly _users: IUser[] = createUsers(12)
-	private readonly _products: IProduct[] = createProducts(18)
-	private readonly _orders: IOrder[] = []
-	private readonly _transactions: ITransaction[] = []
 	private readonly _performanceMetrics: Record<string, number[]> = {}
 	private readonly _alertHistory: {
 		timestamp: Date
@@ -66,6 +62,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🔍 CRITICAL PERFORMANCE MONITORING
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🔍 **Critical Performance Operation**
+	 *
+	 * Executes critical performance monitoring with SLA compliance tracking
+	 *
+	 * @param operationData - Performance operation configuration
+	 *
+	 * @returns Promise resolving to performance operation results
+	 *
+	 * @throws {Error} When performance operation fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.criticalPerformanceOperation({
+	 *   operationType: 'transaction-processing',
+	 *   priority: 'CRITICAL',
+	 *   expectedSLA: 500
+	 * });
+	 * ```
+	 */
 
 	@log(getCriticalPerformanceConfig())
 	public async criticalPerformanceOperation(
@@ -127,6 +143,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 📊 BUSINESS METRICS MONITORING
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 📊 **Business Metrics Operation**
+	 *
+	 * Processes business metrics and KPI performance tracking
+	 *
+	 * @param metricsData - Business metrics configuration
+	 *
+	 * @returns Promise resolving to business metrics analysis
+	 *
+	 * @throws {Error} When metrics processing fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.businessMetricsOperation({
+	 *   kpiName: 'revenue-per-customer',
+	 *   targetValue: 1000,
+	 *   actualValue: 850
+	 * });
+	 * ```
+	 */
 
 	@log(getBusinessMetricsConfig())
 	public async businessMetricsOperation(
@@ -200,6 +236,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🛡️ SECURITY MONITORING
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🛡️ **Security Monitoring Operation**
+	 *
+	 * Monitors security events with risk assessment and compliance tracking
+	 *
+	 * @param securityData - Security event configuration
+	 *
+	 * @returns Promise resolving to security assessment results
+	 *
+	 * @throws {Error} When security monitoring fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.securityMonitoringOperation({
+	 *   eventType: 'LOGIN',
+	 *   userId: 'user-123',
+	 *   riskScore: 75
+	 * });
+	 * ```
+	 */
 
 	@log(getSecurityMonitoringConfig())
 	public async securityMonitoringOperation(
@@ -272,6 +328,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 📈 REAL-TIME ANALYTICS MONITORING
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 📈 **Real-Time Analytics Operation**
+	 *
+	 * Processes real-time analytics with throughput and quality assessment
+	 *
+	 * @param analyticsData - Analytics operation configuration
+	 *
+	 * @returns Promise resolving to analytics operation results
+	 *
+	 * @throws {Error} When analytics processing fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.realTimeAnalyticsOperation({
+	 *   streamId: 'user-events-stream',
+	 *   eventCount: 5000,
+	 *   processingLatency: 85
+	 * });
+	 * ```
+	 */
 
 	@log(getRealTimeAnalyticsConfig())
 	public async realTimeAnalyticsOperation(
@@ -335,6 +411,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 💾 DATABASE PERFORMANCE MONITORING
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 💾 **Database Performance Operation**
+	 *
+	 * Monitors database performance with query optimization analysis
+	 *
+	 * @param dbData - Database operation configuration
+	 *
+	 * @returns Promise resolving to database performance results
+	 *
+	 * @throws {Error} When database monitoring fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.databasePerformanceOperation({
+	 *   queryType: 'SELECT',
+	 *   executionTime: 350,
+	 *   rowsAffected: 1000
+	 * });
+	 * ```
+	 */
 
 	@log(getDatabasePerformanceConfig())
 	public async databasePerformanceOperation(
@@ -413,6 +509,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🌐 API GATEWAY MONITORING
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🌐 **API Gateway Operation**
+	 *
+	 * Monitors API gateway performance with routing and rate limiting
+	 *
+	 * @param apiData - API gateway operation configuration
+	 *
+	 * @returns Promise resolving to API gateway operation results
+	 *
+	 * @throws {Error} When API gateway monitoring fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.apiGatewayOperation({
+	 *   endpoint: '/api/v1/users',
+	 *   method: 'GET',
+	 *   responseTime: 250
+	 * });
+	 * ```
+	 */
 
 	@log(getAPIGatewayConfig())
 	public async apiGatewayOperation(
@@ -501,6 +617,26 @@ export class EnterpriseMonitoringService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 MASTER MONITORING OPERATION
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎯 **Master Monitoring Operation**
+	 *
+	 * Comprehensive monitoring operation with system health assessment
+	 *
+	 * @param masterData - Master monitoring configuration
+	 *
+	 * @returns Promise resolving to comprehensive monitoring results
+	 *
+	 * @throws {Error} When master monitoring fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.masterMonitoringOperation({
+	 *   operationName: 'enterprise-health-check',
+	 *   systemHealth: { cpu: 65, memory: 80 },
+	 *   businessMetrics: { revenue: 95000 }
+	 * });
+	 * ```
+	 */
 
 	@log(getMasterMonitoringConfig())
 	public async masterMonitoringOperation(
@@ -588,6 +724,22 @@ export class EnterpriseMonitoringService {
 	        recommendations
 	    }
 	}
+	/**
+	 * 🚨 **Get Recent Alerts**
+	 *
+	 * Retrieves recent alert history sorted by timestamp
+	 *
+	 * @param limit - Maximum number of alerts to return
+	 * @defaultValue limit = 10
+	 *
+	 * @returns Array of recent alert objects
+	 *
+	 * @example
+	 * ```typescript
+	 * const alerts = service.getRecentAlerts(5);
+	 * console.log(alerts.length); // <= 5
+	 * ```
+	 */
 
 	public getRecentAlerts(limit = 10): readonly {
 		timestamp: Date
@@ -604,6 +756,19 @@ export class EnterpriseMonitoringService {
 	            ) => b.timestamp.getTime() - a.timestamp.getTime())
 	        .slice(0, limit)
 	}
+	/**
+	 * 📊 **Get Monitoring Statistics**
+	 *
+	 * Retrieves comprehensive monitoring statistics and system health
+	 *
+	 * @returns Monitoring statistics including performance metrics and alerts
+	 *
+	 * @example
+	 * ```typescript
+	 * const stats = service.getMonitoringStatistics();
+	 * console.log(stats.alertsSummary.total);
+	 * ```
+	 */
 
 	public getMonitoringStatistics(): {
 		performanceMetrics: Record<

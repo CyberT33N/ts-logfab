@@ -30,6 +30,16 @@ import { type ILogDecoratorConfig } from '@/decorators/index.ts'
  * 🔍 **Critical Performance Monitoring**
  *
  * Configuration for mission-critical performance monitoring
+ *
+ * @returns Critical performance monitoring configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getCriticalPerformanceConfig();
+ * console.log(config.anomalyDetection.thresholdMultiplier); // 1.5
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getCriticalPerformanceConfig(): ILogDecoratorConfig {
     return {
@@ -66,6 +76,16 @@ export function getCriticalPerformanceConfig(): ILogDecoratorConfig {
  * 📊 **Business Metrics Monitoring**
  *
  * Configuration for business metrics and KPI tracking
+ *
+ * @returns Business metrics monitoring configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getBusinessMetricsConfig();
+ * console.log(config.customContext.kpiTracking); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getBusinessMetricsConfig(): ILogDecoratorConfig {
     return {
@@ -103,6 +123,16 @@ export function getBusinessMetricsConfig(): ILogDecoratorConfig {
  * 📈 **Real-time Analytics Monitoring**
  *
  * Configuration for real-time analytics and streaming data
+ *
+ * @returns Real-time analytics monitoring configuration
+ *
+ * @example
+ * ```typescript
+ * const config = getRealTimeAnalyticsConfig();
+ * console.log(config.customContext.highThroughput); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getRealTimeAnalyticsConfig(): ILogDecoratorConfig {
     return {

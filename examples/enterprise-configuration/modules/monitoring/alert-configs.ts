@@ -30,6 +30,16 @@ import { type IAnomalyConfig } from '@/logger/anomaly-detector/index.ts'
  * 🔥 **Critical Alert Configuration**
  *
  * High-priority alerting for critical system failures
+ *
+ * @returns Critical alert configuration with strict thresholds
+ *
+ * @example
+ * ```typescript
+ * const config = getCriticalAlertConfig();
+ * console.log(config.global.confidenceThreshold); // 0.8
+ * ```
+ *
+ * @see {@link IAnomalyConfig} for configuration structure
  */
 export function getCriticalAlertConfig(): IAnomalyConfig {
     return {
@@ -65,6 +75,16 @@ export function getCriticalAlertConfig(): IAnomalyConfig {
  * ⚠️ **Warning Alert Configuration**
  *
  * Medium-priority alerting for system warnings
+ *
+ * @returns Warning alert configuration with moderate thresholds
+ *
+ * @example
+ * ```typescript
+ * const config = getWarningAlertConfig();
+ * console.log(config.global.confidenceThreshold); // 0.6
+ * ```
+ *
+ * @see {@link IAnomalyConfig} for configuration structure
  */
 export function getWarningAlertConfig(): IAnomalyConfig {
     return {
