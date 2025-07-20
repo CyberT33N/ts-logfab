@@ -31,6 +31,17 @@ import env from '@/env.ts'
  * 🎯 **Master Configuration**
  *
  * Demonstrates ALL configuration options combined
+ *
+ * @returns Complete configuration object with all features enabled
+ *
+ * @example
+ * ```typescript
+ * const config = getMasterConfig();
+ * console.log(config.level); // 'debug'
+ * console.log(config.anomalyDetection.enabled); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getMasterConfig(): ILogDecoratorConfig {
     return {
@@ -104,6 +115,16 @@ export function getMasterConfig(): ILogDecoratorConfig {
  * 🎚️ **Runtime Configuration**
  *
  * Demonstrates adaptive runtime configuration based on environment
+ *
+ * @returns Adaptive configuration object based on current environment
+ *
+ * @example
+ * ```typescript
+ * const config = getRuntimeConfig();
+ * console.log(config.level); // 'info' in production, 'debug' in development
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getRuntimeConfig(): ILogDecoratorConfig {
     const isProduction = env.NODE_ENV === 'production'

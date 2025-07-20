@@ -30,6 +30,16 @@ import { type ILogDecoratorConfig } from '@/decorators/index.ts'
  * 🎯 **Complete Semantic Context Configuration**
  *
  * Demonstrates all semantic context options
+ *
+ * @returns Configuration object with semantic context settings
+ *
+ * @example
+ * ```typescript
+ * const config = getSemanticContextConfig();
+ * console.log(config.semanticContext.domain); // 'USER'
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getSemanticContextConfig(): ILogDecoratorConfig {
     return {
@@ -56,6 +66,16 @@ export function getSemanticContextConfig(): ILogDecoratorConfig {
  * 🚨 **Complete Anomaly Detection Configuration**
  *
  * Demonstrates all anomaly detection options
+ *
+ * @returns Configuration object with anomaly detection settings
+ *
+ * @example
+ * ```typescript
+ * const config = getAnomalyDetectionConfig();
+ * console.log(config.anomalyDetection.enabled); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getAnomalyDetectionConfig(): ILogDecoratorConfig {
     return {
@@ -82,6 +102,16 @@ export function getAnomalyDetectionConfig(): ILogDecoratorConfig {
  * 🌍 **Complete Environment Configuration**
  *
  * Demonstrates all environment configuration options
+ *
+ * @returns Configuration object with environment-specific settings
+ *
+ * @example
+ * ```typescript
+ * const config = getEnvironmentConfig();
+ * console.log(config.environment.forceEnvironment); // 'production'
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getEnvironmentConfig(): ILogDecoratorConfig {
     return {
@@ -105,6 +135,16 @@ export function getEnvironmentConfig(): ILogDecoratorConfig {
  * 🎯 **New Enhanced Features Configuration (2024)**
  *
  * Demonstrates the latest Enhanced features with explicit configuration
+ *
+ * @returns Configuration object with enhanced features enabled
+ *
+ * @example
+ * ```typescript
+ * const config = getEnhancedFeaturesConfig();
+ * console.log(config.correlationContext.enabled); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getEnhancedFeaturesConfig(): ILogDecoratorConfig {
     return {

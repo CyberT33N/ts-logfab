@@ -37,6 +37,16 @@ import { getMasterConfig, getRuntimeConfig } from './master-configs.ts'
  * 🎯 **Complete Configuration Demo**
  *
  * Demonstrates all enterprise configuration options
+ *
+ * @returns Promise that resolves when the demonstration is complete
+ *
+ * @throws {Error} When any configuration test fails
+ *
+ * @example
+ * ```typescript
+ * await runCompleteConfigurationDemo();
+ * console.log('Demo completed successfully!');
+ * ```
  */
 export async function runCompleteConfigurationDemo(): Promise<void> {
     logger.info('🎯 Starting Complete Enterprise Configuration Demo')

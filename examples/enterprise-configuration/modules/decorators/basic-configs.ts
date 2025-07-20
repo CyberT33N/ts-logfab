@@ -31,6 +31,16 @@ import env from '@/env.ts'
  * 🎯 **Complete Basic Configuration**
  *
  * Demonstrates all basic configuration options
+ *
+ * @returns Basic logging configuration object with default settings
+ *
+ * @example
+ * ```typescript
+ * const config = getBasicConfig();
+ * console.log(config.level); // 'info'
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getBasicConfig(): ILogDecoratorConfig {
     return {
@@ -54,6 +64,16 @@ export function getBasicConfig(): ILogDecoratorConfig {
  * 🔧 **Enterprise Method Signature Configuration**
  *
  * Demonstrates intelligent method signature overrides
+ *
+ * @returns Configuration object with intelligent method signature overrides
+ *
+ * @example
+ * ```typescript
+ * const config = getMethodSignatureConfig();
+ * console.log(config.methodSignature.isAsync); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getMethodSignatureConfig(): ILogDecoratorConfig {
     return {
@@ -81,6 +101,16 @@ export function getMethodSignatureConfig(): ILogDecoratorConfig {
  * 🔗 **Complete Correlation Context Configuration**
  *
  * Demonstrates all correlation context options
+ *
+ * @returns Configuration object with correlation context settings
+ *
+ * @example
+ * ```typescript
+ * const config = getCorrelationContextConfig();
+ * console.log(config.correlationContext.enabled); // true
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration structure
  */
 export function getCorrelationContextConfig(): ILogDecoratorConfig {
     return {

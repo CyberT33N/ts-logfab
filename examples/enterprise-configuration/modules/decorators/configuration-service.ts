@@ -41,6 +41,12 @@ import { getMasterConfig, getRuntimeConfig } from './master-configs.ts'
  * 🏢 **Enterprise Configuration Showcase Service**
  *
  * Demonstrates all configuration options in real enterprise scenarios
+ *
+ * @example
+ * ```typescript
+ * const service = new EnterpriseConfigurationService();
+ * const result = await service.basicConfigurationMethod([1, 2, 3]);
+ * ```
  */
 export class EnterpriseConfigurationService {
 	[key: string]: unknown
@@ -52,6 +58,21 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 BASIC CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎯 **Basic Configuration Method**
+	 *
+	 * Processes data using basic logging configuration
+	 *
+	 * @param data - Array of data to process
+	 *
+	 * @returns Promise resolving to processing result
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.basicConfigurationMethod([1, 2, 3]);
+	 * console.log(result.processed); // 3
+	 * ```
+	 */
 
 	@log(getBasicConfig())
 	public async basicConfigurationMethod(
@@ -68,6 +89,29 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🔧 METHOD SIGNATURE CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🔧 **Method Signature Showcase**
+	 *
+	 * Demonstrates intelligent method signature configuration
+	 *
+	 * @param userId - User ID for search context
+	 * @param searchCriteria - Search criteria with filters
+	 * @param options - Search options including pagination
+	 *
+	 * @returns Promise resolving to array of matching users
+	 *
+	 * @example
+	 * ```typescript
+	 * const users = await service.methodSignatureShowcase(
+	 *   123,
+	 *   { name: 'Alice', department: 'Engineering' },
+	 *   { includeInactive: false, maxResults: 5 }
+	 * );
+	 * ```
+	 *
+	 * @see {@link IUser} for user structure
+	 * @see {@link ReadonlyDeep} for type safety
+	 */
 
 	@log(getMethodSignatureConfig())
 	public async methodSignatureShowcase(
@@ -90,6 +134,24 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🔗 CORRELATION CONTEXT CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🔗 **Correlation Context Showcase**
+	 *
+	 * Demonstrates correlation context configuration for distributed tracing
+	 *
+	 * @param workflowData - Workflow data with correlation information
+	 *
+	 * @returns Promise resolving to workflow processing result
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.correlationContextShowcase({
+	 *   workflowId: 'wf-123',
+	 *   stepId: 'validation',
+	 *   payload: { userId: 456 }
+	 * });
+	 * ```
+	 */
 
 	@log(getCorrelationContextConfig())
 	public async correlationContextShowcase(
@@ -107,6 +169,24 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 SEMANTIC CONTEXT CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎯 **Semantic Context Showcase**
+	 *
+	 * Demonstrates semantic context configuration for business domain analysis
+	 *
+	 * @param userOperationData - User operation data with business context
+	 *
+	 * @returns Promise resolving to operation result with business impact
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.semanticContextShowcase({
+	 *   userId: 123,
+	 *   operation: 'update',
+	 *   businessContext: { department: 'Finance' }
+	 * });
+	 * ```
+	 */
 
 	@log(getSemanticContextConfig())
 	public async semanticContextShowcase(
@@ -134,6 +214,21 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🚨 ANOMALY DETECTION CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🚨 **Anomaly Detection Showcase**
+	 *
+	 * Demonstrates anomaly detection configuration for performance monitoring
+	 *
+	 * @param performanceData - Array of performance metrics to analyze
+	 *
+	 * @returns Promise resolving to analysis result with anomaly score
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.anomalyDetectionShowcase([100, 150, 200]);
+	 * console.log(result.anomalyScore); // Random score 0-100
+	 * ```
+	 */
 
 	@log(getAnomalyDetectionConfig())
 	public async anomalyDetectionShowcase(
@@ -167,6 +262,24 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🌍 ENVIRONMENT CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🌍 **Environment Configuration Showcase**
+	 *
+	 * Demonstrates environment-specific configuration behavior
+	 *
+	 * @param environmentData - Environment configuration data
+	 *
+	 * @returns Promise resolving to environment processing result
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.environmentConfigShowcase({
+	 *   environment: 'production',
+	 *   configuration: { logLevel: 'info' },
+	 *   deploymentInfo: { version: '1.0.0' }
+	 * });
+	 * ```
+	 */
 
 	@log(getEnvironmentConfig())
 	public async environmentConfigShowcase(
@@ -198,6 +311,28 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎯 MASTER CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎯 **Master Configuration Showcase**
+	 *
+	 * Demonstrates comprehensive configuration with all features enabled
+	 *
+	 * @param businessData - Business transaction data
+	 * @param processingOptions - Processing configuration options
+	 * @param auditContext - Audit and compliance context
+	 *
+	 * @returns Promise resolving to complete business processing result
+	 *
+	 * @throws {Error} When transaction processing fails
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.masterConfigurationShowcase(
+	 *   { transactionId: 'txn-123', amount: 1000, currency: 'USD', businessRules: {} },
+	 *   { validationLevel: 'STRICT', auditRequired: true, realTimeProcessing: true },
+	 *   { auditId: 'audit-456', userId: 'user-789', timestamp: new Date(), complianceLevel: 'HIGH' }
+	 * );
+	 * ```
+	 */
 
 	@log(getMasterConfig())
 	public async masterConfigurationShowcase(
@@ -266,6 +401,24 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🎚️ RUNTIME CONFIGURATION SHOWCASE
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🎚️ **Runtime Configuration Showcase**
+	 *
+	 * Demonstrates adaptive runtime configuration based on environment
+	 *
+	 * @param adaptiveData - Adaptive processing data with priority
+	 *
+	 * @returns Promise resolving to adaptive processing result
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.runtimeConfigurationShowcase({
+	 *   requestType: 'adaptive-processing',
+	 *   priority: 'HIGH',
+	 *   metadata: { source: 'runtime' }
+	 * });
+	 * ```
+	 */
 
 	@log(getRuntimeConfig())
 	public async runtimeConfigurationShowcase(
@@ -296,6 +449,26 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🔥 NEW ENHANCED FEATURES SHOWCASE (2024)
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 🔥 **Enhanced Features Showcase (2024)**
+	 *
+	 * Demonstrates the latest enhanced features with correlation, semantic context, and anomaly detection
+	 *
+	 * @param analyticsData - Analytics data with enhanced processing capabilities
+	 *
+	 * @returns Promise resolving to enhanced analysis result
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await service.enhancedFeaturesShowcase({
+	 *   dataPoints: [25, 30, 45, 60],
+	 *   analysisType: 'trend',
+	 *   metadata: { source: 'enhanced-demo' }
+	 * });
+	 * ```
+	 *
+	 * @see {@link getEnhancedFeaturesConfig} for configuration details
+	 */
 
 	@log(getEnhancedFeaturesConfig())
 	public async enhancedFeaturesShowcase(
@@ -333,6 +506,19 @@ export class EnterpriseConfigurationService {
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🛠️ UTILITY METHODS
 	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * 📊 **Get Service Statistics**
+	 *
+	 * Returns comprehensive statistics about the service state
+	 *
+	 * @returns Service statistics including counts and configuration samples
+	 *
+	 * @example
+	 * ```typescript
+	 * const stats = service.getServiceStatistics();
+	 * console.log(stats.totalUsers); // Number of users
+	 * ```
+	 */
 
 	public getServiceStatistics(): {
 		totalUsers: number
@@ -357,6 +543,17 @@ export class EnterpriseConfigurationService {
 	        }
 	    }
 	}
+	/**
+	 * ⏱️ **Delay Utility**
+	 *
+	 * Internal utility method for simulating processing delays
+	 *
+	 * @param ms - Milliseconds to delay
+	 *
+	 * @returns Promise that resolves after the specified delay
+	 *
+	 * @internal
+	 */
 
 	private async _delay(ms: number): Promise<void> {
 	    return new Promise(resolve => setTimeout(resolve, ms))
