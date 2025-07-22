@@ -130,38 +130,31 @@ export {
 } from './core/index.ts'
 
 // 🚀 Re-export relevant types and decorators for convenience (from types.ts)
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED DECORATORS MAIN INDEX - ENTERPRISE STANDARD
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ==== Main Enhanced Types ====
 export type {
     ILogDecoratorConfig,
-    IMethodSignature,
-    ICorrelationContext,
-    ISemanticContext,
-    IAnomalyDetection,
-    IEnhancedDecoratorConfig
+    EnterpriseDecoratorConfig,
+    IEnhancedLoggingScenario,
+    IEnhancedServiceOperations
 } from './types.ts'
 
+// ==== Enhanced Configuration ====
+export {
+    DEFAULT_LOG_CONFIG
+} from '@/logger/decorators/index.ts'
+
+// ==== Enhanced Decorator Functions ====
 export {
     log,
     logDebug,
     logPerformance,
     logSilent,
-    logErrorsOnly,
-    logWithCorrelation,
-    logWithSemantics,
-    logWithAnomalyDetection,
-    logForProduction,
-    logForDevelopment,
-    logFinancialOperation,
-    logUserOperation,
-    logOrderOperation,
-    logHighPerformance,
-    logComprehensive,
-    enhancedLog,
-    performanceLog,
-    enhancedDebugLog,
-    errorLog,
-    createEnhancedConfig, 
-    getEnhancedLoggingStatus
-} from './types.ts'
+    logErrorsOnly
+} from '@/logger/decorators/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 DEMO RUNNERS & SUMMARIES (from summary utilities)

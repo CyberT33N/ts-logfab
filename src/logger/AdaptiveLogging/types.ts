@@ -22,7 +22,7 @@
 
 import { type LoggingFormat } from '@/env.ts'
 import { ICorrelationContext } from '@/logger/correlation-context/index.ts'
-import { ISemanticContext } from '@/logger/semantic-detector.ts'
+import { ISemanticContext } from '@/logger/semantic-detector/index.ts'
 
 /**
  * 🌍 **Environment Types**

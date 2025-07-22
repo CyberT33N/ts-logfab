@@ -22,8 +22,8 @@
 
 import type { WritableDeep } from 'type-fest'
 import {
-    createEnhancedConfig,
-    type IEnhancedDecoratorConfig
+    DEFAULT_LOG_CONFIG,
+    type ILogDecoratorConfig
 } from '@/logger/decorators/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -82,199 +82,113 @@ import {
  * ```
  * 
  * @see {@link createCustomConfig} for factory-based builder creation
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
- * @see {@link createEnhancedConfig} for direct configuration creation
+ * @see {@link ILogDecoratorConfig} for configuration structure details
+ * @see {@link DEFAULT_LOG_CONFIG} for direct configuration creation
  */
 export class ConfigBuilder {
-    private readonly _config: WritableDeep<Partial<IEnhancedDecoratorConfig>> = {}
+    private readonly _config: WritableDeep<Partial<ILogDecoratorConfig>> = {}
 
     /**
-     * 🔍 Enables or disables performance tracking for method execution timing.
+     * 🚀 **Enable Performance Tracking**
      * 
-     * @remarks
-     * Controls whether the enhanced decorators collect and report execution
-     * timing metrics for decorated methods. When enabled, provides detailed
-     * performance insights including execution duration, timing patterns,
-     * and performance trend analysis.
+     * Activates comprehensive performance monitoring and timing analysis for
+     * decorated methods including execution time measurement, memory usage tracking,
+     * and performance anomaly detection capabilities.
      * 
-     * @param enabled - Whether to enable performance tracking (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link enableAnomalyDetection} for anomaly detection configuration
+     * @param enabled - Whether to enable performance tracking (default: true)
+     * @returns ConfigBuilder instance for method chaining
      */
-    public enablePerformanceTracking(enabled = true): this {
-        this._config.enablePerformanceTracking = enabled
+    public withPerformanceTracking(enabled: boolean = true): ConfigBuilder {
+        this._config.includePerformance = enabled
         return this
     }
 
     /**
-     * 🚨 Enables or disables anomaly detection for unusual execution patterns.
+     * 🚨 **Enable Anomaly Detection**
      * 
-     * @remarks
-     * Controls whether the enhanced decorators monitor for anomalous behavior
-     * such as unexpected execution times, unusual parameter patterns, or
-     * irregular method call frequencies. Provides early warning system for
-     * potential performance issues or system irregularities.
+     * Activates intelligent anomaly detection for method execution patterns,
+     * performance metrics, and behavioral analysis to identify potential
+     * issues and optimization opportunities.
      * 
-     * @param enabled - Whether to enable anomaly detection (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link enablePerformanceTracking} for performance monitoring configuration
+     * @param enabled - Whether to enable anomaly detection (default: true)
+     * @returns ConfigBuilder instance for method chaining
      */
-    public enableAnomalyDetection(enabled = true): this {
-        this._config.enableAnomalyDetection = enabled
+    public withAnomalyDetection(enabled: boolean = true): ConfigBuilder {
+        this._config.anomalyDetection = { enabled }
         return this
     }
 
     /**
-     * 🧠 Enables or disables semantic analysis for context-aware logging.
+     * 🎯 **Enable Semantic Analysis**
      * 
-     * @remarks
-     * Controls whether the enhanced decorators perform semantic analysis
-     * of method parameters, return values, and execution context to provide
-     * intelligent, context-aware logging with semantic understanding of
-     * the data being processed.
+     * Activates semantic context analysis for method names, arguments, and
+     * operational patterns to provide intelligent categorization and enhanced
+     * logging context for business domain understanding.
      * 
-     * @param enabled - Whether to enable semantic analysis (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link enableCorrelationTracking} for correlation tracking configuration
+     * @param enabled - Whether to enable semantic analysis (default: true)
+     * @returns ConfigBuilder instance for method chaining
      */
-    public enableSemanticAnalysis(enabled = true): this {
-        this._config.enableSemanticAnalysis = enabled
+    public withSemanticAnalysis(enabled: boolean = true): ConfigBuilder {
+        this._config.semanticContext = { enabled }
         return this
     }
 
     /**
-     * 🔗 Enables or disables correlation tracking for request/operation tracing.
+     * 🔗 **Enable Correlation Tracking**
      * 
-     * @remarks
-     * Controls whether the enhanced decorators maintain correlation IDs
-     * and context tracking across method calls and operations. Enables
-     * distributed tracing capabilities and helps track operations across
-     * multiple services and method boundaries.
+     * Activates distributed correlation tracking for method calls including
+     * correlation ID generation, inheritance, and context propagation across
+     * service boundaries and asynchronous operations.
      * 
-     * @param enabled - Whether to enable correlation tracking (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link enableSemanticAnalysis} for semantic analysis configuration
+     * @param enabled - Whether to enable correlation tracking (default: true)
+     * @returns ConfigBuilder instance for method chaining
      */
-    public enableCorrelationTracking(enabled = true): this {
-        this._config.enableCorrelationTracking = enabled
+    public withCorrelationTracking(enabled: boolean = true): ConfigBuilder {
+        this._config.correlationContext = { enabled, inheritFromParent: true }
         return this
     }
 
     /**
-     * 🎨 Enables or disables automatic format switching based on output destination.
+     * 📊 **Set Logging Level**
      * 
-     * @remarks
-     * Controls whether the enhanced decorators automatically adapt their
-     * output format based on the destination (console, file, structured logging).
-     * Provides optimal formatting for different output contexts while maintaining
-     * consistent information content.
+     * Configures the logging level for decorator output to control verbosity
+     * and filtering of log messages based on severity and importance levels.
      * 
-     * @param enabled - Whether to enable auto-format switching (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link setLogLevel} for log level configuration
+     * @param level - Logging level ('debug', 'info', 'warn', 'error')
+     * @returns ConfigBuilder instance for method chaining
      */
-    public enableAutoFormatSwitching(enabled = true): this {
-        this._config.enableAutoFormatSwitching = enabled
+    public withLogLevel(level: 'debug' | 'info' | 'warn' | 'error'): ConfigBuilder {
+        this._config.level = level
         return this
     }
 
     /**
-     * 📊 Sets the logging level to control output verbosity and filtering.
+     * 📋 **Include Method Arguments**
      * 
-     * @remarks
-     * Configures the minimum logging level for the enhanced decorators.
-     * Controls which log messages are output based on their severity level,
-     * helping to filter noise in production environments while providing
-     * detailed information in development and debugging scenarios.
+     * Configures whether to include method arguments in log output for
+     * debugging and analysis purposes with appropriate sanitization and
+     * length limitation capabilities.
      * 
-     * @param level - The minimum log level to output (trace, debug, info, warn, error)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link includeStackTrace} for stack trace inclusion configuration
+     * @param enabled - Whether to include arguments (default: true)
+     * @returns ConfigBuilder instance for method chaining
      */
-    public setLogLevel(level: 'trace' | 'debug' | 'info' | 'warn' | 'error'): this {
-        this._config.logLevel = level
+    public withArguments(enabled: boolean = true): ConfigBuilder {
+        this._config.includeArgs = enabled
         return this
     }
 
     /**
-     * 📍 Configures whether to include stack traces in log output.
+     * 📝 **Include Method Results**
      * 
-     * @remarks
-     * Controls whether the enhanced decorators capture and include
-     * stack trace information in log entries. Valuable for debugging
-     * and error analysis but may impact performance and expose
-     * sensitive information in production environments.
+     * Configures whether to include method return values in log output for
+     * comprehensive debugging and analysis with appropriate data sanitization
+     * and security considerations.
      * 
-     * @param enabled - Whether to include stack traces (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link includeArguments} for argument inclusion configuration
+     * @param enabled - Whether to include method results (default: true)
+     * @returns ConfigBuilder instance for method chaining
      */
-    public includeStackTrace(enabled = true): this {
-        this._config.includeStackTrace = enabled
-        return this
-    }
-
-    /**
-     * 🔧 Configures whether to include method arguments in log output.
-     * 
-     * @remarks
-     * Controls whether the enhanced decorators capture and log the actual
-     * arguments passed to decorated methods. Provides valuable debugging
-     * information but may impact performance and expose sensitive data,
-     * so consider security implications in production environments.
-     * 
-     * @param enabled - Whether to include method arguments (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link includeResult} for result inclusion configuration
-     */
-    public includeArguments(enabled = true): this {
-        this._config.includeArguments = enabled
-        return this
-    }
-
-    /**
-     * 📤 Configures whether to include method return values in log output.
-     * 
-     * @remarks
-     * Controls whether the enhanced decorators capture and log the return
-     * values from decorated methods. Useful for understanding method behavior
-     * and debugging, but consider performance impact and data sensitivity,
-     * especially for methods returning large objects or sensitive information.
-     * 
-     * @param enabled - Whether to include method results (defaults to true)
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link setMaxArgumentsLength} for argument length limitation
-     */
-    public includeResult(enabled = true): this {
-        this._config.includeResult = enabled
-        return this
-    }
-
-    /**
-     * 📏 Sets the maximum length for logged arguments to prevent excessive output.
-     * 
-     * @remarks
-     * Configures the character limit for argument serialization in log output.
-     * Helps prevent excessive log sizes when methods receive large objects
-     * while still providing useful debugging information. Arguments exceeding
-     * this length will be truncated with an indication of the original size.
-     * 
-     * @param length - Maximum character length for argument serialization
-     * @returns The builder instance for method chaining
-     * 
-     * @see {@link includeArguments} for enabling argument inclusion
-     */
-    public setMaxArgumentsLength(length: number): this {
-        this._config.maxArgumentsLength = length
+    public withResults(enabled: boolean = true): ConfigBuilder {
+        this._config.includeResults = enabled
         return this
     }
 
@@ -289,11 +203,14 @@ export class ConfigBuilder {
      * 
      * @returns Immutable enhanced decorator configuration object
      * 
-     * @see {@link createEnhancedConfig} for the underlying configuration creation
-     * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+     * @see {@link DEFAULT_LOG_CONFIG} for the underlying configuration creation
+     * @see {@link ILogDecoratorConfig} for configuration structure details
      */
-    public build(): IEnhancedDecoratorConfig {
-        return createEnhancedConfig(this._config)
+    public build(): ILogDecoratorConfig {
+        return {
+            ...DEFAULT_LOG_CONFIG,
+            ...this._config
+        }
     }
 }
 
@@ -345,8 +262,8 @@ export class ConfigBuilder {
  * @returns New ConfigBuilder instance ready for configuration
  * 
  * @see {@link ConfigBuilder} for detailed builder documentation
- * @see {@link IEnhancedDecoratorConfig} for configuration structure
- * @see {@link createEnhancedConfig} for direct configuration creation
+ * @see {@link ILogDecoratorConfig} for configuration structure
+ * @see {@link DEFAULT_LOG_CONFIG} for direct configuration creation
  */
 export function createCustomConfig(): ConfigBuilder {
     return new ConfigBuilder()

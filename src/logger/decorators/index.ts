@@ -9,67 +9,49 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 DECORATOR LOGGING BARREL FILE                             ██
-██          UNIFIED EXPORTS FOR ALL DECORATOR LOGGING MODULES               ██
+██              🎯 ENHANCED DECORATOR LOGGING - MAIN EXPORTS                 ██
+██          ENTERPRISE-READY DECORATOR LOGGING SYSTEM                       ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 CONFIGURATION EXPORTS
+// 🎯 ENHANCED DECORATOR LOGGING EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export type {
-    IDecoratorLoggingConfig,
-    IEnhancedDecoratorConfig
-} from './config.ts'
-
-export {
-    DEFAULT_DECORATOR_CONFIG,
-    DEFAULT_ENHANCED_CONFIG,
-    createDecoratorLoggingConfig,
-    createEnhancedConfig,
-    getDefaultDecoratorConfig,
-    getEnhancedLoggingStatus
-} from './config.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 TYPES EXPORTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export type {
-    IEnhancedLogContext
-} from './types.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 UTILITY FUNCTIONS EXPORTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export {
-    createEnhancedContext,
-    createEnhancedDecoratorPrefix,
-    getSemanticIcon
-} from './utils.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 LOGGING FUNCTIONS EXPORTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ==== Enhanced Logging Functions ====
 export {
     logEnhancedMethodStart,
     logEnhancedMethodSuccess,
     logEnhancedMethodError,
-    logEnhancedMethodDebug
-} from './logging-functions.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DECORATOR IMPLEMENTATIONS EXPORTS
-// ═══════════════════════════════════════════════════════════════════════════════
+    logEnhancedDebug
+} from './core-logging.ts'
 
 export {
-    log,
-    performanceLog,
-    debugLog,
-    errorLog
-} from './decorator-implementations.ts' 
+    logDebug,
+    logErrorsOnly,
+    logPerformance,
+    logSilent
+} from './logging-functions.ts'
+
+// ==== Core Log Decorator ====
+export { log } from '@/decorators/core-decorator.ts'
+
+// ==== Enhanced Configuration ====
+export {
+    type ILogDecoratorConfig,
+    DEFAULT_LOG_CONFIG
+} from '@/decorators/types.ts'
+
+// ==== Enhanced Types ====
+export {
+    type IEnhancedLogContext
+} from './types.ts'
+
+// ==== Utility Functions ====
+export {
+    createEnhancedContext,
+    createEnhancedDecoratorPrefix,
+    getSemanticIcon
+} from './utils.ts' 

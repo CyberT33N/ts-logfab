@@ -18,15 +18,14 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep } from 'type-fest'
-import { performanceLog } from '@/logger/decorators/index.ts'
+import { logPerformance } from '@/logger/decorators/index.ts'
 import { UtilityService } from './UtilityService.ts'
 
 /**
- * 🔥 Specialized test service demonstrating @performanceLog decorator
- *  configurations for performance monitoring scenarios.
+ * 🔥 Specialized test service demonstrating @logPerformance decorator
+ * configurations for performance monitoring, optimization, and analytics scenarios.
  * 
- * @remarks
- * This service provides comprehensive examples of the enhanced @performanceLog decorator across
+ * This service provides comprehensive examples of the enhanced @logPerformance decorator across
  * different computational scenarios. It focuses specifically on performance measurement, anomaly
  * detection, and resource usage tracking for CPU-intensive and memory-intensive operations,
  * showcasing how performance logging adapts to different workload characteristics.
@@ -44,7 +43,7 @@ import { UtilityService } from './UtilityService.ts'
  * - Configurable logging levels for different monitoring needs
  * 
  * @see {@link UtilityService} for shared utilities and data
- * @see {@link performanceLog} for the performance decorator implementation
+ * @see {@link logPerformance} for the performance decorator implementation
  */
 export class PerformanceDecoratorTestService {
     [key: string]: unknown
@@ -55,15 +54,15 @@ export class PerformanceDecoratorTestService {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // 🔥 ENHANCED DECORATOR 'performanceLog' IMPLEMENTATION
+    // 🔥 ENHANCED DECORATOR 'logPerformance' IMPLEMENTATION
     // ═══════════════════════════════════════════════════════════════════════════════
 
     /**
-     * ⚡ Executes intensive computational task with default @performanceLog monitoring.
+     * ⚡ Executes intensive computational task with default @logPerformance monitoring.
      * 
      * @remarks
      * This method demonstrates CPU-intensive operations with mathematical computations
-     * using the @performanceLog decorator with default configuration. It combines
+     * using the @logPerformance decorator with default configuration. It combines
      * trigonometric functions with iterative processing to create realistic computational
      * load while measuring execution time and memory consumption.
      * 
@@ -73,7 +72,7 @@ export class PerformanceDecoratorTestService {
      * - Periodic async delays to simulate I/O bound mixed workloads
      * - Memory allocation tracking throughout execution
      * 
-     * @decorator `@performanceLog()` - Default performance monitoring configuration
+     * @decorator `@logPerformance()` - Default performance monitoring configuration
      * 
      * @param iterations - Number of computational iterations to execute
      * @returns Promise resolving to computation results with performance metrics
@@ -93,7 +92,7 @@ export class PerformanceDecoratorTestService {
      * // Performance logs will automatically capture execution metrics
      * ```
      */
-    @performanceLog() // DEFAULT PERFORMANCE CONFIGURATION
+    @logPerformance() // DEFAULT PERFORMANCE CONFIGURATION
     public async intensiveComputationTask(iterations: Readonly<number>): Promise<{
         result: number
         processingTime: number
@@ -123,7 +122,7 @@ export class PerformanceDecoratorTestService {
     }
 
     /**
-     * 🔢 Performs matrix multiplication with enhanced @performanceLog monitoring and anomaly detection.
+     * 🔢 Performs matrix multiplication with enhanced @logPerformance monitoring and anomaly detection.
      * 
      * @remarks
      * This method demonstrates mathematically intensive matrix operations with enhanced
@@ -137,7 +136,7 @@ export class PerformanceDecoratorTestService {
      * - Debug-level logging for detailed performance insights
      * - Result inclusion for output validation tracking
      * 
-     * @decorator `@performanceLog({ enableAnomalyDetection: true, enableSemanticAnalysis: true, 
+     * @decorator `@logPerformance({ enableAnomalyDetection: true, enableSemanticAnalysis: true, 
      * logLevel: 'debug', includeResult: true })`
      * 
      * @param matrixA - First matrix for multiplication (read-only deep)
@@ -159,7 +158,7 @@ export class PerformanceDecoratorTestService {
      * // and semantic categorization of the mathematical operation
      * ```
      */
-    @performanceLog({
+    @logPerformance({
         enableAnomalyDetection: true,
         enableSemanticAnalysis: true,
         logLevel: 'debug',
@@ -191,7 +190,7 @@ export class PerformanceDecoratorTestService {
     }
 
     /**
-     * 📦 Executes batch data processing with optimized @performanceLog configuration for production monitoring.
+     * 📦 Executes batch data processing with optimized @logPerformance configuration for production monitoring.
      * 
      * @remarks
      * This method demonstrates batch processing operations with performance monitoring
@@ -205,7 +204,7 @@ export class PerformanceDecoratorTestService {
      * - Info-level logging for operational visibility
      * - Arguments and results excluded for privacy and performance
      * 
-     * @decorator `@performanceLog({ enablePerformanceTracking: true, enableAnomalyDetection: true, 
+     * @decorator `@logPerformance({ enablePerformanceTracking: true, enableAnomalyDetection: true, 
      * logLevel: 'info', includeArguments: false, includeResult: false })`
      * 
      * @param batchSize - Number of items to process in each batch
@@ -225,7 +224,7 @@ export class PerformanceDecoratorTestService {
      * // any anomalies in batch processing times
      * ```
      */
-    @performanceLog({
+    @logPerformance({
         enablePerformanceTracking: true,
         enableAnomalyDetection: true,
         logLevel: 'info',

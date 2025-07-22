@@ -52,21 +52,12 @@
  * @see {@link EnhancedDecoratorService} Enhanced decorator implementation
  */
 
-import type { ReadonlyDeep } from 'type-fest'
-
-// Standard decorators import
-import { 
-    log as standardLog, 
-    logDebug as standardLogDebug, 
-    logPerformance as standardLogPerformance 
-} from '@/decorators/index.ts'
-
-// Enhanced decorators import
+import { ReadonlyDeep } from 'type-fest'
 import {
-    createEnhancedConfig,
-    debugLog as enhancedDebugLog,
-    log as enhancedLog,
-    performanceLog as enhancedPerformanceLog
+    DEFAULT_LOG_CONFIG,
+    log,
+    logDebug,
+    logPerformance
 } from '@/logger/decorators/index.ts'
 
 import { createProducts, createUsers, type IProduct, type IUser } from '../../core/models.ts'
@@ -225,7 +216,7 @@ export class StandardDecoratorService {
      * @since 1.0.0
      * @see {@link IUser} User interface definition
      */
-	@standardLog()
+	@log()
     public async basicOperation(userId: number): Promise<IUser | null> {
         await this._delay(100)
         return this._users.find(user => user.id === userId) ?? null
@@ -263,7 +254,7 @@ export class StandardDecoratorService {
      * @since 1.0.0
      * @see {@link IUser} User interface definition
      */
-	@standardLog({
+	@log({
 	    level: 'debug',
 	    includePerformance: true,
 	    includeArgs: true,
@@ -313,7 +304,7 @@ export class StandardDecoratorService {
      * @since 1.0.0
      * @see {@link ReadonlyDeep} Type-safe immutable data handling
      */
-	@standardLog({
+	@log({
 	    level: 'info',
 	    includePerformance: true,
 	    correlationContext: {
@@ -376,7 +367,7 @@ export class StandardDecoratorService {
      * @since 1.0.0
      * @see {@link ReadonlyDeep} Type-safe immutable data handling
      */
-	@standardLogDebug()
+	@logDebug()
 	public async standardDebugOperation(
 	    input: ReadonlyDeep<Record<string, unknown>>
 	): Promise<Record<string, unknown>> {
@@ -423,7 +414,7 @@ export class StandardDecoratorService {
      * 
      * @since 1.0.0
      */
-	@standardLogPerformance()
+	@logPerformance()
 	public standardPerformanceOperation(numbers: readonly number[]): number {
 	    return numbers.reduce((sum, num) => sum + num, 0)
 	}
@@ -619,7 +610,7 @@ export class EnhancedDecoratorService {
      * @since 1.0.0
      * @see {@link IUser} User interface definition
      */
-	@enhancedLog()
+	@log()
     public async basicOperation(userId: number): Promise<IUser | null> {
         await this._delay(100)
         return this._users.find(user => user.id === userId) ?? null
@@ -659,7 +650,7 @@ export class EnhancedDecoratorService {
      * @since 1.0.0
      * @see {@link IUser} User interface definition
      */
-	@enhancedLog({
+	@log({
 	    enablePerformanceTracking: true,
 	    enableAnomalyDetection: true,
 	    enableSemanticAnalysis: true,
@@ -679,7 +670,7 @@ export class EnhancedDecoratorService {
      * 🏢 **Advanced Enhanced Decorator Operation**
      * 
      * Showcases the enhanced decorator's enterprise capabilities using the
-     * `createEnhancedConfig` factory for maximum flexibility while maintaining
+     * `DEFAULT_LOG_CONFIG` enterprise standard for maximum flexibility while maintaining
      * the streamlined approach with auto-format switching and optimized feature
      * selection for production environments.
      * 
@@ -711,21 +702,30 @@ export class EnhancedDecoratorService {
      * 
      * @since 1.0.0
      * @see {@link ReadonlyDeep} Type-safe immutable data handling
-     * @see {@link createEnhancedConfig} Configuration factory function
+     * @see {@link DEFAULT_LOG_CONFIG} Enterprise configuration standard
      */
-	@enhancedLog(
-	    createEnhancedConfig({
-	        enablePerformanceTracking: true,
-	        enableAnomalyDetection: true,
-	        enableSemanticAnalysis: true,
-	        enableCorrelationTracking: true,
-	        enableAutoFormatSwitching: true,
-	        logLevel: 'info',
-	        includeStackTrace: false,
-	        includeArguments: true,
-	        includeResult: false,
-	        maxArgumentsLength: 200
-	    })
+	@log(
+	    {
+	        ...DEFAULT_LOG_CONFIG,
+	        includePerformance: true,
+	        anomalyDetection: {
+	            enabled: true
+	        },
+	        correlationContext: {
+	            enabled: true,
+	            inheritFromParent: true
+	        },
+	        semanticContext: {
+	            enabled: true
+	        },
+	        environment: {
+	            forceFormat: 'human'
+	        },
+	        level: 'debug',
+	        logStart: true,
+	        logSuccess: true,
+	        includeResult: false
+	    }
 	)
 	public async enhancedAdvancedOperation(
 	    data: ReadonlyDeep<readonly unknown[]>
@@ -773,7 +773,7 @@ export class EnhancedDecoratorService {
      * @since 1.0.0
      * @see {@link ReadonlyDeep} Type-safe immutable data handling
      */
-	@enhancedDebugLog()
+	@logDebug()
 	public async enhancedDebugOperation(
 	    input: ReadonlyDeep<Record<string, unknown>>
 	): Promise<Record<string, unknown>> {
@@ -820,7 +820,7 @@ export class EnhancedDecoratorService {
      * 
      * @since 1.0.0
      */
-	@enhancedPerformanceLog()
+	@logPerformance()
 	public enhancedPerformanceOperation(numbers: readonly number[]): number {
 	    return numbers.reduce((sum, num) => sum + num, 0)
 	}

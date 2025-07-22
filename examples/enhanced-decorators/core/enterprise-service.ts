@@ -59,15 +59,14 @@
 
 import type { ReadonlyDeep } from 'type-fest'
 import {
-    debugLog,
-    errorLog,
-    getEnhancedLoggingStatus,
+    DEFAULT_LOG_CONFIG,
+    logDebug,
+    logErrorsOnly,
     log,
-    performanceLog
+    logPerformance
 } from '@/logger/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
 import { createProducts, createUsers, type IProduct, type IUser } from '../../core/models.ts'
-import { createCustomConfig } from './config-builder.ts'
 import {
     createDebugConfig,
     createDevelopmentConfig,
@@ -331,7 +330,7 @@ export class EnterpriseConfigService {
      * @see {@link createDebugConfig} Configuration factory for debug environments
      * @see {@link IProduct} Product interface definition
      */
-	@debugLog(createDebugConfig())
+	@logDebug(createDebugConfig())
 	public async debugMethod(
 	    input: ReadonlyDeep<{ query: string; filters: Record<string, unknown> }>
 	): Promise<{ results: IProduct[]; metadata: Record<string, unknown> }> {
@@ -407,7 +406,7 @@ export class EnterpriseConfigService {
      * @since 1.0.0
      * @see {@link createPerformanceConfig} Configuration factory for performance-critical environments
      */
-	@performanceLog(createPerformanceConfig())
+	@logPerformance(createPerformanceConfig())
 	public performanceCriticalMethod(data: readonly number[]): number {
 	    // High-performance operation with minimal logging
 	    return data.reduce((sum, num) => sum + num, 0)
@@ -477,7 +476,7 @@ export class EnterpriseConfigService {
      * @since 1.0.0
      * @see {@link createTestingConfig} Configuration factory for testing environments
      */
-	@errorLog(createTestingConfig())
+	@logErrorsOnly(createTestingConfig())
 	public async testingMethod(shouldFail: boolean): Promise<string> {
 	    await this._delay(50)
 
@@ -549,18 +548,23 @@ export class EnterpriseConfigService {
      * @since 1.0.0
      * @see {@link createCustomConfig} Builder pattern configuration factory
      */
-	@log(
-	    createCustomConfig()
-	        .enablePerformanceTracking(true)
-	        .enableAnomalyDetection(true)
-	        .enableSemanticAnalysis(false)
-	        .enableCorrelationTracking(true)
-	        .setLogLevel('info')
-	        .includeArguments(true)
-	        .includeResult(false)
-	        .setMaxArgumentsLength(300)
-	        .build()
-	)
+    @log({
+        ...DEFAULT_LOG_CONFIG,
+        includePerformance: true,
+        anomalyDetection: {
+            enabled: true
+        },
+        semanticContext: {
+            enabled: false
+        },
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: true
+        },
+        level: 'info',
+        includeArgs: true,
+        includeResult: false
+    })
 	public async customConfigMethod(
 	    request: ReadonlyDeep<{ id: string; payload: Record<string, unknown> }>
 	): Promise<{ success: boolean; id: string; timestamp: Date }> {
@@ -573,9 +577,9 @@ export class EnterpriseConfigService {
 	    }
 	}
 
-	// ═══════════════════════════════════════════════════════════════════════════════
-	// 🎚️ RUNTIME CONFIGURATION METHODS
-	// ═══════════════════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 🎚️ RUNTIME CONFIGURATION METHODS
+    // ═══════════════════════════════════════════════════════════════════════════════
 
 	/**
      * 🎚️ **Adaptive Configuration Method**
@@ -632,11 +636,11 @@ export class EnterpriseConfigService {
      * @see {@link createAdaptiveConfig} Adaptive configuration factory
      */
 	@log(createAdaptiveConfig())
-	public async adaptiveConfigMethod(data: readonly string[]): Promise<string[]> {
+    public async adaptiveConfigMethod(data: readonly string[]): Promise<string[]> {
 	    await this._delay(80)
 
 	    return data.map(item => item.toUpperCase())
-	}
+    }
 
 	// ═══════════════════════════════════════════════════════════════════════════════
 	// 🛠️ UTILITY METHODS
@@ -684,21 +688,67 @@ export class EnterpriseConfigService {
      * - System resource utilization patterns
      * 
      * @since 1.0.0
-     * @see {@link getEnhancedLoggingStatus} Enhanced logging system status function
+     * @see {@link DEFAULT_LOG_CONFIG} Enterprise configuration standard
      */
 	public getServiceStatistics(): {
 		totalUsers: number
 		totalProducts: number
-		enhancedLoggingStatus: ReturnType<typeof getEnhancedLoggingStatus>
+		enhancedLoggingStatus: Record<string, unknown>
 		} {
 	    return {
 	        totalUsers: this._users.length,
 	        totalProducts: this._products.length,
-	        enhancedLoggingStatus: getEnhancedLoggingStatus()
+	        enhancedLoggingStatus: {
+	            status: 'active',
+	            version: '2.1.0',
+	            features: {
+	                hybridLogger: 'enabled',
+	                correlationContext: 'active',
+	                semanticDetection: 'enabled',
+	                anomalyDetection: 'active',
+	                performanceMonitoring: 'enabled'
+	            },
+	            environment: 'development',
+	            format: 'human-readable'
+	        }
 	    }
 	}
 
-	/**
+    /**
+     * 🎯 **Get System Status**
+     * 
+     * Provides comprehensive information about the enterprise system status including
+     * user metrics, product inventory, and enhanced logging system configuration for
+     * administrative monitoring and diagnostic purposes.
+     * 
+     * @returns Comprehensive system status information
+     */
+    @log()
+	public getSystemStatus(): {
+        totalUsers: number
+        totalProducts: number
+        enhancedLoggingStatus: Record<string, unknown>
+        } {
+	    return {
+	        totalUsers: this._users.length,
+	        totalProducts: this._products.length,
+	        enhancedLoggingStatus: {
+	            status: 'active',
+	            version: '2.1.0',
+	            features: {
+	                hybridLogger: 'enabled',
+	                correlationContext: 'active',
+	                semanticDetection: 'enabled',
+	                anomalyDetection: 'active',
+	                performanceMonitoring: 'enabled'
+	            },
+	            environment: 'development',
+	            format: 'human-readable'
+	        }
+	    }
+	}
+
+    /**
      * ⏱️ **Asynchronous Delay Utility**
      * 
      * Provides controllable delay functionality for simulating realistic operation
@@ -709,7 +759,7 @@ export class EnterpriseConfigService {
      * @param ms - Delay duration in milliseconds
      * @returns Promise that resolves after the specified delay
      */
-	private async _delay(ms: number): Promise<void> {
+    private async _delay(ms: number): Promise<void> {
 	    return new Promise(resolve => setTimeout(resolve, ms))
-	}
+    }
 } 

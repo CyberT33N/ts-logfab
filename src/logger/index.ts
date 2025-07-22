@@ -9,30 +9,128 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
+██              🎯 TS-LOGFAB LOGGER - MAIN BARREL FILE                       ██
+██          ENTERPRISE-READY LOGGING FRAMEWORK WITH ENHANCED FEATURES       ██
+██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// Re-export all types and interfaces
-export type { ILogContext, IPerformanceMetrics } from './types.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 MAIN LOGGER EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export logger instance
-export { logger } from './logger-factory.ts'
-
-// Re-export all Enhanced decorator logging functions and types
 export {
+    logger,
+    getLogger,
+    resetLogger,
+    getAnomalyDetectorInstance,
+    startPerformanceTracking,
+    endPerformanceTracking
+} from './logger-factory.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENHANCED DECORATOR LOGGING EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    type ILogDecoratorConfig,
+    DEFAULT_LOG_CONFIG,
     logEnhancedMethodStart,
     logEnhancedMethodSuccess,
     logEnhancedMethodError,
-    logEnhancedMethodDebug,
-    createDecoratorLoggingConfig,
-    getDefaultDecoratorConfig,
+    logEnhancedDebug,
     type IEnhancedLogContext,
-    type IDecoratorLoggingConfig
+    logDebug,
+    logErrorsOnly,
+    logPerformance,
+    logSilent,
+    log
 } from './decorators/index.ts'
 
-// Re-export performance utilities
-export { createPerformanceSnapshot } from './performance/utils/index.ts'
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ADAPTIVE LOGGING EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Re-export logging utilities
-export { extractLogRelevantArgs, extractResultMetadata } from './logging-utils.ts'
+export {
+    createHybridLogger,
+    createDevelopmentLogger,
+    createProductionLogger,
+    getCurrentLoggingFormat,
+    isStructuredLoggingEnabled
+} from './AdaptiveLogging/index.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 CORRELATION CONTEXT EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    type ICorrelationContext,
+    type ICallChainInfo,
+    type IContextCreationOptions,
+    type IContextRunOptions,
+    type IContextDebugInfo,
+    getCurrentCorrelationContext,
+    createCorrelationContext,
+    runWithCorrelationContext,
+    getOrCreateCorrelationContext,
+    getCorrelationId,
+    getWorkflowId,
+    addCorrelationMetadata,
+    clearAllCorrelationContexts,
+    getCorrelationDebugInfo
+} from './correlation-context/index.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 SEMANTIC DETECTION EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    type ISemanticContext,
+    type OperationType,
+    type DomainType,
+    type ComplexityLevel,
+    type CostLevel,
+    type IPatternConfig,
+    detectSemanticContext,
+    DEFAULT_PATTERN_CONFIG,
+    createCustomPatternConfig
+} from './semantic-detector/index.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ANOMALY DETECTION EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    type IAnomalyDetection,
+    type AnomalyType,
+    type AnomalySeverity,
+    type AnomalyDetector,
+    type IAnomalyConfig,
+    createAnomalyDetector,
+    createPerformanceMetric
+} from './anomaly-detector/index.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 PERFORMANCE MONITORING EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    type IPerformanceSession,
+    type IPerformanceResult,
+    type IPerformanceMonitorConfig,
+    type IPerformanceStatsSummary,
+    PerformanceMonitor,
+    createPerformanceMonitor,
+    getGlobalPerformanceMonitor,
+    createPerformanceSnapshot
+} from './performance/index.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 SHARED TYPES EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+    type ILogContext,
+    type IPerformanceMetrics
+} from './types.ts'

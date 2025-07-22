@@ -17,65 +17,75 @@
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED DECORATOR CONFIGURATION FACTORIES
+// 🎯 ENTERPRISE CONFIGURATION FACTORIES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import env from '@/env.ts'
 import {
-    createEnhancedConfig,
-    type IEnhancedDecoratorConfig
+    DEFAULT_LOG_CONFIG,
+    type ILogDecoratorConfig
 } from '@/logger/decorators/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🏭 ENTERPRISE CONFIG FACTORY PATTERNS
+// 🎯 ENTERPRISE CONFIGURATION FACTORIES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🚀 **Development Configuration**
- *
- * Optimized for development environments with maximum visibility
+ * 🛠️ **Development Configuration Factory**
  * 
- * @remarks
- * Creates a comprehensive configuration optimized for development workflows
- * with maximum observability and debugging capabilities. Enables all advanced
- * features including semantic analysis, anomaly detection, and full argument
- * logging to provide developers with complete insight into application behavior.
+ * Creates a comprehensive logging configuration optimized for development environments.
+ * This configuration provides maximum debugging capabilities, detailed performance metrics,
+ * enhanced context information, and comprehensive error tracking to support effective
+ * development and troubleshooting workflows.
  * 
- * 🔧 **Configuration Characteristics:**
- * - Performance tracking enabled for timing analysis
- * - Anomaly detection active for unusual behavior identification
- * - Semantic analysis enabled for context-aware logging
- * - Correlation tracking for request/operation tracing
- * - Auto-format switching based on output destination
- * - Debug-level logging with maximum verbosity
- * - Full stack traces and argument/result logging included
- * - Extended argument length limit (500 chars) for detailed inspection
+ * **🔧 Key Features:**
+ * - Full debugging capabilities with detailed context information
+ * - Enhanced performance monitoring for development optimization
+ * - Comprehensive error tracking with stack traces and arguments
+ * - Correlation context for distributed debugging scenarios
+ * - Semantic analysis for intelligent operation categorization
+ * - Anomaly detection for identifying unusual development patterns
  * 
- * 💡 **Development Benefits:**
- * - Complete visibility into method execution flow
- * - Detailed debugging information for troubleshooting
- * - Performance metrics for optimization identification
- * - Rich context for understanding application behavior
+ * **🎯 Use Cases:**
+ * - Local development environments requiring comprehensive logging
+ * - Integration testing with detailed operation tracking
+ * - Performance profiling and optimization during development
+ * - Debugging complex business logic with enhanced context
+ * - Development CI/CD pipelines requiring detailed operation logs
  * 
- * @returns Configuration object optimized for development environments
+ * @example
+ * ```typescript
+ * @log(createDevelopmentConfig())
+ * public async complexBusinessLogic(data: BusinessData): Promise<Result> {
+ *     // Enhanced development logging with full context
+ *     return await this.processBusinessData(data)
+ * }
+ * ```
  * 
- * @see {@link createProductionConfig} for production-optimized alternative
- * @see {@link createDebugConfig} for maximum verbosity configuration
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+ * @see {@link ILogDecoratorConfig} for configuration structure details
  */
-export function createDevelopmentConfig(): IEnhancedDecoratorConfig {
-    return createEnhancedConfig({
-        enablePerformanceTracking: true,
-        enableAnomalyDetection: true,
-        enableSemanticAnalysis: true,
-        enableCorrelationTracking: true,
-        enableAutoFormatSwitching: true,
-        logLevel: 'debug',
-        includeStackTrace: true,
-        includeArguments: true,
-        includeResult: true,
-        maxArgumentsLength: 500
-    })
+export function createDevelopmentConfig(): ILogDecoratorConfig {
+    return {
+        ...DEFAULT_LOG_CONFIG,
+        level: 'debug',
+        logStart: true,
+        logSuccess: true,
+        logDebug: true,
+        includePerformance: true,
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: true
+        },
+        semanticContext: {
+            enabled: true
+        },
+        anomalyDetection: {
+            enabled: true
+        },
+        environment: {
+            forceFormat: 'human'
+        }
+    }
 }
 
 /**
@@ -110,21 +120,28 @@ export function createDevelopmentConfig(): IEnhancedDecoratorConfig {
  * 
  * @see {@link createDevelopmentConfig} for development-friendly alternative
  * @see {@link createPerformanceConfig} for maximum performance configuration
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+ * @see {@link ILogDecoratorConfig} for configuration structure details
  */
-export function createProductionConfig(): IEnhancedDecoratorConfig {
-    return createEnhancedConfig({
-        enablePerformanceTracking: true,
-        enableAnomalyDetection: true,
-        enableSemanticAnalysis: false, // Disabled for performance
-        enableCorrelationTracking: true,
-        enableAutoFormatSwitching: true,
-        logLevel: 'info',
-        includeStackTrace: false,
-        includeArguments: false,
-        includeResult: false,
-        maxArgumentsLength: 100
-    })
+export function createProductionConfig(): ILogDecoratorConfig {
+    return {
+        ...DEFAULT_LOG_CONFIG,
+        level: 'info',
+        logStart: false,
+        logSuccess: false,
+        logDebug: false,
+        includePerformance: true,
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: true
+        },
+        anomalyDetection: {
+            enabled: true
+        },
+        environment: {
+            forceFormat: 'json',
+            disableInEnvironments: ['test']
+        }
+    }
 }
 
 /**
@@ -160,10 +177,11 @@ export function createProductionConfig(): IEnhancedDecoratorConfig {
  * 
  * @see {@link createDevelopmentConfig} for standard development configuration
  * @see {@link createTestingConfig} for testing-specific configuration
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+ * @see {@link ILogDecoratorConfig} for configuration structure details
  */
-export function createDebugConfig(): IEnhancedDecoratorConfig {
-    return createEnhancedConfig({
+export function createDebugConfig(): ILogDecoratorConfig {
+    return {
+        ...DEFAULT_LOG_CONFIG,
         enablePerformanceTracking: true,
         enableAnomalyDetection: true,
         enableSemanticAnalysis: true,
@@ -174,170 +192,112 @@ export function createDebugConfig(): IEnhancedDecoratorConfig {
         includeArguments: true,
         includeResult: true,
         maxArgumentsLength: 1000
-    })
+    }
 }
 
 /**
- * ⚡ **Performance Configuration**
- *
- * Minimal logging for performance-critical operations
+ * 🎯 **Performance Optimization Configuration Factory**
  * 
- * @remarks
- * Creates a minimal-overhead configuration specifically designed for performance-critical
- * applications where logging impact must be absolutely minimized. Disables most advanced
- * features while maintaining only essential performance tracking capabilities to ensure
- * negligible impact on application execution speed.
- * 
- * 🚀 **Performance Optimizations:**
- * - Only performance tracking enabled for timing metrics
- * - All analysis features disabled (anomaly, semantic, correlation)
- * - Auto-format switching disabled to reduce processing
- * - Warning-level logging to minimize output volume
- * - No stack traces to eliminate stack inspection overhead
- * - No argument or result logging to reduce serialization cost
- * - Minimal argument length limit (50 chars) for emergency logging
- * 
- * ⚡ **Performance Benefits:**
- * - Near-zero logging overhead for maximum application speed
- * - Essential timing metrics preserved for performance monitoring
- * - Minimal resource consumption for high-throughput scenarios
- * - Streamlined execution path with reduced branching
- * 
- * 🎯 **Ideal For:**
- * - High-frequency trading systems and real-time applications
- * - Microservices with strict latency requirements
- * - Batch processing operations with performance constraints
- * - Production APIs with heavy load requirements
- * 
- * @returns Configuration object optimized for maximum performance
+ * Generates configuration optimized for high-performance production environments
+ * with minimal logging overhead while maintaining essential monitoring capabilities.
  * 
  * @see {@link createProductionConfig} for balanced production configuration
  * @see {@link createDevelopmentConfig} for development-friendly alternative
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+ * @see {@link ILogDecoratorConfig} for configuration structure details
  */
-export function createPerformanceConfig(): IEnhancedDecoratorConfig {
-    return createEnhancedConfig({
-        enablePerformanceTracking: true,
-        enableAnomalyDetection: false,
-        enableSemanticAnalysis: false,
-        enableCorrelationTracking: false,
-        enableAutoFormatSwitching: false,
-        logLevel: 'warn',
-        includeStackTrace: false,
-        includeArguments: false,
-        includeResult: false,
-        maxArgumentsLength: 50
-    })
+export function createPerformanceConfig(): ILogDecoratorConfig {
+    return {
+        ...DEFAULT_LOG_CONFIG,
+        level: 'error',
+        logStart: false,
+        logSuccess: false,
+        logDebug: false,
+        includePerformance: false,
+        correlationContext: {
+            enabled: false
+        },
+        semanticContext: {
+            enabled: false
+        },
+        anomalyDetection: {
+            enabled: false
+        },
+        environment: {
+            forceFormat: 'machine'
+        }
+    }
 }
 
 /**
- * 🧪 **Testing Configuration**
- *
- * Specialized for testing environments
+ * 🎯 **Testing Configuration Factory**
  * 
- * @remarks
- * Creates a testing-optimized configuration that balances minimal performance
- * impact with essential debugging capabilities required for test execution
- * and failure analysis. Disables performance-intensive features while maintaining
- * correlation tracking and argument logging for effective test debugging.
- * 
- * 🧪 **Testing Characteristics:**
- * - Performance tracking disabled to avoid test timing interference
- * - Anomaly detection disabled to prevent false positives in test data
- * - Semantic analysis disabled to reduce test execution overhead
- * - Correlation tracking enabled for test flow tracing
- * - Auto-format switching enabled for readable test output
- * - Error-level logging to focus on failures and issues
- * - Stack traces enabled for test failure debugging
- * - Arguments and results logged for test assertion verification
- * - Moderate argument length limit (200 chars) for test data inspection
- * 
- * 🎯 **Testing Benefits:**
- * - Minimal interference with test execution timing
- * - Essential debugging information for test failure analysis
- * - Focused logging on errors and critical issues
- * - Correlation tracking for complex test scenario debugging
- * 
- * 🔧 **Testing Use Cases:**
- * - Unit test debugging and assertion verification
- * - Integration test flow analysis and issue identification
- * - End-to-end test execution monitoring
- * - Test environment deployment validation
- * 
- * @returns Configuration object optimized for testing environments
+ * Creates configuration specifically designed for testing environments with
+ * comprehensive logging and validation features to support test execution,
+ * debugging, and validation processes.
  * 
  * @see {@link createDebugConfig} for maximum debugging capabilities
  * @see {@link createDevelopmentConfig} for development environment configuration
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+ * @see {@link ILogDecoratorConfig} for configuration structure details
  */
-export function createTestingConfig(): IEnhancedDecoratorConfig {
-    return createEnhancedConfig({
-        enablePerformanceTracking: false,
-        enableAnomalyDetection: false,
-        enableSemanticAnalysis: false,
-        enableCorrelationTracking: true,
-        enableAutoFormatSwitching: true,
-        logLevel: 'error',
-        includeStackTrace: true,
-        includeArguments: true,
-        includeResult: true,
-        maxArgumentsLength: 200
-    })
+export function createTestingConfig(): ILogDecoratorConfig {
+    return {
+        ...DEFAULT_LOG_CONFIG,
+        level: 'debug',
+        logStart: true,
+        logSuccess: true,
+        logDebug: true,
+        includePerformance: true,
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: false
+        },
+        semanticContext: {
+            enabled: true
+        },
+        anomalyDetection: {
+            enabled: false
+        },
+        environment: {
+            forceFormat: 'human'
+        }
+    }
 }
 
 /**
- * 🎚️ **Adaptive Configuration**
- *
- * Runtime configuration that adapts to environment
+ * 🎚️ **Adaptive Configuration Factory**
  * 
- * @remarks
- * Creates an intelligent configuration that automatically adapts to the runtime
- * environment by detecting the NODE_ENV setting and selecting the most appropriate
- * configuration profile. Provides seamless transitions between development and
- * production environments without requiring manual configuration changes.
+ * Creates adaptive configuration that automatically adjusts based on the current
+ * environment and operational context to provide optimal logging behavior across
+ * different deployment scenarios and operational contexts.
  * 
- * 🤖 **Adaptive Logic:**
- * - Automatically detects NODE_ENV environment variable
- * - Switches to development configuration for 'development' environment
- * - Defaults to production configuration for all other environments
- * - Provides consistent behavior across different deployment scenarios
- * - Eliminates manual configuration management overhead
- * 
- * 🌍 **Environment Detection:**
- * - **Development Mode**: Full debugging features, maximum observability
- * - **Production Mode**: Performance-optimized, security-conscious logging
- * - **Fallback Behavior**: Defaults to production for safety in unknown environments
- * 
- * 🔄 **Benefits:**
- * - Zero-configuration deployment across environments
- * - Automatic optimization based on runtime context
- * - Consistent behavior with environment-appropriate settings
- * - Simplified application configuration management
- * 
- * @example
- * Demonstrating adaptive configuration behavior:
- * ```typescript
- * // In development environment (NODE_ENV=development)
- * const config1 = createAdaptiveConfig();
- * // Returns development config with full debugging features
- * 
- * // In production environment (NODE_ENV=production)
- * const config2 = createAdaptiveConfig(); 
- * // Returns production config with performance optimizations
- * 
- * // In unknown environment (NODE_ENV=staging)
- * const config3 = createAdaptiveConfig();
- * // Returns production config as safe fallback
- * ```
- * 
- * @returns Configuration object adapted to the current runtime environment
- * 
- * @see {@link createDevelopmentConfig} for explicit development configuration
  * @see {@link createProductionConfig} for explicit production configuration
  * @see {@link env} for environment variable access utilities
- * @see {@link IEnhancedDecoratorConfig} for configuration structure details
+ * @see {@link ILogDecoratorConfig} for configuration structure details
  */
-export function createAdaptiveConfig(): IEnhancedDecoratorConfig {
-    const isDev = env.NODE_ENV === 'development'
-    return isDev ? createDevelopmentConfig() : createProductionConfig()
+export function createAdaptiveConfig(): ILogDecoratorConfig {
+    const isDevelopment = env.NODE_ENV === 'development'
+    const isProduction = env.NODE_ENV === 'production'
+    const isTesting = env.NODE_ENV === 'test'
+
+    return {
+        ...DEFAULT_LOG_CONFIG,
+        level: isDevelopment ? 'debug' : isProduction ? 'info' : 'debug',
+        logStart: !isProduction,
+        logSuccess: isDevelopment,
+        logDebug: isDevelopment || isTesting,
+        includePerformance: !isProduction,
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: isProduction
+        },
+        semanticContext: {
+            enabled: !isProduction
+        },
+        anomalyDetection: {
+            enabled: isProduction
+        },
+        environment: {
+            forceFormat: isProduction ? 'machine' : 'human'
+        }
+    }
 } 

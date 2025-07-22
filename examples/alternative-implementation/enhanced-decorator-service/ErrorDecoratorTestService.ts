@@ -17,33 +17,25 @@
 // 🔥 ERROR DECORATOR TEST SERVICE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { errorLog } from '@/logger/decorators/index.ts'
+import { logErrorsOnly } from '@/logger/decorators/index.ts'
 import { UtilityService } from './UtilityService.ts'
 
 /**
- * 🔥 Specialized test service demonstrating @errorLog decorator configurations 
- * for error handling and recovery scenarios.
+ * 🔥 Specialized test service demonstrating @logErrorsOnly decorator configurations
+ * for error handling, monitoring, and diagnostic scenarios.
  * 
- * @remarks
- * This service provides comprehensive examples of the enhanced @errorLog decorator across
- * different error handling scenarios. It focuses on error detection, logging, stack trace
- * analysis, and recovery mechanisms for building robust applications with comprehensive
- * error monitoring and diagnostic capabilities.
+ * This service provides comprehensive examples of the enhanced @logErrorsOnly decorator across
+ * multiple error handling scenarios including critical system errors, recovery operations,
+ * and resilient error management patterns.
  * 
- * 🧪 **Error Test Scenarios:**
- * - Controlled error generation with different error types and conditions
- * - Critical error handling with detailed diagnostic information
- * - Recovery operations with minimal logging overhead
- * - Anomaly detection for unusual error patterns
+ * Each method showcases different aspects of the decorator's functionality:
+ * - Critical error detection and alerting
+ * - Error recovery and resilience patterns  
+ * - Minimalistic error logging for high-performance systems
+ * - Exception handling with contextual information
+ * - Error analysis and diagnostic capabilities
  * 
- * ⚠️ **Error Monitoring Features:**
- * - Comprehensive error logging with configurable detail levels
- * - Stack trace analysis for error source identification
- * - Argument logging for error context preservation
- * - Anomaly detection for identifying unusual error patterns
- * 
- * @see {@link UtilityService} for shared utilities and data
- * @see {@link errorLog} for the error decorator implementation
+ * @see {@link logErrorsOnly} for the error decorator implementation
  */
 export class ErrorDecoratorTestService {
     [key: string]: unknown
@@ -58,22 +50,18 @@ export class ErrorDecoratorTestService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     /**
-     * ⚠️ Demonstrates controlled error generation using default @errorLog configuration.
+     * ⚠️ Demonstrates controlled error generation using default @logErrorsOnly configuration.
      * 
      * @remarks
-     * This method simulates various error conditions to test error logging capabilities
-     * with default decorator settings. It provides controlled error scenarios including
-     * validation errors, network errors, permission errors, and timeout errors to
-     * demonstrate comprehensive error handling patterns.
+     * This method generates controlled errors for testing error handling capabilities
+     * with the enhanced decorator. It provides different error types and conditions
+     * to validate error detection, logging mechanisms, and exception flow management.
      * 
-     * 🔍 **Error Types Supported:**
-     * - Validation errors for input parameter issues
-     * - Network errors for connectivity problems
-     * - Permission errors for access control failures
-     * - Timeout errors for performance-related issues
-     * - Generic errors for unknown conditions
+     * The operation includes various error scenarios including type errors, validation
+     * failures, and system exceptions to comprehensively test error handling behavior
+     * and verify that error information is properly captured and logged.
      * 
-     * @decorator `@errorLog()` - Default error logging configuration
+     * @decorator `@logErrorsOnly()` - Default error logging configuration
      * 
      * @param shouldFail - Flag determining whether the operation should fail
      * @param errorType - Type of error to simulate when shouldFail is true
@@ -98,7 +86,7 @@ export class ErrorDecoratorTestService {
      * }
      * ```
      */
-    @errorLog() // DEFAULT ERROR CONFIGURATION
+    @logErrorsOnly() // DEFAULT ERROR CONFIGURATION
     public async errorProneOperation(shouldFail: Readonly<boolean>, errorType: Readonly<string>): Promise<string> {
         await this._utilityService.delay(100)
         
@@ -121,7 +109,7 @@ export class ErrorDecoratorTestService {
     }
 
     /**
-     * 🚨 Executes critical error handling with enhanced @errorLog diagnostic capabilities.
+     * 🚨 Executes critical error handling with enhanced @logErrorsOnly diagnostic capabilities.
      * 
      * @remarks
      * This method demonstrates advanced error handling scenarios with comprehensive
@@ -135,7 +123,7 @@ export class ErrorDecoratorTestService {
      * - Anomaly detection for identifying unusual error patterns
      * - Error-level logging for critical error visibility
      * 
-     * @decorator `@errorLog({ includeStackTrace: true, includeArguments: true, 
+     * @decorator `@logErrorsOnly({ includeStackTrace: true, includeArguments: true, 
      * enableAnomalyDetection: true, logLevel: 'error' })`
      * 
      * @param operation - Name of the operation being performed for error context
@@ -165,7 +153,7 @@ export class ErrorDecoratorTestService {
      * }
      * ```
      */
-    @errorLog({
+    @logErrorsOnly({
         includeStackTrace: true,
         includeArguments: true,
         enableAnomalyDetection: true,
@@ -227,7 +215,7 @@ export class ErrorDecoratorTestService {
     }
 
     /**
-     * 🔄 Performs error recovery operation with minimal @errorLog overhead for resilient systems.
+     * 🔄 Performs error recovery operation with minimal @logErrorsOnly overhead for resilient systems.
      * 
      * @remarks
      * This method demonstrates error recovery scenarios with minimal logging configuration
@@ -241,7 +229,7 @@ export class ErrorDecoratorTestService {
      * - Anomaly detection disabled for faster recovery
      * - Warning-level logging for essential error visibility
      * 
-     * @decorator `@errorLog({ includeStackTrace: false, includeArguments: false, enableAnomalyDetection:
+     * @decorator `@logErrorsOnly({ includeStackTrace: false, includeArguments: false, enableAnomalyDetection:
      *  false, logLevel: 'warn' })`
      * 
      * @param failurePoint - Description of the failure point for recovery context
@@ -264,7 +252,7 @@ export class ErrorDecoratorTestService {
      * }
      * ```
      */
-    @errorLog({
+    @logErrorsOnly({
         includeStackTrace: false,
         includeArguments: false,
         enableAnomalyDetection: false,

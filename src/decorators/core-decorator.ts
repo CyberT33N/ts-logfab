@@ -13,174 +13,72 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-import type { ReadonlyDeep } from 'type-fest'
-import {
-    getDefaultDecoratorConfig,
-    logEnhancedMethodError,
+// ==== Imports ====
+import { ReadonlyDeep } from 'type-fest'
+import { 
     logEnhancedMethodStart,
     logEnhancedMethodSuccess,
-    type IDecoratorLoggingConfig
-} from '@/logger/decorators/index.ts'
-import {
-    extractResultMetadata
-} from '@/logger/index.ts'
-import {
-    type ILogDecoratorConfig,
-    type AnyMethod,
-    DEFAULT_LOG_CONFIG
-} from './types.ts'
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🔄 ENHANCED CONFIGURATION ADAPTER
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🔄 **Configuration Adapter for Enhanced Logging**
- * 
- * Converts the legacy ILogDecoratorConfig to the new IDecoratorLoggingConfig
- * for backward compatibility while enabling enhanced features.
- */
-function convertToEnhancedConfig(config: ReadonlyDeep<ILogDecoratorConfig>): IDecoratorLoggingConfig {
-    const defaults = getDefaultDecoratorConfig()
-    
-    // Map trace level to debug since enhanced config doesn't support trace
-    const mappedLogLevel = config.level === 'trace' ? 'debug' : config.level
-    
-    return {
-        enableCorrelation: config.correlationContext?.enabled ?? defaults.enableCorrelation,
-        enableSemanticDetection: config.semanticContext?.enabled ?? defaults.enableSemanticDetection,
-        enableAnomalyDetection: config.anomalyDetection?.enabled ?? defaults.enableAnomalyDetection,
-        enablePerformanceTracking: config.includePerformance ?? defaults.enablePerformanceTracking,
-        useHybridLogger: true, // Always use hybrid logger for enhanced features
-        logLevel: mappedLogLevel ?? defaults.logLevel
-    }
-}
+    logEnhancedMethodError
+} from '@/logger/decorators/core-logging.ts'
+import { type ILogDecoratorConfig, DEFAULT_LOG_CONFIG } from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ✨ ENTERPRISE LOG DECORATOR IMPLEMENTATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **ENTERPRISE LOG DECORATOR**
+ * 🎯 **Enhanced Log Decorator with Enterprise Features**
  * 
- * Perfect TypeScript decorator for automatic method logging with:
- * - 🚀 **Automatic prefix generation** (ClassName::methodName)
- * - ⚡ **Performance metrics** (execution time, memory usage)
- * - 📊 **Argument logging** (smart filtering for relevance)
- * - 🎯 **Return value tracking** (type and size information)
- * - 🔧 **Error handling** (detailed stack traces and context)
- * - 🎨 **Beautiful formatting** (UTF-8 symbols and structured output)
- * - 🏢 **Enterprise-ready** (configurable, type-safe, reusable)
+ * Advanced logging decorator with correlation, semantic detection, and anomaly monitoring.
+ * Now uses the modern ILogDecoratorConfig interface directly.
  * 
- * @param config - Optional configuration for decorator behavior
- * 
- * @example
- * ```typescript
- * class MyService {
- *     @log()
- *     async processData(data: string[]): Promise<ProcessedData> {
- *         // Your business logic here
- *         return processedResult
- *     }
- * 
- *     @log({ level: 'debug', includeArgs: false })
- *     private async internalMethod(): Promise<void> {
- *         // Internal processing
- *     }
- * 
- *     @log({ 
- *         customContext: { module: 'data-processing' },
- *         logDebug: true 
- *     })
- *     async complexOperation(config: Config): Promise<Result> {
- *         // Complex business logic
- *         return result
- *     }
- * }
- * ```
- * 
- * **Log Output Examples:**
- * ```
- * 🚀 Method execution started
- * ┌─ 🏷️  MyService::processData(arg0=Array)
- * └─ 🚀 Method execution started
- * 
- * ✅ Method completed successfully (245ms)
- * ┌─ 🏷️  MyService::processData(arg0=Array)
- * └─ ✅ Method completed successfully (245ms)
- * ```
+ * @param config - Enterprise logging configuration
+ * @returns Method decorator for automatic logging
  */
-export function log(config: ReadonlyDeep<ILogDecoratorConfig> = {}): MethodDecorator {
-    return function <T>(
-        target: object,
+export function log(config: ReadonlyDeep<ILogDecoratorConfig> = DEFAULT_LOG_CONFIG): MethodDecorator {
+    return function(
+        target: ReadonlyDeep<object>,
         propertyKey: string | symbol,
-        descriptor: Readonly<TypedPropertyDescriptor<T>>
-    ): TypedPropertyDescriptor<T> {
-        // 🔧 Merge configuration with defaults
-        const finalConfig = {
-            ...DEFAULT_LOG_CONFIG,
-            ...config
-        }
-        
+        descriptor: ReadonlyDeep<PropertyDescriptor>
+    ): PropertyDescriptor {
         // 🎯 Get the original method with proper typing
-        const originalMethod = descriptor.value as AnyMethod
+        const originalMethod = descriptor.value as (...args: readonly unknown[]) => Promise<unknown>
         
         if (typeof originalMethod !== 'function') {
-            throw new Error(
-                `@log can only be applied to methods, but ${String(propertyKey)} is not a function`
-            )
+            throw new Error(`@log can only be applied to methods, got ${typeof originalMethod}`)
         }
         
-        // ✨ Create the enhanced method with logging
+        // 🎯 Create enhanced async wrapper with direct enhanced logging
         const enhancedMethod = async function(
-            this: object, 
+            this: unknown,
             ...args: readonly unknown[]
         ): Promise<unknown> {
-            // 🏗️ Setup logging context
-            const className = this.constructor.name
-            const methodName = String(propertyKey)
-            
-            // 🔄 Convert configuration to enhanced format
-            const enhancedConfig = convertToEnhancedConfig(finalConfig)
-            
-            // 🚀 Enhanced method start logging
+            // Use enhanced logging with enterprise features
             const startResult = logEnhancedMethodStart(
-                className, 
-                methodName, 
-                args, 
-                enhancedConfig
+                target.constructor.name,
+                String(propertyKey),
+                args,
+                config
             )
-            
+
             try {
-                // 🎯 Execute the original method
                 const result = await originalMethod.apply(this, args as unknown[])
                 
-                // ✅ Enhanced success logging
-                logEnhancedMethodSuccess(
-                    startResult,
-                    finalConfig.includeResult ? extractResultMetadata(result) : undefined,
-                    enhancedConfig
-                )
+                // Log successful completion
+                logEnhancedMethodSuccess(startResult, result, config)
                 
                 return result
-            } catch (error) {
-                // 🚨 Ensure we have a proper Error object
-                const errorObj = error instanceof Error 
-                    ? error 
-                    : new Error(String(error))
+            } catch (error: unknown) {
+                // Log error with enhanced context
+                logEnhancedMethodError(startResult, error, config)
                 
-                // ❌ Enhanced error logging
-                logEnhancedMethodError(startResult, errorObj, enhancedConfig)
-                
-                // 🔄 Re-throw the error to maintain normal error flow
                 throw error
             }
         }
         
-        // 🎯 Properly assign the enhanced method
         return {
             ...descriptor,
-            value: enhancedMethod as T
+            value: enhancedMethod
         }
     }
 } 

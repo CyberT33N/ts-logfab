@@ -19,8 +19,7 @@
 
 import { ReadonlyDeep } from 'type-fest'
 import { 
-    createEnhancedConfig,
-    getEnhancedLoggingStatus
+    DEFAULT_LOG_CONFIG
 } from '@/logger/decorators/index.ts'
 import { IUser, IProduct } from '../../core/models.ts'
 import { DebugDecoratorTestService } from './DebugDecoratorTestService.ts'
@@ -169,22 +168,24 @@ export class EnhancedDecoratorService {
         return this._utilityService.getAnalytics()
     }
 
-    public getEnhancedLoggingStatus(): ReturnType<typeof getEnhancedLoggingStatus> {
-        return getEnhancedLoggingStatus()
-    }
-
-    public createCustomConfig(): ReturnType<typeof createEnhancedConfig> {
-        return createEnhancedConfig({
-            enablePerformanceTracking: true,
-            enableAnomalyDetection: true,
-            enableSemanticAnalysis: true,
-            enableCorrelationTracking: true,
-            logLevel: 'info',
-            includeStackTrace: false,
-            includeArguments: true,
-            includeResult: true,
-            maxArgumentsLength: 500
-        })
+    public createCustomConfig(): typeof DEFAULT_LOG_CONFIG {
+        return {
+            ...DEFAULT_LOG_CONFIG,
+            includePerformance: true,
+            anomalyDetection: {
+                enabled: true
+            },
+            correlationContext: {
+                enabled: true,
+                inheritFromParent: true
+            },
+            semanticContext: {
+                enabled: true
+            },
+            environment: {
+                forceFormat: 'human'
+            }
+        }
     }
 }
 

@@ -339,7 +339,7 @@ function createCorrelationFields(entry: ReadonlyDeep<IFormattedLogEntry>): Parti
 function createSemanticFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<IJsonLogOutput> {
     const fields: WritableDeep<Partial<IJsonLogOutput>> = {}
     
-    if (entry.semantic) {
+    if (entry.semantic !== undefined) {
         fields.operation = entry.semantic.operation
         fields.domain = entry.semantic.domain
         fields.complexity = entry.semantic.complexity
@@ -493,8 +493,9 @@ function createMultiLineFormat(
     }
     
     // Semantic info
-    if (entry.semantic) {
-        const semanticLine = `  🎯 ${entry.semantic.operation} → ${entry.semantic.domain} (${entry.semantic.complexity})`
+    if (entry.semantic !== undefined) {
+        const semanticLine = `
+        🎯 ${String(entry.semantic.operation)} → ${String(entry.semantic.domain)} (${String(entry.semantic.complexity)})`
         lines.push(semanticLine)
     }
     

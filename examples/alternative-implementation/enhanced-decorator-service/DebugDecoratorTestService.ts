@@ -17,32 +17,30 @@
 // 🔥 DEBUG DECORATOR TEST SERVICE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { debugLog } from '@/logger/decorators/index.ts'
+import { logDebug } from '@/logger/decorators/index.ts'
 import { UtilityService } from './UtilityService.ts'
 
 /**
- * 🔥 Specialized test service demonstrating @debugLog decorator configurations for debugging and diagnostic scenarios.
+ * 🔥 Specialized test service demonstrating @logDebug decorator configurations for debugging and diagnostic scenarios.
  * 
- * @remarks
- * This service provides comprehensive examples of the enhanced @debugLog decorator across
- * different debugging scenarios. It focuses on diagnostic logging, stack trace analysis,
- * and detailed inspection capabilities for troubleshooting complex application behavior
- * and data validation scenarios.
+ * This service provides comprehensive examples of the enhanced @logDebug decorator across
+ * multiple operational scenarios including data inspection, system monitoring, and diagnostic analysis.
  * 
- * 🧪 **Debug Test Scenarios:**
- * - Data inspection and type analysis with comprehensive reporting
- * - Complex debugging scenarios with full diagnostic information
- * - Lightweight debugging operations optimized for minimal overhead
- * - Stack trace analysis for error tracking and troubleshooting
+ * The implementation demonstrates various configuration patterns for the debug decorator,
+ * including standard diagnostic configurations, enhanced debugging capabilities, and
+ * performance-optimized debug configurations for production systems.
  * 
- * 🔍 **Debug Monitoring Features:**
- * - Stack trace inclusion for error source identification
- * - Argument and result logging for data flow analysis
- * - Configurable logging levels for different diagnostic needs
- * - Data type inspection and validation reporting
+ * Each method showcases different aspects of the decorator's functionality:
+ * - Data inspection and analysis capabilities  
+ * - Performance monitoring with debugging context
+ * - Error detection and diagnostic information
+ * - System health monitoring and analysis
+ * - Configuration flexibility for different environments
  * 
- * @see {@link UtilityService} for shared utilities and data
- * @see {@link debugLog} for the debug decorator implementation
+ * The service serves as both a practical implementation reference and a comprehensive
+ * test suite for validating decorator behavior across different operational scenarios.
+ * 
+ * @see {@link logDebug} for the debug decorator implementation
  */
 export class DebugDecoratorTestService {
     [key: string]: unknown
@@ -53,14 +51,14 @@ export class DebugDecoratorTestService {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // 🔥 ENHANCED DECORATOR 'debugLog' IMPLEMENTATION
+    // 🔥 ENHANCED DECORATOR 'logDebug' IMPLEMENTATION
     // ═══════════════════════════════════════════════════════════════════════════════
 
     /**
-     * 🔍 Performs comprehensive data inspection and type analysis using default @debugLog configuration.
+     * 🔍 Performs comprehensive data inspection and type analysis using default @logDebug configuration.
      * 
      * @remarks
-     * This method demonstrates diagnostic data analysis with the @debugLog decorator using
+     * This method demonstrates diagnostic data analysis with the @logDebug decorator using
      * default settings. It analyzes data collections to identify type patterns, null values,
      * and data quality issues, providing comprehensive inspection reports for debugging
      * data-related problems.
@@ -71,7 +69,7 @@ export class DebugDecoratorTestService {
      * - Sample data extraction for representative data inspection
      * - Comprehensive reporting structure for debugging insights
      * 
-     * @decorator `@debugLog()` - Default debug configuration with standard diagnostic features
+     * @decorator `@logDebug()` - Default debug configuration with standard diagnostic features
      * 
      * @param data - Read-only array of data items to inspect and analyze
      * @returns Promise resolving to comprehensive data analysis report
@@ -92,7 +90,7 @@ export class DebugDecoratorTestService {
      * // Debug logs will capture the analysis process
      * ```
      */
-    @debugLog() // DEFAULT DEBUG CONFIGURATION
+    @logDebug() // DEFAULT DEBUG CONFIGURATION
     public async debugDataInspection(data: readonly unknown[]): Promise<{
         dataTypes: Record<string, number>
         nullCount: number
@@ -128,7 +126,7 @@ export class DebugDecoratorTestService {
     }
 
     /**
-     * 🛠️ Executes complex debugging scenario with full @debugLog diagnostic capabilities enabled.
+     * 🛠️ Executes complex debugging scenario with full @logDebug diagnostic capabilities enabled.
      * 
      * @remarks
      * This method demonstrates advanced debugging scenarios with all diagnostic features
@@ -142,7 +140,7 @@ export class DebugDecoratorTestService {
      * - Result logging for output verification
      * - Debug-level logging for detailed diagnostic information
      * 
-     * @decorator `@debugLog({ includeStackTrace: true, includeArguments: true, 
+     * @decorator `@logDebug({ includeStackTrace: true, includeArguments: true, 
      * includeResult: true, logLevel: 'debug' })`
      * 
      * @param config - Configuration object to validate and process
@@ -166,7 +164,7 @@ export class DebugDecoratorTestService {
      * // Full debug logs with stack traces and argument details
      * ```
      */
-    @debugLog({
+    @logDebug({
         includeStackTrace: true,
         includeArguments: true,
         includeResult: true,
@@ -215,7 +213,7 @@ export class DebugDecoratorTestService {
      * - Trace-level logging for reduced log volume
      * - Optimized for high-frequency debugging scenarios
      * 
-     * @decorator `@debugLog({ includeStackTrace: false, includeArguments: false, includeResult: false, 
+     * @decorator `@logDebug({ includeStackTrace: false, includeArguments: false, includeResult: false, 
      * logLevel: 'trace' })`
      * 
      * @param items - Read-only array of string items to process
@@ -234,7 +232,7 @@ export class DebugDecoratorTestService {
      * // Only trace-level logs will be generated with minimal information
      * ```
      */
-    @debugLog({
+    @logDebug({
         includeStackTrace: false,
         includeArguments: false,
         includeResult: false,

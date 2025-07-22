@@ -9,131 +9,54 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 DECORATOR LOGGING CONFIGURATION MODULE                     ██
-██          UNIFIED CONFIGURATION FOR ALL DECORATOR LOGGING FEATURES        ██
+██              🎯 DECORATOR CONFIGURATION MODULE                           ██
+██          ENTERPRISE-STANDARD DECORATOR CONFIGURATIONS                    ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DECORATOR LOGGING CONFIGURATION INTERFACES
+// 🎯 ENTERPRISE DECORATOR CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **Decorator Logging Configuration**
- */
-export interface IDecoratorLoggingConfig {
-    readonly enableCorrelation: boolean
-    readonly enableSemanticDetection: boolean
-    readonly enableAnomalyDetection: boolean
-    readonly enablePerformanceTracking: boolean
-    readonly useHybridLogger: boolean
-    readonly logLevel: 'debug' | 'info' | 'warn' | 'error'
-}
-
-/**
- * ⚙️ **Enhanced Decorator Configuration**
+ * 🎯 **Enterprise Decorator Configuration Module**
  * 
- * Configuration for all enhanced logging decorators
- */
-export interface IEnhancedDecoratorConfig {
-    readonly enablePerformanceTracking: boolean
-    readonly enableAnomalyDetection: boolean
-    readonly enableSemanticAnalysis: boolean
-    readonly enableCorrelationTracking: boolean
-    readonly enableAutoFormatSwitching: boolean
-    readonly logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error'
-    readonly includeStackTrace: boolean
-    readonly includeArguments: boolean
-    readonly includeResult: boolean
-    readonly maxArgumentsLength: number
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 DEFAULT CONFIGURATIONS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🎯 **Default Decorator Configuration**
- */
-export const DEFAULT_DECORATOR_CONFIG: IDecoratorLoggingConfig = {
-    enableCorrelation: true,
-    enableSemanticDetection: true,
-    enableAnomalyDetection: true,
-    enablePerformanceTracking: true,
-    useHybridLogger: true,
-    logLevel: 'info'
-}
-
-/**
- * 🎯 **Default Enhanced Configuration**
- */
-export const DEFAULT_ENHANCED_CONFIG: IEnhancedDecoratorConfig = {
-    enablePerformanceTracking: true,
-    enableAnomalyDetection: true,
-    enableSemanticAnalysis: true,
-    enableCorrelationTracking: true,
-    enableAutoFormatSwitching: true,
-    logLevel: 'info',
-    includeStackTrace: false,
-    includeArguments: true,
-    includeResult: false,
-    maxArgumentsLength: 200
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 CONFIGURATION FACTORY FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * 🎯 **Create decorator logging configuration**
- */
-export function createDecoratorLoggingConfig(
-    overrides: Partial<IDecoratorLoggingConfig> = {}
-): IDecoratorLoggingConfig {
-    return {
-        ...DEFAULT_DECORATOR_CONFIG,
-        ...overrides
-    }
-}
-
-/**
- * 🎯 **Enhanced Logging Configuration Factory**
+ * This module provides enterprise-standard decorator configurations that have been
+ * migrated from legacy interfaces to the modern ILogDecoratorConfig standard.
  * 
- * Create custom configurations for enhanced decorators
- */
-export function createEnhancedConfig(
-    overrides: Partial<IEnhancedDecoratorConfig>
-): IEnhancedDecoratorConfig {
-    return {
-        ...DEFAULT_ENHANCED_CONFIG,
-        ...overrides
-    }
-}
-
-/**
- * 🎯 **Get default decorator logging configuration**
- */
-export function getDefaultDecoratorConfig(): IDecoratorLoggingConfig {
-    return { ...DEFAULT_DECORATOR_CONFIG }
-}
-
-/**
- * 📋 **Enhanced Logging Status**
+ * All legacy interfaces (IEnhancedDecoratorConfig, IDecoratorLoggingConfig) have
+ * been completely removed and replaced with the unified enterprise interface.
  * 
- * Get current status of enhanced logging system
+ * @see {@link ILogDecoratorConfig} - Located in @/decorators/types.ts
+ * @see {@link DEFAULT_LOG_CONFIG} - Located in @/decorators/types.ts
+ * 
+ * @module DecoratorConfig
+ * @version 2.1.0 - Enterprise Standard
+ * @author Enterprise Logging Team
  */
-export function getEnhancedLoggingStatus(): {
-    readonly performanceMonitor: boolean
-    readonly correlationContext: boolean
-    readonly semanticAnalysis: boolean
-    readonly formatSwitching: boolean
-    } {
-    return {
-        performanceMonitor: true,
-        correlationContext: true,
-        semanticAnalysis: true,
-        formatSwitching: true
-    }
-} 
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENTERPRISE CONFIGURATION EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * ✅ **All decorator configurations now use the Enterprise Standard:**
+ * 
+ * - ILogDecoratorConfig (from @/decorators/types.ts)
+ * - DEFAULT_LOG_CONFIG (from @/decorators/types.ts)
+ * 
+ * Legacy interfaces completely removed:
+ * - ❌ IEnhancedDecoratorConfig (DELETED)
+ * - ❌ IDecoratorLoggingConfig (DELETED)  
+ * - ❌ DEFAULT_ENHANCED_CONFIG (DELETED)
+ * - ❌ createEnhancedConfig (DELETED)
+ * - ❌ getEnhancedLoggingStatus (DELETED)
+ */
+
+// Re-export Enterprise Standard from central location
+export {
+    type ILogDecoratorConfig,
+    DEFAULT_LOG_CONFIG
+} from '@/decorators/types.ts' 

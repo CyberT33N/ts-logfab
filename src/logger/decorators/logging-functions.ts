@@ -9,8 +9,8 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 DECORATOR LOGGING FUNCTIONS MODULE                        ██
-██          LOW-LEVEL LOGGING FUNCTIONS FOR DECORATOR LOGGING               ██
+██              🎯 CONVENIENCE DECORATOR FUNCTIONS                            ██
+██          ENTERPRISE-GRADE LOGGING WITH MODERN CONFIGURATION               ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
@@ -18,188 +18,133 @@
 
 // ==== Imports ====
 import { ReadonlyDeep } from 'type-fest'
-import { 
-    createHybridLogger, getCurrentLoggingFormat, isStructuredLoggingEnabled 
-} from '@/logger/AdaptiveLogging/index.ts'
-import { getLogger, startPerformanceTracking, endPerformanceTracking } from '../logger-factory.ts'
-import { type IDecoratorLoggingConfig, DEFAULT_DECORATOR_CONFIG } from './config.ts'
-import { type IEnhancedLogContext } from './types.ts'
-import { createEnhancedContext, createEnhancedDecoratorPrefix } from './utils.ts'
+import { log } from '@/decorators/core-decorator.ts'
+import { type ILogDecoratorConfig, DEFAULT_LOG_CONFIG } from '@/decorators/types.ts'
+
+// Re-export core logging functions
+export {
+    logEnhancedMethodStart,
+    logEnhancedMethodSuccess,
+    logEnhancedMethodError,
+    logEnhancedDebug
+} from './core-logging.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED LOGGING FUNCTIONS
+// 🎯 CONVENIENCE DECORATOR FUNCTIONS (ENTERPRISE-READY)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **Enhanced method start logging with correlation and semantic context**
+ * 🐛 **Debug Decorator**
+ * 
+ * Convenience decorator for debug-level logging with enhanced context
  */
-export function logEnhancedMethodStart(
-    className: string,
-    methodName: string,
-    args: ReadonlyDeep<unknown[]> = [],
-    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
-): { context: IEnhancedLogContext; performanceContext?: ReturnType<typeof startPerformanceTracking> } {
-    const context = createEnhancedContext(className, methodName, args, config)
-    const prefix = createEnhancedDecoratorPrefix(className, methodName, context)
-    
-    // Choose appropriate logger
-    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
-    
-    // Start performance tracking if enabled
-    let performanceContext: ReturnType<typeof startPerformanceTracking> | undefined
-    if (config.enablePerformanceTracking) {
-        performanceContext = startPerformanceTracking(`${className}.${methodName}`)
+export function logDebug(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
+    const debugConfig: ReadonlyDeep<ILogDecoratorConfig> = {
+        ...DEFAULT_LOG_CONFIG,
+        ...config,
+        level: 'debug',
+        logStart: true,
+        logSuccess: true,
+        logDebug: true,
+        includePerformance: true,
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: true,
+            ...config.correlationContext
+        },
+        semanticContext: {
+            enabled: true,
+            ...config.semanticContext
+        }
     }
     
-    // Log method start with enhanced context
-    logger.info({
-        decorator: {
-            phase: 'start',
-            className,
-            methodName,
-            prefix
-        },
-        correlation: context.correlation,
-        semantic: context.semantic,
-        performance: performanceContext ? {
-            startTime: performanceContext.startTime,
-            method: performanceContext.method
-        } : undefined,
+    return log(debugConfig)
+}
+
+/**
+ * ⚠️ **Errors Only Decorator**
+ * 
+ * Convenience decorator for error-focused logging with enhanced error tracking
+ */
+export function logErrorsOnly(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
+    const errorConfig: ReadonlyDeep<ILogDecoratorConfig> = {
+        ...DEFAULT_LOG_CONFIG,
+        ...config,
+        level: 'error',
+        logStart: false,
+        logSuccess: false,
+        includePerformance: false,
         anomalyDetection: {
-            enabled: config.enableAnomalyDetection,
-            tracking: config.enablePerformanceTracking
+            enabled: true,
+            ...config.anomalyDetection
         },
-        environment: {
-            loggingFormat: getCurrentLoggingFormat(),
-            structuredLogging: isStructuredLoggingEnabled()
-        },
-        args: context.args
-    }, `🚀 Enhanced Method: ${prefix} started`)
-    
-    return { context, performanceContext }
-}
-
-/**
- * 🎯 **Enhanced method success logging with anomaly detection**
- */
-export function logEnhancedMethodSuccess(
-    startResult: ReadonlyDeep<{ 
-        readonly context: IEnhancedLogContext; 
-        readonly performanceContext?: ReturnType<typeof startPerformanceTracking> 
-    }>,
-    result?: ReadonlyDeep<{ type: string; size?: number }>,
-    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
-): void {
-    const { context, performanceContext } = startResult
-    const prefix = createEnhancedDecoratorPrefix(context.className ?? '', context.methodName ?? '', context)
-    
-    // Choose appropriate logger
-    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
-    
-    // End performance tracking and anomaly detection if enabled
-    if (config.enablePerformanceTracking && performanceContext) {
-        endPerformanceTracking(performanceContext, true, logger)
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: true,
+            ...config.correlationContext
+        }
     }
     
-    // Log success with enhanced context
-    logger.info({
-        decorator: {
-            phase: 'success',
-            className: context.className,
-            methodName: context.methodName,
-            prefix
-        },
-        correlation: context.correlation,
-        semantic: context.semantic,
-        result: result ? {
-            type: result.type,
-            size: result.size,
-            complexity: context.semantic?.complexity
-        } : undefined,
-        performance: performanceContext ? {
-            method: performanceContext.method,
-            completed: true
-        } : undefined
-    }, `✅ Enhanced Method: ${prefix} completed successfully`)
+    return log(errorConfig)
 }
 
 /**
- * 🎯 **Enhanced method error logging with correlation and anomaly context**
+ * ⚡ **Performance Decorator**
+ * 
+ * Convenience decorator for performance-focused logging with full metrics
  */
-export function logEnhancedMethodError(
-    startResult: ReadonlyDeep<{ 
-        readonly context: IEnhancedLogContext; 
-        readonly performanceContext?: ReturnType<typeof startPerformanceTracking> 
-    }>,
-    error: ReadonlyDeep<Error>,
-    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
-): void {
-    const { context, performanceContext } = startResult
-    const prefix = createEnhancedDecoratorPrefix(context.className ?? '', context.methodName ?? '', context)
-    
-    // Choose appropriate logger
-    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
-    
-    // End performance tracking with error flag if enabled
-    if (config.enablePerformanceTracking && performanceContext) {
-        endPerformanceTracking(performanceContext, false, logger)
+export function logPerformance(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
+    const performanceConfig: ReadonlyDeep<ILogDecoratorConfig> = {
+        ...DEFAULT_LOG_CONFIG,
+        ...config,
+        level: 'info',
+        logStart: true,
+        logSuccess: true,
+        includePerformance: true,
+        anomalyDetection: {
+            enabled: true,
+            ...config.anomalyDetection
+        },
+        correlationContext: {
+            enabled: true,
+            inheritFromParent: true,
+            ...config.correlationContext
+        },
+        semanticContext: {
+            enabled: true,
+            ...config.semanticContext
+        }
     }
     
-    // Log error with enhanced context and potential anomaly information
-    logger.error({
-        decorator: {
-            phase: 'error',
-            className: context.className,
-            methodName: context.methodName,
-            prefix
-        },
-        correlation: context.correlation,
-        semantic: context.semantic,
-        error: {
-            name: error.name,
-            message: error.message,
-            stack: error.stack,
-            type: 'method_execution_error'
-        },
-        performance: performanceContext ? {
-            method: performanceContext.method,
-            failed: true
-        } : undefined,
-        anomalyContext: {
-            errorOccurred: true,
-            potentialAnomaly: config.enableAnomalyDetection,
-            semanticContext: context.semantic
-        }
-    }, `❌ Enhanced Method: ${prefix} failed with error: ${error.message}`)
+    return log(performanceConfig)
 }
 
 /**
- * 🎯 **Enhanced debug logging with semantic context**
+ * 🔇 **Silent Decorator**
+ * 
+ * Convenience decorator that only logs errors (silent execution)
  */
-export function logEnhancedMethodDebug(
-    context: ReadonlyDeep<IEnhancedLogContext>,
-    message: string,
-    data?: ReadonlyDeep<Record<string, unknown>>,
-    config: ReadonlyDeep<IDecoratorLoggingConfig> = DEFAULT_DECORATOR_CONFIG
-): void {
-    const prefix = createEnhancedDecoratorPrefix(context.className ?? '', context.methodName ?? '', context)
-    
-    // Choose appropriate logger
-    const logger = config.useHybridLogger ? createHybridLogger() : getLogger()
-    
-    logger.debug({
-        decorator: {
-            phase: 'debug',
-            className: context.className,
-            methodName: context.methodName,
-            prefix
+export function logSilent(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
+    const silentConfig: ReadonlyDeep<ILogDecoratorConfig> = {
+        ...DEFAULT_LOG_CONFIG,
+        ...config,
+        level: 'warn',
+        logStart: false,
+        logSuccess: false,
+        includePerformance: false,
+        correlationContext: {
+            enabled: false,
+            ...config.correlationContext
         },
-        correlation: context.correlation,
-        semantic: context.semantic,
-        debug: {
-            message,
-            data,
-            timestamp: Date.now()
+        semanticContext: {
+            enabled: false,
+            ...config.semanticContext
+        },
+        anomalyDetection: {
+            enabled: false,
+            ...config.anomalyDetection
         }
-    }, `🔍 Enhanced Debug: ${prefix} - ${message}`)
+    }
+    
+    return log(silentConfig)
 } 

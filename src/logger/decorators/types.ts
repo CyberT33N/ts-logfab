@@ -22,6 +22,19 @@ import { type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 import { type ILogContext, type IPerformanceMetrics } from '@/logger/types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 PERFORMANCE CONTEXT INTERFACE (from logger-factory)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Performance Context for Method Tracking** 
+ */
+interface IPerformanceContext {
+    readonly method: string
+    readonly startTime: number
+    readonly startSnapshot: IPerformanceMetrics
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 ENHANCED LOGGING INTERFACES
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -33,4 +46,10 @@ export interface IEnhancedLogContext extends ILogContext {
     readonly semantic?: ISemanticContext
     readonly performance?: IPerformanceMetrics
     readonly anomalyDetection?: boolean
+    
+    // ==== 🚀 ENTERPRISE EXTENSIONS ====
+    readonly startTime: number
+    readonly performanceContext?: IPerformanceContext
+    readonly enhancedContext: Record<string, unknown>
+    readonly prefix: string
 } 
