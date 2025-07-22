@@ -14,29 +14,139 @@
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED PERFORMANCE CONFIGURATION WITH ANOMALY DETECTION
+// 🎯 ENTERPRISE PERFORMANCE CONFIGURATION - MODERN STANDARD
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import type { ReadonlyDeep } from 'type-fest'
+import { DEFAULT_LOG_CONFIG, type ILogDecoratorConfig } from '@/decorators/types.ts'
 import { 
     AnomalyDetector, 
     createAnomalyDetector
 } from '@/logger/anomaly-detector/index.ts'
-import type { IEnhancedPerformanceConfig, IPerformanceBaseline } from '@/logger/performance/types.ts'
+import type { AnomalyType } from '@/logger/anomaly-detector/types.ts'
+import type { IPerformanceBaseline } from '@/logger/performance/types.ts'
 import type { ISemanticContext } from '@/logger/semantic-detector/index.ts'
 
 /**
- * 🎯 **Default Enhanced Performance Configuration**
+ * 🎯 **Enterprise Performance Configuration Interface**
+ * 
+ * Modern performance configuration that extends the Enterprise Standard ILogDecoratorConfig
  */
-const DEFAULT_ENHANCED_CONFIG: IEnhancedPerformanceConfig = {
+export interface IEnterprisePerformanceConfig {
+    /**
+     * 🚨 **Anomaly Detection Configuration** - inherited from Enterprise Standard
+     */
+    readonly anomalyDetection: NonNullable<ILogDecoratorConfig['anomalyDetection']>
+    
+    /**
+     * 📊 **Performance Baseline Configuration**
+     */
+    readonly baseline: {
+        readonly trackingEnabled: boolean
+        readonly minSampleSize: number
+        readonly maxHistoryDays: number
+    }
+    
+    /**
+     * 🎚️ **Performance Thresholds Configuration**
+     */
+    readonly thresholds: {
+        readonly slowMethodWarning: number // ms
+        readonly slowMethodCritical: number // ms
+        readonly memoryWarning: number // bytes
+        readonly memoryCritical: number // bytes
+        readonly cpuWarning: number // percentage
+        readonly cpuCritical: number // percentage
+    }
+    
+    /**
+     * 📝 **Performance Reporting Configuration**
+     */
+    readonly reporting: {
+        readonly logAnomalies: boolean
+        readonly logBaselines: boolean
+        readonly logThresholdViolations: boolean
+    }
+}
+
+/**
+ * 🎯 **Enterprise Performance Configuration - Default Values**
+ * 
+ * Modern configuration based on Enterprise Standard with performance extensions
+ */
+const ENTERPRISE_PERFORMANCE_CONFIG: IEnterprisePerformanceConfig = {
     anomalyDetection: {
-        enabled: true,
-        config: {
+        ...DEFAULT_LOG_CONFIG.anomalyDetection,
+        minSamples: 10,
+        thresholdMultiplier: 2.5,
+        enableCriticalAlerts: true,
+        enableWarningAlerts: true
+    },
+    baseline: {
+        trackingEnabled: true,
+        minSampleSize: 20,
+        maxHistoryDays: 30
+    },
+    thresholds: {
+        slowMethodWarning: 1000, // 1 second
+        slowMethodCritical: 5000, // 5 seconds
+        memoryWarning: 50 * 1024 * 1024, // 50MB
+        memoryCritical: 100 * 1024 * 1024, // 100MB
+        cpuWarning: 80, // 80%
+        cpuCritical: 95 // 95%
+    },
+    reporting: {
+        logAnomalies: true,
+        logBaselines: false,
+        logThresholdViolations: true
+    }
+} as const
+
+/**
+ * 🎯 **Global Enterprise Performance State**
+ */
+let enterprisePerformanceConfig: IEnterprisePerformanceConfig = ENTERPRISE_PERFORMANCE_CONFIG
+let anomalyDetector: AnomalyDetector | undefined
+const performanceBaselines = new Map<string, IPerformanceBaseline>()
+
+/**
+ * 🎯 **Configure Enterprise Performance Monitoring**
+ * 
+ * @param config - The enterprise performance configuration
+ */
+export function configureEnterprisePerformanceMonitoring(
+    config: ReadonlyDeep<Partial<IEnterprisePerformanceConfig>>
+): void {
+    enterprisePerformanceConfig = {
+        ...ENTERPRISE_PERFORMANCE_CONFIG,
+        ...config,
+        anomalyDetection: {
+            ...ENTERPRISE_PERFORMANCE_CONFIG.anomalyDetection,
+            ...config.anomalyDetection
+        },
+        baseline: {
+            ...ENTERPRISE_PERFORMANCE_CONFIG.baseline,
+            ...config.baseline
+        },
+        thresholds: {
+            ...ENTERPRISE_PERFORMANCE_CONFIG.thresholds,
+            ...config.thresholds
+        },
+        reporting: {
+            ...ENTERPRISE_PERFORMANCE_CONFIG.reporting,
+            ...config.reporting
+        }
+    }
+
+    // Initialize or reconfigure anomaly detector using Enterprise Standard
+    if (enterprisePerformanceConfig.anomalyDetection.enabled === true) {
+        // Convert Enterprise config to Anomaly Detector config format
+        const anomalyConfig = {
             performance: {
                 slowThreshold: 3.0,
                 fastThreshold: 0.1,
-                stdDevSensitivity: 2.5,
-                minSampleSize: 10
+                stdDevSensitivity: enterprisePerformanceConfig.anomalyDetection.thresholdMultiplier ?? 2.5,
+                minSampleSize: enterprisePerformanceConfig.anomalyDetection.minSamples ?? 10
             },
             memory: {
                 highThreshold: 2.0,
@@ -60,91 +170,33 @@ const DEFAULT_ENHANCED_CONFIG: IEnhancedPerformanceConfig = {
                     'PERFORMANCE_FAST',
                     'MEMORY_HIGH',
                     'STATISTICAL_OUTLIER'
-                ]
+                ] as const satisfies readonly AnomalyType[]
             }
         }
-    },
-    baseline: {
-        trackingEnabled: true,
-        minSampleSize: 20,
-        maxHistoryDays: 30
-    },
-    thresholds: {
-        slowMethodWarning: 1000, // 1 second
-        slowMethodCritical: 5000, // 5 seconds
-        memoryWarning: 50 * 1024 * 1024, // 50MB
-        memoryCritical: 100 * 1024 * 1024, // 100MB
-        cpuWarning: 80, // 80%
-        cpuCritical: 95 // 95%
-    },
-    reporting: {
-        logAnomalies: true,
-        logBaselines: false,
-        logThresholdViolations: true
-    }
-} as const
-
-/**
- * 🎯 **Global Enhanced Performance State**
- */
-let enhancedPerformanceConfig: IEnhancedPerformanceConfig = DEFAULT_ENHANCED_CONFIG
-let anomalyDetector: AnomalyDetector | undefined
-const performanceBaselines = new Map<string, IPerformanceBaseline>()
-
-/**
- * 🎯 **Configure Enhanced Performance Monitoring**
- * 
- * @param config - The enhanced performance configuration
- */
-export function configureEnhancedPerformanceMonitoring(
-    config: ReadonlyDeep<Partial<IEnhancedPerformanceConfig>>
-): void {
-    enhancedPerformanceConfig = {
-        ...DEFAULT_ENHANCED_CONFIG,
-        ...config,
-        anomalyDetection: {
-            ...DEFAULT_ENHANCED_CONFIG.anomalyDetection,
-            ...config.anomalyDetection
-        },
-        baseline: {
-            ...DEFAULT_ENHANCED_CONFIG.baseline,
-            ...config.baseline
-        },
-        thresholds: {
-            ...DEFAULT_ENHANCED_CONFIG.thresholds,
-            ...config.thresholds
-        },
-        reporting: {
-            ...DEFAULT_ENHANCED_CONFIG.reporting,
-            ...config.reporting
-        }
-    }
-
-    // Initialize or reconfigure anomaly detector
-    if (enhancedPerformanceConfig.anomalyDetection.enabled) {
-        anomalyDetector = createAnomalyDetector(enhancedPerformanceConfig.anomalyDetection.config)
+        
+        anomalyDetector = createAnomalyDetector(anomalyConfig)
     } else {
         anomalyDetector = undefined
     }
 }
 
 /**
- * 🎯 **Get Current Enhanced Performance Configuration**
+ * 🎯 **Get Current Enterprise Performance Configuration**
  * 
- * @returns The current configuration
+ * @returns The current enterprise configuration
  */
-export function getEnhancedPerformanceConfiguration(): ReadonlyDeep<IEnhancedPerformanceConfig> {
-    return enhancedPerformanceConfig
+export function getEnterprisePerformanceConfiguration(): ReadonlyDeep<IEnterprisePerformanceConfig> {
+    return enterprisePerformanceConfig
 }
 
 /**
- * 🎯 **Initialize Enhanced Performance Monitoring**
+ * 🎯 **Initialize Enterprise Performance Monitoring**
  * 
  * Call this once at application startup
  */
-export function initializeEnhancedPerformanceMonitoring(): void {
-    if (enhancedPerformanceConfig.anomalyDetection.enabled && !anomalyDetector) {
-        anomalyDetector = createAnomalyDetector(enhancedPerformanceConfig.anomalyDetection.config)
+export function initializeEnterprisePerformanceMonitoring(): void {
+    if (enterprisePerformanceConfig.anomalyDetection.enabled === true && !anomalyDetector) {
+        configureEnterprisePerformanceMonitoring({}) // Use default config
     }
 }
 
@@ -260,7 +312,7 @@ export function getAnomalyDetectionStatistics(): {
     return {
         trackedMethods,
         totalMethods: trackedMethods.length,
-        isEnabled: enhancedPerformanceConfig.anomalyDetection.enabled
+        isEnabled: enterprisePerformanceConfig.anomalyDetection.enabled ?? false
     }
 }
 
@@ -280,5 +332,24 @@ export function getGlobalAnomalyDetector(): AnomalyDetector | undefined {
     return anomalyDetector
 }
 
-// Initialize enhanced performance monitoring on module load
-initializeEnhancedPerformanceMonitoring() 
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔄 LEGACY COMPATIBILITY FUNCTIONS (DEPRECATED)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * @deprecated Use configureEnterprisePerformanceMonitoring instead
+ */
+export const configureEnhancedPerformanceMonitoring = configureEnterprisePerformanceMonitoring
+
+/**
+ * @deprecated Use getEnterprisePerformanceConfiguration instead
+ */
+export const getEnhancedPerformanceConfiguration = getEnterprisePerformanceConfiguration
+
+/**
+ * @deprecated Use initializeEnterprisePerformanceMonitoring instead
+ */
+export const initializeEnhancedPerformanceMonitoring = initializeEnterprisePerformanceMonitoring
+
+// Initialize enterprise performance monitoring on module load
+initializeEnterprisePerformanceMonitoring() 

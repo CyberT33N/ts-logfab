@@ -24,7 +24,7 @@ import {
 import type { IPerformanceBaseline } from '@/logger/performance/types.ts'
 import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 import { 
-    getEnhancedPerformanceConfiguration,
+    getEnterprisePerformanceConfiguration,
     updatePerformanceBaseline,
     getGlobalAnomalyDetector
 } from './enhanced-config.ts'
@@ -54,7 +54,7 @@ export function trackMethodPerformance(
     let baseline: IPerformanceBaseline | undefined
     const thresholdViolations: string[] = []
     const finalSemanticContext = semanticContext ?? detectSemanticContext(method, [])
-    const config = getEnhancedPerformanceConfiguration()
+    const config = getEnterprisePerformanceConfiguration()
 
     // Check threshold violations
     if (duration > config.thresholds.slowMethodCritical) {
@@ -73,7 +73,7 @@ export function trackMethodPerformance(
 
     // Anomaly detection
     const anomalyDetector = getGlobalAnomalyDetector()
-    if (anomalyDetector && config.anomalyDetection.enabled) {
+    if (anomalyDetector && config.anomalyDetection.enabled === true) {
         const metric = createPerformanceMetric(method, duration, memoryDelta, success, finalSemanticContext)
         anomalies = anomalyDetector.addMetricAndDetect(metric)
     }

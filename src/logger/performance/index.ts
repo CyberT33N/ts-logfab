@@ -34,22 +34,32 @@ export type {
     IPerformanceResult,
     IPerformanceMonitorConfig,
     IPerformanceStatsSummary,
-    IEnhancedPerformanceConfig,
     IPerformanceBaseline,
     IEnhancedPerformanceSnapshot
 } from './types.ts'
 
-// Utils - Enhanced Performance Monitoring
+// Enterprise Performance Configuration
+export type { IEnterprisePerformanceConfig } from './utils/enhanced-config.ts'
+
+// Utils - Enterprise Performance Monitoring
 export {
-    configureEnhancedPerformanceMonitoring,
-    getEnhancedPerformanceConfiguration,
-    initializeEnhancedPerformanceMonitoring,
+    configureEnterprisePerformanceMonitoring,
+    getEnterprisePerformanceConfiguration,
+    initializeEnterprisePerformanceMonitoring,
     updatePerformanceBaseline,
     getPerformanceBaseline,
     getAllPerformanceBaselines,
     clearPerformanceBaselines,
     getAnomalyDetectionStatistics,
     clearAnomalyDetectionData,
+    // Legacy compatibility exports (deprecated)
+    configureEnhancedPerformanceMonitoring,
+    getEnhancedPerformanceConfiguration,
+    initializeEnhancedPerformanceMonitoring
+} from './utils/enhanced-config.ts'
+
+// Performance Utils
+export {
     trackMethodPerformance,
     createEnhancedPerformanceSnapshot,
     createPerformanceSnapshot,

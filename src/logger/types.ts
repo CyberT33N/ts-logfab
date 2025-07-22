@@ -102,20 +102,6 @@ export interface IPerformanceBaseline {
 }
 
 /**
- * ⚙️ Enhanced Performance Configuration Interface
- * Performance monitoring settings
- */
-export interface IEnhancedPerformanceConfig {
-    readonly enableAnomalyDetection: boolean
-    readonly enableBaselineTracking: boolean
-    readonly warningThresholdMultiplier: number
-    readonly criticalThresholdMultiplier: number
-    readonly minSamplesForBaseline: number
-    readonly maxMethodsTracked: number
-    readonly inactivityTimeoutMs: number
-}
-
-/**
  * 🌍 Logging Environment Enum
  * Environment-specific logging behavior
  */

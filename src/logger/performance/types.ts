@@ -17,7 +17,6 @@
 // 📊 PERFORMANCE MONITORING - SHARED TYPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import type { ReadonlyDeep } from 'type-fest'
 import type { IAnomalyDetection, IAnomalyConfig } from '@/logger/anomaly-detector/index.ts'
 import type { IRingBufferStats } from '@/logger/ring-buffer.ts'
 import type { ISemanticContext } from '@/logger/semantic-detector/index.ts'
@@ -106,36 +105,6 @@ export interface IPerformanceStatsSummary {
         readonly averageUsage: number
         readonly peakUsage: number
         readonly totalAllocated: number
-    }
-}
-
-/**
- * 🎯 **Enhanced Performance Configuration**
- * 
- * Configuration for performance monitoring with anomaly detection
- */
-export interface IEnhancedPerformanceConfig {
-    readonly anomalyDetection: {
-        readonly enabled: boolean
-        readonly config?: ReadonlyDeep<Partial<IAnomalyConfig>>
-    }
-    readonly baseline: {
-        readonly trackingEnabled: boolean
-        readonly minSampleSize: number
-        readonly maxHistoryDays: number
-    }
-    readonly thresholds: {
-        readonly slowMethodWarning: number // ms
-        readonly slowMethodCritical: number // ms
-        readonly memoryWarning: number // bytes
-        readonly memoryCritical: number // bytes
-        readonly cpuWarning: number // percentage
-        readonly cpuCritical: number // percentage
-    }
-    readonly reporting: {
-        readonly logAnomalies: boolean
-        readonly logBaselines: boolean
-        readonly logThresholdViolations: boolean
     }
 }
 
