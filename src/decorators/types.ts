@@ -38,12 +38,6 @@ export interface IMethodSignature {
     readonly parameterTypes?: readonly string[]
     
     /**
-     * ⚡ Is method async
-     * @example true
-     */
-    readonly isAsync?: boolean
-    
-    /**
      * 📤 Return type
      * @example 'Promise<User>'
      */

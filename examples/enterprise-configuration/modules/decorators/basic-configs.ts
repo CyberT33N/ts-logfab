@@ -70,7 +70,6 @@ export function getBasicConfig(): ILogDecoratorConfig {
  * @example
  * ```typescript
  * const config = getMethodSignatureConfig();
- * console.log(config.methodSignature.isAsync); // true
  * ```
  *
  * @see {@link ILogDecoratorConfig} for configuration structure
@@ -84,7 +83,6 @@ export function getMethodSignatureConfig(): ILogDecoratorConfig {
         methodSignature: {
             parameterNames: ['userId', 'searchCriteria', 'options'],
             parameterTypes: ['number', 'ISearchCriteria', 'ISearchOptions'],
-            isAsync: true,
             returnType: 'Promise<IUser[]>',
             fullSignature:
 				// eslint-disable-next-line max-len

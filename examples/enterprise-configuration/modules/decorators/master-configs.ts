@@ -65,7 +65,6 @@ export function getMasterConfig(): ILogDecoratorConfig {
         methodSignature: {
             parameterNames: ['businessData', 'processingOptions', 'auditContext'],
             parameterTypes: ['IBusinessData', 'IProcessingOptions', 'IAuditContext'],
-            isAsync: true,
             returnType: 'Promise<IBusinessResult>',
             fullSignature:
 				// eslint-disable-next-line max-len
