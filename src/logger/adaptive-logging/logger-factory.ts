@@ -117,9 +117,18 @@ function transformToStructuredEntry(
     
     // Safe string conversion function
     const safeString = (value: unknown, fallback: string): string => {
-        if (typeof value === 'string') {return value}
-        if (typeof value === 'number') {return value.toString()}
-        if (typeof value === 'boolean') {return value.toString()}
+        if (typeof value === 'string') {
+            return value
+        }
+
+        if (typeof value === 'number') {
+            return value.toString()
+        }
+     
+        if (typeof value === 'boolean') {
+            return value.toString()
+        }
+  
         return fallback
     }
     

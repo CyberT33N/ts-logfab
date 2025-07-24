@@ -21,7 +21,7 @@ import { ReadonlyDeep } from 'type-fest'
 import { type ILogDecoratorConfig, DEFAULT_LOG_CONFIG } from '@/decorators/types.ts'
 import { 
     createHybridLogger, getCurrentLoggingFormat
-} from '@/logger/AdaptiveLogging/index.ts'
+} from '@/logger/adaptive-logging/index.ts'
 import { startPerformanceTracking, endPerformanceTracking } from '../logger-factory.ts'
 import { type IEnhancedLogContext } from './types.ts'
 import { createEnhancedContext, createEnhancedDecoratorPrefix } from './utils.ts'

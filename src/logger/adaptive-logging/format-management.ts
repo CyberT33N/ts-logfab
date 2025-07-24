@@ -146,7 +146,7 @@ export function autoConfigureFormat(
         ...DEFAULT_FORMAT_CONFIG,
         ...baseConfig,
         ...overrides
-    } as IFormatConfig
+    }
 }
 
 /**
@@ -233,13 +233,18 @@ export function createJsonOutput(
 ): IJsonLogOutput {
     const { jsonOptions } = config
     
-    // Build complete output object
-    const output: Partial<IJsonLogOutput> = {
+    // Initialize required fields first - guarantees type safety
+    const requiredFields: Pick<IJsonLogOutput, 'timestamp' | 'level' | 'msg' | 'method' | 'file'> = {
         timestamp: entry.timestamp,
         level: entry.level,
         msg: entry.message,
         method: entry.context.method,
-        file: entry.context.file,
+        file: entry.context.file
+    }
+    
+    // Build complete output object with all optional fields
+    const output: IJsonLogOutput = {
+        ...requiredFields,
         ...createContextFields(entry),
         ...createCorrelationFields(entry),
         ...createSemanticFields(entry),
@@ -250,7 +255,7 @@ export function createJsonOutput(
         ...jsonOptions.customFields
     }
     
-    return output as IJsonLogOutput
+    return output
 }
 
 /**
@@ -434,9 +439,17 @@ function formatTimestamp(timestamp: string, format: 'iso' | 'relative' | 'time-o
     case 'relative': {
         const now = new Date()
         const diff = now.getTime() - date.getTime()
-        if (diff < 1000) {return 'now'}
-        if (diff < 60000) {return `${Math.floor(diff / 1000).toString()}s ago`}
-        if (diff < 3600000) {return `${Math.floor(diff / 60000).toString()}m ago`}
+
+        if (diff < 1000) {
+            return 'now'
+        }
+        if (diff < 60000) {
+            return `${Math.floor(diff / 1000).toString()}s ago`
+        }
+        if (diff < 3600000) {
+            return `${Math.floor(diff / 60000).toString()}m ago`
+        }
+        
         return `${Math.floor(diff / 3600000).toString()}h ago`
     }
     case 'time-only':

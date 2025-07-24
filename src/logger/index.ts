@@ -58,7 +58,7 @@ export {
     createProductionLogger,
     getCurrentLoggingFormat,
     isStructuredLoggingEnabled
-} from './AdaptiveLogging/index.ts'
+} from './adaptive-logging/index.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 CORRELATION CONTEXT EXPORTS

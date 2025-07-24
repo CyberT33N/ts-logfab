@@ -20,7 +20,7 @@
 import { randomUUID } from 'crypto'
 import { ReadonlyDeep } from 'type-fest'
 import { type ILogDecoratorConfig } from '@/decorators/types.ts'
-import { isStructuredLoggingEnabled } from '@/logger/AdaptiveLogging/index.ts'
+import { isStructuredLoggingEnabled } from '@/logger/adaptive-logging/index.ts'
 import { 
     getCurrentCorrelationContext, 
     createCorrelationContext, 
