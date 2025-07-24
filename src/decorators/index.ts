@@ -23,10 +23,7 @@ export type {
     ICorrelationContext,
     ISemanticContext,
     IAnomalyDetection,
-    ILogDecoratorConfig,
-    AsyncMethod,
-    SyncMethod,
-    AnyMethod
+    ILogDecoratorConfig
 } from './types.ts'
 
 export {

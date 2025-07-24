@@ -310,11 +310,3 @@ export const DEFAULT_LOG_CONFIG: Required<
         disableInEnvironments: []
     }
 } as const
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🔧 HELPER TYPES FOR PROPER METHOD TYPING
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export type AsyncMethod = (...args: readonly unknown[]) => Promise<unknown>
-export type SyncMethod = (...args: readonly unknown[]) => unknown
-export type AnyMethod = AsyncMethod | SyncMethod 

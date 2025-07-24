@@ -95,7 +95,7 @@ export const logErrorsOnly = (): MethodDecorator => log({
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🚀 ENHANCED DECORATOR VARIANTS (NEW)
+// 🚀 ENHANCED DECORATOR VARIANTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
