@@ -25,10 +25,141 @@ import { join } from 'path'
 import { pino } from 'pino'
 import pretty from 'pino-pretty'
 import { ReadonlyDeep } from 'type-fest'
+import { z } from 'zod'
 import { PackageJson } from 'zod-package-json'
 import { resolveLoggingFormat, getLoggingConfig, type LoggingFormat } from '@/env.ts'
 import { createEnterprisePrettyConfig } from '@/prettifiers/index.ts'
 import { type IStructuredLogEntry, type IHybridLoggerConfig } from './types.ts'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 ENTERPRISE TYPE DEFINITIONS & ZOD SCHEMAS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 🎯 **Base Logger Information Interface**
+ * 
+ * Enterprise-grade type definition for logger base information
+ * Used for consistent logger metadata across all instances
+ */
+export interface IBaseLoggerInfo {
+    /** Service/Package name (branded type for type safety) */
+    readonly name: string
+    /** Package author information */
+    readonly author?: string | Record<string, unknown> | undefined
+    /** Semantic version (branded type) */
+    readonly version: string
+    /** Runtime environment (branded type) */
+    readonly environment?: string | undefined
+    /** Node.js version (branded type) */
+    readonly nodeVersion: string
+    /** Operating system platform */
+    readonly platform: string
+    /** Configured logging format */
+    readonly loggingFormat: Exclude<LoggingFormat, 'auto'>
+    /** Whether structured data logging is enabled */
+    readonly structuredData: boolean
+}
+
+/**
+ * 🎯 **Base Logger Information Schema**
+ * 
+ * Zod schema for runtime validation of base logger information
+ * Implements enterprise-grade validation with comprehensive error handling
+ */
+const baseLoggerInfoSchema = z.object({
+    name: z.string().min(1).describe('Service/Package name'),
+    author: z.union([
+        z.string(),
+        z.record(z.unknown()),
+        z.undefined()
+    ]).optional().describe('Package author information'),
+    version: z.string().regex(/^\d+\.\d+\.\d+/, 'Must be valid semantic version').describe('Semantic version'),
+    environment: z.string().optional().describe('Runtime environment'),
+    nodeVersion: z.string().regex(/^v?\d+\.\d+\.\d+/, 'Must be valid Node.js version').describe('Node.js version'),
+    platform: z.string().min(1).describe('Operating system platform'),
+    loggingFormat: z.enum(['human', 'machine']).describe('Configured logging format'),
+    structuredData: z.boolean().describe('Whether structured data logging is enabled')
+}).strict()
+
+/**
+ * 🎯 **Raw Log Entry Schema**
+ * 
+ * Schema for validating incoming log entries before transformation
+ */
+const rawLogEntrySchema = z.object({
+    level: z.union([z.string(), z.number()]).optional(),
+    msg: z.unknown().optional(),
+    hostname: z.string().optional(),
+    data: z.record(z.unknown()).optional(),
+    performance: z.object({
+        method: z.string().optional(),
+        duration: z.number().optional(),
+        memoryUsage: z.number().optional(),
+        success: z.boolean().optional(),
+        anomalies: z.array(z.unknown()).readonly().optional()
+    }).optional(),
+    anomaly: z.object({
+        type: z.string().optional(),
+        severity: z.string().optional(),
+        confidence: z.number().optional(),
+        method: z.string().optional(),
+        current: z.number().optional(),
+        expected: z.number().optional(),
+        deviation: z.number().optional()
+    }).optional(),
+    context: z.object({
+        correlationId: z.string().optional(),
+        requestId: z.string().optional(),
+        workflowId: z.string().optional(),
+        operationId: z.string().optional(),
+        userId: z.string().optional()
+    }).optional(),
+    metadata: z.record(z.unknown()).optional()
+}).passthrough() // Allow additional properties
+
+/**
+ * 🎯 **Structured Log Entry Schema**
+ * 
+ * Enterprise-grade schema for structured log entries
+ * Ensures data consistency and type safety at runtime
+ */
+const structuredLogEntrySchema = z.object({
+    timestamp: z.string().datetime().describe('ISO 8601 timestamp'),
+    level: z.string().min(1).describe('Log level'),
+    message: z.string().describe('Log message'),
+    service: z.string().min(1).describe('Service name'),
+    version: z.string().regex(/^\d+\.\d+\.\d+/, 'Must be valid semantic version').describe('Service version'),
+    environment: z.string().describe('Runtime environment'),
+    nodeVersion: z.string().regex(/^v?\d+\.\d+\.\d+/, 'Must be valid Node.js version').describe('Node.js version'),
+    platform: z.string().min(1).describe('Operating system platform'),
+    pid: z.number().int().positive().describe('Process ID'),
+    hostname: z.string().describe('Hostname'),
+    data: z.record(z.unknown()).optional().describe('Additional log data'),
+    performance: z.object({
+        method: z.string().optional(),
+        duration: z.number().optional(),
+        memoryUsage: z.number().optional(),
+        success: z.boolean().optional(),
+        anomalies: z.array(z.unknown()).readonly().optional()
+    }).optional().describe('Performance metrics'),
+    anomaly: z.object({
+        type: z.string().optional(),
+        severity: z.string().optional(),
+        confidence: z.number().optional(),
+        method: z.string().optional(),
+        current: z.number().optional(),
+        expected: z.number().optional(),
+        deviation: z.number().optional()
+    }).optional().describe('Anomaly detection data'),
+    context: z.object({
+        correlationId: z.string().optional(),
+        requestId: z.string().optional(),
+        workflowId: z.string().optional(),
+        operationId: z.string().optional(),
+        userId: z.string().optional()
+    }).optional().describe('Context information'),
+    metadata: z.record(z.unknown()).optional().describe('Additional metadata')
+}).strict()
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 SINGLETON LOGGER MANAGEMENT
@@ -105,49 +236,115 @@ function createMachineStream(): NodeJS.WritableStream {
 }
 
 /**
- * 🎯 **Transform log entry to structured format**
+ * 🎯 **Transform log entry to structured format with Zod validation**
  * 
- * Converts pino log entries to standardized structured format
+ * Enterprise-grade transformation with runtime validation and error handling
+ * Ensures data integrity and type safety at runtime
  */
 function transformToStructuredEntry(
-    logEntry: ReadonlyDeep<Record<string, unknown>>,
-    baseInfo: ReadonlyDeep<Record<string, unknown>>
+    logEntry: ReadonlyDeep<unknown>,
+    baseInfo: ReadonlyDeep<IBaseLoggerInfo>
 ): IStructuredLogEntry {
-    const now = new Date().toISOString()
-    
-    // Safe string conversion function
-    const safeString = (value: unknown, fallback: string): string => {
-        if (typeof value === 'string') {
-            return value
+    try {
+        // Validate base info with Zod schema
+        const validatedBaseInfo = baseLoggerInfoSchema.parse(baseInfo)
+        
+        // Parse and validate raw log entry
+        const parsedLogEntry = rawLogEntrySchema.parse(logEntry)
+        
+        // Create structured entry
+        const now = new Date().toISOString()
+        
+        // Safe level conversion (Pino delivers level as NUMBER, we need STRING)
+        const safeLevelToString = (level: unknown): string => {
+            const numberResult = z.number().safeParse(level)
+            if (numberResult.success) {
+                // Convert Pino numeric levels to string labels (using bracket notation for ESLint)
+                const levelMap = {
+                    [10]: 'trace',
+                    [20]: 'debug', 
+                    [30]: 'info',
+                    [40]: 'warn',
+                    [50]: 'error',
+                    [60]: 'fatal'
+                } as const
+                return levelMap[numberResult.data as keyof typeof levelMap]
+            }
+            
+            const stringResult = z.string().safeParse(level)
+            if (stringResult.success) {
+                return stringResult.data
+            }
+            
+            return 'info' // fallback
         }
-
-        if (typeof value === 'number') {
-            return value.toString()
+        
+        // Safe string fallback (only for potentially undefined values)
+        const safeStringFallback = (value: unknown, fallback: string): string => {
+            const result = z.string().safeParse(value)
+            return result.success ? result.data : fallback
         }
-     
-        if (typeof value === 'boolean') {
-            return value.toString()
+        
+        // Safe message conversion (Pino msg should be string, but ensure it's safe)
+        const safeMessage = (msg: unknown): string => {
+            if (typeof msg === 'string') {
+                return msg
+            }
+            if (typeof msg === 'undefined' || msg === null) {
+                return ''
+            }
+            if (typeof msg === 'number' || typeof msg === 'boolean') {
+                return String(msg)
+            }
+            // For objects, use JSON.stringify to avoid [object Object]
+            return JSON.stringify(msg)
         }
-  
-        return fallback
-    }
-    
-    return {
-        timestamp: now,
-        level: safeString(logEntry.level, 'info'),
-        message: safeString(logEntry.msg, ''),
-        service: safeString(baseInfo.name, 'unknown'),
-        version: safeString(baseInfo.version, '0.0.0'),
-        environment: safeString(baseInfo.environment, 'unknown'),
-        nodeVersion: safeString(baseInfo.nodeVersion, process.version),
-        platform: safeString(baseInfo.platform, process.platform),
-        pid: process.pid,
-        hostname: safeString(logEntry.hostname, 'unknown'),
-        data: logEntry.data as Record<string, unknown>,
-        performance: logEntry.performance as IStructuredLogEntry['performance'],
-        anomaly: logEntry.anomaly as IStructuredLogEntry['anomaly'],
-        context: logEntry.context as IStructuredLogEntry['context'],
-        metadata: logEntry.metadata as Record<string, unknown>
+        
+        // Build structured log entry
+        const structuredEntry: IStructuredLogEntry = {
+            timestamp: now,
+            level: safeLevelToString(parsedLogEntry.level),
+            message: safeMessage(parsedLogEntry.msg),
+            service: validatedBaseInfo.name,
+            version: validatedBaseInfo.version,
+            environment: validatedBaseInfo.environment ?? 'unknown',
+            nodeVersion: validatedBaseInfo.nodeVersion,
+            platform: validatedBaseInfo.platform,
+            pid: process.pid,
+            hostname: safeStringFallback(parsedLogEntry.hostname, 'unknown'),
+            data: parsedLogEntry.data,
+            performance: parsedLogEntry.performance,
+            anomaly: parsedLogEntry.anomaly,
+            context: parsedLogEntry.context,
+            metadata: parsedLogEntry.metadata
+        }
+        
+        // Validate final structured entry
+        return structuredLogEntrySchema.parse(structuredEntry)
+    } catch (error) {
+        // Enterprise-grade error handling
+        if (error instanceof z.ZodError) {
+            // Log validation error details for debugging
+            console.error('🚨 Structured log entry validation failed:', {
+                errors: error.errors,
+                receivedLogEntry: logEntry,
+                receivedBaseInfo: baseInfo
+            })
+            
+            // Return a minimal valid entry as fallback
+            return structuredLogEntrySchema.parse({
+                timestamp: new Date().toISOString(),
+                level: 'error',
+                message: 'Log validation failed',
+                service: 'ts-logfab',
+                nodeVersion: process.version,
+                platform: process.platform,
+                pid: process.pid
+            })
+        }
+        
+        // Re-throw unexpected errors
+        throw error
     }
 }
 
@@ -204,8 +401,8 @@ export function createHybridLogger(
     const packagePath = join(currentDir, 'package.json')
     const packageJson = PackageJson.parse(JSON.parse(readFileSync(packagePath, 'utf-8')))
     
-    // Create base logger information
-    const baseInfo = {
+    // Create base logger information with proper typing
+    const baseInfo: IBaseLoggerInfo = {
         name: packageJson.name,
         author: packageJson.author,
         version: packageJson.version,
@@ -216,6 +413,9 @@ export function createHybridLogger(
         structuredData: finalConfig.enableStructuredData
     }
     
+    // Validate base info at creation time
+    const validatedBaseInfo = baseLoggerInfoSchema.parse(baseInfo)
+    
     // Create appropriate stream based on format (cached to prevent leaks)
     const stream = getCachedStream(finalConfig.format)
     
@@ -224,7 +424,7 @@ export function createHybridLogger(
         {
             name: finalConfig.name,
             level: finalConfig.level,
-            base: baseInfo
+            base: validatedBaseInfo
         },
         stream
     )
@@ -239,33 +439,41 @@ export function createHybridLogger(
         
         logger.info = (obj: ReadonlyDeep<unknown>, msg?: string, ...args: ReadonlyDeep<unknown[]>): void => {
             if (typeof obj === 'object' && obj !== null) {
-                const structured = transformToStructuredEntry(obj as Record<string, unknown>, baseInfo)
-                originalInfo(structured, msg, ...args); return
+                const structured = transformToStructuredEntry(obj, validatedBaseInfo)
+                originalInfo(structured, msg, ...args)
+                return
             }
+
             originalInfo(obj, msg, ...args)
         }
         
         logger.warn = (obj: ReadonlyDeep<unknown>, msg?: string, ...args: ReadonlyDeep<unknown[]>): void => {
             if (typeof obj === 'object' && obj !== null) {
-                const structured = transformToStructuredEntry(obj as Record<string, unknown>, baseInfo)
-                originalWarn(structured, msg, ...args); return
+                const structured = transformToStructuredEntry(obj, validatedBaseInfo)
+                originalWarn(structured, msg, ...args)
+                return
             }
+
             originalWarn(obj, msg, ...args)
         }
         
         logger.error = (obj: ReadonlyDeep<unknown>, msg?: string, ...args: ReadonlyDeep<unknown[]>): void => {
             if (typeof obj === 'object' && obj !== null) {
-                const structured = transformToStructuredEntry(obj as Record<string, unknown>, baseInfo)
-                originalError(structured, msg, ...args); return
+                const structured = transformToStructuredEntry(obj, validatedBaseInfo)
+                originalError(structured, msg, ...args)
+                return
             }
+
             originalError(obj, msg, ...args)
         }
         
         logger.debug = (obj: ReadonlyDeep<unknown>, msg?: string, ...args: ReadonlyDeep<unknown[]>): void => {
             if (typeof obj === 'object' && obj !== null) {
-                const structured = transformToStructuredEntry(obj as Record<string, unknown>, baseInfo)
-                originalDebug(structured, msg, ...args); return
+                const structured = transformToStructuredEntry(obj, validatedBaseInfo)
+                originalDebug(structured, msg, ...args)
+                return
             }
+
             originalDebug(obj, msg, ...args)
         }
     }
