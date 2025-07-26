@@ -90,6 +90,7 @@ export function getCurrentCorrelationContext(): ICorrelationContext | undefined 
  */
 export function getOrCreateCorrelationContext(options: ReadonlyDeep<IContextRunOptions> = {}): ICorrelationContext {
     const current = getCurrentCorrelationContext()
+
     if (current !== undefined) {
         return current
     }
@@ -121,6 +122,7 @@ export function getWorkflowId(): string {
  */
 export function addCorrelationMetadata(metadata: Readonly<Record<string, unknown>>): void {
     const current = getCurrentCorrelationContext()
+    
     if (current !== undefined) {
         Object.assign(current.metadata, metadata)
     }

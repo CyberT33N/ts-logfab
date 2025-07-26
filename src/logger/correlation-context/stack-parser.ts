@@ -26,6 +26,7 @@ import type { ICallChainInfo } from './types.ts'
  */
 export function parseCallStack(): readonly ICallChainInfo[] {
     const stack = new Error().stack
+
     if (stack === undefined) {
         return []
     }
@@ -35,6 +36,7 @@ export function parseCallStack(): readonly ICallChainInfo[] {
 
     for (const line of lines.slice(0, MAX_CALL_STACK_DEPTH)) {
         const info = parseStackLine(line.trim())
+        
         if (info !== null) {
             result.push(info)
         }

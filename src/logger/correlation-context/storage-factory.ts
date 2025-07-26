@@ -14,7 +14,7 @@
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🏭 ENTERPRISE CONTEXT STORAGE FACTORY
+// 🏭 CONTEXT STORAGE FACTORY
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { AsyncLocalStorage } from 'async_hooks'
@@ -24,7 +24,7 @@ import type { ICorrelationContext } from './types.ts'
  * 🏭 **Context Storage Factory**
  * 
  * Singleton factory for managing AsyncLocalStorage instance
- * Enterprise pattern for dependency injection and testing
+ * Pattern for dependency injection and testing
  */
 export class ContextStorageFactory {
     private static _instance: ContextStorageFactory | null = null

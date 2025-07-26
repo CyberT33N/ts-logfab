@@ -35,17 +35,28 @@ export function generateWorkflowId(
         return parentContext.workflowId
     }
 
-    // Create new workflow ID based on call signature
-    const signature = callChain
-        .slice(0, 3) // Use first 3 stack frames
-        .map(info => `${info.className ?? ''}${info.methodName}`)
-        .join('->')
-        .toLowerCase()
-        .replace(/[^a-z0-9->]/g, '') // Clean non-alphanumeric chars
+    // ==== Create new workflow ID based on call signature ==== 
+    
+    // Step 1: Extract only the first 3 stack frames for signature generation
+    const relevantStackFrames = callChain.slice(0, 3)
+    
+    // Step 2: Transform each stack frame into a readable method signature
+    const methodSignatures = relevantStackFrames.map(info => 
+        `${info.className ?? ''}${info.methodName}`
+    )
+    
+    // Step 3: Combine all method signatures into a call chain representation
+    const callChainRepresentation = methodSignatures.join('->')
+    
+    // Step 4: Normalize to lowercase for consistent hashing
+    const normalizedSignature = callChainRepresentation.toLowerCase()
+    
+    // Step 5: Clean up signature by removing non-alphanumeric chars (except arrows)
+    const cleanedSignature = normalizedSignature.replace(/[^a-z0-9->]/g, '')
 
-    if (signature.length > 0) {
+    if (cleanedSignature.length > 0) {
         // Create hash-like ID from signature
-        const hash = simpleHash(signature)
+        const hash = simpleHash(cleanedSignature)
         return `wf-${hash}`
     }
 
@@ -70,6 +81,7 @@ export function detectRequestId(): string | undefined {
 
         for (const source of requestIdSources) {
             const value = process.env[source]
+
             if (value !== undefined && value.length > 0) {
                 return value
             }
@@ -88,10 +100,12 @@ export function detectRequestId(): string | undefined {
  */
 export function simpleHash(str: Readonly<string>): string {
     let hash = 0
+
     for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i)
         hash = ((hash << 5) - hash) + char
         hash = hash & hash // Convert to 32-bit integer
     }
+    
     return Math.abs(hash).toString(36).slice(0, 8)
 } 
