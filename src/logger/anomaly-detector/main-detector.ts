@@ -38,6 +38,14 @@ import {
  * 🎛️ **Anomaly Detector Class**
  * 
  * Main class for detecting anomalies using ring buffers and statistical analysis
+ *
+ * @example
+ * ```typescript
+ * const detector = new AnomalyDetector({
+ *   performance: { slowThreshold: 2.0 }
+ * });
+ * const anomalies = detector.addMetricAndDetect(metric);
+ * ```
  */
 export class AnomalyDetector {
     private readonly _ringBuffers = new Map<string, RingBuffer<number>>()
@@ -57,6 +65,16 @@ export class AnomalyDetector {
      * 📊 **Add performance metric and detect anomalies**
      * 
      * Main entry point for anomaly detection
+     *
+     * @param metric - Performance metric to analyze
+     *
+     * @returns Array of detected anomalies
+     *
+     * @example
+     * ```typescript
+     * const anomalies = detector.addMetricAndDetect(metric);
+     * anomalies.forEach(anomaly => console.log(anomaly.type));
+     * ```
      */
     public addMetricAndDetect(metric: ReadonlyDeep<IPerformanceMetric>): readonly IAnomalyDetection[] {
         // Get or create ring buffer for this method
@@ -104,6 +122,12 @@ export class AnomalyDetector {
      * 📈 **Get current statistics for a method**
      * 
      * Returns current performance statistics
+     *
+     * @param method - Method name
+     *
+     * @returns Current performance statistics
+     *
+     * @example
      */
     public getMethodStats(method: string): IRingBufferStats | undefined {
         const buffer = this._ringBuffers.get(method)

@@ -22,6 +22,7 @@ import { log } from './core-decorator.ts'
 /**
  * 🔍 **DEBUG LOG DECORATOR**
  * Pre-configured for debug-level logging with detailed information and all Enhanced features
+ * @returns Method decorator for debug-level logging
  */
 export const logDebug = (): MethodDecorator => log({
     level: 'debug',
@@ -38,6 +39,7 @@ export const logDebug = (): MethodDecorator => log({
 /**
  * ⚡ **PERFORMANCE LOG DECORATOR**
  * Focused on performance metrics and execution timing with Enhanced monitoring
+ * @returns Method decorator optimized for performance monitoring
  */
 export const logPerformance = (): MethodDecorator => log({
     level: 'info',
@@ -60,6 +62,7 @@ export const logPerformance = (): MethodDecorator => log({
 /**
  * 🔒 **SILENT LOG DECORATOR**
  * Minimal logging for sensitive operations with reduced Enhanced features
+ * @returns Method decorator for minimal logging
  */
 export const logSilent = (): MethodDecorator => log({
     level: 'info',
@@ -76,6 +79,7 @@ export const logSilent = (): MethodDecorator => log({
 /**
  * 🚨 **ERROR-ONLY LOG DECORATOR**
  * Only logs when methods fail with Enhanced error analysis
+ * @returns Method decorator for error-only logging
  */
 export const logErrorsOnly = (): MethodDecorator => log({
     level: 'error',
@@ -101,6 +105,8 @@ export const logErrorsOnly = (): MethodDecorator => log({
 /**
  * 🔗 **CORRELATION LOG DECORATOR**
  * Automatic correlation context tracking with enhanced ID management
+ * @param options - Optional correlation configuration
+ * @returns Method decorator with correlation tracking
  */
 export const logWithCorrelation = (options?: {
     readonly correlationId?: string
@@ -121,6 +127,8 @@ export const logWithCorrelation = (options?: {
 /**
  * 🎯 **SEMANTIC LOG DECORATOR**
  * Business context and domain-specific logging
+ * @param options - Optional semantic configuration
+ * @returns Method decorator with business context
  */
 export const logWithSemantics = (options?: {
     readonly domain?: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL'
@@ -140,6 +148,8 @@ export const logWithSemantics = (options?: {
 /**
  * 🚨 **ANOMALY DETECTION LOG DECORATOR**
  * Enhanced performance monitoring with anomaly detection
+ * @param options - Optional anomaly detection configuration
+ * @returns Method decorator with anomaly monitoring
  */
 export const logWithAnomalyDetection = (options?: {
     readonly minSamples?: number
@@ -160,6 +170,7 @@ export const logWithAnomalyDetection = (options?: {
 /**
  * 🌍 **PRODUCTION LOG DECORATOR**
  * Production-optimized logging with minimal output
+ * @returns Method decorator optimized for production
  */
 export const logForProduction = (): MethodDecorator => log({
     level: 'info',
@@ -178,6 +189,7 @@ export const logForProduction = (): MethodDecorator => log({
 /**
  * 🛠️ **DEVELOPMENT LOG DECORATOR**
  * Development-optimized logging with detailed output
+ * @returns Method decorator optimized for development
  */
 export const logForDevelopment = (): MethodDecorator => log({
     level: 'debug',
@@ -197,6 +209,8 @@ export const logForDevelopment = (): MethodDecorator => log({
 /**
  * 💰 **FINANCIAL OPERATION LOG DECORATOR**
  * Specialized for financial domain operations
+ * @param options - Optional financial operation configuration
+ * @returns Method decorator for financial operations
  */
 export const logFinancialOperation = (options?: {
     readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'COMPUTE'
@@ -229,6 +243,8 @@ export const logFinancialOperation = (options?: {
 /**
  * 👤 **USER OPERATION LOG DECORATOR**
  * Specialized for user domain operations
+ * @param options - Optional user operation configuration
+ * @returns Method decorator for user operations
  */
 export const logUserOperation = (options?: {
     readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE'
@@ -259,6 +275,8 @@ export const logUserOperation = (options?: {
 /**
  * 📦 **ORDER OPERATION LOG DECORATOR**
  * Specialized for order/commerce domain operations
+ * @param options - Optional order operation configuration
+ * @returns Method decorator for order/commerce operations
  */
 export const logOrderOperation = (options?: {
     readonly operation?: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE'
@@ -291,6 +309,7 @@ export const logOrderOperation = (options?: {
 /**
  * ⚡ **HIGH-PERFORMANCE LOG DECORATOR**
  * Minimal logging for performance-critical operations
+ * @returns Method decorator for high-performance operations
  */
 export const logHighPerformance = (): MethodDecorator => log({
     level: 'warn', // Only log warnings and errors
@@ -311,6 +330,8 @@ export const logHighPerformance = (): MethodDecorator => log({
 /**
  * 🔍 **COMPREHENSIVE LOG DECORATOR**
  * Maximum logging with all enhanced features enabled
+ * @param options - Optional comprehensive logging configuration
+ * @returns Method decorator with all features enabled
  */
 export const logComprehensive = (options?: {
     readonly domain?: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL'

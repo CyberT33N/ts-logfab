@@ -26,6 +26,12 @@ import { isDetectorEnabled } from './utils.ts'
  * 📊 **Detect statistical outliers**
  * 
  * Detects statistical anomalies using advanced methods
+ *
+ * @param metric - Performance metric to analyze
+ * @param buffer - Ring buffer with historical data
+ * @param config - Anomaly detection configuration
+ *
+ * @returns Array of detected statistical outliers
  */
 export function detectStatisticalOutliers(
     metric: ReadonlyDeep<IPerformanceMetric>, 

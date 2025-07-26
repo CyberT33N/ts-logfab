@@ -25,6 +25,14 @@ import { type EnvironmentType } from './types.ts'
 /**
  * 🌍 **Detect current environment**
  * Checks NODE_ENV and other environment indicators
+ * 
+ * @returns Detected environment type
+ *
+ * @example
+ * ```typescript
+ * const env = detectEnvironment();
+ * console.log(`Running in ${env} environment`);
+ * ```
  */
 export function detectEnvironment(): EnvironmentType {
     const nodeEnv = process.env.NODE_ENV?.toLowerCase()
@@ -54,6 +62,7 @@ export function detectEnvironment(): EnvironmentType {
 /**
  * 🔍 **Check for production cloud indicators**
  * Helper function to detect cloud production environments
+ * @returns True if production indicators are detected
  */
 function hasProductionIndicators(): boolean {
     const nodeEnv = process.env.NODE_ENV
@@ -73,6 +82,8 @@ function hasProductionIndicators(): boolean {
 
 /**
  * 🔍 **Check if environment is development**
+ * 
+ * @returns True if development environment
  */
 export function isDevelopmentEnvironment(): boolean {
     return detectEnvironment() === 'development'
@@ -80,6 +91,8 @@ export function isDevelopmentEnvironment(): boolean {
 
 /**
  * 🔍 **Check if environment is production**
+ * 
+ * @returns True if production environment
  */
 export function isProductionEnvironment(): boolean {
     return detectEnvironment() === 'production'
@@ -87,6 +100,8 @@ export function isProductionEnvironment(): boolean {
 
 /**
  * 🔍 **Check if environment is test**
+ * 
+ * @returns True if test environment
  */
 export function isTestEnvironment(): boolean {
     return detectEnvironment() === 'test'
@@ -94,6 +109,8 @@ export function isTestEnvironment(): boolean {
 
 /**
  * 🔍 **Check if environment is staging**
+ * 
+ * @returns True if staging environment
  */
 export function isStagingEnvironment(): boolean {
     return detectEnvironment() === 'staging'

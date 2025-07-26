@@ -68,6 +68,16 @@ const DEFAULT_FORMAT_CONFIG: IFormatConfig = {
 /**
  * 🎛️ **Auto-configure format based on environment**
  * Returns optimal configuration for detected environment
+ * 
+ * @param overrides - Optional configuration overrides
+ * 
+ * @returns Optimized format configuration for current environment
+ *
+ * @example
+ * ```typescript
+ * const config = autoConfigureFormat({ format: 'hybrid' });
+ * console.log(`Using ${config.format} format`);
+ * ```
  */
 export function autoConfigureFormat(
     overrides: ReadonlyDeep<Partial<IFormatConfig>> = {}
@@ -152,6 +162,11 @@ export function autoConfigureFormat(
 /**
  * 🎯 **Create format configuration factory**
  * Convenience function for creating custom configurations
+ * 
+ * @param environment - Target environment type
+ * @param overrides - Optional configuration overrides
+ * 
+ * @returns Custom format configuration
  */
 export function createFormatConfig(
     environment: EnvironmentType,
@@ -170,6 +185,17 @@ export function createFormatConfig(
 /**
  * 👤 **Create human-readable log output**
  * Generates colored, formatted string for development
+ * 
+ * @param entry - Formatted log entry to convert
+ * @param config - Optional format configuration
+ * 
+ * @returns Human-readable log output with colors and formatting
+ *
+ * @example
+ * ```typescript
+ * const output = createHumanOutput(logEntry, config);
+ * console.log(output.formatted);
+ * ```
  */
 export function createHumanOutput(
     entry: ReadonlyDeep<IFormattedLogEntry>,
@@ -226,6 +252,11 @@ export function createHumanOutput(
 /**
  * 📊 **Create JSON log output**
  * Generates structured object for production logging
+ * 
+ * @param entry - Formatted log entry to convert
+ * @param config - Optional format configuration
+ * 
+ * @returns Structured JSON log output
  */
 export function createJsonOutput(
     entry: ReadonlyDeep<IFormattedLogEntry>,
@@ -261,6 +292,19 @@ export function createJsonOutput(
 /**
  * 🔄 **Main format switching function**
  * Decides format based on configuration and context
+ * 
+ * @param entry - Formatted log entry to process
+ * @param config - Optional format configuration
+ * 
+ * @returns Either human or JSON formatted output based on configuration
+ *
+ * @example
+ * ```typescript
+ * const formatted = formatLogEntry(entry, config);
+ * if ('formatted' in formatted) {
+ *   console.log(formatted.formatted);
+ * }
+ * ```
  */
 export function formatLogEntry(
     entry: ReadonlyDeep<IFormattedLogEntry>,
@@ -305,6 +349,10 @@ export function formatLogEntry(
 
 /**
  * 🏗️ **Create context fields**
+ * 
+ * @param entry - Log entry containing context information
+ * 
+ * @returns Partial JSON output with context fields
  */
 function createContextFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<IJsonLogOutput> {
     const fields: WritableDeep<Partial<IJsonLogOutput>> = {}
@@ -322,6 +370,10 @@ function createContextFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<I
 
 /**
  * 🏗️ **Create correlation fields**
+ * 
+ * @param entry - Log entry containing correlation information
+ * 
+ * @returns Partial JSON output with correlation fields
  */
 function createCorrelationFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<IJsonLogOutput> {
     const fields: WritableDeep<Partial<IJsonLogOutput>> = {}
@@ -340,6 +392,10 @@ function createCorrelationFields(entry: ReadonlyDeep<IFormattedLogEntry>): Parti
 
 /**
  * 🏗️ **Create semantic fields**
+ * 
+ * @param entry - Log entry containing semantic information
+ * 
+ * @returns Partial JSON output with semantic fields
  */
 function createSemanticFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<IJsonLogOutput> {
     const fields: WritableDeep<Partial<IJsonLogOutput>> = {}
@@ -355,6 +411,10 @@ function createSemanticFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<
 
 /**
  * 🏗️ **Create performance fields**
+ * 
+ * @param entry - Log entry containing performance information
+ * 
+ * @returns Partial JSON output with performance fields
  */
 function createPerformanceFields(entry: ReadonlyDeep<IFormattedLogEntry>): Partial<IJsonLogOutput> {
     const fields: WritableDeep<Partial<IJsonLogOutput>> = {}
@@ -369,6 +429,11 @@ function createPerformanceFields(entry: ReadonlyDeep<IFormattedLogEntry>): Parti
 
 /**
  * 🏗️ **Create raw data fields**
+ * 
+ * @param entry - Log entry containing raw data
+ * @param jsonOptions - JSON formatting options
+ * 
+ * @returns Partial JSON output with raw data fields
  */
 function createRawDataFields(
     entry: ReadonlyDeep<IFormattedLogEntry>, 
@@ -389,6 +454,11 @@ function createRawDataFields(
 
 /**
  * 🏗️ **Create error fields**
+ * 
+ * @param entry - Log entry containing error information
+ * @param jsonOptions - JSON formatting options
+ * 
+ * @returns Partial JSON output with error fields
  */
 function createErrorFields(
     entry: ReadonlyDeep<IFormattedLogEntry>, 
@@ -411,6 +481,11 @@ function createErrorFields(
 
 /**
  * 🏗️ **Create metadata fields**
+ * 
+ * @param entry - Log entry containing metadata
+ * @param jsonOptions - JSON formatting options
+ * 
+ * @returns Metadata fields for JSON output
  */
 function createMetadataFields(
     entry: ReadonlyDeep<IFormattedLogEntry>, 
@@ -429,6 +504,11 @@ function createMetadataFields(
 
 /**
  * 🕒 **Format timestamp based on configuration**
+ * 
+ * @param timestamp - ISO timestamp string
+ * @param format - Desired timestamp format
+ * 
+ * @returns Formatted timestamp string
  */
 function formatTimestamp(timestamp: string, format: 'iso' | 'relative' | 'time-only'): string {
     const date = new Date(timestamp)
@@ -460,6 +540,12 @@ function formatTimestamp(timestamp: string, format: 'iso' | 'relative' | 'time-o
 
 /**
  * 🎨 **Get level styling information**
+ * 
+ * @param level - Log level string
+ * @param useColors - Whether to include color codes
+ * @param useSymbols - Whether to include symbols
+ * 
+ * @returns Level styling information
  */
 function getLevelStyle(level: string, useColors: boolean, useSymbols: boolean): {
     symbol: string
@@ -483,6 +569,15 @@ function getLevelStyle(level: string, useColors: boolean, useSymbols: boolean): 
 
 /**
  * 📑 **Create multi-line format**
+ * 
+ * @param entry - Log entry to format
+ * @param levelInfo - Level styling information
+ * @param timestamp - Formatted timestamp
+ * @param methodInfo - Method information string
+ * @param location - Location information string
+ * @param options - Human formatting options
+ * 
+ * @returns Multi-line formatted string
  */
 function createMultiLineFormat(
     entry: ReadonlyDeep<IFormattedLogEntry>,
@@ -540,6 +635,14 @@ function createMultiLineFormat(
 
 /**
  * 📊 **Create table format**
+ * 
+ * @param entry - Log entry to format
+ * @param levelInfo - Level styling information
+ * @param timestamp - Formatted timestamp
+ * @param methodInfo - Method information string
+ * @param location - Location information string
+ * 
+ * @returns Table-formatted string
  */
 function createTableFormat(
     entry: ReadonlyDeep<IFormattedLogEntry>,

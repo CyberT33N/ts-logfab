@@ -183,6 +183,10 @@ const streamCache = new Map<string, NodeJS.WritableStream>()
  * 🎯 **Get or create cached stream**
  * 
  * Reuses existing streams to prevent EventEmitter memory leaks
+ * 
+ * @param format - Logging format type
+ * 
+ * @returns Cached or new writable stream
  */
 function getCachedStream(format: Exclude<LoggingFormat, 'auto'>): NodeJS.WritableStream {
     const cacheKey = `stream-${format}`
@@ -199,8 +203,11 @@ function getCachedStream(format: Exclude<LoggingFormat, 'auto'>): NodeJS.Writabl
 
 /**
  * 🎯 **Generate logger cache key**
- * 
  * Creates unique cache key for logger configuration
+ * 
+ * @param config - Logger configuration
+ * 
+ * @returns Unique cache key string
  */
 function generateLoggerCacheKey(config: ReadonlyDeep<IHybridLoggerConfig>): string {
     return `${config.format}-${config.name}-${config.level}-${String(config.enableStructuredData)}`
@@ -212,8 +219,9 @@ function generateLoggerCacheKey(config: ReadonlyDeep<IHybridLoggerConfig>): stri
 
 /**
  * 🎯 **Create human-readable stream (Development)**
- * 
  * Beautiful, colored output optimized for developer experience
+ * 
+ * @returns Pretty-formatted writable stream
  */
 function createHumanStream(): NodeJS.WritableStream {
     const prettyConfig = createEnterprisePrettyConfig()
@@ -228,8 +236,9 @@ function createHumanStream(): NodeJS.WritableStream {
 
 /**
  * 🎯 **Create machine-readable stream (Production)**
- * 
  * JSON structured output optimized for log aggregation and ML processing
+ * 
+ * @returns Machine-readable writable stream
  */
 function createMachineStream(): NodeJS.WritableStream {
     return process.stderr
@@ -240,6 +249,13 @@ function createMachineStream(): NodeJS.WritableStream {
  * 
  * Enterprise-grade transformation with runtime validation and error handling
  * Ensures data integrity and type safety at runtime
+ * 
+ * @param logEntry - Raw log entry to transform
+ * @param baseInfo - Base logger information
+ * 
+ * @returns Validated structured log entry
+ *
+ * @throws {Error} When validation fails
  */
 function transformToStructuredEntry(
     logEntry: ReadonlyDeep<unknown>,
@@ -356,6 +372,14 @@ function transformToStructuredEntry(
  * 🎯 **Create hybrid logger configuration**
  * 
  * Automatically detects environment and configures appropriate output format
+ * 
+ * @returns Hybrid logger configuration based on environment
+ *
+ * @example
+ * ```typescript
+ * const config = createHybridLoggerConfig();
+ * console.log(`Format: ${config.format}`);
+ * ```
  */
 export function createHybridLoggerConfig(): IHybridLoggerConfig {
     const loggingConfig = getLoggingConfig()
@@ -379,6 +403,15 @@ export function createHybridLoggerConfig(): IHybridLoggerConfig {
  * 
  * Creates environment-adaptive logger with appropriate output format
  * Uses singleton pattern to prevent EventEmitter memory leaks
+ * @param config - Optional configuration overrides
+ * 
+ * @returns Configured pino logger instance
+ *
+ * @example
+ * ```typescript
+ * const logger = createHybridLogger({ level: 'debug' });
+ * logger.info('Application started');
+ * ```
  */
 export function createHybridLogger(
     config: ReadonlyDeep<Partial<IHybridLoggerConfig>> = {}
@@ -502,6 +535,8 @@ export function createHybridLogger(
 
 /**
  * 🎯 **Create development logger (human format)**
+ * 
+ * @returns Development-optimized logger
  */
 export function createDevelopmentLogger(): pino.Logger {
     return createHybridLogger({
@@ -514,6 +549,8 @@ export function createDevelopmentLogger(): pino.Logger {
 
 /**
  * 🎯 **Create production logger (machine format)**
+ * 
+ * @returns Production-optimized logger
  */
 export function createProductionLogger(): pino.Logger {
     return createHybridLogger({
@@ -526,6 +563,8 @@ export function createProductionLogger(): pino.Logger {
 
 /**
  * 🎯 **Get current logging format**
+ * 
+ * @returns Current logging format
  */
 export function getCurrentLoggingFormat(): Exclude<LoggingFormat, 'auto'> {
     return resolveLoggingFormat()
@@ -533,6 +572,8 @@ export function getCurrentLoggingFormat(): Exclude<LoggingFormat, 'auto'> {
 
 /**
  * 🎯 **Check if running in structured logging mode**
+ * 
+ * @returns True if structured logging is enabled
  */
 export function isStructuredLoggingEnabled(): boolean {
     return resolveLoggingFormat() === 'machine'

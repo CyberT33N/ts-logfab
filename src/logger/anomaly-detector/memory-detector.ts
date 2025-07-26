@@ -26,6 +26,12 @@ import { isDetectorEnabled } from './utils.ts'
  * 💾 **Detect memory anomalies**
  * 
  * Detects high or low memory usage
+ *
+ * @param metric - Performance metric to analyze
+ * @param buffer - Ring buffer with historical data
+ * @param config - Anomaly detection configuration
+ *
+ * @returns Array of detected memory anomalies
  */
 export function detectMemoryAnomalies(
     metric: ReadonlyDeep<IPerformanceMetric>, 

@@ -25,6 +25,12 @@ import { isDetectorEnabled } from './utils.ts'
  * 🔄 **Detect frequency anomalies**
  * 
  * Detects unusual call frequency patterns
+ *
+ * @param metric - Performance metric to analyze
+ * @param frequencyTracking - Map of method names to timestamp arrays
+ * @param config - Anomaly detection configuration
+ *
+ * @returns Array of detected frequency anomalies
  */
 export function detectFrequencyAnomalies(
     metric: ReadonlyDeep<IPerformanceMetric>,

@@ -19,6 +19,17 @@
 
 import { type IAnomalyConfig } from './types.ts'
 
+/**
+ * 🎯 **Default Anomaly Detection Configuration**
+ *
+ * Comprehensive configuration with optimized thresholds for all anomaly detectors
+ *
+ * @example
+ * ```typescript
+ * const detector = new AnomalyDetector(DEFAULT_ANOMALY_CONFIG);
+ * detector.addMetricAndDetect(metric);
+ * ```
+ */
 const DEFAULT_ANOMALY_CONFIG: IAnomalyConfig = {
     performance: {
         slowThreshold: 3.0, // 3x average is considered slow

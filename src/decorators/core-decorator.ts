@@ -60,6 +60,25 @@ type ValidatedMethodDescriptor = ReadonlyDeep<z.infer<typeof methodDescriptorSch
  * 
  * Validation using Zod + native PropertyDescriptor interface
  * Single documented assertion after proven validation
+ *
+ * @param descriptor - The property descriptor to validate
+ * @param target - The target object containing the method
+ * @param propertyKey - The property key (method name) being validated
+ *
+ * @returns Validated descriptor with guaranteed function type
+ *
+ * @throws {Error} When descriptor validation fails or is invalid
+ *
+ * @example
+ * ```typescript
+ * const descriptor = {
+ *   value: myFunction,
+ *   writable: true,
+ *   enumerable: false,
+ *   configurable: true
+ * };
+ * const validated = validateMethodDescriptor(descriptor, target, 'myMethod');
+ * ```
  */
 function validateMethodDescriptor(
     descriptor: ReadonlyDeep<unknown>,
@@ -105,6 +124,23 @@ function validateMethodDescriptor(
  * 
  * @param config - Enterprise logging configuration
  * @returns Type-safe method decorator
+ *
+ * @param config - Enterprise logging configuration with enhanced features
+ *
+ * @returns Type-safe method decorator function
+ *
+ * @example
+ * ```typescript
+ * class UserService {
+ *   @log({ level: 'info', includePerformance: true })
+ *   async createUser(name: string, email: string): Promise<User> {
+ *     // Implementation
+ *   }
+ * }
+ * ```
+ *
+ * @see {@link ILogDecoratorConfig} for configuration options
+ * @see {@link MethodDecorator} for decorator interface
  */
 export function log(
     config: ReadonlyDeep<ILogDecoratorConfig> = DEFAULT_LOG_CONFIG

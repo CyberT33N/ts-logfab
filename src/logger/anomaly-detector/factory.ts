@@ -25,6 +25,8 @@ import {
 
 /**
  * 🏭 **Create anomaly detector with configuration**
+ * @param config - Optional anomaly detection configuration
+ * @returns Configured anomaly detector instance
  */
 export function createAnomalyDetector(
     config: ReadonlyDeep<Partial<IAnomalyConfig>> = {}
@@ -34,6 +36,20 @@ export function createAnomalyDetector(
 
 /**
  * 📊 **Create performance metric object**
+ * 
+ * @param method - Method name
+ * @param duration - Execution duration in milliseconds
+ * @param memory - Memory usage in MB
+ * @param success - Whether the operation succeeded
+ * @param semantic - Optional semantic context
+ *
+ * @returns Performance metric object
+ *
+ * @example
+ * ```typescript
+ * const metric = createPerformanceMetric('getUserById', 150, 25, true);
+ * detector.addMetricAndDetect(metric);
+ * ```
  */
 export function createPerformanceMetric(
     method: string,

@@ -25,6 +25,18 @@ import { isDetectorEnabled } from './utils.ts'
  * ❌ **Detect error anomalies**
  * 
  * Detects error spikes and patterns
+ *
+ * @param metric - Performance metric to analyze
+ * @param errorCounts - Map of method names to error counts
+ * @param config - Anomaly detection configuration
+ *
+ * @returns Array of detected error anomalies
+ *
+ * @example
+ * ```typescript
+ * const anomalies = detectErrorAnomalies(metric, errorCounts, config);
+ * anomalies.forEach(anomaly => console.log(anomaly.type));
+ * ```
  */
 export function detectErrorAnomalies(
     metric: ReadonlyDeep<IPerformanceMetric>,

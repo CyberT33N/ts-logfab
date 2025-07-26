@@ -24,6 +24,9 @@ import {
 
 /**
  * 📦 **Get or create ring buffer for method**
+ * @param ringBuffers - Map of existing ring buffers
+ * @param method - Method name to get buffer for
+ * @returns Ring buffer for the specified method
  */
 export function getOrCreateBuffer(
     ringBuffers: Readonly<Map<string, RingBuffer<number>>>,
@@ -41,6 +44,10 @@ export function getOrCreateBuffer(
 
 /**
  * 🔄 **Track method call frequency**
+ * @param frequencyTracking - Map of method frequency data
+ * @param method - Method name
+ * @param timestamp - Current timestamp
+ * @param timeWindow - Time window for frequency tracking
  */
 export function trackFrequency(
     frequencyTracking: Readonly<Map<string, number[]>>,
@@ -60,6 +67,8 @@ export function trackFrequency(
 
 /**
  * ❌ **Increment error count**
+ * @param errorCounts - Map of method error counts
+ * @param method - Method name
  */
 export function incrementErrorCount(
     errorCounts: Readonly<Map<string, number>>,
@@ -71,6 +80,8 @@ export function incrementErrorCount(
 
 /**
  * ✅ **Reset error count**
+ * @param errorCounts - Map of method error counts
+ * @param method - Method name
  */
 export function resetErrorCount(
     errorCounts: Readonly<Map<string, number>>,
@@ -81,6 +92,8 @@ export function resetErrorCount(
 
 /**
  * ⚖️ **Calculate anomaly severity**
+ * @param deviation - Standard deviation value
+ * @returns Calculated severity level
  */
 export function calculateSeverity(deviation: number): AnomalySeverity {
     if (deviation > 4.0) {
@@ -100,6 +113,9 @@ export function calculateSeverity(deviation: number): AnomalySeverity {
 
 /**
  * 🎯 **Calculate confidence score**
+ * @param deviation - Standard deviation value
+ * @param type - Type of anomaly detection
+ * @returns Confidence score between 0 and 1
  */
 export function calculateConfidence(deviation: number, type: 'performance' | 'memory' | 'frequency'): number {
     switch (type) {
@@ -120,6 +136,9 @@ export function calculateConfidence(deviation: number, type: 'performance' | 'me
 
 /**
  * 🔍 **Check if detector is enabled**
+ * @param config - Anomaly detection configuration
+ * @param type - Anomaly type to check
+ * @returns True if detector is enabled
  */
 export function isDetectorEnabled(config: IAnomalyConfig, type: AnomalyType): boolean {
     return config.global.enabledDetectors.includes(type)
@@ -127,6 +146,18 @@ export function isDetectorEnabled(config: IAnomalyConfig, type: AnomalyType): bo
 
 /**
  * 🚰 **Filter and rate limit anomalies**
+ * 
+ * @param anomalies - Array of detected anomalies
+ * @param config - Anomaly detection configuration
+ * @param lastAnomalyTime - Map tracking last anomaly times
+ *
+ * @returns Filtered array of anomalies
+ *
+ * @example
+ * ```typescript
+ * const filtered = filterAndRateLimit(anomalies, config, lastTime);
+ * console.log(`${filtered.length} anomalies after filtering`);
+ * ```
  */
 export function filterAndRateLimit(
     anomalies: readonly IAnomalyDetection[],

@@ -26,6 +26,12 @@ import { calculateSeverity, calculateConfidence, isDetectorEnabled } from './uti
  * 🐌 **Detect performance anomalies**
  * 
  * Detects slow or unusually fast executions
+ *
+ * @param metric - Performance metric to analyze
+ * @param buffer - Ring buffer with historical performance data
+ * @param config - Anomaly detection configuration
+ *
+ * @returns Array of detected performance anomalies
  */
 export function detectPerformanceAnomalies(
     metric: ReadonlyDeep<IPerformanceMetric>, 
