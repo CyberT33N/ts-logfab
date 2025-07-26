@@ -50,7 +50,7 @@ export class AnomalyDetector {
         this._config = {
             ...DEFAULT_ANOMALY_CONFIG,
             ...config
-        } as IAnomalyConfig
+        }
     }
 
     /**

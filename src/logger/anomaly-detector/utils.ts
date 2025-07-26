@@ -30,10 +30,12 @@ export function getOrCreateBuffer(
     method: string
 ): RingBuffer<number> {
     let buffer = ringBuffers.get(method)
+
     if (!buffer) {
         buffer = new RingBuffer<number>(50) // 50 samples per method
         ringBuffers.set(method, buffer)
     }
+
     return buffer
 }
 
@@ -84,12 +86,15 @@ export function calculateSeverity(deviation: number): AnomalySeverity {
     if (deviation > 4.0) {
         return 'CRITICAL'
     }
+
     if (deviation > 3.0) {
         return 'HIGH'
     }
+
     if (deviation > 2.0) {
         return 'MEDIUM'
     }
+    
     return 'LOW'
 }
 
