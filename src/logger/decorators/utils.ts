@@ -29,6 +29,7 @@ import {
 import { detectSemanticContext, type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 import { toWritable } from '@/utils/data-utils.ts'
 import { type ILogContext } from '../types.ts'
+import { type IEnhancedContextData } from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎯 ENHANCED CONTEXT CREATION (ENTERPRISE-READY)
@@ -119,14 +120,22 @@ function createSemanticFromConfig(
 /**
  * 🎯 **Create enhanced context for enterprise decorator logging**
  * 
- * Automatically adds correlation and semantic context based on modern config
+ * Automatically adds correlation and semantic context based on modern config.
+ * Returns enterprise-grade type-safe enhanced context data.
+ * 
+ * @param className - Target class name for context
+ * @param methodName - Target method name for context
+ * @param args - Method arguments array
+ * @param config - Enterprise logging configuration
+ * 
+ * @returns Type-safe enhanced context data with correlation, semantic, and environment information
  */
 export function createEnhancedContext(
     className: string,
     methodName: string,
     args: readonly unknown[],
     config: ReadonlyDeep<ILogDecoratorConfig>
-): Record<string, unknown> {
+): IEnhancedContextData {
     const baseContext: ILogContext = {
         className,
         methodName,
@@ -158,7 +167,7 @@ export function createEnhancedContext(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 PREFIX CREATION (ENTERPRISE-READY)
+// 🎯 PREFIX CREATION 
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**

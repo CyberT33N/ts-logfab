@@ -23,7 +23,7 @@ import {
     createHybridLogger, getCurrentLoggingFormat
 } from '@/logger/adaptive-logging/index.ts'
 import { startPerformanceTracking, endPerformanceTracking } from '../logger-factory.ts'
-import { type IEnhancedLogContext } from './types.ts'
+import { type IEnhancedLogContext, type IEnhancedContextData } from './types.ts'
 import { createEnhancedContext, createEnhancedDecoratorPrefix } from './utils.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -39,6 +39,7 @@ import { createEnhancedContext, createEnhancedDecoratorPrefix } from './utils.ts
  * @param methodName - Method name for context  
  * @param args - Method arguments array
  * @param config - Enterprise logging configuration
+ * 
  * @returns Enhanced log context for performance tracking
  */
 export function logEnhancedMethodStart(
@@ -56,7 +57,7 @@ export function logEnhancedMethodStart(
         })
         : createHybridLogger()
     
-    // Create enhanced logging context
+    // Create enhanced logging context (Type-Safe with IEnhancedContextData)
     const enhancedContextData = createEnhancedContext(
         className,
         methodName,
@@ -73,6 +74,7 @@ export function logEnhancedMethodStart(
     
     // Start performance tracking if enabled
     let performanceContext: ReturnType<typeof startPerformanceTracking> | undefined
+    
     if (config.includePerformance === true) {
         performanceContext = startPerformanceTracking(`${className}::${methodName}`)
     }
@@ -90,6 +92,7 @@ export function logEnhancedMethodStart(
         }, `${prefix} ⚡ Method execution started`)
     }
     
+    // Return enterprise-grade typed result (NO TYPE CASTING NEEDED!)
     return {
         className,
         methodName,
@@ -97,10 +100,9 @@ export function logEnhancedMethodStart(
         performanceContext,
         enhancedContext: enhancedContextData,
         prefix,
-        // Legacy ILogContext properties
-        methodSignature: `${className}.${methodName}`,
-        operationId: enhancedContextData.operationId as string,
-        args: enhancedContextData.args as Record<string, unknown>
+        methodSignature: enhancedContextData.methodSignature ?? `${className}.${methodName}`,
+        operationId: enhancedContextData.operationId ?? '',
+        args: enhancedContextData.args ?? {}
     }
 }
 
@@ -237,7 +239,7 @@ export function logEnhancedDebug(
         })
         : createHybridLogger()
     
-    // Create enhanced logging context
+    // Create enhanced logging context (Type-Safe with IEnhancedContextData)
     const enhancedContext = createEnhancedContext(
         className,
         methodName,
