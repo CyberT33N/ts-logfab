@@ -22,7 +22,7 @@ import { type ISemanticContext } from '@/logger/semantic-detector/index.ts'
 import { type ILogContext, type IPerformanceMetrics } from '@/logger/types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED CONTEXT DATA INTERFACES (ENTERPRISE-GRADE TYPE SAFETY)
+// 🎯 ENHANCED CONTEXT DATA INTERFACES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**

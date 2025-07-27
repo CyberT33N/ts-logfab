@@ -9,8 +9,6 @@
 ██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
 ██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
 ██                                                                           ██
-██              🎯 DECORATOR LOGGING UTILITIES MODULE                        ██
-██          UTILITY FUNCTIONS AND HELPERS FOR DECORATOR LOGGING             ██
 ██                                                                           ██
 ███████████████████████████████████████████████████████████████████████████████
 ███████████████████████████████████████████████████████████████████████████████
@@ -32,7 +30,7 @@ import { type ILogContext } from '../types.ts'
 import { type IEnhancedContextData } from './types.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENHANCED CONTEXT CREATION (ENTERPRISE-READY)
+// 🎯 ENHANCED CONTEXT CREATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
@@ -43,19 +41,22 @@ function createCorrelationFromConfig(
     className: string,
     methodName: string
 ): ICorrelationContext | undefined {
-    if (config.correlationContext?.enabled !== true) {
+    const { correlationContext } = config
+    const { enabled, correlationId, workflowId, requestId, inheritFromParent } = correlationContext ?? {}
+
+    if (enabled !== true) {
         return undefined
     }
 
     const hasCustomValues = Boolean(
-        config.correlationContext.correlationId ?? 
-        config.correlationContext.workflowId ?? 
-        config.correlationContext.requestId
+        correlationId ?? 
+        workflowId ?? 
+        requestId
     )
 
     if (hasCustomValues) {
         const baseContext = createCorrelationContext({
-            requestId: config.correlationContext.requestId ?? randomUUID(),
+            requestId: requestId ?? randomUUID(),
             metadata: {
                 className,
                 methodName,
@@ -66,14 +67,15 @@ function createCorrelationFromConfig(
         // Manual workflowId and correlationId assignment (if provided)
         return {
             ...baseContext,
-            correlationId: config.correlationContext.correlationId ?? baseContext.correlationId,
-            workflowId: config.correlationContext.workflowId ?? baseContext.workflowId
+            correlationId: correlationId ?? baseContext.correlationId,
+            workflowId: workflowId ?? baseContext.workflowId
         }
     }
 
     // Get or create correlation context
     const existing = getCurrentCorrelationContext()
-    if (existing && config.correlationContext.inheritFromParent !== false) {
+
+    if (existing && inheritFromParent !== false) {
         return existing
     }
 
@@ -95,20 +97,23 @@ function createSemanticFromConfig(
     methodName: string,
     args: readonly unknown[]
 ): ISemanticContext | undefined {
-    if (config.semanticContext?.enabled !== true) {
+    const { semanticContext } = config
+    const { enabled, domain, operation, complexity, tags, businessKey } = semanticContext ?? {}
+
+    if (enabled !== true) {
         return undefined
     }
 
-    if (config.semanticContext.domain !== undefined || config.semanticContext.operation !== undefined) {
+    if (domain !== undefined || operation !== undefined) {
         // Create semantic context with proper interface structure
         return {
-            domain: config.semanticContext.domain ?? 'GENERAL',
-            operation: config.semanticContext.operation ?? 'UNKNOWN',
-            complexity: config.semanticContext.complexity ?? 'MEDIUM',
+            domain: domain ?? 'GENERAL',
+            operation: operation ?? 'UNKNOWN',
+            complexity: complexity ?? 'MEDIUM',
             confidence: 0.8, // High confidence for manual configuration
             metadata: {
-                detectedPatterns: config.semanticContext.tags ?? [],
-                entityType: config.semanticContext.businessKey,
+                detectedPatterns: tags ?? [],
+                entityType: businessKey,
                 estimatedCost: 'MEDIUM' as const
             }
         }
@@ -178,20 +183,23 @@ export function createEnhancedDecoratorPrefix(
     methodName: string,
     config: ReadonlyDeep<ILogDecoratorConfig>
 ): string {
+    const { customPrefix, semanticContext, correlationContext } = config
+    
     // Use custom prefix if provided
-    if (config.customPrefix !== undefined && config.customPrefix.length > 0) {
-        return config.customPrefix
+    if (customPrefix !== undefined && customPrefix.length > 0) {
+        return customPrefix
     }
     
     const parts = [className, methodName]
     
     // Add semantic context indicators if enabled
-    if (config.semanticContext?.enabled === true) {
+    if (semanticContext?.enabled === true) {
         let semanticIcon: string
+        const { domain, operation } = semanticContext
         
-        if (config.semanticContext.domain !== undefined && config.semanticContext.operation !== undefined) {
+        if (domain !== undefined && operation !== undefined) {
             // Use configured values
-            semanticIcon = getSemanticIconFromConfig(config.semanticContext.domain, config.semanticContext.operation)
+            semanticIcon = getSemanticIconFromConfig(domain, operation)
         } else {
             // Detect from method name
             const detectedSemantic = detectSemanticContext(methodName, [])
@@ -202,8 +210,8 @@ export function createEnhancedDecoratorPrefix(
     }
     
     // Add correlation info in structured format if enabled
-    if (config.correlationContext?.enabled === true && isStructuredLoggingEnabled()) {
-        const correlationId = config.correlationContext.correlationId ?? randomUUID()
+    if (correlationContext?.enabled === true && isStructuredLoggingEnabled()) {
+        const correlationId = correlationContext.correlationId ?? randomUUID()
         parts.push(`[${correlationId.slice(0, 8)}]`)
     }
     

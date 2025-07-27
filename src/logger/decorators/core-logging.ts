@@ -23,7 +23,7 @@ import {
     createHybridLogger, getCurrentLoggingFormat
 } from '@/logger/adaptive-logging/index.ts'
 import { startPerformanceTracking, endPerformanceTracking } from '../logger-factory.ts'
-import { type IEnhancedLogContext, type IEnhancedContextData } from './types.ts'
+import { type IEnhancedLogContext  } from './types.ts'
 import { createEnhancedContext, createEnhancedDecoratorPrefix } from './utils.ts'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -48,14 +48,12 @@ export function logEnhancedMethodStart(
     args: readonly unknown[],
     config: ReadonlyDeep<ILogDecoratorConfig> = DEFAULT_LOG_CONFIG
 ): IEnhancedLogContext {
+    const { environment, includePerformance, logStart, level } = config
+
     // Use Hybrid Logger for enterprise features
-    const logger = config.environment?.forceFormat 
-        ? createHybridLogger({ 
-            format: config.environment.forceFormat === 'auto' 
-                ? getCurrentLoggingFormat() 
-                : config.environment.forceFormat 
-        })
-        : createHybridLogger()
+    const logger = environment?.forceFormat ? createHybridLogger({ 
+        format: environment.forceFormat === 'auto' ? getCurrentLoggingFormat() : environment.forceFormat 
+    }) : createHybridLogger()
     
     // Create enhanced logging context (Type-Safe with IEnhancedContextData)
     const enhancedContextData = createEnhancedContext(
@@ -75,13 +73,13 @@ export function logEnhancedMethodStart(
     // Start performance tracking if enabled
     let performanceContext: ReturnType<typeof startPerformanceTracking> | undefined
     
-    if (config.includePerformance === true) {
+    if (includePerformance === true) {
         performanceContext = startPerformanceTracking(`${className}::${methodName}`)
     }
     
     // Log method start with enhanced context
-    if (config.logStart !== false) {
-        logger[config.level ?? 'info']({
+    if (logStart !== false) {
+        logger[level ?? 'info']({
             ...enhancedContextData,
             event: 'method_start',
             prefix,
@@ -120,26 +118,25 @@ export function logEnhancedMethodSuccess(
     result: unknown,
     config: ReadonlyDeep<ILogDecoratorConfig> = DEFAULT_LOG_CONFIG
 ): void {
+    const { environment, includePerformance, includeResult, logSuccess, level } = config
+    const { startTime, performanceContext, prefix, enhancedContext } = startResult
+
     // Use Hybrid Logger for enterprise features  
-    const logger = config.environment?.forceFormat
-        ? createHybridLogger({ 
-            format: config.environment.forceFormat === 'auto' 
-                ? getCurrentLoggingFormat() 
-                : config.environment.forceFormat 
-        })
-        : createHybridLogger()
+    const logger = environment?.forceFormat ? createHybridLogger({ 
+        format: environment.forceFormat === 'auto' ? getCurrentLoggingFormat() : environment.forceFormat 
+    }) : createHybridLogger()
     
     // Calculate execution time
-    const executionTime = Date.now() - startResult.startTime
+    const executionTime = Date.now() - startTime
     const executionTimeStr = executionTime.toFixed(2)
     
     // End performance tracking if enabled
-    if (config.includePerformance === true && startResult.performanceContext !== undefined) {
-        endPerformanceTracking(startResult.performanceContext, true, logger)
+    if (includePerformance === true && performanceContext !== undefined) {
+        endPerformanceTracking(performanceContext, true, logger)
     }
     
     // Prepare result metadata
-    const resultMetadata = config.includeResult === true ? {
+    const resultMetadata = includeResult === true ? {
         type: typeof result,
         isArray: Array.isArray(result),
         isPromise: result instanceof Promise,
@@ -147,14 +144,14 @@ export function logEnhancedMethodSuccess(
     } : undefined
     
     // Log successful completion
-    if (config.logSuccess !== false) {
-        logger[config.level ?? 'info']({
-            ...startResult.enhancedContext,
+    if (logSuccess !== false) {
+        logger[level ?? 'info']({
+            ...enhancedContext,
             event: 'method_success',
             executionTime,
             result: resultMetadata,
-            prefix: startResult.prefix
-        }, `${startResult.prefix} ✅ Method completed successfully (${executionTimeStr}ms)`)
+            prefix
+        }, `${prefix} ✅ Method completed successfully (${executionTimeStr}ms)`)
     }
 }
 
@@ -172,22 +169,25 @@ export function logEnhancedMethodError(
     errorObj: unknown,
     config: ReadonlyDeep<ILogDecoratorConfig> = DEFAULT_LOG_CONFIG
 ): void {
+    const { environment, includePerformance } = config
+    const { startTime, performanceContext, prefix, enhancedContext } = startResult
+
     // Use Hybrid Logger for enterprise features
-    const logger = config.environment?.forceFormat
+    const logger = environment?.forceFormat
         ? createHybridLogger({ 
-            format: config.environment.forceFormat === 'auto' 
+            format: environment.forceFormat === 'auto' 
                 ? getCurrentLoggingFormat() 
-                : config.environment.forceFormat 
+                : environment.forceFormat 
         })
         : createHybridLogger()
     
     // Calculate execution time
-    const executionTime = Date.now() - startResult.startTime
+    const executionTime = Date.now() - startTime
     const executionTimeStr = executionTime.toFixed(2)
     
     // End performance tracking if enabled
-    if (config.includePerformance === true && startResult.performanceContext !== undefined) {
-        endPerformanceTracking(startResult.performanceContext, false, logger)
+    if (includePerformance === true && performanceContext !== undefined) {
+        endPerformanceTracking(performanceContext, false, logger)
     }
     
     // Prepare error metadata
@@ -201,12 +201,12 @@ export function logEnhancedMethodError(
     
     // Log error with enhanced context
     logger.error({
-        ...startResult.enhancedContext,
+        ...enhancedContext,
         event: 'method_error',
         executionTime,
         error: errorMetadata,
-        prefix: startResult.prefix
-    }, `${startResult.prefix} ❌ Method failed (${executionTimeStr}ms): ${errorMetadata.message}`)
+        prefix
+    }, `${prefix} ❌ Method failed (${executionTimeStr}ms): ${errorMetadata.message}`)
 }
 
 /**
@@ -225,17 +225,19 @@ export function logEnhancedDebug(
     debugData: ReadonlyDeep<Record<string, unknown>>,
     config: ReadonlyDeep<ILogDecoratorConfig> = DEFAULT_LOG_CONFIG
 ): void {
+    const { environment, logDebug } = config
+
     // Only log if debug is enabled
-    if (config.logDebug !== true) {
+    if (logDebug !== true) {
         return
     }
     
     // Use Hybrid Logger for enterprise features
-    const logger = config.environment?.forceFormat
+    const logger = environment?.forceFormat
         ? createHybridLogger({ 
-            format: config.environment.forceFormat === 'auto' 
+            format: environment.forceFormat === 'auto' 
                 ? getCurrentLoggingFormat() 
-                : config.environment.forceFormat 
+                : environment.forceFormat 
         })
         : createHybridLogger()
     
