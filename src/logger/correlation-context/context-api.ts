@@ -26,7 +26,12 @@ import { generateWorkflowId, detectRequestId } from './workflow-utils.ts'
 
 /**
  * 🚀 **Create new correlation context**
+ * 
  * Automatically generates all required IDs and detects call chain
+ * 
+ * @param options - Context creation options
+ * 
+ * @returns New correlation context instance
  */
 export function createCorrelationContext(options: ReadonlyDeep<IContextCreationOptions> = {}): ICorrelationContext {
     const { parentContext, requestId, metadata = {} } = options
@@ -53,7 +58,13 @@ export function createCorrelationContext(options: ReadonlyDeep<IContextCreationO
 
 /**
  * 🎯 **Run operation with correlation context**
+ * 
  * Automatically creates context if none exists
+ * 
+ * @param contextOrOptions - Correlation context or run options
+ * @param callback - Function to execute with context
+ * 
+ * @returns Result of the callback function
  */
 export function runWithCorrelationContext<T>(
     contextOrOptions: ReadonlyDeep<ICorrelationContext | IContextRunOptions>,
@@ -77,7 +88,10 @@ export function runWithCorrelationContext<T>(
 
 /**
  * 📖 **Get current correlation context**
+ * 
  * Returns undefined if no context is active
+ * 
+ * @returns Current correlation context or undefined
  */
 export function getCurrentCorrelationContext(): ICorrelationContext | undefined {
     const storage = ContextStorageFactory.getInstance().getStorage()
@@ -86,7 +100,12 @@ export function getCurrentCorrelationContext(): ICorrelationContext | undefined 
 
 /**
  * 🔄 **Get or create correlation context**
+ * 
  * Always returns a valid context (creates one if none exists)
+ * 
+ * @param options - Context run options
+ * 
+ * @returns Valid correlation context
  */
 export function getOrCreateCorrelationContext(options: ReadonlyDeep<IContextRunOptions> = {}): ICorrelationContext {
     const current = getCurrentCorrelationContext()
@@ -100,7 +119,10 @@ export function getOrCreateCorrelationContext(options: ReadonlyDeep<IContextRunO
 
 /**
  * 🆔 **Get correlation ID (shorthand)**
+ * 
  * Returns a correlation ID, creating context if needed
+ * 
+ * @returns Correlation ID string
  */
 export function getCorrelationId(): string {
     const context = getOrCreateCorrelationContext()
@@ -109,7 +131,10 @@ export function getCorrelationId(): string {
 
 /**
  * 🎬 **Get workflow ID (shorthand)**
+ * 
  * Returns a workflow ID, creating context if needed
+ * 
+ * @returns Workflow ID string
  */
 export function getWorkflowId(): string {
     const context = getOrCreateCorrelationContext()
@@ -118,7 +143,10 @@ export function getWorkflowId(): string {
 
 /**
  * 📊 **Add metadata to current context**
+ * 
  * Merges metadata into existing context
+ * 
+ * @param metadata - Metadata to add to current context
  */
 export function addCorrelationMetadata(metadata: Readonly<Record<string, unknown>>): void {
     const current = getCurrentCorrelationContext()
@@ -130,6 +158,7 @@ export function addCorrelationMetadata(metadata: Readonly<Record<string, unknown
 
 /**
  * 🧹 **Clear all contexts (for testing)**
+ * 
  * Clears all active contexts
  */
 export function clearAllCorrelationContexts(): void {
@@ -139,7 +168,10 @@ export function clearAllCorrelationContexts(): void {
 
 /**
  * 📊 **Get context information for debugging**
+ * 
  * Returns current context state and statistics
+ * 
+ * @returns Debug information about current context
  */
 export function getCorrelationDebugInfo(): IContextDebugInfo {
     const current = getCurrentCorrelationContext()

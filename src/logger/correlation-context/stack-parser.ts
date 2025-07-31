@@ -22,7 +22,10 @@ import type { ICallChainInfo } from './types.ts'
 
 /**
  * 🔍 **Parse call stack for workflow detection**
+ * 
  * Extracts method names and file information from Error stack
+ * 
+ * @returns Array of call chain information objects
  */
 export function parseCallStack(): readonly ICallChainInfo[] {
     const stack = new Error().stack
@@ -47,7 +50,12 @@ export function parseCallStack(): readonly ICallChainInfo[] {
 
 /**
  * 🧩 **Parse individual stack trace line**
- * Extracts method name, file, and line number
+ * 
+ * Extracts method name, file, and line number from a single stack trace line
+ * 
+ * @param line - The stack trace line to parse
+ * 
+ * @returns Parsed call chain info or null if parsing fails
  */
 export function parseStackLine(line: Readonly<string>): ICallChainInfo | null {
     // Common Node.js stack trace patterns:

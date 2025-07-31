@@ -17,5 +17,11 @@
 // 📊 MODULE-LEVEL CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/**
+ * 📊 **Maximum call stack depth for stack parsing**
+ */
 export const MAX_CALL_STACK_DEPTH = 20
-export const MAX_WORKFLOW_DEPTH = 10 
+/**
+ * 🔄 **Maximum workflow depth for correlation context**
+ */
+export const MAX_WORKFLOW_DEPTH = 10

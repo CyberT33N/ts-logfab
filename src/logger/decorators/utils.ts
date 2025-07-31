@@ -35,6 +35,12 @@ import { type IEnhancedContextData } from './types.ts'
 
 /**
  * 🎯 **Create correlation context from config**
+ * 
+ * @param config - Log decorator configuration
+ * @param className - Target class name
+ * @param methodName - Target method name
+ * 
+ * @returns Correlation context or undefined if disabled
  */
 function createCorrelationFromConfig(
     config: ReadonlyDeep<ILogDecoratorConfig>,
@@ -91,6 +97,12 @@ function createCorrelationFromConfig(
 
 /**
  * 🎯 **Create semantic context from config**
+ * 
+ * @param config - Log decorator configuration
+ * @param methodName - Target method name
+ * @param args - Method arguments array
+ * 
+ * @returns Semantic context or undefined if disabled
  */
 function createSemanticFromConfig(
     config: ReadonlyDeep<ILogDecoratorConfig>,
@@ -177,6 +189,12 @@ export function createEnhancedContext(
 
 /**
  * 🎯 **Creates a contextual prefix for enhanced enterprise decorator logging**
+ * 
+ * @param className - Target class name
+ * @param methodName - Target method name
+ * @param config - Log decorator configuration
+ * 
+ * @returns Formatted logging prefix string
  */
 export function createEnhancedDecoratorPrefix(
     className: string,
@@ -224,6 +242,11 @@ export function createEnhancedDecoratorPrefix(
 
 /**
  * 🎯 **Get semantic context icon from config**
+ * 
+ * @param domain - Semantic domain type
+ * @param operation - Semantic operation type
+ * 
+ * @returns Unicode icon string representing the semantic context
  */
 function getSemanticIconFromConfig(
     domain: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL',
@@ -255,6 +278,10 @@ function getSemanticIconFromConfig(
 
 /**
  * 🎯 **Get semantic context icon from detected context**
+ * 
+ * @param semantic - Detected semantic context
+ * 
+ * @returns Unicode icon string representing the semantic context
  */
 export function getSemanticIcon(semantic: ReadonlyDeep<ISemanticContext>): string {
     const domainIcons = {

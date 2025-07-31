@@ -29,6 +29,9 @@ import { type ILogContext, type IPerformanceMetrics } from '@/logger/types.ts'
  * 🌍 **Environment Configuration Data**
  * 
  * Type-safe representation of environment-specific logging configuration
+ * 
+ * @property loggingFormat - Preferred logging format for the environment
+ * @property disabledInEnvironments - List of environments where logging is disabled
  */
 export interface IEnvironmentContextData {
     readonly loggingFormat?: 'human' | 'machine' | 'auto'
@@ -41,7 +44,11 @@ export interface IEnvironmentContextData {
  * Enterprise-grade type-safe representation of enhanced logging context data.
  * This interface defines the exact structure returned by `createEnhancedContext`.
  * 
- * @extends ILogContext - Inherits all base logging context properties
+ * @property correlation - Correlation context information
+ * @property semantic - Semantic context information
+ * @property anomalyDetection - Whether anomaly detection is enabled
+ * @property environment - Environment-specific configuration
+ * @property customContext - Additional custom context data
  */
 export interface IEnhancedContextData extends ILogContext {
     readonly correlation?: ICorrelationContext
@@ -56,7 +63,11 @@ export interface IEnhancedContextData extends ILogContext {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 🎯 **Performance Context for Method Tracking** 
+ * 🎯 **Performance Context for Method Tracking**
+ * 
+ * @property method - Method name being tracked
+ * @property startTime - Start timestamp for performance measurement
+ * @property startSnapshot - Initial performance metrics snapshot
  */
 interface IPerformanceContext {
     readonly method: string
@@ -72,6 +83,15 @@ interface IPerformanceContext {
  * 🎯 **Enhanced Log Context with Correlation and Semantic Data**
  * 
  * Enterprise-grade logging context with performance tracking and type-safe enhanced context data.
+ * 
+ * @property correlation - Correlation context information
+ * @property semantic - Semantic context information
+ * @property performance - Performance metrics data
+ * @property anomalyDetection - Whether anomaly detection is enabled
+ * @property startTime - Start timestamp for logging
+ * @property performanceContext - Performance tracking context
+ * @property enhancedContext - Enhanced context data
+ * @property prefix - Logging prefix string
  */
 export interface IEnhancedLogContext extends ILogContext {
     readonly correlation?: ICorrelationContext

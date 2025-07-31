@@ -34,16 +34,31 @@ export class ContextStorageFactory {
         this._storage = new AsyncLocalStorage<ICorrelationContext>()
     }
 
-    // 🧪 For testing: allows storage replacement
+    /**
+     * 🧪 **Reset factory instance for testing**
+     * 
+     * Allows storage replacement for testing purposes.
+     * Should only be used in test environments.
+     */
     public static resetInstance(): void {
         ContextStorageFactory._instance = null
     }
 
+    /**
+     * 🏭 **Get singleton factory instance**
+     * 
+     * @returns The singleton ContextStorageFactory instance
+     */
     public static getInstance(): ContextStorageFactory {
         ContextStorageFactory._instance ??= new ContextStorageFactory()
         return ContextStorageFactory._instance
     }
 
+    /**
+     * 📦 **Get AsyncLocalStorage instance**
+     * 
+     * @returns The AsyncLocalStorage instance for correlation context
+     */
     public getStorage(): AsyncLocalStorage<ICorrelationContext> {
         return this._storage
     }

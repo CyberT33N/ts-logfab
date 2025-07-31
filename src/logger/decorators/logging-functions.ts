@@ -34,9 +34,14 @@ export {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
+ /**
  * 🐛 **Debug Decorator**
  * 
  * Convenience decorator for debug-level logging with enhanced context
+ * 
+ * @param config - Partial log decorator configuration
+ * 
+ * @returns Method decorator for debug logging
  */
 export function logDebug(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
     const debugConfig: ReadonlyDeep<ILogDecoratorConfig> = {
@@ -65,6 +70,10 @@ export function logDebug(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}
  * ⚠️ **Errors Only Decorator**
  * 
  * Convenience decorator for error-focused logging with enhanced error tracking
+ * 
+ * @param config - Partial log decorator configuration
+ * 
+ * @returns Method decorator for error-only logging
  */
 export function logErrorsOnly(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
     const errorConfig: ReadonlyDeep<ILogDecoratorConfig> = {
@@ -92,6 +101,10 @@ export function logErrorsOnly(config: ReadonlyDeep<Partial<ILogDecoratorConfig>>
  * ⚡ **Performance Decorator**
  * 
  * Convenience decorator for performance-focused logging with full metrics
+ * 
+ * @param config - Partial log decorator configuration
+ * 
+ * @returns Method decorator for performance logging
  */
 export function logPerformance(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
     const performanceConfig: ReadonlyDeep<ILogDecoratorConfig> = {
@@ -123,6 +136,10 @@ export function logPerformance(config: ReadonlyDeep<Partial<ILogDecoratorConfig>
  * 🔇 **Silent Decorator**
  * 
  * Convenience decorator that only logs errors (silent execution)
+ * 
+ * @param config - Partial log decorator configuration
+ * 
+ * @returns Method decorator for silent logging
  */
 export function logSilent(config: ReadonlyDeep<Partial<ILogDecoratorConfig>> = {}): MethodDecorator {
     const silentConfig: ReadonlyDeep<ILogDecoratorConfig> = {

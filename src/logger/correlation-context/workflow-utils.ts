@@ -24,7 +24,13 @@ import type { ICallChainInfo, ICorrelationContext } from './types.ts'
 
 /**
  * 🎯 **Generate workflow ID from call chain**
+ * 
  * Creates deterministic ID based on method call sequence
+ * 
+ * @param callChain - Array of call chain information
+ * @param parentContext - Optional parent correlation context
+ * 
+ * @returns Generated workflow ID string
  */
 export function generateWorkflowId(
     callChain: Readonly<readonly ICallChainInfo[]>, 
@@ -66,7 +72,10 @@ export function generateWorkflowId(
 
 /**
  * 🔍 **Detect request ID from various sources**
+ * 
  * Attempts to find HTTP request ID from common sources
+ * 
+ * @returns Request ID if found, undefined otherwise
  */
 export function detectRequestId(): string | undefined {
     // Check common HTTP header patterns in Node.js
@@ -96,7 +105,12 @@ export function detectRequestId(): string | undefined {
 
 /**
  * 🧮 **Simple hash function for deterministic IDs**
+ * 
  * Creates consistent short hashes from strings
+ * 
+ * @param str - String to hash
+ * 
+ * @returns Short hash string
  */
 export function simpleHash(str: Readonly<string>): string {
     let hash = 0
