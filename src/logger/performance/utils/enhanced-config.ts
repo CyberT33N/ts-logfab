@@ -1,26 +1,28 @@
 /*
-███████████████████████████████████████████████████████████████████████████████
-██******************** PRESENTED BY t33n Software ***************************██
-██                                                                           ██
-██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
-██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
-██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
-██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
-██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
-██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
-██                                                                           ██
-███████████████████████████████████████████████████████████████████████████████
-███████████████████████████████████████████████████████████████████████████████
-*/
+ *███████████████████████████████████████████████████████████████████████████████
+ *██******************** PRESENTED BY t33n Software ***************************██
+ *██                                                                           ██
+ *██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
+ *██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
+ *██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
+ *██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
+ *██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
+ *██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
+ *██                                                                           ██
+ *███████████████████████████████████████████████████████████████████████████████
+ *███████████████████████████████████████████████████████████████████████████████
+ */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ENTERPRISE PERFORMANCE CONFIGURATION - MODERN STANDARD
-// ═══════════════════════════════════════════════════════════════════════════════
+/*
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 🎯 ENTERPRISE PERFORMANCE CONFIGURATION - MODERN STANDARD
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 
 import type { ReadonlyDeep } from 'type-fest'
 import { DEFAULT_LOG_CONFIG, type ILogDecoratorConfig } from '@/decorators/types.ts'
-import { 
-    AnomalyDetector, 
+import {
+    AnomalyDetector,
     createAnomalyDetector
 } from '@/logger/anomaly-detector/index.ts'
 import type { AnomalyType } from '@/logger/anomaly-detector/types.ts'
@@ -29,15 +31,16 @@ import type { ISemanticContext } from '@/logger/semantic-detector/index.ts'
 
 /**
  * 🎯 **Enterprise Performance Configuration Interface**
- * 
+ *
  * Modern performance configuration that extends the Enterprise Standard ILogDecoratorConfig
  */
 export interface IEnterprisePerformanceConfig {
+
     /**
      * 🚨 **Anomaly Detection Configuration** - inherited from Enterprise Standard
      */
     readonly anomalyDetection: NonNullable<ILogDecoratorConfig['anomalyDetection']>
-    
+
     /**
      * 📊 **Performance Baseline Configuration**
      */
@@ -46,7 +49,7 @@ export interface IEnterprisePerformanceConfig {
         readonly minSampleSize: number
         readonly maxHistoryDays: number
     }
-    
+
     /**
      * 🎚️ **Performance Thresholds Configuration**
      */
@@ -58,7 +61,7 @@ export interface IEnterprisePerformanceConfig {
         readonly cpuWarning: number // percentage
         readonly cpuCritical: number // percentage
     }
-    
+
     /**
      * 📝 **Performance Reporting Configuration**
      */
@@ -71,7 +74,7 @@ export interface IEnterprisePerformanceConfig {
 
 /**
  * 🎯 **Enterprise Performance Configuration - Default Values**
- * 
+ *
  * Modern configuration based on Enterprise Standard with performance extensions
  */
 const ENTERPRISE_PERFORMANCE_CONFIG: IEnterprisePerformanceConfig = {
@@ -111,7 +114,7 @@ const performanceBaselines = new Map<string, IPerformanceBaseline>()
 
 /**
  * 🎯 **Configure Enterprise Performance Monitoring**
- * 
+ *
  * @param config - The enterprise performance configuration
  */
 export function configureEnterprisePerformanceMonitoring(
@@ -173,16 +176,19 @@ export function configureEnterprisePerformanceMonitoring(
                 ] as const satisfies readonly AnomalyType[]
             }
         }
-        
-        anomalyDetector = createAnomalyDetector(anomalyConfig)
-    } else {
+
+        anomalyDetector = createAnomalyDetector(
+            anomalyConfig
+        )
+    }
+    else {
         anomalyDetector = undefined
     }
 }
 
 /**
  * 🎯 **Get Current Enterprise Performance Configuration**
- * 
+ *
  * @returns The current enterprise configuration
  */
 export function getEnterprisePerformanceConfiguration(): ReadonlyDeep<IEnterprisePerformanceConfig> {
@@ -191,18 +197,20 @@ export function getEnterprisePerformanceConfiguration(): ReadonlyDeep<IEnterpris
 
 /**
  * 🎯 **Initialize Enterprise Performance Monitoring**
- * 
+ *
  * Call this once at application startup
  */
 export function initializeEnterprisePerformanceMonitoring(): void {
     if (enterprisePerformanceConfig.anomalyDetection.enabled === true && !anomalyDetector) {
-        configureEnterprisePerformanceMonitoring({}) // Use default config
+        configureEnterprisePerformanceMonitoring(
+            {}
+        ) // Use default config
     }
 }
 
 /**
  * 🎯 **Update Performance Baseline for a Method**
- * 
+ *
  * @param method - The method name
  * @param duration - The execution duration
  * @param memory - The memory usage
@@ -215,9 +223,13 @@ export function updatePerformanceBaseline(
     memory: number,
     semantic?: ISemanticContext
 ): IPerformanceBaseline {
-    const existing = performanceBaselines.get(method)
+    const existing = performanceBaselines.get(
+        method
+    )
     const timestamp = Date.now()
-    const validMemoryDelta = Math.max(0, memory) // Ensure memory delta is not negative for averaging
+    const validMemoryDelta = Math.max(
+        0, memory
+    ) // Ensure memory delta is not negative for averaging
 
     if (!existing) {
         const newBaseline: IPerformanceBaseline = {
@@ -230,7 +242,11 @@ export function updatePerformanceBaseline(
             lastUpdated: timestamp,
             semantic
         }
-        performanceBaselines.set(method, newBaseline)
+
+        performanceBaselines.set(
+            method, newBaseline
+        )
+
         return newBaseline
     }
 
@@ -242,64 +258,83 @@ export function updatePerformanceBaseline(
         method,
         averageDuration: existing.averageDuration + alpha * (duration - existing.averageDuration),
         medianDuration: existing.medianDuration, // Keep existing for now (complex to update incrementally)
-        p95Duration: Math.max(existing.p95Duration, duration), // Simplified P95 approximation
+        p95Duration: Math.max(
+            existing.p95Duration, duration
+        ), // Simplified P95 approximation
         averageMemory: existing.averageMemory + alpha * (validMemoryDelta - existing.averageMemory),
         sampleSize: newSampleSize,
         lastUpdated: timestamp,
         semantic: semantic ?? existing.semantic
     }
 
-    performanceBaselines.set(method, updatedBaseline)
+    performanceBaselines.set(
+        method, updatedBaseline
+    )
+
     return updatedBaseline
 }
 
 /**
  * 🎯 **Get Performance Baseline for a Method**
- * 
+ *
  * @param method - The method name
  * @returns The baseline data or undefined
  */
-export function getPerformanceBaseline(method: string): IPerformanceBaseline | undefined {
-    return performanceBaselines.get(method)
+export function getPerformanceBaseline(
+    method: string
+): IPerformanceBaseline | undefined {
+    return performanceBaselines.get(
+        method
+    )
 }
 
 /**
  * 🎯 **Get All Performance Baselines**
- * 
+ *
  * @returns Map of all baseline data
  */
 export function getAllPerformanceBaselines(): ReadonlyMap<string, IPerformanceBaseline> {
-    return new Map(performanceBaselines)
+    return new Map(
+        performanceBaselines
+    )
 }
 
 /**
  * 🎯 **Clear Performance Baselines**
- * 
+ *
  * @param olderThanDays - Optional: only clear baselines older than specified days
  */
-export function clearPerformanceBaselines(olderThanDays?: number): void {
-    if (olderThanDays !== undefined && olderThanDays > 0 && !Number.isNaN(olderThanDays)) {
+export function clearPerformanceBaselines(
+    olderThanDays?: number
+): void {
+    if (olderThanDays !== undefined && olderThanDays > 0 && !Number.isNaN(
+        olderThanDays
+    )) {
         const cutoffTime = Date.now() - (olderThanDays * 24 * 60 * 60 * 1000)
+
         for (const [method, baseline] of performanceBaselines.entries()) {
             if (baseline.lastUpdated < cutoffTime) {
-                performanceBaselines.delete(method)
+                performanceBaselines.delete(
+                    method
+                )
             }
         }
-    } else {
+    }
+    else {
         performanceBaselines.clear()
     }
 }
 
 /**
  * 🎯 **Get Anomaly Detection Statistics**
- * 
+ *
  * @returns Current anomaly detector statistics
  */
 export function getAnomalyDetectionStatistics(): {
     readonly trackedMethods: readonly string[]
     readonly totalMethods: number
     readonly isEnabled: boolean
-    } {
+} {
     if (!anomalyDetector) {
         return {
             trackedMethods: [],
@@ -309,6 +344,7 @@ export function getAnomalyDetectionStatistics(): {
     }
 
     const trackedMethods = anomalyDetector.getTrackedMethods()
+
     return {
         trackedMethods,
         totalMethods: trackedMethods.length,
@@ -325,31 +361,18 @@ export function clearAnomalyDetectionData(): void {
 
 /**
  * 🎯 **Get Global Anomaly Detector Instance**
- * 
+ *
  * @returns The current anomaly detector instance
  */
 export function getGlobalAnomalyDetector(): AnomalyDetector | undefined {
     return anomalyDetector
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🔄 LEGACY COMPATIBILITY FUNCTIONS (DEPRECATED)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * @deprecated Use configureEnterprisePerformanceMonitoring instead
+/*
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 🔄 LEGACY COMPATIBILITY FUNCTIONS (DEPRECATED)
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
-export const configureEnhancedPerformanceMonitoring = configureEnterprisePerformanceMonitoring
-
-/**
- * @deprecated Use getEnterprisePerformanceConfiguration instead
- */
-export const getEnhancedPerformanceConfiguration = getEnterprisePerformanceConfiguration
-
-/**
- * @deprecated Use initializeEnterprisePerformanceMonitoring instead
- */
-export const initializeEnhancedPerformanceMonitoring = initializeEnterprisePerformanceMonitoring
 
 // Initialize enterprise performance monitoring on module load
-initializeEnterprisePerformanceMonitoring() 
+initializeEnterprisePerformanceMonitoring()

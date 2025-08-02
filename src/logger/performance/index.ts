@@ -51,11 +51,7 @@ export {
     getAllPerformanceBaselines,
     clearPerformanceBaselines,
     getAnomalyDetectionStatistics,
-    clearAnomalyDetectionData,
-    // Legacy compatibility exports (deprecated)
-    configureEnhancedPerformanceMonitoring,
-    getEnhancedPerformanceConfiguration,
-    initializeEnhancedPerformanceMonitoring
+    clearAnomalyDetectionData
 } from './utils/enhanced-config.ts'
 
 // Performance Utils
