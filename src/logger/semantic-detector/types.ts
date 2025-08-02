@@ -113,7 +113,7 @@ export type CostLevel = 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'EXPENSIVE'
  * Uses mapped types for complete readonly compliance
  */
 export interface IPatternConfig {
-    readonly operations: Record<OperationType, readonly RegExp[]>
+    readonly operations: Record<OperationType, readonly Readonly<RegExp>[]>
     readonly domains: Record<DomainType, readonly string[]>
     readonly complexityIndicators: {
         readonly high: readonly string[]

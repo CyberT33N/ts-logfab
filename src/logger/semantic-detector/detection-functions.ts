@@ -43,7 +43,6 @@ import {
  */
 export function detectOperation(
     methodName: Readonly<string>,
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     config: ReadonlyDeep<IPatternConfig> = DEFAULT_PATTERN_CONFIG
 ): { operation: OperationType; confidence: number; patterns: readonly string[] } {
     const detectedPatterns: string[] = []
@@ -87,7 +86,6 @@ export function detectOperation(
  */
 export function detectDomain(
     methodName: Readonly<string>,
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     config: ReadonlyDeep<IPatternConfig> = DEFAULT_PATTERN_CONFIG
 ): { domain: DomainType; confidence: number; keywords: readonly string[] } {
     const lowerMethodName = methodName.toLowerCase()
@@ -133,7 +131,6 @@ export function detectDomain(
 export function calculateComplexity(
     methodName: Readonly<string>,
     args: ReadonlyDeep<readonly unknown[]>,
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     config: ReadonlyDeep<IPatternConfig> = DEFAULT_PATTERN_CONFIG
 ): { complexity: ComplexityLevel; factors: readonly string[] } {
     const factors: string[] = []
@@ -204,7 +201,6 @@ export function estimateOperationCost(
     methodName: Readonly<string>,
     operation: OperationType,
     complexity: ComplexityLevel,
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     config: ReadonlyDeep<IPatternConfig> = DEFAULT_PATTERN_CONFIG
 ): CostLevel {
     const lowerMethodName = methodName.toLowerCase()
@@ -248,7 +244,6 @@ export function estimateOperationCost(
 export function detectSemanticContext(
     methodName: Readonly<string>,
     args: ReadonlyDeep<readonly unknown[]> = [],
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     config: ReadonlyDeep<IPatternConfig> = DEFAULT_PATTERN_CONFIG
 ): ISemanticContext {
     // Detect operation
