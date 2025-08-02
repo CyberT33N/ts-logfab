@@ -110,6 +110,7 @@ export type CostLevel = 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'EXPENSIVE'
  * 🔍 **Pattern Configuration**
  * 
  * Configurable patterns for operation and domain detection
+ * Uses mapped types for complete readonly compliance
  */
 export interface IPatternConfig {
     readonly operations: Record<OperationType, readonly RegExp[]>
