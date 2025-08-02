@@ -1,202 +1,252 @@
 /*
-███████████████████████████████████████████████████████████████████████████████
-██******************** PRESENTED BY t33n Software ***************************██
-██                                                                           ██
-██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
-██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
-██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
-██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
-██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
-██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
-██                                                                           ██
-███████████████████████████████████████████████████████████████████████████████
-███████████████████████████████████████████████████████████████████████████████
-*/
+ *███████████████████████████████████████████████████████████████████████████████
+ *██******************** PRESENTED BY t33n Software ***************************██
+ *██                                                                           ██
+ *██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
+ *██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
+ *██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
+ *██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
+ *██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
+ *██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
+ *██                                                                           ██
+ *███████████████████████████████████████████████████████████████████████████████
+ *███████████████████████████████████████████████████████████████████████████████
+ */
 
 // ==== Imports ====
 import { createUsers } from '../../core/models.ts'
 
 /**
  * 🔧 Contract interface for performance testing helper operations.
- * 
+ *
  * @remarks
  * This interface defines a standardized set of operations for performance testing scenarios,
  * covering various types of computational workloads, data processing, and I/O simulation.
- * 
+ *
  * Each method represents a different category of performance testing:
  * - Large dataset processing with checksum validation
  * - Complex mathematical computations
  * - I/O operation simulation with variable timing
  * - Default operations for baseline testing
- * 
+ *
  * @see {@link PerformanceHelpers} for the concrete implementation
  */
 export interface IPerformanceHelpers {
-    processLargeDataset(size: number): Promise<{ processed: number; checksum: number }>
-    performComplexComputation(complexity: number): Promise<{ result: number; operations: number }>
-    simulateIOOperations(operations: number): Promise<{ operations: number; totalTime: number }>
-    defaultOperation(workload: number): Promise<{ workload: number; result: string }>
+    processLargeDataset: (size: number) => Promise<{ processed: number
+        checksum: number }>
+    performComplexComputation: (complexity: number) => Promise<{ result: number
+        operations: number }>
+    simulateIOOperations: (operations: number) => Promise<{ operations: number
+        totalTime: number }>
+    defaultOperation: (workload: number) => Promise<{ workload: number
+        result: string }>
 }
 
 /**
  * ⚙️ Concrete implementation of performance testing helper operations.
- * 
+ *
  * @remarks
  * This class provides realistic performance testing scenarios for benchmarking and
  * monitoring systems. Each method simulates different types of computational and
  * I/O workloads that are commonly found in real-world applications.
- * 
+ *
  * 🔧 **Operation Categories:**
  * - **Data Processing:** Large dataset manipulation with user generation and checksum calculation
  * - **CPU-Intensive:** Complex mathematical computations with nested loops
  * - **I/O Simulation:** Variable-timing operations to simulate database or network calls
  * - **Baseline Testing:** Simple operations for establishing performance baselines
- * 
+ *
  * @example
  * Basic usage for performance testing:
  * ```typescript
  * const helpers = new PerformanceHelpers();
- * 
+ *
  * // Test data processing performance
  * const dataResult = await helpers.processLargeDataset(10000);
  * console.log(`Processed ${dataResult.processed} items, checksum: ${dataResult.checksum}`);
- * 
+ *
  * // Test computational performance
  * const compResult = await helpers.performComplexComputation(5000);
  * console.log(`Result: ${compResult.result}, operations: ${compResult.operations}`);
- * 
+ *
  * // Test I/O simulation
  * const ioResult = await helpers.simulateIOOperations(100);
  * console.log(`Completed ${ioResult.operations} I/O ops in ${ioResult.totalTime}ms`);
  * ```
- * 
+ *
  * @see {@link IPerformanceHelpers} for the interface contract
  */
 export class PerformanceHelpers implements IPerformanceHelpers {
     /**
      * 📊 Processes a large dataset of generated users with checksum validation.
-     * 
+     *
      * @remarks
      * This method creates a specified number of user objects and processes them
      * sequentially, calculating a checksum based on user properties. Each user
      * processing includes a small delay to simulate realistic processing time.
-     * 
+     *
      * The checksum calculation incorporates user ID, age, name length, and email
      * length to provide a meaningful computational workload during data processing.
-     * 
+     *
      * @param size - Number of user objects to generate and process
-     * 
+     *
      * @returns Promise resolving to processing results with total processed count
      * and calculated checksum value
-     * 
+     *
      * @see {@link createUsers} for user generation implementation
      */
-    public async processLargeDataset(size: number): Promise<{ processed: number; checksum: number }> {
-        const data = createUsers(size)
+    public async processLargeDataset(
+        size: number
+    ): Promise<{ processed: number
+        checksum: number }> {
+        const data = createUsers(
+            size
+        )
         let checksum = 0
-        
+
         for (const user of data) {
             checksum += user.id + user.age + user.name.length + user.email.length
-            await this._delay(1) // Simulate processing time
+            await this._delay(
+                1
+            )
         }
-        
-        return { processed: data.length, checksum }
+
+        return {
+            processed: data.length,
+            checksum
+        }
     }
 
     /**
      * 🧮 Performs intensive mathematical computations with nested loop operations.
-     * 
+     *
      * @remarks
      * This method executes complex mathematical calculations involving square roots,
      * trigonometric functions, and nested iterations to create a CPU-intensive workload.
-     * 
+     *
      * The computation uses nested loops where the outer loop runs for the specified
      * complexity and the inner loop performs 100 mathematical operations per iteration.
      * Periodic delays are introduced to prevent overwhelming the system.
-     * 
+     *
      * @param complexity - Number of outer loop iterations (directly affects computation time)
-     * 
+     *
      * @returns Promise resolving to computation results with final result value
      * and total number of mathematical operations performed
      */
-    public async performComplexComputation(complexity: number): Promise<{ result: number; operations: number }> {
+    public async performComplexComputation(
+        complexity: number
+    ): Promise<{ result: number
+        operations: number }> {
         let result = 0
         let operations = 0
-        
+
         for (let i = 0; i < complexity; i++) {
             for (let j = 0; j < 100; j++) {
-                result += Math.sqrt(i * j) * Math.sin(i) * Math.cos(j)
+                result += Math.sqrt(
+                    i * j
+                ) * Math.sin(
+                    i
+                ) * Math.cos(
+                    j
+                )
                 operations++
             }
-            
+
             if (i % 1000 === 0) {
-                await this._delay(1)
+                await this._delay(
+                    1
+                )
             }
         }
-        
-        return { result, operations }
+
+        return {
+            result,
+            operations
+        }
     }
 
     /**
      * 🔄 Simulates I/O operations with variable timing patterns.
-     * 
+     *
      * @remarks
      * This method simulates database queries, network requests, or file system operations
      * by introducing random delays that mimic real-world I/O latency patterns.
-     * 
+     *
      * Each simulated I/O operation has a random delay between 5-15ms to represent
      * the variable nature of actual I/O operations in production environments.
-     * 
+     *
      * @param operations - Number of I/O operations to simulate
-     * 
+     *
      * @returns Promise resolving to simulation results with operation count
      * and total elapsed time for all operations
      */
-    public async simulateIOOperations(operations: number): Promise<{ operations: number; totalTime: number }> {
+    public async simulateIOOperations(
+        operations: number
+    ): Promise<{ operations: number
+        totalTime: number }> {
         const startTime = Date.now()
-        
+
         for (let i = 0; i < operations; i++) {
             // Simulate I/O delay with variable timing
             const ioDelay = Math.random() * 10 + 5
-            await this._delay(ioDelay)
+
+            await this._delay(
+                ioDelay
+            )
         }
-        
+
         const totalTime = Date.now() - startTime
-        
-        return { operations, totalTime }
+
+        return {
+            operations,
+            totalTime
+        }
     }
 
     /**
      * ⚙️ Executes a simple default operation for baseline performance testing.
-     * 
+     *
      * @remarks
      * This method provides a straightforward operation with predictable timing
      * for establishing performance baselines and comparing against more complex operations.
-     * 
+     *
      * The delay is directly proportional to the workload parameter (workload * 10ms),
      * providing consistent and predictable performance characteristics.
-     * 
+     *
      * @param workload - Workload multiplier that directly affects operation duration
-     * 
+     *
      * @returns Promise resolving to operation results with workload confirmation
      * and completion message
      */
-    public async defaultOperation(workload: number): Promise<{ workload: number; result: string }> {
-        await this._delay(workload * 10)
-        
+    public async defaultOperation(
+        workload: number
+    ): Promise<{ workload: number
+        result: string }> {
+        await this._delay(
+            workload * 10
+        )
+
         return {
             workload,
-            result: `Default operation completed with workload ${String(workload)}`
+            result: `Default operation completed with workload ${String(
+                workload
+            )}`
         }
     }
 
     /**
      * ⏱️ Creates an asynchronous delay for timing control in performance tests.
-     * 
+     *
      * @param ms - Delay duration in milliseconds
      * @returns Promise that resolves after the specified delay
      */
-    private async _delay(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms))
+    private async _delay(
+        ms: number
+    ): Promise<void> {
+        await new Promise(
+            resolve => setTimeout(
+                resolve, ms
+            )
+        )
     }
-} 
+}
