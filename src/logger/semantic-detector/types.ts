@@ -1,25 +1,27 @@
 /*
-███████████████████████████████████████████████████████████████████████████████
-██******************** PRESENTED BY t33n Software ***************************██
-██                                                                           ██
-██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
-██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
-██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
-██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
-██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
-██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
-██                                                                           ██
-███████████████████████████████████████████████████████████████████████████████
-███████████████████████████████████████████████████████████████████████████████
-*/
+ *███████████████████████████████████████████████████████████████████████████████
+ *██******************** PRESENTED BY t33n Software ***************************██
+ *██                                                                           ██
+ *██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
+ *██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
+ *██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
+ *██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
+ *██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
+ *██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
+ *██                                                                           ██
+ *███████████████████████████████████████████████████████████████████████████████
+ *███████████████████████████████████████████████████████████████████████████████
+ */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🧠 SEMANTIC CONTEXT DETECTION - TYPE DEFINITIONS
-// ═══════════════════════════════════════════════════════════════════════════════
+/*
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 🧠 SEMANTIC CONTEXT DETECTION - TYPE DEFINITIONS
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 
 /**
  * 🎯 **Semantic Context Interface**
- * 
+ *
  * Provides business context extracted from method names and arguments
  * - operation: Type of operation being performed
  * - domain: Business domain the operation belongs to
@@ -40,7 +42,7 @@ export interface ISemanticContext {
 
 /**
  * 🔄 **Operation Types Enum**
- * 
+ *
  * Central source of truth for all operation types
  * Used for type-safe iteration without type-casting
  */
@@ -59,7 +61,7 @@ export enum EOperationType {
 
 /**
  * 🔄 **Operation Types**
- * 
+ *
  * CRUD and computational operations
  * Automatically derived from EOperationType enum - ZERO DUPLICATION!
  */
@@ -67,7 +69,7 @@ export type OperationType = `${EOperationType}`
 
 /**
  * 🏢 **Domain Types Enum**
- * 
+ *
  * Central source of truth for all domain types
  * Used for type-safe iteration without type-casting
  */
@@ -86,7 +88,7 @@ export enum EDomainType {
 
 /**
  * 🏢 **Domain Types**
- * 
+ *
  * Business domains for better log categorization
  * Automatically derived from EDomainType enum - ZERO DUPLICATION!
  */
@@ -94,21 +96,21 @@ export type DomainType = `${EDomainType}`
 
 /**
  * 📊 **Complexity Levels**
- * 
+ *
  * Based on argument count, types, and detected patterns
  */
 export type ComplexityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME'
 
 /**
  * 💰 **Cost Levels**
- * 
+ *
  * Estimated resource cost for operations
  */
 export type CostLevel = 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'EXPENSIVE'
 
 /**
  * 🔍 **Pattern Configuration**
- * 
+ *
  * Configurable patterns for operation and domain detection
  * Uses mapped types for complete readonly compliance
  */
@@ -124,4 +126,4 @@ export interface IPatternConfig {
         readonly high: readonly string[]
         readonly medium: readonly string[]
     }
-} 
+}

@@ -1,50 +1,67 @@
 /*
-███████████████████████████████████████████████████████████████████████████████
-██******************** PRESENTED BY t33n Software ***************************██
-██                                                                           ██
-██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
-██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
-██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
-██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
-██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
-██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
-██                                                                           ██
-███████████████████████████████████████████████████████████████████████████████
-███████████████████████████████████████████████████████████████████████████████
-*/
+ *██████████████████████████████████████████████████████████████████████████████
+ *██******************** PRESENTED BY t33n Software **************************██
+ *██                                                                          ██
+ *██                  ████████╗██████╗ ██████╗ ███╗   ██╗                     ██
+ *██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                     ██
+ *██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                     ██
+ *██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                     ██
+ *██                     ██║   ██████╔╝██████╔╝██║ ╚████║                     ██
+ *██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                     ██
+ *██                                                                          ██
+ *██████████████████████████████████████████████████████████████████████████████
+ *██████████████████████████████████████████████████████████████████████████████
+ */
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 🔧 SEMANTIC DETECTION - PRIVATE UTILITY FUNCTIONS
-// ═════════════════════════════════════════════════════════════════════════════
+/*
+ * ═════════════════════════════════════════════════════════════════════════════
+ * 🔧 SEMANTIC DETECTION - PRIVATE UTILITY FUNCTIONS
+ * ═════════════════════════════════════════════════════════════════════════════
+ */
 
-import { ReadonlyDeep } from 'type-fest'
 import type { OperationType, ComplexityLevel } from './types.ts'
 
 /**
  * 📊 **Calculate pattern confidence**
  * Higher confidence for more specific matches
  */
- 
-export function calculatePatternConfidence(methodName: Readonly<string>, pattern: ReadonlyDeep<RegExp>): number {
-    const match = methodName.match(pattern)
-    if (match === null) {return 0}
 
-    let confidence = 0.5 // Base confidence
+export function calculatePatternConfidence(
+    methodName: Readonly<string>, pattern: Readonly<RegExp>
+): number {
+    const match = methodName.match(
+        pattern
+    )
+
+    if (match === null) {
+        return 0
+    }
+
+    // Base confidence
+    let confidence = 0.5
 
     // Bonus for exact word boundary matches
-    if (pattern.source.includes('\\b') || pattern.source.includes('^') || pattern.source.includes('$')) {
+    if (pattern.source.includes(
+        '\\b'
+    ) || pattern.source.includes(
+        '^'
+    ) || pattern.source.includes(
+        '$'
+    )) {
         confidence += 0.3
     }
 
     // Bonus for longer matches
     const matchLength = match[0].length
     const nameLength = methodName.length
+
     confidence += (matchLength / nameLength) * 0.2
 
     // Bonus for matches at start or end
     if (match.index === 0) {
         confidence += 0.1
     }
+
     if (match.index !== undefined && match.index + matchLength === nameLength) {
         confidence += 0.1
     }
@@ -62,10 +79,16 @@ export function calculatePatternConfidence(methodName: Readonly<string>, pattern
 export function calculateKeywordConfidence(
     methodName: Readonly<string>, keyword: Readonly<string>
 ): number {
-    const index = methodName.indexOf(keyword)
-    if (index === -1) {return 0}
+    const index = methodName.indexOf(
+        keyword
+    )
 
-    let confidence = 0.4 // Base confidence
+    if (index === -1) {
+        return 0
+    }
+
+    // Base confidence
+    let confidence = 0.4
 
     // Bonus for keyword at start
     if (index === 0) {
@@ -89,42 +112,46 @@ export function calculateKeywordConfidence(
 /**
  * 💰 **Get base cost for operation type**
  */
-export function getBaseCostForOperation(operation: OperationType): number {
+export function getBaseCostForOperation(
+    operation: OperationType
+): number {
     switch (operation) {
-    case 'READ':
-    case 'VALIDATE':
-        return 1
-    case 'WRITE':
-    case 'UPDATE':
-    case 'TRANSFORM':
-        return 2
-    case 'DELETE':
-    case 'COMPUTE':
-    case 'AGGREGATE':
-        return 3
-    case 'SEARCH':
-        return 2
-    case 'UNKNOWN':
-    default:
-        return 1
+        case 'READ':
+        case 'VALIDATE':
+            return 1
+        case 'WRITE':
+        case 'UPDATE':
+        case 'TRANSFORM':
+            return 2
+        case 'DELETE':
+        case 'COMPUTE':
+        case 'AGGREGATE':
+            return 3
+        case 'SEARCH':
+            return 2
+        case 'UNKNOWN':
+        default:
+            return 1
     }
 }
 
 /**
  * 💰 **Get complexity adjustment**
  */
-export function getComplexityAdjustment(complexity: ComplexityLevel): number {
+export function getComplexityAdjustment(
+    complexity: ComplexityLevel
+): number {
     switch (complexity) {
-    case 'LOW':
-        return 0
-    case 'MEDIUM':
-        return 1
-    case 'HIGH':
-        return 2
-    case 'EXTREME':
-        return 3
-    default:
-        return 0
+        case 'LOW':
+            return 0
+        case 'MEDIUM':
+            return 1
+        case 'HIGH':
+            return 2
+        case 'EXTREME':
+            return 3
+        default:
+            return 0
     }
 }
 
@@ -132,7 +159,9 @@ export function getComplexityAdjustment(complexity: ComplexityLevel): number {
  * 🏷️ **Detect entity type from method name**
  * Attempts to identify the main entity being operated on
  */
-export function detectEntityType(methodName: Readonly<string>): string | undefined {
+export function detectEntityType(
+    methodName: Readonly<string>
+): string | undefined {
     // Common entity patterns in method names
     const entityPatterns = [
         /(?:get|create|update|delete|find|save|load|process|calculate)([A-Z][a-zA-Z]*)/,
@@ -142,11 +171,14 @@ export function detectEntityType(methodName: Readonly<string>): string | undefin
     ]
 
     for (const pattern of entityPatterns) {
-        const match = methodName.match(pattern)
+        const match = methodName.match(
+            pattern
+        )
+
         if (match?.[1] !== undefined) {
             return match[1].toLowerCase()
         }
     }
 
     return undefined
-} 
+}
