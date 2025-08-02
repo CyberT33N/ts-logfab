@@ -19,6 +19,7 @@ import importPlugin from 'eslint-plugin-import'
 import a11yPlugin from 'eslint-plugin-jsx-a11y'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
+import stylistic from '@stylistic/eslint-plugin'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
@@ -50,7 +51,6 @@ export default tseslint.config(
             }],
             'func-names': ['error', 'never'],
             'no-use-before-define': 'off', // Let typescript-eslint handle this
-            'max-len': ['error', 120],
             'object-curly-spacing': ['error', 'always'], // Stricter than original
             'comma-dangle': ['error', 'never'],
             'semi': ['error', 'never'],
@@ -122,6 +122,36 @@ export default tseslint.config(
             'import/no-unresolved': 'error',
             'import/no-cycle': 'error',
             'import/no-unused-modules': 'error'
+        }
+    },
+    
+    // ===== STYLISTIC PLUGIN FOR FUNCTION PARAMETER MULTILINE FORMATTING =====
+    {
+        plugins: {
+            '@stylistic': stylistic
+        },
+        rules: {
+            '@stylistic/max-len': ['error', {
+                'code': 80
+            }],
+            '@stylistic/function-paren-newline': ['error', { 
+                "minItems": 2
+            }],
+            // ===== NODE_TS_CODEQUALITY_MULTILINE_RETURNS_001 IMPLEMENTIERUNG =====
+            '@stylistic/object-curly-newline': ['error', {
+                'ObjectExpression': { 'multiline': true, 'minProperties': 2 }, // Erzwingt mehrzeilige Objektliterale
+                'ObjectPattern': { 'multiline': true, 'minProperties': 2 },
+                'ImportDeclaration': { 'multiline': true, 'minProperties': 3 },
+                'ExportDeclaration': { 'multiline': true, 'minProperties': 3 }
+            }],
+            '@stylistic/object-property-newline': ['error', { 
+                'allowAllPropertiesOnSameLine': false // Jede Objekteigenschaft auf eigener Zeile
+            }],
+            '@stylistic/brace-style': ['error', 'stroustrup', { 
+                'allowSingleLine': false // Erzwingt mehrzeilige geschweifte Klammern
+            }],
+            '@stylistic/nonblock-statement-body-position': ['error', 'below'], // Return-Statements in eigener Zeile
+            'curly': ['error', 'all'], // Erzwingt geschweifte Klammern bei allen if-statements
         }
     },
     

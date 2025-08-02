@@ -13,9 +13,9 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════════════
 // 🔧 SEMANTIC DETECTION - PRIVATE UTILITY FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep } from 'type-fest'
 import type { OperationType, ComplexityLevel } from './types.ts'
@@ -24,7 +24,7 @@ import type { OperationType, ComplexityLevel } from './types.ts'
  * 📊 **Calculate pattern confidence**
  * Higher confidence for more specific matches
  */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+ 
 export function calculatePatternConfidence(methodName: Readonly<string>, pattern: ReadonlyDeep<RegExp>): number {
     const match = methodName.match(pattern)
     if (match === null) {return 0}
@@ -49,14 +49,19 @@ export function calculatePatternConfidence(methodName: Readonly<string>, pattern
         confidence += 0.1
     }
 
-    return Math.min(confidence, 1.0)
+    return Math.min(
+        confidence,
+        1.0
+    )
 }
 
 /**
  * 🔍 **Calculate keyword confidence**
  * Higher confidence for more prominent keyword positions
  */
-export function calculateKeywordConfidence(methodName: Readonly<string>, keyword: Readonly<string>): number {
+export function calculateKeywordConfidence(
+    methodName: Readonly<string>, keyword: Readonly<string>
+): number {
     const index = methodName.indexOf(keyword)
     if (index === -1) {return 0}
 
@@ -75,7 +80,10 @@ export function calculateKeywordConfidence(methodName: Readonly<string>, keyword
     // Bonus for longer keywords (more specific)
     confidence += (keyword.length / methodName.length) * 0.1
 
-    return Math.min(confidence, 1.0)
+    return Math.min(
+        confidence,
+        1.0
+    )
 }
 
 /**

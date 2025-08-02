@@ -230,10 +230,22 @@ export function estimateOperationCost(
     const baseCost = getBaseCostForOperation(operation) + getComplexityAdjustment(complexity)
 
     // Map to cost level
-    if (baseCost >= 5) {return 'EXPENSIVE'}
-    if (baseCost >= 4) {return 'HIGH'}
-    if (baseCost >= 2) {return 'MEDIUM'}
-    if (baseCost >= 1) {return 'LOW'}
+    if (baseCost >= 5) {
+        return 'EXPENSIVE'
+    }
+    
+    if (baseCost >= 4) {
+        return 'HIGH'
+    }
+
+    if (baseCost >= 2) {
+        return 'MEDIUM'
+    }
+
+    if (baseCost >= 1) {
+        return 'LOW'
+    }
+
     return 'MINIMAL'
 }
 
