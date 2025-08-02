@@ -14,6 +14,7 @@
  */
 
 // ==== Imports ====
+import { setTimeout } from 'node:timers/promises'
 import { createUsers } from '../../core/models.ts'
 
 /**
@@ -106,7 +107,7 @@ export class PerformanceHelpers implements IPerformanceHelpers {
 
         for (const user of data) {
             checksum += user.id + user.age + user.name.length + user.email.length
-            await this._delay(
+            await setTimeout(
                 1
             )
         }
@@ -153,7 +154,7 @@ export class PerformanceHelpers implements IPerformanceHelpers {
             }
 
             if (i % 1000 === 0) {
-                await this._delay(
+                await setTimeout(
                     1
                 )
             }
@@ -190,7 +191,7 @@ export class PerformanceHelpers implements IPerformanceHelpers {
             // Simulate I/O delay with variable timing
             const ioDelay = Math.random() * 10 + 5
 
-            await this._delay(
+            await setTimeout(
                 ioDelay
             )
         }
@@ -222,7 +223,7 @@ export class PerformanceHelpers implements IPerformanceHelpers {
         workload: number
     ): Promise<{ workload: number
         result: string }> {
-        await this._delay(
+        await setTimeout(
             workload * 10
         )
 
@@ -232,21 +233,5 @@ export class PerformanceHelpers implements IPerformanceHelpers {
                 workload
             )}`
         }
-    }
-
-    /**
-     * ⏱️ Creates an asynchronous delay for timing control in performance tests.
-     *
-     * @param ms - Delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     */
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
     }
 }

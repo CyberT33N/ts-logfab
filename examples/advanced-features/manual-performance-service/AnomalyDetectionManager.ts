@@ -14,6 +14,7 @@
  */
 
 // ==== Imports ====
+import { setTimeout } from 'node:timers/promises'
 import { ReadonlyDeep } from 'type-fest'
 import {
     trackMethodPerformance,
@@ -91,22 +92,6 @@ export class AnomalyDetectionManager {
     }
 
     /**
-     * ⏱️ Creates an asynchronous delay for testing and anomaly simulation purposes.
-     *
-     * @param ms - Delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     */
-    public static async delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
-    }
-
-    /**
      * ⚙️ Executes a performance-intensive operation with comprehensive anomaly detection monitoring.
      *
      * @remarks
@@ -166,7 +151,7 @@ export class AnomalyDetectionManager {
             if (i % 5000 === 0) {
                 const delay = Math.random() > 0.7 ? 10 : 1
 
-                await AnomalyDetectionManager.delay(
+                await setTimeout(
                     delay
                 )
             }

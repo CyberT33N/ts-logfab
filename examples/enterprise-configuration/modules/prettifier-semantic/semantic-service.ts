@@ -22,6 +22,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
+import { setTimeout } from 'node:timers/promises'
 import type { ReadonlyDeep } from 'type-fest'
 import {
     logFinancialOperation, logUserOperation, logWithSemantics
@@ -115,7 +116,7 @@ export class EnterprisePrettifierSemanticService {
         businessInsights: Record<string, unknown>
         operationSummary: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -189,7 +190,7 @@ export class EnterprisePrettifierSemanticService {
         complianceCheck: Record<string, unknown>
         riskAssessment: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             180
         )
 
@@ -258,7 +259,7 @@ export class EnterprisePrettifierSemanticService {
         securityAssessment: Record<string, unknown>
         auditInformation: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -319,7 +320,7 @@ export class EnterprisePrettifierSemanticService {
     ): Promise<{ userId: number
         created: boolean
         profile: Record<string, unknown> }> {
-        await this._delay(
+        await setTimeout(
             120
         )
 
@@ -376,7 +377,7 @@ export class EnterprisePrettifierSemanticService {
     ): Promise<{ transactionId: string
         processed: boolean
         status: string }> {
-        await this._delay(
+        await setTimeout(
             80
         )
 
@@ -435,7 +436,7 @@ export class EnterprisePrettifierSemanticService {
         performanceMetrics: Record<string, number>
         contextAnalysis: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -509,7 +510,7 @@ export class EnterprisePrettifierSemanticService {
         environmentAnalysis: Record<string, unknown>
         overallAssessment: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             250
         )
 
@@ -619,14 +620,4 @@ export class EnterprisePrettifierSemanticService {
      * 🛠️ UTILITY METHODS
      * ═══════════════════════════════════════════════════════════════════════════════
      */
-
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
-    }
 }

@@ -14,6 +14,7 @@
  */
 
 // ==== Imports ====
+import { setTimeout } from 'node:timers/promises'
 import { ReadonlyDeep } from 'type-fest'
 import {
     createPerformanceMark,
@@ -198,7 +199,7 @@ export class PerformanceMarksManager {
             ) * Math.random()
 
             if (i % 10000 === 0) {
-                await this._delay(
+                await setTimeout(
                     1
                 )
             }
@@ -240,21 +241,5 @@ export class PerformanceMarksManager {
                 gcData
             }
         }
-    }
-
-    /**
-     * ⏱️ Creates an asynchronous delay for timing control and GC event simulation.
-     *
-     * @param ms - Delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     */
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
     }
 }

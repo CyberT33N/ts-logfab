@@ -22,6 +22,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
+import { setTimeout } from 'node:timers/promises'
 import type { ReadonlyDeep } from 'type-fest'
 import { log } from '@/decorators/index.ts'
 import { logger } from '@/logger/index.ts'
@@ -120,7 +121,7 @@ export class EnterpriseMonitoringService {
         const isSlowOperation = Math.random() > 0.8
         const processingTime = isSlowOperation ? 800 : 150
 
-        await this._delay(
+        await setTimeout(
             processingTime
         )
 
@@ -204,7 +205,7 @@ export class EnterpriseMonitoringService {
             Date.now()
         )}`
 
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -324,7 +325,7 @@ export class EnterpriseMonitoringService {
             Date.now()
         )}`
 
-        await this._delay(
+        await setTimeout(
             80
         )
 
@@ -445,12 +446,14 @@ export class EnterpriseMonitoringService {
         )}`
 
         // Minimal delay for real-time processing
-        await this._delay(
+        await setTimeout(
             20
         )
 
         const throughput = analyticsData.eventCount / (analyticsData.processingLatency / 1000)
-        const latencyCompliance = analyticsData.processingLatency <= 100 // 100ms SLA
+
+        // 100ms SLA
+        const latencyCompliance = analyticsData.processingLatency <= 100
 
         let qualityAssessment: 'EXCELLENT' | 'GOOD' | 'POOR'
 
@@ -544,7 +547,7 @@ export class EnterpriseMonitoringService {
             Date.now()
         )}`
 
-        await this._delay(
+        await setTimeout(
             dbData.executionTime
         )
 
@@ -676,7 +679,7 @@ export class EnterpriseMonitoringService {
             Date.now()
         )}`
 
-        await this._delay(
+        await setTimeout(
             apiData.responseTime
         )
 
@@ -808,7 +811,7 @@ export class EnterpriseMonitoringService {
             Date.now()
         )}`
 
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -834,7 +837,8 @@ export class EnterpriseMonitoringService {
             )
         )
 
-        const overallHealthScore = (systemHealthScore + businessHealthScore + securityHealthScore + performanceHealthScore) / 4
+        const overallHealthScore = (systemHealthScore + businessHealthScore
+            + securityHealthScore + performanceHealthScore) / 4
 
         const alerts: string[] = []
         const recommendations: string[] = []
@@ -1068,16 +1072,6 @@ export class EnterpriseMonitoringService {
      * 🛠️ UTILITY METHODS
      * ═══════════════════════════════════════════════════════════════════════════════
      */
-
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
-    }
 
     private _recordPerformanceMetrics(
         category: string, value: number

@@ -59,6 +59,7 @@
  * @see {@link createTestingConfig} Testing configuration factory
  */
 
+import { setTimeout } from 'node:timers/promises'
 import type { ReadonlyDeep } from 'type-fest'
 import {
     DEFAULT_LOG_CONFIG,
@@ -217,7 +218,7 @@ export class EnterpriseConfigService {
             traceId: string }>
     ): Promise<{ processed: number
         timestamp: Date }> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -293,7 +294,7 @@ export class EnterpriseConfigService {
     public async productionMethod(
         userId: number
     ): Promise<IUser | null> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -372,7 +373,7 @@ export class EnterpriseConfigService {
             filters: Record<string, unknown> }>
     ): Promise<{ results: IProduct[]
         metadata: Record<string, unknown> }> {
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -538,7 +539,7 @@ export class EnterpriseConfigService {
     public async testingMethod(
         shouldFail: boolean
     ): Promise<string> {
-        await this._delay(
+        await setTimeout(
             50
         )
 
@@ -639,7 +640,7 @@ export class EnterpriseConfigService {
     ): Promise<{ success: boolean
         id: string
         timestamp: Date }> {
-        await this._delay(
+        await setTimeout(
             120
         )
 
@@ -716,7 +717,7 @@ export class EnterpriseConfigService {
     public async adaptiveConfigMethod(
         data: readonly string[]
     ): Promise<string[]> {
-        await this._delay(
+        await setTimeout(
             80
         )
 
@@ -831,26 +832,5 @@ export class EnterpriseConfigService {
                 format: 'human-readable'
             }
         }
-    }
-
-    /**
-     * ⏱️ **Asynchronous Delay Utility**
-     *
-     * Provides controllable delay functionality for simulating realistic operation
-     * timing in demonstration and testing scenarios. This utility enables consistent
-     * performance testing and benchmarking across different configuration patterns
-     * within the enterprise service environment.
-     *
-     * @param ms - Delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     */
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
     }
 }

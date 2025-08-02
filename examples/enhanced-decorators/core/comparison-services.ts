@@ -54,6 +54,7 @@
  * @see {@link EnhancedDecoratorService} Enhanced decorator implementation
  */
 
+import { setTimeout } from 'node:timers/promises'
 import { ReadonlyDeep } from 'type-fest'
 import {
     DEFAULT_LOG_CONFIG,
@@ -236,7 +237,7 @@ export class StandardDecoratorService {
     public async basicOperation(
         userId: number
     ): Promise<IUser | null> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -289,7 +290,7 @@ export class StandardDecoratorService {
     public async standardConfiguredOperation(
         searchTerm: string
     ): Promise<IUser[]> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -361,7 +362,7 @@ export class StandardDecoratorService {
         data: ReadonlyDeep<readonly unknown[]>
     ): Promise<{ processed: number
         timestamp: Date }> {
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -409,7 +410,7 @@ export class StandardDecoratorService {
     public async standardDebugOperation(
         input: ReadonlyDeep<Record<string, unknown>>
     ): Promise<Record<string, unknown>> {
-        await this._delay(
+        await setTimeout(
             80
         )
 
@@ -544,41 +545,6 @@ export class StandardDecoratorService {
      * 🛠️ UTILITY METHODS
      * ═══════════════════════════════════════════════════════════════════════════════
      */
-
-    /**
-     * ⏱️ **Asynchronous Delay Utility**
-     *
-     * Provides controllable delay functionality for simulating realistic operation
-     * timing in demonstration and testing scenarios. This utility enables consistent
-     * performance testing and benchmarking across different decorator implementations.
-     *
-     * @param ms - Delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     *
-     * @example
-     * ```typescript
-     * // Simulate 100ms operation delay
-     * await this._delay(100);
-     * ```
-     *
-     * @remarks
-     * **Testing Applications:**
-     * - Consistent timing simulation across test scenarios
-     * - Performance baseline establishment for benchmarking
-     * - Realistic operation duration modeling
-     *
-     * @private
-     * @since 1.0.0
-     */
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
-    }
 }
 
 /*
@@ -677,7 +643,7 @@ export class EnhancedDecoratorService {
     public async basicOperation(
         userId: number
     ): Promise<IUser | null> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -735,7 +701,7 @@ export class EnhancedDecoratorService {
     public async enhancedConfiguredOperation(
         searchTerm: string
     ): Promise<IUser[]> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -811,7 +777,7 @@ export class EnhancedDecoratorService {
         data: ReadonlyDeep<readonly unknown[]>
     ): Promise<{ processed: number
         timestamp: Date }> {
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -860,7 +826,7 @@ export class EnhancedDecoratorService {
     public async enhancedDebugOperation(
         input: ReadonlyDeep<Record<string, unknown>>
     ): Promise<Record<string, unknown>> {
-        await this._delay(
+        await setTimeout(
             80
         )
 
@@ -997,41 +963,4 @@ export class EnhancedDecoratorService {
      * 🛠️ UTILITY METHODS
      * ═══════════════════════════════════════════════════════════════════════════════
      */
-
-    /**
-     * ⏱️ **Asynchronous Delay Utility**
-     *
-     * Provides controllable delay functionality for simulating realistic operation
-     * timing in demonstration and testing scenarios. This utility enables consistent
-     * performance testing and benchmarking across different decorator implementations
-     * with optimized timing precision for enhanced testing accuracy.
-     *
-     * @param ms - Delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     *
-     * @example
-     * ```typescript
-     * // Simulate 100ms operation delay
-     * await this._delay(100);
-     * ```
-     *
-     * @remarks
-     * **Enhanced Testing Applications:**
-     * - Consistent timing simulation across test scenarios with improved precision
-     * - Performance baseline establishment for accurate benchmarking
-     * - Realistic operation duration modeling for enhanced testing
-     * - Optimized timing control for comparative performance analysis
-     *
-     * @private
-     * @since 1.0.0
-     */
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
-    }
 }

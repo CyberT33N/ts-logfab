@@ -19,6 +19,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
+import { setTimeout } from 'node:timers/promises'
 import {
     log,
     logDebug,
@@ -140,7 +141,7 @@ export class BaseService {
     public async getUserById(
         id: Readonly<number>
     ): Promise<IUser | null> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -187,7 +188,7 @@ export class BaseService {
     public async createUser(
         name: Readonly<string>, email: Readonly<string>, age: Readonly<number>
     ): Promise<IUser> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -245,7 +246,7 @@ export class BaseService {
     public async searchUsersByName(
         searchTerm: Readonly<string>
     ): Promise<IUser[]> {
-        await this._delay(
+        await setTimeout(
             50
         )
 
@@ -308,7 +309,7 @@ export class BaseService {
             ) * Math.random()
 
             if (i % 1000 === 0) {
-                await this._delay(
+                await setTimeout(
                     1
                 )
             }
@@ -347,7 +348,7 @@ export class BaseService {
                 i, i + batchSize
             )
 
-            await this._delay(
+            await setTimeout(
                 100
             )
 
@@ -389,7 +390,7 @@ export class BaseService {
     public async sensitiveOperation(
         apiKey: Readonly<string>, secretData: Readonly<string>
     ): Promise<boolean> {
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -462,7 +463,7 @@ export class BaseService {
     public async riskyOperation(
         shouldFail: Readonly<boolean>
     ): Promise<string> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -494,7 +495,7 @@ export class BaseService {
     public async validateData(
         data: unknown
     ): Promise<boolean> {
-        await this._delay(
+        await setTimeout(
             50
         )
 
@@ -554,7 +555,7 @@ export class BaseService {
     public async getProductById(
         id: Readonly<string>
     ): Promise<IProduct | null> {
-        await this._delay(
+        await setTimeout(
             75
         )
 
@@ -599,27 +600,6 @@ export class BaseService {
      */
     public getProductsData(): readonly IProduct[] {
         return this._products
-    }
-
-    /**
-     * ⏱️ Private utility method for simulating asynchronous delays.
-     *
-     * @remarks
-     * Internal helper for creating realistic timing delays in demonstration methods.
-     * Simulates database operations, network requests, and other I/O-bound operations
-     * to provide meaningful performance metrics in decorator demonstrations.
-     *
-     * @param ms - The delay duration in milliseconds
-     * @returns Promise that resolves after the specified delay
-     */
-    private async _delay(
-        ms: Readonly<number>
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
     }
 }
 

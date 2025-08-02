@@ -22,6 +22,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
+import { setTimeout } from 'node:timers/promises'
 import type { ReadonlyDeep } from 'type-fest'
 import { log } from '@/decorators/index.ts'
 import env from '@/env.ts'
@@ -97,7 +98,7 @@ export class EnterpriseConfigurationService {
         data: ReadonlyDeep<readonly unknown[]>
     ): Promise<{ processed: number
         timestamp: Date }> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -146,7 +147,7 @@ export class EnterpriseConfigurationService {
         options: ReadonlyDeep<{ includeInactive?: boolean
             maxResults?: number }>
     ): Promise<IUser[]> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -203,7 +204,7 @@ export class EnterpriseConfigurationService {
     ): Promise<{ workflowId: string
         stepCompleted: boolean
         nextStep: string }> {
-        await this._delay(
+        await setTimeout(
             200
         )
 
@@ -253,7 +254,7 @@ export class EnterpriseConfigurationService {
         businessImpact: string
         auditTrail: string
     }> {
-        await this._delay(
+        await setTimeout(
             180
         )
 
@@ -304,7 +305,7 @@ export class EnterpriseConfigurationService {
         // Simulate variable processing time to trigger anomaly detection
         const processingDelay = Math.random() > 0.7 ? 500 : 100
 
-        await this._delay(
+        await setTimeout(
             processingDelay
         )
 
@@ -365,7 +366,7 @@ export class EnterpriseConfigurationService {
         deploymentValidated: boolean
         environmentSpecificData: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             120
         )
 
@@ -445,7 +446,7 @@ export class EnterpriseConfigurationService {
             nextActions: readonly string[]
         }
     }> {
-        await this._delay(
+        await setTimeout(
             300
         )
 
@@ -527,7 +528,7 @@ export class EnterpriseConfigurationService {
         processed: boolean
         adaptiveResponse: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             100
         )
 
@@ -585,7 +586,7 @@ export class EnterpriseConfigurationService {
         anomalyDetected: boolean
         resultSummary: Record<string, unknown>
     }> {
-        await this._delay(
+        await setTimeout(
             150
         )
 
@@ -669,14 +670,4 @@ export class EnterpriseConfigurationService {
      *
      * @internal
      */
-
-    private async _delay(
-        ms: number
-    ): Promise<void> {
-        await new Promise(
-            resolve => setTimeout(
-                resolve, ms
-            )
-        )
-    }
 }

@@ -1,83 +1,91 @@
 /*
-███████████████████████████████████████████████████████████████████████████████
-██******************** PRESENTED BY t33n Software ***************************██
-██                                                                           ██
-██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
-██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
-██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
-██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
-██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
-██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
-██                                                                           ██
-███████████████████████████████████████████████████████████████████████████████
-███████████████████████████████████████████████████████████████████████████████
-*/
+ *███████████████████████████████████████████████████████████████████████████████
+ *██******************** PRESENTED BY t33n Software ***************************██
+ *██                                                                           ██
+ *██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
+ *██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
+ *██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
+ *██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
+ *██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
+ *██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
+ *██                                                                           ██
+ *███████████████████████████████████████████████████████████████████████████████
+ *███████████████████████████████████████████████████████████████████████████████
+ */
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🔥 ERROR DECORATOR TEST SERVICE
-// ═══════════════════════════════════════════════════════════════════════════════
+/*
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 🔥 ERROR DECORATOR TEST SERVICE
+ * ═══════════════════════════════════════════════════════════════════════════════
+ */
 
+import { setTimeout } from 'node:timers/promises'
 import { logErrorsOnly } from '@/logger/decorators/index.ts'
 import { UtilityService } from './UtilityService.ts'
 
 /**
  * 🔥 Specialized test service demonstrating @logErrorsOnly decorator configurations
  * for error handling, monitoring, and diagnostic scenarios.
- * 
+ *
  * This service provides comprehensive examples of the enhanced @logErrorsOnly decorator across
  * multiple error handling scenarios including critical system errors, recovery operations,
  * and resilient error management patterns.
- * 
+ *
  * Each method showcases different aspects of the decorator's functionality:
  * - Critical error detection and alerting
- * - Error recovery and resilience patterns  
+ * - Error recovery and resilience patterns
  * - Minimalistic error logging for high-performance systems
  * - Exception handling with contextual information
  * - Error analysis and diagnostic capabilities
- * 
+ *
  * @see {@link logErrorsOnly} for the error decorator implementation
  */
 export class ErrorDecoratorTestService {
     [key: string]: unknown
+
     private readonly _utilityService: Readonly<UtilityService>
 
-    public constructor(utilityService: Readonly<UtilityService>) {
+    public constructor(
+        utilityService: Readonly<UtilityService>
+    ) {
         this._utilityService = utilityService
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 🔥 ENHANCED DECORATOR 'errorLog' IMPLEMENTATION
-    // ═══════════════════════════════════════════════════════════════════════════════
+    /*
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * 🔥 ENHANCED DECORATOR 'errorLog' IMPLEMENTATION
+     * ═══════════════════════════════════════════════════════════════════════════════
+     */
 
     /**
      * ⚠️ Demonstrates controlled error generation using default @logErrorsOnly configuration.
-     * 
+     *
      * @remarks
      * This method generates controlled errors for testing error handling capabilities
      * with the enhanced decorator. It provides different error types and conditions
      * to validate error detection, logging mechanisms, and exception flow management.
-     * 
+     *
      * The operation includes various error scenarios including type errors, validation
      * failures, and system exceptions to comprehensively test error handling behavior
      * and verify that error information is properly captured and logged.
-     * 
+     *
      * @decorator `@logErrorsOnly()` - Default error logging configuration
-     * 
+     *
      * @param shouldFail - Flag determining whether the operation should fail
      * @param errorType - Type of error to simulate when shouldFail is true
      * @returns Promise resolving to success message or throwing an error
      * @throws {Error} Various error types based on the errorType parameter
-     * 
+     *
      * @example
      * Testing different error scenarios:
      * ```typescript
      * const errorService = new ErrorDecoratorTestService(utilityService);
-     * 
+     *
      * try {
      *     // Test successful operation
      *     const result = await errorService.errorProneOperation(false, 'none');
      *     console.log(result); // "Operation completed successfully without errors"
-     * 
+     *
      *     // Test validation error
      *     await errorService.errorProneOperation(true, 'validation');
      * } catch (error) {
@@ -87,63 +95,77 @@ export class ErrorDecoratorTestService {
      * ```
      */
     @logErrorsOnly() // DEFAULT ERROR CONFIGURATION
-    public async errorProneOperation(shouldFail: Readonly<boolean>, errorType: Readonly<string>): Promise<string> {
-        await this._utilityService.delay(100)
-        
+    public async errorProneOperation(
+        shouldFail: Readonly<boolean>, errorType: Readonly<string>
+    ): Promise<string> {
+        await setTimeout(
+            100
+        )
+
         if (shouldFail) {
             switch (errorType) {
-            case 'validation':
-                throw new Error('Validation failed: Invalid input parameters')
-            case 'network':
-                throw new Error('Network error: Unable to connect to external service')
-            case 'permission':
-                throw new Error('Permission denied: Insufficient access rights')
-            case 'timeout':
-                throw new Error('Operation timeout: Request took too long to complete')
-            default:
-                throw new Error('Unknown error occurred')
+                case 'validation':
+                    throw new Error(
+                        'Validation failed: Invalid input parameters'
+                    )
+                case 'network':
+                    throw new Error(
+                        'Network error: Unable to connect to external service'
+                    )
+                case 'permission':
+                    throw new Error(
+                        'Permission denied: Insufficient access rights'
+                    )
+                case 'timeout':
+                    throw new Error(
+                        'Operation timeout: Request took too long to complete'
+                    )
+                default:
+                    throw new Error(
+                        'Unknown error occurred'
+                    )
             }
         }
-        
+
         return 'Operation completed successfully without errors'
     }
 
     /**
      * 🚨 Executes critical error handling with enhanced @logErrorsOnly diagnostic capabilities.
-     * 
+     *
      * @remarks
      * This method demonstrates advanced error handling scenarios with comprehensive
      * diagnostic features including stack trace analysis, argument logging, and anomaly
      * detection. It processes data collections with configurable error tolerance and
      * provides detailed error reporting for critical operations.
-     * 
+     *
      * 🔍 **Enhanced Error Features:**
      * - Stack trace inclusion for complete error context
      * - Argument logging for error reproduction analysis
      * - Anomaly detection for identifying unusual error patterns
      * - Error-level logging for critical error visibility
-     * 
-     * @decorator `@logErrorsOnly({ includeStackTrace: true, includeArguments: true, 
+     *
+     * @decorator `@logErrorsOnly({ includeStackTrace: true, includeArguments: true,
      * enableAnomalyDetection: true, logLevel: 'error' })`
-     * 
+     *
      * @param operation - Name of the operation being performed for error context
      * @param data - Array of data items to process with error validation
      * @param options - Configuration options including strict mode and error limits
      * @returns Promise resolving to processing results with error summary
      * @throws {Error} When critical errors exceed tolerance thresholds
-     * 
+     *
      * @example
      * Processing data with comprehensive error handling:
      * ```typescript
      * const errorService = new ErrorDecoratorTestService(utilityService);
-     * 
+     *
      * const testData = [{ valid: true }, null, { empty: {} }, 'invalid'];
      * const options = { strict: true, maxErrors: 2 };
-     * 
+     *
      * try {
      *     const result = await errorService.criticalErrorHandler(
-     *         'dataValidation', 
-     *         testData, 
+     *         'dataValidation',
+     *         testData,
      *         options
      *     );
      *     console.log(`Processed ${result.processedItems} items successfully`);
@@ -153,60 +175,85 @@ export class ErrorDecoratorTestService {
      * }
      * ```
      */
-    @logErrorsOnly({
-        includeStackTrace: true,
-        includeArguments: true,
-        enableAnomalyDetection: true,
-        logLevel: 'error'
-    })
+    @logErrorsOnly(
+        {
+            includeStackTrace: true,
+            includeArguments: true,
+            enableAnomalyDetection: true,
+            logLevel: 'error'
+        }
+    )
     public async criticalErrorHandler(
-        operation: Readonly<string>, 
-        data: readonly unknown[], 
+        operation: Readonly<string>,
+        data: readonly unknown[],
         options: Readonly<Record<string, unknown>>
     ): Promise<{
         success: boolean
         errorsEncountered: string[]
         processedItems: number
     }> {
-        await this._utilityService.delay(200)
-        
+        await setTimeout(
+            200
+        )
+
         const errorsEncountered: string[] = []
         let processedItems = 0
-        
+
         // Use options for configuration
         const strictMode = options.strict === true
         const maxErrors = typeof options.maxErrors === 'number' ? options.maxErrors : Infinity
-        
+
         for (const [index, item] of data.entries()) {
             try {
                 if (item === null) {
-                    throw new Error(`Null value encountered at index ${String(index)}`)
+                    throw new Error(
+                        `Null value encountered at index ${String(
+                            index
+                        )}`
+                    )
                 }
-                
+
                 if (typeof item !== 'object') {
-                    throw new Error(`Invalid type '${typeof item}' at index ${String(index)}`)
+                    throw new Error(
+                        `Invalid type '${typeof item}' at index ${String(
+                            index
+                        )}`
+                    )
                 }
-                
+
                 // In strict mode, perform additional validation
-                if (strictMode && typeof item === 'object' && Object.keys(item).length === 0) {
-                    throw new Error(`Empty object at index ${String(index)} (strict mode)`)
+                if (strictMode && typeof item === 'object' && Object.keys(
+                    item
+                ).length === 0) {
+                    throw new Error(
+                        `Empty object at index ${String(
+                            index
+                        )} (strict mode)`
+                    )
                 }
-                
+
                 processedItems++
-            } catch (error) {
-                errorsEncountered.push((error as Error).message)
-                
+            }
+            catch (error) {
+                errorsEncountered.push(
+                    (error as Error).message
+                )
+
                 // Stop processing if max errors reached
                 if (errorsEncountered.length >= maxErrors) {
                     break
                 }
             }
         }
-        
+
         if (errorsEncountered.length > 0) {
-            throw new Error(`Critical errors in ${operation}: ${errorsEncountered.join(', ')}`)
+            throw new Error(
+                `Critical errors in ${operation}: ${errorsEncountered.join(
+                    ', '
+                )}`
+            )
         }
-        
+
         return {
             success: true,
             errorsEncountered,
@@ -216,31 +263,31 @@ export class ErrorDecoratorTestService {
 
     /**
      * 🔄 Performs error recovery operation with minimal @logErrorsOnly overhead for resilient systems.
-     * 
+     *
      * @remarks
      * This method demonstrates error recovery scenarios with minimal logging configuration
      * optimized for resilient systems where recovery operations are frequent. It uses
      * warning-level logging and excludes detailed diagnostic information to maintain
      * performance while providing essential error visibility.
-     * 
+     *
      * 🚀 **Minimal Error Configuration:**
      * - Stack trace disabled for performance optimization
      * - Arguments excluded for reduced logging overhead
      * - Anomaly detection disabled for faster recovery
      * - Warning-level logging for essential error visibility
-     * 
+     *
      * @decorator `@logErrorsOnly({ includeStackTrace: false, includeArguments: false, enableAnomalyDetection:
      *  false, logLevel: 'warn' })`
-     * 
+     *
      * @param failurePoint - Description of the failure point for recovery context
      * @returns Promise resolving to true if recovery succeeds
      * @throws {Error} When recovery operation fails
-     * 
+     *
      * @example
      * Implementing error recovery with minimal logging:
      * ```typescript
      * const errorService = new ErrorDecoratorTestService(utilityService);
-     * 
+     *
      * try {
      *     const recovered = await errorService.recoveryOperation('database connection');
      *     if (recovered) {
@@ -252,15 +299,21 @@ export class ErrorDecoratorTestService {
      * }
      * ```
      */
-    @logErrorsOnly({
-        includeStackTrace: false,
-        includeArguments: false,
-        enableAnomalyDetection: false,
-        logLevel: 'warn'
-    })
-    public async recoveryOperation(failurePoint: Readonly<string>): Promise<boolean> {
-        await this._utilityService.delay(150)
-        
+    @logErrorsOnly(
+        {
+            includeStackTrace: false,
+            includeArguments: false,
+            enableAnomalyDetection: false,
+            logLevel: 'warn'
+        }
+    )
+    public async recoveryOperation(
+        failurePoint: Readonly<string>
+    ): Promise<boolean> {
+        await setTimeout(
+            150
+        )
+
         // Simulate recovery logic
         const recoveryChance = Math.random()
 
@@ -270,12 +323,12 @@ export class ErrorDecoratorTestService {
             c: 3
         }
 
-      
-        
         if (recoveryChance < 0.3) {
-            throw new Error(`Recovery failed at ${failurePoint}`)
+            throw new Error(
+                `Recovery failed at ${failurePoint}`
+            )
         }
-        
+
         return true
     }
-} 
+}
