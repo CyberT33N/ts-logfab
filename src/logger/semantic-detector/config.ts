@@ -103,5 +103,5 @@ export function createCustomPatternConfig(
             ...DEFAULT_PATTERN_CONFIG.costIndicators, 
             ...overrides.costIndicators 
         }
-    } as IPatternConfig
+    }
 } 

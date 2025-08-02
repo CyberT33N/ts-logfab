@@ -62,7 +62,8 @@ export class PerformanceStatisticsManager {
      * Returns aggregated statistics across all methods
      */
     public getPerformanceSummary(totalSessions: number, activeSessions: number): IPerformanceStatsSummary {
-        const methodStats = Array.from(this._ringBuffers.entries()).map(
+        const entries = Array.from(this._ringBuffers.entries())
+        const methodStats = entries.map(
             ([method, buffer]: readonly [string, ReadonlyDeep<RingBuffer<number>>]) => ({
                 method,
                 stats: buffer.calculateStats()
@@ -195,10 +196,12 @@ export class PerformanceStatisticsManager {
      */
     private _getOrCreateRingBuffer(method: string): RingBuffer<number> {
         let buffer = this._ringBuffers.get(method)
+
         if (!buffer) {
             buffer = new RingBuffer<number>(this._ringBufferSize)
             this._ringBuffers.set(method, buffer)
         }
+        
         return buffer
     }
 } 

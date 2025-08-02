@@ -14,18 +14,20 @@
 */
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🔧 SEMANTIC DETECTION FUNCTIONS
+// 🎯 SEMANTIC CONTEXT DETECTION - CORE FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { ReadonlyDeep } from 'type-fest'
 import { DEFAULT_PATTERN_CONFIG } from './config.ts'
-import type { 
-    ISemanticContext, 
-    OperationType, 
-    DomainType, 
-    ComplexityLevel, 
-    CostLevel, 
-    IPatternConfig 
+import { 
+    EOperationType,
+    EDomainType,
+    type OperationType, 
+    type DomainType, 
+    type ComplexityLevel, 
+    type CostLevel, 
+    type IPatternConfig, 
+    type ISemanticContext
 } from './types.ts'
 import { 
     calculatePatternConfidence, 
@@ -48,12 +50,15 @@ export function detectOperation(
     let bestMatch: OperationType = 'UNKNOWN'
     let highestConfidence = 0
 
-    // Test each operation type
-    for (const [operationType, patterns] of Object.entries(config.operations)) {
-        if (operationType === 'UNKNOWN') {
+    // Enterprise-grade: Use enum values for type-safe iteration
+    const operationTypes = Object.values(EOperationType)
+    
+    for (const operationType of operationTypes) {
+        if (operationType === EOperationType.unknown) {
             continue
         }
 
+        const patterns = config.operations[operationType]
         for (const pattern of patterns) {
             if (pattern.test(methodName)) {
                 detectedPatterns.push(pattern.source)
@@ -63,7 +68,7 @@ export function detectOperation(
                 
                 if (confidence > highestConfidence) {
                     highestConfidence = confidence
-                    bestMatch = operationType as OperationType
+                    bestMatch = operationType
                 }
             }
         }
@@ -90,12 +95,15 @@ export function detectDomain(
     let bestMatch: DomainType = 'GENERAL'
     let highestConfidence = 0
 
-    // Test each domain
-    for (const [domainType, keywords] of Object.entries(config.domains)) {
-        if (domainType === 'GENERAL') {
+    // Enterprise-grade: Use enum values for type-safe iteration
+    const domainTypes = Object.values(EDomainType)
+
+    for (const domainType of domainTypes) {
+        if (domainType === EDomainType.general) {
             continue
         }
 
+        const keywords = config.domains[domainType]
         for (const keyword of keywords) {
             if (lowerMethodName.includes(keyword)) {
                 detectedKeywords.push(keyword)
@@ -105,7 +113,7 @@ export function detectDomain(
                 
                 if (confidence > highestConfidence) {
                     highestConfidence = confidence
-                    bestMatch = domainType.toUpperCase() as DomainType
+                    bestMatch = domainType
                 }
             }
         }

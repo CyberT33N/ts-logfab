@@ -39,38 +39,58 @@ export interface ISemanticContext {
 }
 
 /**
+ * 🔄 **Operation Types Enum**
+ * 
+ * Central source of truth for all operation types
+ * Used for type-safe iteration without type-casting
+ */
+export enum EOperationType {
+    read = 'READ',
+    write = 'WRITE',
+    update = 'UPDATE',
+    delete = 'DELETE',
+    compute = 'COMPUTE',
+    validate = 'VALIDATE',
+    transform = 'TRANSFORM',
+    search = 'SEARCH',
+    aggregate = 'AGGREGATE',
+    unknown = 'UNKNOWN'
+}
+
+/**
  * 🔄 **Operation Types**
  * 
  * CRUD and computational operations
+ * Automatically derived from EOperationType enum - ZERO DUPLICATION!
  */
-export type OperationType = 
-    | 'READ' 
-    | 'WRITE' 
-    | 'UPDATE' 
-    | 'DELETE' 
-    | 'COMPUTE' 
-    | 'VALIDATE'
-    | 'TRANSFORM'
-    | 'SEARCH'
-    | 'AGGREGATE'
-    | 'UNKNOWN'
+export type OperationType = `${EOperationType}`
+
+/**
+ * 🏢 **Domain Types Enum**
+ * 
+ * Central source of truth for all domain types
+ * Used for type-safe iteration without type-casting
+ */
+export enum EDomainType {
+    user = 'USER',
+    order = 'ORDER',
+    product = 'PRODUCT',
+    finance = 'FINANCE',
+    system = 'SYSTEM',
+    auth = 'AUTH',
+    notification = 'NOTIFICATION',
+    analytics = 'ANALYTICS',
+    integration = 'INTEGRATION',
+    general = 'GENERAL'
+}
 
 /**
  * 🏢 **Domain Types**
  * 
  * Business domains for better log categorization
+ * Automatically derived from EDomainType enum - ZERO DUPLICATION!
  */
-export type DomainType = 
-    | 'USER' 
-    | 'ORDER' 
-    | 'PRODUCT' 
-    | 'FINANCE' 
-    | 'SYSTEM' 
-    | 'AUTH'
-    | 'NOTIFICATION'
-    | 'ANALYTICS'
-    | 'INTEGRATION'
-    | 'GENERAL'
+export type DomainType = `${EDomainType}`
 
 /**
  * 📊 **Complexity Levels**

@@ -22,15 +22,15 @@ import {
     AnomalyDetector,
     createPerformanceMetric,
     type IAnomalyDetection
-} from '../../anomaly-detector/index.ts'
-import { getLogger } from '../../logger-factory.ts'
-import type { IRingBufferStats } from '../../ring-buffer.ts'
+} from '@/logger/anomaly-detector/index.ts'
+import { getLogger } from '@/logger/logger-factory.ts'
 import type {
     IPerformanceSession,
     IPerformanceResult,
     IPerformanceMonitorConfig,
     IPerformanceStatsSummary
-} from '../types.ts'
+} from '@/logger/performance/types.ts'
+import type { IRingBufferStats } from '@/logger/ring-buffer.ts'
 import { PerformanceSessionManager } from './session-management.ts'
 import { PerformanceStatisticsManager } from './statistics.ts'
 
@@ -49,7 +49,7 @@ export class PerformanceMonitor {
         this._config = {
             ...DEFAULT_PERFORMANCE_CONFIG,
             ...config
-        } as IPerformanceMonitorConfig
+        }
 
         this._sessionManager = new PerformanceSessionManager(this._config)
         this._statisticsManager = new PerformanceStatisticsManager(this._config.ringBufferSize)
@@ -102,6 +102,7 @@ export class PerformanceMonitor {
 
         // Detect anomalies
         let anomalies: readonly IAnomalyDetection[] = []
+
         if (this._config.enableAnomalyDetection) {
             const metric = createPerformanceMetric(
                 session.method,
@@ -110,6 +111,7 @@ export class PerformanceMonitor {
                 success,
                 session.semantic
             )
+
             anomalies = this._anomalyDetector.addMetricAndDetect(metric)
         }
 
@@ -219,6 +221,7 @@ export class PerformanceMonitor {
     private _startMemoryTracking(): void {
         setInterval(() => {
             const memoryUsage = this._getCurrentMemoryUsage()
+
             if (memoryUsage > 0) {
                 this._statisticsManager.addMemorySnapshot(memoryUsage)
             }
@@ -232,6 +235,7 @@ export class PerformanceMonitor {
         // Log anomalies
         if (this._config.autoLogAnomalies && result.anomalies.length > 0) {
             const logger = getLogger()
+
             for (const anomaly of result.anomalies) {
                 logger.warn(
                     {
@@ -249,6 +253,7 @@ export class PerformanceMonitor {
             result.duration > this._config.slowOperationThreshold
         ) {
             const logger = getLogger()
+
             logger.warn(
                 {
                     performance: {
@@ -315,7 +320,6 @@ function formatAnomalyForLog(anomaly: ReadonlyDeep<IAnomalyDetection>): Record<s
 // ═══════════════════════════════════════════════════════════════════════════════
 // 📊 DEFAULT CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════════
-
 const DEFAULT_PERFORMANCE_CONFIG: IPerformanceMonitorConfig = {
     enabled: true,
     enableMemoryTracking: true,

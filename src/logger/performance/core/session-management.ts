@@ -57,6 +57,7 @@ export class PerformanceSessionManager {
 
         // Check concurrent session limit
         const maxSessions = this._config.maxConcurrentSessions
+
         if (this._activeSessions.size >= maxSessions) {
             console.warn(`[PerformanceMonitor] Max concurrent sessions (${maxSessions.toString()}) reached`)
             return this._createMinimalSession(method, args, className)
@@ -68,6 +69,7 @@ export class PerformanceSessionManager {
 
         // Semantic analysis
         let semantic: ISemanticContext
+        
         if (this._config.enableSemanticAnalysis) {
             semantic = detectSemanticContext(method, args)
         } else {
