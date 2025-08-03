@@ -32,6 +32,14 @@ import pluginSecurity from 'eslint-plugin-security'
 import sonarjs from 'eslint-plugin-sonarjs'
 // https://www.npmjs.com/package/eslint-plugin-promise
 import pluginPromise from 'eslint-plugin-promise'
+// https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/
+import pluginTsDoc from 'eslint-plugin-tsdoc'
+// https://www.npmjs.com/package/eslint-plugin-unused-imports
+import unusedImports from "eslint-plugin-unused-imports"
+// https://www.npmjs.com/package/eslint-plugin-no-secrets
+import noSecrets from "eslint-plugin-no-secrets"
+// https://www.npmjs.com/package/eslint-plugin-jsonc
+import eslintPluginJsonc from 'eslint-plugin-jsonc'
 
 export default tseslint.config(
      {
@@ -80,18 +88,18 @@ export default tseslint.config(
                'default-case': 'error',
                'eqeqeq': ['error', 'always'],
                'dot-notation': 'off', // Disabled to allow bracket notation for private method testing
-               
+
                // ===== IMPORT SORTING CONFLICT RESOLUTION =====
                'sort-imports': 'off', // Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
-               
+
                // Additional critical rules for enterprise compliance
                'no-empty': ['error', { allowEmptyCatch: false }],
                'no-fallthrough': ['error', { commentPattern: 'falls?\\s?through' }],
-               'no-irregular-whitespace': ['error', { 
+               'no-irregular-whitespace': ['error', {
                     skipStrings: false,
                     skipComments: false,
                     skipRegExps: false,
-                    skipTemplates: false 
+                    skipTemplates: false
                }],
                'prefer-const': ['error', {
                     destructuring: 'all',
@@ -99,40 +107,40 @@ export default tseslint.config(
                }],
 
                // ===== ENTERPRISE-GRADE ADDITIONAL RULES (Google/Microsoft Standards) =====
-               
+
                // Performance & Async Best Practices
                'no-await-in-loop': 'error', // Prevents performance issues with sequential awaits
                'no-promise-executor-return': ['error', { // Prevents anti-patterns in Promise constructors
                     allowVoid: false
                }],
-               
+
                // Loop & Control Flow Safety
                'no-unmodified-loop-condition': 'error', // Prevents infinite loops
                'no-unreachable-loop': 'error', // Detects loops that only run once
                'no-loop-func': 'error', // Prevents closure issues in loops
-               
+
                // Security & Code Injection Prevention
                'no-implied-eval': 'error', // Prevents indirect eval() usage
                'no-new-func': 'error', // Prevents new Function() constructor
                'no-script-url': 'error', // Prevents javascript: URLs (XSS prevention)
-               
+
                // Object & Prototype Safety
                'no-extend-native': 'error', // Prevents modifying native prototypes
                'no-new-wrappers': 'error', // Prevents new String/Number/Boolean
                'no-proto': 'error', // Disallows __proto__ usage
                'prefer-object-has-own': 'error', // Modern hasOwn() over hasOwnProperty
-               
+
                // Variable & Parameter Management
                'no-param-reassign': ['error', { // Immutability best practice
                     props: true,
                     ignorePropertyModificationsFor: ['acc', 'accumulator', 'ctx', 'context', 'req', 'request', 'res', 'response', 'state']
                }],
                'no-shadow-restricted-names': 'error', // Prevents shadowing restricted names
-               
+
                // Error Handling Excellence
                // 'no-throw-literal': 'error', // Handled by @typescript-eslint/no-throw-literal
                'no-useless-catch': 'error', // Prevents redundant catch blocks
-               
+
                // Code Quality & Maintainability
                'no-sequences': ['error', { // Prevents comma operator abuse
                     allowInParentheses: false
@@ -151,7 +159,7 @@ export default tseslint.config(
                'no-void': ['error', { // Prevents void operator
                     allowAsStatement: false
                }],
-               
+
                // Modern JavaScript Best Practices
                'prefer-rest-params': 'error', // Use ...args over arguments
                'prefer-spread': 'error', // Use spread over .apply()
@@ -162,7 +170,7 @@ export default tseslint.config(
                'symbol-description': 'error', // Symbols must have descriptions
                'radix': ['error', 'always'], // parseInt must have radix
                'require-unicode-regexp': 'error', // Unicode flag for RegEx
-               
+
                // Restricted Usage (Enterprise Security)
                'no-restricted-globals': ['error',
                     // Browser globals that shouldn't be used in Node.js
@@ -231,7 +239,7 @@ export default tseslint.config(
                          message: 'Use object spread instead of Object.assign with object literal'
                     }
                ],
-               
+
                // Function Design
                'max-params': ['error', { max: 4 }], // Limit function parameters
                'max-depth': ['error', { max: 4 }], // Limit nesting depth
@@ -243,13 +251,13 @@ export default tseslint.config(
                     skipComments: true,
                     IIFEs: true
                }],
-               
+
                // Class & OOP Standards
                'max-classes-per-file': ['error', 1], // One class per file
                'grouped-accessor-pairs': ['error', 'setBeforeGet'], // Setter before getter
                'no-constructor-return': 'error', // No return in constructor
                'no-new': 'error', // No new for side effects
-               
+
                // Variable Declarations
                'no-useless-assignment': 'error', // No assignments that aren't used
                'no-multi-assign': 'error', // No chained assignments
@@ -257,7 +265,7 @@ export default tseslint.config(
                //      destructuring: 'all',
                //      ignoreReadBeforeAssign: false
                // }], // Already defined above in base rules
-               
+
                // Additional Safety
                'no-alert': 'error', // No alert/confirm/prompt
                'no-caller': 'error', // No arguments.caller/callee
@@ -269,7 +277,7 @@ export default tseslint.config(
                'no-implicit-globals': ['error', { // No implicit globals
                     lexicalBindings: true
                }],
-               
+
                // Modern Syntax Enforcement  
                // 'prefer-destructuring': ['error', {...}], // Handled by @typescript-eslint/prefer-destructuring
                // 'prefer-template': 'error', // Handled by unicorn/prefer-template-literal which is more powerful
@@ -279,33 +287,126 @@ export default tseslint.config(
           }
      },
 
-           // ===== PROMISE PLUGIN =====
-      pluginPromise.configs['flat/recommended'],
-      {
-           rules: {
-                // ===== ENTERPRISE PROMISE STANDARDS (Google/Microsoft/Meta) =====
-                
-                // UPGRADE: Warnings zu Errors (Zero-Tolerance für Promise Anti-Patterns)
-                'promise/no-callback-in-promise': 'error', // War 'warn' - Mixing Callbacks/Promises ist Enterprise Anti-Pattern
-                'promise/no-promise-in-callback': 'error', // War 'warn' - Callback-Promise-Mixing verhindert Clean Architecture
-                'promise/no-nesting': 'error', // War 'warn' - Nested Promises = Code Smell (use async/await)
-                'promise/no-return-in-finally': 'error', // War 'warn' - Finally sollte NIEMALS returnen
-                'promise/valid-params': 'error', // War 'warn' - Falsche Promise-Parameter = Runtime Errors
-                
-                // NEUE REGELN: Modern JavaScript Best Practices
-                'promise/prefer-await-to-then': 'error', // Google/MS Standard: async/await > then/catch
-                'promise/prefer-await-to-callbacks': 'error', // Enterprise: Callbacks sind Legacy
-                'promise/no-multiple-resolved': 'error', // Verhindert Promise Race Conditions
-                'promise/spec-only': 'error', // Nur Standard Promise Methods (keine Bluebird etc.)
-                
-                // PRAGMATISCHE AUSNAHMEN
-                'promise/avoid-new': 'off', // Manchmal notwendig für Custom Promise Wrapping
-                'promise/no-native': 'off' // TypeScript Projekte nutzen immer native Promises
-           }
-      },
+     // ===== PROMISE PLUGIN =====
+     pluginPromise.configs['flat/recommended'],
+     {
+          rules: {
+               // ===== ENTERPRISE PROMISE STANDARDS (Google/Microsoft/Meta) =====
+
+               // UPGRADE: Warnings zu Errors (Zero-Tolerance für Promise Anti-Patterns)
+               'promise/no-callback-in-promise': 'error', // War 'warn' - Mixing Callbacks/Promises ist Enterprise Anti-Pattern
+               'promise/no-promise-in-callback': 'error', // War 'warn' - Callback-Promise-Mixing verhindert Clean Architecture
+               'promise/no-nesting': 'error', // War 'warn' - Nested Promises = Code Smell (use async/await)
+               'promise/no-return-in-finally': 'error', // War 'warn' - Finally sollte NIEMALS returnen
+               'promise/valid-params': 'error', // War 'warn' - Falsche Promise-Parameter = Runtime Errors
+
+               // NEUE REGELN: Modern JavaScript Best Practices
+               'promise/prefer-await-to-then': 'error', // Google/MS Standard: async/await > then/catch
+               'promise/prefer-await-to-callbacks': 'error', // Enterprise: Callbacks sind Legacy
+               'promise/no-multiple-resolved': 'error', // Verhindert Promise Race Conditions
+               'promise/spec-only': 'error', // Nur Standard Promise Methods (keine Bluebird etc.)
+
+               // PRAGMATISCHE AUSNAHMEN
+               'promise/avoid-new': 'off', // Manchmal notwendig für Custom Promise Wrapping
+               'promise/no-native': 'off' // TypeScript Projekte nutzen immer native Promises
+          }
+     },
 
      // ===== SECURITY PLUGIN =====
      pluginSecurity.configs.recommended,
+
+         // ===== JSONC PLUGIN =====
+    eslintPluginJsonc.configs['flat/all'],
+    {
+        rules: {
+            // ===== ENTERPRISE-GRADE JSON/JSONC STANDARDS (Google/Microsoft/Meta) =====
+            
+            // SECURITY & DATA INTEGRITY (CRITICAL)
+            'jsonc/no-comments': ['error'], // JSON files MUST NOT contain comments (breaks parsers)
+            'jsonc/no-bigint-literals': 'error', // BigInt not supported in JSON standard
+            'jsonc/no-undefined-value': 'error', // undefined is not valid JSON
+            'jsonc/no-nan': 'error', // NaN breaks JSON parsers
+            'jsonc/no-infinity': 'error', // Infinity not valid in JSON
+            
+            // STANDARDIZATION & CONSISTENCY (Google Style Guide)
+            'jsonc/comma-dangle': ['error', 'never'], // No trailing commas in JSON
+            'jsonc/quotes': ['error', 'double'], // JSON standard requires double quotes
+            'jsonc/quote-props': ['error', 'always'], // Property names must be quoted
+            'jsonc/indent': ['error', 2], // Google/Microsoft standard: 2 spaces for JSON
+            
+            // SORTING & ORGANIZATION (Enterprise Maintainability)
+            'jsonc/sort-keys': ['error', 'asc', {
+                caseSensitive: false,
+                natural: true,
+                minKeys: 2,
+                allowLineSeparatedGroups: true // Allow logical grouping
+            }],
+            'jsonc/sort-array-values': 'off', // Arrays often have semantic ordering
+            
+            // FORMATTING STANDARDS (Airbnb/Google Hybrid)
+            'jsonc/array-bracket-spacing': ['error', 'never'],
+            'jsonc/object-curly-spacing': ['error', 'always'],
+            'jsonc/key-spacing': ['error', {
+                beforeColon: false,
+                afterColon: true,
+                mode: 'strict'
+            }],
+            'jsonc/comma-style': ['error', 'last'],
+            'jsonc/array-bracket-newline': ['error', { 
+                multiline: true,
+                minItems: 3 
+            }],
+            'jsonc/array-element-newline': ['error', {
+                multiline: true,
+                minItems: 3
+            }],
+            'jsonc/object-curly-newline': ['error', {
+                ObjectExpression: {
+                    multiline: true,
+                    minProperties: 3,
+                    consistent: true
+                },
+                ObjectPattern: {
+                    multiline: true,
+                    minProperties: 3,
+                    consistent: true
+                }
+            }],
+            'jsonc/object-property-newline': ['error', {
+                allowAllPropertiesOnSameLine: false // Each property on new line
+            }],
+            
+            // ERROR PREVENTION (Microsoft Standards)
+            'jsonc/no-dupe-keys': 'error', // Duplicate keys cause data loss
+            'jsonc/no-sparse-arrays': 'error', // [1,,3] is invalid JSON
+            'jsonc/no-octal-escape': 'error', // Octal escapes not supported
+            'jsonc/no-useless-escape': 'error', // Remove unnecessary escapes
+            'jsonc/no-irregular-whitespace': ['error', {
+                skipStrings: false,
+                skipComments: false,
+                skipRegExps: false,
+                skipTemplates: false
+            }],
+            
+            // JSONC/JSON5 SPECIFIC (When using JSONC files)
+            'jsonc/no-hexadecimal-numeric-literals': 'error', // 0xFF not valid
+            'jsonc/no-binary-numeric-literals': 'error', // 0b1010 not valid
+            'jsonc/no-octal-numeric-literals': 'error', // 0o755 not valid
+            'jsonc/no-numeric-separators': 'error', // 1_000 not valid
+            'jsonc/no-plus-sign': 'error', // +1 should be 1
+            'jsonc/no-floating-decimal': 'error', // .5 should be 0.5
+            
+            // SPECIAL CASES FOR CONFIGURATION FILES
+            'jsonc/auto': 'off' // Too aggressive for mixed JSON/JSONC environments
+        }
+    },
+
+     // ===== NO SECRETS PLUGIN =====
+     {
+          plugins: {
+               "no-secrets": noSecrets,
+          }
+     },
 
      // ===== SONARJS PLUGIN =====
      sonarjs.configs.recommended,
@@ -314,52 +415,52 @@ export default tseslint.config(
                // ===== ENTERPRISE-CRITICAL COMPLEXITY RULES =====
                // 'sonarjs/cyclomatic-complexity': 'off', // REDUNDANT: Bereits durch ESLint Core 'complexity' abgedeckt
                // 'sonarjs/max-lines-per-function': 'off', // REDUNDANT: Bereits durch ESLint Core abgedeckt
-               
+
                // ===== CODE MAINTAINABILITY (Google/Microsoft Standards) =====
                'sonarjs/max-lines': ['error', { maximum: 400 }], // Enterprise: Maximale Dateigröße
                'sonarjs/expression-complexity': 'error', // Verhindert überkomplexe Ausdrücke
                'sonarjs/no-duplicate-string': ['error', { threshold: 3 }], // String darf max 2x vorkommen
-               
+
                // ===== TYPE SAFETY & ARCHITECTURE =====
                'sonarjs/no-implicit-dependencies': 'error', // Prüft implizite Dependencies
                'sonarjs/arguments-usage': 'error', // Verhindert unsichere 'arguments' Nutzung
-               
+
                // ===== DEFENSIVE PROGRAMMING (Enterprise Best Practice) =====
                'sonarjs/elseif-without-else': 'error', // Erzwingt else-Block für Vollständigkeit
                'sonarjs/bool-param-default': 'error', // Boolean Parameter brauchen Defaults
-               
+
                // ===== CODE CLARITY & MODERN SYNTAX =====
                'sonarjs/no-collapsible-if': 'error', // Vereinfacht verschachtelte if-Statements
                'sonarjs/prefer-object-literal': 'error', // Moderne Object-Literal Syntax
                'sonarjs/prefer-immediate-return': 'error', // Return direkt statt Variable
-               
+
                // ===== FUNCTION DESIGN (Clean Code) =====
                'sonarjs/function-name': ['error', {
                     format: '^[a-z][a-zA-Z0-9]*$' // camelCase enforcement
                }],
-               
+
                // ===== TESTING BEST PRACTICES =====
                'sonarjs/no-identical-functions': 'error', // Identische Funktionen verhindern
-               
+
                // ===== LOOP & CONTROL FLOW SAFETY =====
                'sonarjs/no-for-in-iterable': 'error', // for...in nicht für Iterables
                'sonarjs/no-nested-switch': 'error', // Keine verschachtelten switch
                'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }], // Max 3 Ebenen Verschachtelung
-               
+
                // ===== REGEX SAFETY (Performance & Security) =====
                // Viele Regex-Regeln sind TypeScript-aware und ergänzen unicorn/regexp
                'sonarjs/no-empty-character-class': 'error', // Leere Character Classes verhindern
                'sonarjs/single-char-in-character-classes': 'error', // [a] -> a
                'sonarjs/no-control-regex': 'error', // Keine Control Characters in Regex
-               
+
                // ===== VARIABLE & PARAMETER HYGIENE =====
                'sonarjs/no-parameter-reassignment': 'error', // Parameter Reassignment verhindern
                'sonarjs/variable-name': 'error', // Variable naming conventions
-               
+
                // ===== ASYNC/PROMISE PATTERNS =====
                'sonarjs/no-ignored-return': 'error', // Return values müssen verwendet werden
                'sonarjs/no-invariant-returns': 'error', // Funktionen sollten nicht immer dasselbe returnen
-               
+
                // ===== REACT SPECIFIC (Falls React verwendet wird) =====
                // Diese sind NICHT redundant mit react-plugin, da sie andere Aspekte prüfen
                'sonarjs/jsx-no-leaked-render': 'error', // Verhindert && mit non-boolean
@@ -378,6 +479,13 @@ export default tseslint.config(
                'n/no-unpublished-import': 'off',
                'n/prefer-node-protocol': 'off', // Already handled by unicorn/prefer-node-protocol
                'n/prefer-global/process': ['error', 'never'] // Enterprise: Force explicit imports
+          }
+     },
+
+     // ===== UNUSED IMPORTS PLUGIN =====
+     {
+          plugins: {
+               "unused-imports": unusedImports,
           }
      },
 
@@ -405,192 +513,192 @@ export default tseslint.config(
                }
           },
           rules: {
-            // ===== IMPORT ORDER & STYLE (Google/Airbnb Standards) =====
-            'import/first': 'error',
-            'import/no-duplicates': ['error', {
-                'prefer-inline': true, // TypeScript type imports inline
-                'considerQueryString': true
-            }],
-            'import/order': ['error', {
-                'groups': [
-                    'builtin',  // Node.js built-in modules
-                    'external', // npm packages
-                    'internal', // @/* aliases
-                    'parent',   // ../ imports
-                    'sibling',  // ./ imports
-                    'index',    // ./index imports
-                    'object',   // import log = console.log
-                    'type'      // import type { Foo }
-                ],
-                'pathGroups': [
-                    {
-                        'pattern': '@/**',
-                        'group': 'internal',
-                        'position': 'before'
+               // ===== IMPORT ORDER & STYLE (Google/Airbnb Standards) =====
+               'import/first': 'error',
+               'import/no-duplicates': ['error', {
+                    'prefer-inline': true, // TypeScript type imports inline
+                    'considerQueryString': true
+               }],
+               'import/order': ['error', {
+                    'groups': [
+                         'builtin',  // Node.js built-in modules
+                         'external', // npm packages
+                         'internal', // @/* aliases
+                         'parent',   // ../ imports
+                         'sibling',  // ./ imports
+                         'index',    // ./index imports
+                         'object',   // import log = console.log
+                         'type'      // import type { Foo }
+                    ],
+                    'pathGroups': [
+                         {
+                              'pattern': '@/**',
+                              'group': 'internal',
+                              'position': 'before'
+                         },
+                         {
+                              'pattern': '~/**',
+                              'group': 'internal',
+                              'position': 'before'
+                         }
+                    ],
+                    'pathGroupsExcludedImportTypes': ['type'],
+                    'newlines-between': 'always', // Enterprise: Klare Trennung
+                    'alphabetize': {
+                         'order': 'asc',
+                         'orderImportKind': 'asc',
+                         'caseInsensitive': true
                     },
-                    {
-                        'pattern': '~/**',
-                        'group': 'internal',
-                        'position': 'before'
-                    }
-                ],
-                'pathGroupsExcludedImportTypes': ['type'],
-                'newlines-between': 'always', // Enterprise: Klare Trennung
-                'alphabetize': {
-                    'order': 'asc',
-                    'orderImportKind': 'asc',
-                    'caseInsensitive': true
-                },
-                'warnOnUnassignedImports': true // Warnung bei Side-Effect Imports
-            }],
-            
-            // ===== RESOLUTION & SECURITY (Critical for Enterprise) =====
-            'import/no-unresolved': ['error', {
-                'commonjs': true,
-                'amd': true,
-                'caseSensitive': true, // Linux/Windows Kompatibilität
-                'caseSensitiveStrict': true
-            }],
-            'import/no-absolute-path': 'error', // Security: Keine absoluten Pfade
-            'import/no-webpack-loader-syntax': 'error', // Keine Webpack-spezifische Syntax
-            'import/no-self-import': 'error', // Verhindert Selbst-Imports
-            'import/no-useless-path-segments': ['error', {
-                'noUselessIndex': true,
-                'commonjs': true
-            }],
-            
-            // ===== DEPENDENCY MANAGEMENT (Enterprise Boundaries) =====
-            // Ref: https://github.com/import-js/eslint-plugin-import/issues/496
-          //   'import/no-extraneous-dependencies': ['error', {
-          //       'devDependencies': [
-          //           '**/*.test.ts',
-          //           '**/*.spec.ts',
-          //           '**/test/**',
-          //           '**/tests/**',
-          //           '**/spec/**',
-          //           '**/__tests__/**',
-          //           '**/__mocks__/**',
-          //           '**/test.tsx',
-          //           '**/test-setup.ts',
-          //           '**/*.config.ts',
-          //           '**/*.config.js',
-          //           '**/vitest.*.ts',
-          //           '**/setupTests.ts',
-          //           '**/setupFiles.ts'
-          //       ],
-          //       'optionalDependencies': false,
-          //       'peerDependencies': true,
-          //       'includeTypes': true, // TypeScript @types/* packages
-          //       'includeInternal': true,
-          //       // ===== ENTERPRISE FIX: TypeScript Aliases Resolution =====
-          //       // Ref: https://github.com/import-js/eslint-plugin-import/issues/496
-          //       // Force ESLint to resolve dependencies from project root, not from nested directories
-          //       'packageDir': './' // Use project root package.json for TypeScript alias resolution
-          //   }],
-          //   'import/no-nodejs-modules': ['error', {
-          //       'allow': ['path', 'fs', 'os', 'crypto', 'util', 'stream'] // Erlaubte Node.js Module
-          //   }],
-            'import/no-restricted-paths': ['error', {
-                'zones': [
-                    // Domain Boundaries (Clean Architecture)
-                    {
-                        'target': './src/domain',
-                        'from': './src/infrastructure',
-                        'message': 'Domain should not depend on Infrastructure'
-                    },
-                    {
-                        'target': './src/domain',
-                        'from': './src/application',
-                        'message': 'Domain should not depend on Application'
-                    }
-                ]
-            }],
-            
-            // ===== PERFORMANCE & TREE-SHAKING =====
-            'import/no-cycle': ['error', {
-                'maxDepth': 5, // Tiefere Analyse für komplexe Projekte
-                'ignoreExternal': true,
-                'allowUnsafeDynamicCyclicDependency': false
-            }],
-            // 'import/no-unused-modules': 'off', // Inkompatibel mit Flat Config - siehe https://github.com/import-js/eslint-plugin-import/issues/3079
-            'import/no-deprecated': 'error', // Verhindert Nutzung veralteter APIs
-            'import/no-mutable-exports': 'error', // Immutable Exports
-            'import/no-commonjs': 'error', // Pure ES Modules (für Tree-shaking)
-            'import/no-amd': 'error', // Kein AMD
-            'import/no-dynamic-require': 'error', // Kein dynamisches require()
-            
-            // ===== EXPORT CONSISTENCY =====
-            'import/export': 'error', // Validiert alle Exports
-            'import/no-named-as-default': 'error', // Verhindert Konfusion
-            'import/no-named-as-default-member': 'error',
-            'import/no-default-export': 'off', // Diese Regel hat keine exceptions Option - deaktiviert für Flexibilität
-            
-            // ===== TYPE IMPORTS (TypeScript Specific) =====
-            'import/consistent-type-specifier-style': ['error', 'prefer-inline'], // import { type Foo }
-            'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
-            'import/no-empty-named-blocks': 'error', // import {} from 'foo' verhindert
-            'import/no-anonymous-default-export': ['error', { // Named Defaults
-                'allowArray': false,
-                'allowArrowFunction': false,
-                'allowAnonymousClass': false,
-                'allowAnonymousFunction': false,
-                'allowCallExpression': false,
-                'allowNew': false,
-                'allowObject': false,
-                'allowLiteral': false
-            }],
-            
-            // ===== FILE EXTENSIONS (TypeScript/React Ready) =====
-            'import/extensions': ['error', 'always', {
-                'ts': 'always',
-                'tsx': 'always',
-                'js': 'never',
-                'jsx': 'never',
-                'json': 'always',
-                'css': 'always',
-                'scss': 'always'
-            }],
-            
-            // ===== MONOREPO & NAMESPACE SUPPORT =====
-            'import/no-relative-packages': 'error', // Keine relativen Package-Imports
-          //   'import/no-internal-modules': ['error', {
-          //       'allow': [
-          //           '**/src/**', // Erlaubt interne src imports
-          //           '**/*.types', // Erlaubt .types imports
-          //           '**/constants/*',
-          //           '**/utils/*'
-          //       ]
-          //   }],
-            
-            // ===== NAMING CONVENTIONS =====
-            'import/no-named-export': 'off', // Named exports sind erwünscht
-            'import/no-namespace': ['error', { // Wildcard imports vermeiden
-                'ignore': ['*.d.ts'] // Außer für Type Definitions
-            }],
-            'import/prefer-default-export': 'off', // Named exports bevorzugt
-            'import/max-dependencies': ['error', { 
-                'max': 15, // Maximale Dependencies pro File
-                'ignoreTypeImports': true
-            }],
-            
-            // ===== CODE STYLE =====
-            'import/newline-after-import': ['error', {
-                'count': 1,
-                'considerComments': true
-            }],
-            'import/no-unassigned-import': ['error', {
-                'allow': [
-                    '**/*.css',
-                    '**/*.scss',
-                    '**/*.less',
-                    'reflect-metadata', // Decorators
-                    'core-js/**',
-                    '@babel/polyfill'
-                ]
-            }],
-            'import/group-exports': 'error', // Gruppierte Exports am Ende
-            'import/exports-last': 'error' // Alle Exports am Ende der Datei
-        }
+                    'warnOnUnassignedImports': true // Warnung bei Side-Effect Imports
+               }],
+
+               // ===== RESOLUTION & SECURITY (Critical for Enterprise) =====
+               'import/no-unresolved': ['error', {
+                    'commonjs': true,
+                    'amd': true,
+                    'caseSensitive': true, // Linux/Windows Kompatibilität
+                    'caseSensitiveStrict': true
+               }],
+               'import/no-absolute-path': 'error', // Security: Keine absoluten Pfade
+               'import/no-webpack-loader-syntax': 'error', // Keine Webpack-spezifische Syntax
+               'import/no-self-import': 'error', // Verhindert Selbst-Imports
+               'import/no-useless-path-segments': ['error', {
+                    'noUselessIndex': true,
+                    'commonjs': true
+               }],
+
+               // ===== DEPENDENCY MANAGEMENT (Enterprise Boundaries) =====
+               // Ref: https://github.com/import-js/eslint-plugin-import/issues/496
+               //   'import/no-extraneous-dependencies': ['error', {
+               //       'devDependencies': [
+               //           '**/*.test.ts',
+               //           '**/*.spec.ts',
+               //           '**/test/**',
+               //           '**/tests/**',
+               //           '**/spec/**',
+               //           '**/__tests__/**',
+               //           '**/__mocks__/**',
+               //           '**/test.tsx',
+               //           '**/test-setup.ts',
+               //           '**/*.config.ts',
+               //           '**/*.config.js',
+               //           '**/vitest.*.ts',
+               //           '**/setupTests.ts',
+               //           '**/setupFiles.ts'
+               //       ],
+               //       'optionalDependencies': false,
+               //       'peerDependencies': true,
+               //       'includeTypes': true, // TypeScript @types/* packages
+               //       'includeInternal': true,
+               //       // ===== ENTERPRISE FIX: TypeScript Aliases Resolution =====
+               //       // Ref: https://github.com/import-js/eslint-plugin-import/issues/496
+               //       // Force ESLint to resolve dependencies from project root, not from nested directories
+               //       'packageDir': './' // Use project root package.json for TypeScript alias resolution
+               //   }],
+               //   'import/no-nodejs-modules': ['error', {
+               //       'allow': ['path', 'fs', 'os', 'crypto', 'util', 'stream'] // Erlaubte Node.js Module
+               //   }],
+               'import/no-restricted-paths': ['error', {
+                    'zones': [
+                         // Domain Boundaries (Clean Architecture)
+                         {
+                              'target': './src/domain',
+                              'from': './src/infrastructure',
+                              'message': 'Domain should not depend on Infrastructure'
+                         },
+                         {
+                              'target': './src/domain',
+                              'from': './src/application',
+                              'message': 'Domain should not depend on Application'
+                         }
+                    ]
+               }],
+
+               // ===== PERFORMANCE & TREE-SHAKING =====
+               'import/no-cycle': ['error', {
+                    'maxDepth': 5, // Tiefere Analyse für komplexe Projekte
+                    'ignoreExternal': true,
+                    'allowUnsafeDynamicCyclicDependency': false
+               }],
+               // 'import/no-unused-modules': 'off', // Inkompatibel mit Flat Config - siehe https://github.com/import-js/eslint-plugin-import/issues/3079
+               'import/no-deprecated': 'error', // Verhindert Nutzung veralteter APIs
+               'import/no-mutable-exports': 'error', // Immutable Exports
+               'import/no-commonjs': 'error', // Pure ES Modules (für Tree-shaking)
+               'import/no-amd': 'error', // Kein AMD
+               'import/no-dynamic-require': 'error', // Kein dynamisches require()
+
+               // ===== EXPORT CONSISTENCY =====
+               'import/export': 'error', // Validiert alle Exports
+               'import/no-named-as-default': 'error', // Verhindert Konfusion
+               'import/no-named-as-default-member': 'error',
+               'import/no-default-export': 'off', // Diese Regel hat keine exceptions Option - deaktiviert für Flexibilität
+
+               // ===== TYPE IMPORTS (TypeScript Specific) =====
+               'import/consistent-type-specifier-style': ['error', 'prefer-inline'], // import { type Foo }
+               'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
+               'import/no-empty-named-blocks': 'error', // import {} from 'foo' verhindert
+               'import/no-anonymous-default-export': ['error', { // Named Defaults
+                    'allowArray': false,
+                    'allowArrowFunction': false,
+                    'allowAnonymousClass': false,
+                    'allowAnonymousFunction': false,
+                    'allowCallExpression': false,
+                    'allowNew': false,
+                    'allowObject': false,
+                    'allowLiteral': false
+               }],
+
+               // ===== FILE EXTENSIONS (TypeScript/React Ready) =====
+               'import/extensions': ['error', 'always', {
+                    'ts': 'always',
+                    'tsx': 'always',
+                    'js': 'never',
+                    'jsx': 'never',
+                    'json': 'always',
+                    'css': 'always',
+                    'scss': 'always'
+               }],
+
+               // ===== MONOREPO & NAMESPACE SUPPORT =====
+               'import/no-relative-packages': 'error', // Keine relativen Package-Imports
+               //   'import/no-internal-modules': ['error', {
+               //       'allow': [
+               //           '**/src/**', // Erlaubt interne src imports
+               //           '**/*.types', // Erlaubt .types imports
+               //           '**/constants/*',
+               //           '**/utils/*'
+               //       ]
+               //   }],
+
+               // ===== NAMING CONVENTIONS =====
+               'import/no-named-export': 'off', // Named exports sind erwünscht
+               'import/no-namespace': ['error', { // Wildcard imports vermeiden
+                    'ignore': ['*.d.ts'] // Außer für Type Definitions
+               }],
+               'import/prefer-default-export': 'off', // Named exports bevorzugt
+               'import/max-dependencies': ['error', {
+                    'max': 15, // Maximale Dependencies pro File
+                    'ignoreTypeImports': true
+               }],
+
+               // ===== CODE STYLE =====
+               'import/newline-after-import': ['error', {
+                    'count': 1,
+                    'considerComments': true
+               }],
+               'import/no-unassigned-import': ['error', {
+                    'allow': [
+                         '**/*.css',
+                         '**/*.scss',
+                         '**/*.less',
+                         'reflect-metadata', // Decorators
+                         'core-js/**',
+                         '@babel/polyfill'
+                    ]
+               }],
+               'import/group-exports': 'error', // Gruppierte Exports am Ende
+               'import/exports-last': 'error' // Alle Exports am Ende der Datei
+          }
      },
 
      // ===== ENTERPRISE-GRADE @STYLISTIC CONFIGURATION =====
@@ -1065,6 +1173,16 @@ export default tseslint.config(
                     The root directory for the tsconfig.json file (https://typescript-eslint.io/packages/parser/#tsconfigrootdir) */
                     tsconfigRootDir: import.meta.dirname
                }
+          }
+     },
+
+     // ===== TSDOC PLUGIN =====
+     {
+          plugins: {
+               'tsdoc': pluginTsDoc
+          },
+          rules: {
+               'tsdoc/syntax': 'error' // Enterprise: TSDoc compliance ist Pflicht
           }
      },
 
