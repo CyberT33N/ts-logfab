@@ -98,16 +98,19 @@ export default tseslint.config(
                }],
                'one-var': ['error', 'never'], // Stricter than original
                'guard-for-in': 'error', // Stricter than original
-               // 'no-duplicate-imports': 'error', // Handled by import/no-duplicates plugin rule
+               // ENTERPRISE: import/no-duplicates hat mehr Features (inline types, query strings)
+               // 'no-duplicate-imports': 'error', // ❌ REDUNDANT: Übernommen von import/no-duplicates
                // 'no-return-await': 'error', // Handled by @typescript-eslint/return-await
                'no-template-curly-in-string': 'error',
                'require-atomic-updates': 'error',
                'accessor-pairs': 'error',
                'array-callback-return': 'error',
                'block-scoped-var': 'error',
-               // 'camelcase': ['error', { properties: 'never' }], // Handled by @typescript-eslint/naming-convention
+               // ENTERPRISE: naming-convention ist viel mächtiger und granularer
+               // 'camelcase': ['error', { properties: 'never' }], // ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
                'complexity': ['error', 15], // Enterprise standard: Google/Microsoft use 10-15
-               // 'consistent-return': 'error', // Handled by @typescript-eslint/consistent-return
+               // ENTERPRISE: Type-aware Return Checking ist präziser
+               // 'consistent-return': 'error', // ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
                'curly': ['error', 'all'],
                'default-case': 'error',
                'eqeqeq': ['error', 'always'],
@@ -162,19 +165,21 @@ export default tseslint.config(
                'no-shadow-restricted-names': 'error', // Prevents shadowing restricted names
 
                // Error Handling Excellence
-               // 'no-throw-literal': 'error', // Handled by @typescript-eslint/no-throw-literal
+               // ENTERPRISE: @typescript-eslint/only-throw-error ist moderner als no-throw-literal
+               // 'no-throw-literal': 'error', // ❌ REDUNDANT: Übernommen von @typescript-eslint/only-throw-error
                'no-useless-catch': 'error', // Prevents redundant catch blocks
 
                // Code Quality & Maintainability
                'no-sequences': ['error', { // Prevents comma operator abuse
                     allowInParentheses: false
                }],
-               'no-unused-expressions': ['error', { // Prevents side-effect free code
-                    allowShortCircuit: false,
-                    allowTernary: false,
-                    allowTaggedTemplates: false,
-                    enforceForJSX: true
-               }],
+               // ENTERPRISE: @typescript-eslint/no-unused-expressions hat Type-aware Features
+               // 'no-unused-expressions': ['error', { // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-unused-expressions
+               //      allowShortCircuit: false,
+               //      allowTernary: false,
+               //      allowTaggedTemplates: false,
+               //      enforceForJSX: true
+               // }],
                'no-useless-call': 'error', // Prevents unnecessary .call()/.apply()
                'no-useless-concat': 'error', // Prevents unnecessary string concatenation
                'no-useless-computed-key': 'error', // Prevents redundant computed properties
@@ -303,7 +308,8 @@ export default tseslint.config(
                }],
 
                // Modern Syntax Enforcement  
-               // 'prefer-destructuring': ['error', {...}], // Handled by @typescript-eslint/prefer-destructuring
+               // ENTERPRISE: TypeScript Version versteht Type Narrowing besser
+               // 'prefer-destructuring': ['error', {...}], // ❌ REDUNDANT: Übernommen von @typescript-eslint/prefer-destructuring
                // 'prefer-template': 'error', // Handled by unicorn/prefer-template-literal which is more powerful
                'prefer-object-spread': 'error', // Object spread over Object.assign
                'prefer-exponentiation-operator': 'error', // ** over Math.pow
@@ -885,10 +891,10 @@ export default tseslint.config(
                'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }], // Max 3 Ebenen Verschachtelung
 
                // ===== REGEX SAFETY (Performance & Security) =====
-               // Viele Regex-Regeln sind TypeScript-aware und ergänzen unicorn/regexp
-               'sonarjs/no-empty-character-class': 'error', // Leere Character Classes verhindern
-               'sonarjs/single-char-in-character-classes': 'error', // [a] -> a
-               'sonarjs/no-control-regex': 'error', // Keine Control Characters in Regex
+               // ENTERPRISE: regexp Plugin hat spezialisiertere Regex-Prüfungen
+               // 'sonarjs/no-empty-character-class': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-empty-character-class
+               'sonarjs/single-char-in-character-classes': 'error', // ✅ UNIQUE: SonarJS-spezifische Regel
+               // 'sonarjs/no-control-regex': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-control-character
 
                // ===== VARIABLE & PARAMETER HYGIENE =====
                'sonarjs/no-parameter-reassignment': 'error', // Parameter Reassignment verhindern
@@ -934,6 +940,87 @@ export default tseslint.config(
      {
           plugins: {
                boundaries,
+          },
+          settings: {
+               // ===== ENTERPRISE CLEAN ARCHITECTURE LAYERS =====
+               'boundaries/elements': [
+                    // Domain Layer (Core Business Logic)
+                    {
+                         type: 'domain',
+                         pattern: 'src/domain/**/*',
+                         mode: 'folder',
+                         capture: ['module', 'entity']
+                    },
+                    // Application Layer (Use Cases)
+                    {
+                         type: 'application',
+                         pattern: 'src/application/**/*', 
+                         mode: 'folder',
+                         capture: ['module', 'useCase']
+                    },
+                    // Infrastructure Layer (External Implementations)
+                    {
+                         type: 'infrastructure',
+                         pattern: 'src/infrastructure/**/*',
+                         mode: 'folder',
+                         capture: ['module', 'implementation']
+                    },
+                    // Shared Utilities
+                    {
+                         type: 'utils',
+                         pattern: 'src/utils/**/*',
+                         mode: 'file',
+                         capture: ['category', 'utility']
+                    },
+                    // Logger System (Special Case für ts-logfab)
+                    {
+                         type: 'logger',
+                         pattern: 'src/logger/**/*',
+                         mode: 'folder',
+                         capture: ['subsystem', 'component']
+                    },
+                    // Decorators
+                    {
+                         type: 'decorators',
+                         pattern: 'src/decorators/**/*',
+                         mode: 'file',
+                         capture: ['decorator']
+                    },
+                    // Prettifiers
+                    {
+                         type: 'prettifiers',
+                         pattern: 'src/prettifiers/**/*',
+                         mode: 'folder',
+                         capture: ['prettifier']
+                    },
+                    // Type Definitions
+                    {
+                         type: 'types',
+                         pattern: 'src/types/**/*',
+                         mode: 'file',
+                         capture: ['typeCategory']
+                    },
+                    // Test Files
+                    {
+                         type: 'test',
+                         pattern: ['**/*.test.ts', '**/*.spec.ts', '**/test/**/*'],
+                         mode: 'file'
+                    },
+                    // Examples (nicht Teil der Hauptarchitektur)
+                    {
+                         type: 'examples',
+                         pattern: 'examples/**/*',
+                         mode: 'file'
+                    }
+               ],
+               
+               // Ignoriere Build-Ausgaben und Dependencies
+               'boundaries/ignore': [
+                    'node_modules/**/*',
+                    'dist/**/*',
+                    'coverage/**/*',
+                    '**/*.d.ts' // Generierte Type Definitions
+               ]
           }
      },
 
@@ -2556,7 +2643,161 @@ export default tseslint.config(
                     'propertyDeclaration': true, // Properties müssen typisiert sein
                     'variableDeclaration': false, // Kann durch Type Inference abgeleitet werden
                     'variableDeclarationIgnoreFunction': true
-               }]
+               }],
+
+               // ===== ENTERPRISE-GRADE NEUE REGELN (VERIFIZIERT) =====
+               // Type Safety Enhancement
+               '@typescript-eslint/no-redundant-type-constituents': 'error', // Verhindert redundante Union/Intersection Types
+               '@typescript-eslint/no-duplicate-type-constituents': 'error', // Keine doppelten Type Constituents
+               '@typescript-eslint/no-unnecessary-template-expression': 'error', // Korrekter Name (nicht no-useless-template-literals)
+               '@typescript-eslint/prefer-find': 'error', // Array.find() > filter()[0]
+               '@typescript-eslint/prefer-includes': 'error', // includes() > indexOf() !== -1
+
+               // TypeScript 5.x Features
+               '@typescript-eslint/no-unsafe-declaration-merging': 'error', // TypeScript 5.x Declaration Merging Safety
+               '@typescript-eslint/no-unsafe-enum-comparison': 'error' // TypeScript 5.x Enum Comparison Safety
+          }
+     },
+
+     // ===== BOUNDARIES PLUGIN CONFIGURATION =====
+     // Enterprise-Grade Clean Architecture Enforcement
+     {
+          rules: {
+               // ===== ELEMENT TYPES BOUNDARIES =====
+               'boundaries/element-types': ['error', {
+                    default: 'disallow', // Enterprise: Explizit erlauben statt implizit
+                    message: 'Enterprise Architecture Violation: ${file.type} cannot import ${dependency.type}',
+                    rules: [
+                         // Domain Layer (innerste Schicht)
+                         {
+                              from: 'domain',
+                              allow: ['domain'], // Domain darf nur Domain importieren
+                              message: 'Domain layer must be independent of outer layers'
+                         },
+                         // Application Layer (Use Cases)
+                         {
+                              from: 'application', 
+                              allow: ['domain', 'application'], // Application darf Domain und sich selbst
+                              message: 'Application layer can only depend on Domain layer'
+                         },
+                         // Infrastructure Layer (äußerste Schicht)
+                         {
+                              from: 'infrastructure',
+                              allow: ['domain', 'application', 'infrastructure'], // Infrastructure darf alles
+                              message: 'Infrastructure must implement interfaces from inner layers'
+                         },
+                         // Utils/Helpers (Shared Code)
+                         {
+                              from: 'utils',
+                              allow: ['utils'], // Utils sind self-contained
+                              message: 'Utils must not depend on business logic'
+                         },
+                         // Logger System (Kern des ts-logfab)
+                         {
+                              from: 'logger',
+                              allow: ['logger', 'utils', 'types', 'prettifiers'], // Logger kann Prettifiers nutzen
+                              message: 'Logger must not depend on decorators or examples'
+                         },
+                         // Decorators (höhere Abstraktionsebene)
+                         {
+                              from: 'decorators',
+                              allow: ['logger', 'types', 'utils'], // Decorators nutzen Logger
+                              message: 'Decorators should only decorate logger functionality'
+                         },
+                         // Prettifiers (Output Formatting)
+                         {
+                              from: 'prettifiers',
+                              allow: ['prettifiers', 'types', 'utils'], // Prettifiers sind unabhängig
+                              message: 'Prettifiers must not depend on logger internals'
+                         },
+                         // Type Definitions
+                         {
+                              from: 'types',
+                              allow: ['types'], // Types haben keine Dependencies
+                              message: 'Type definitions must be self-contained'
+                         },
+                         // Examples (Dokumentation)
+                         {
+                              from: 'examples',
+                              allow: ['logger', 'decorators', 'prettifiers', 'types', 'utils', 'examples'], // Examples dürfen alles nutzen
+                              message: 'Examples can demonstrate all features'
+                         },
+                         // Test Files
+                         {
+                              from: 'test',
+                              allow: ['logger', 'decorators', 'prettifiers', 'types', 'utils', 'test'], // Tests dürfen alles
+                              message: 'Test files have unrestricted access'
+                         }
+                    ]
+               }],
+               
+               // ===== EXTERNAL DEPENDENCIES CONTROL =====
+               'boundaries/external': ['error', {
+                    default: 'allow', // Enterprise: Externe Deps sind erlaubt außer explizit verboten
+                    rules: [
+                         // Logger Core (minimale externe Dependencies)
+                         {
+                              from: 'logger',
+                              disallow: [
+                                   // Logger darf keine UI/Web Frameworks haben
+                                   'express', 'fastify', 'koa',
+                                   'react', 'vue', 'angular',
+                                   // Keine ORMs oder Datenbanken
+                                   'typeorm', 'sequelize', 'mongoose',
+                                   'pg', 'mysql', 'sqlite3'
+                              ],
+                              message: 'Logger core must remain lightweight with minimal dependencies'
+                         },
+                         // Type Definitions (keine externen Dependencies)
+                         {
+                              from: 'types',
+                              disallow: '*', // Types dürfen KEINE externen Dependencies haben
+                              message: 'Type definitions must not have any external dependencies'
+                         },
+                         // Prettifiers (nur Formatting-Libraries)
+                         {
+                              from: 'prettifiers',
+                              allow: [
+                                   // Nur Formatting-bezogene Libraries
+                                   'chalk', 'ansi-colors', 'cli-color', // Farben
+                                   'cli-table3', 'table', 'ascii-table', // Tabellen
+                                   'strip-ansi', 'ansi-regex' // ANSI Handling
+                              ],
+                              message: 'Prettifiers should only use formatting-related libraries'
+                         }
+                    ]
+               }],
+               
+               // ===== ENTRY POINT ENFORCEMENT =====
+               'boundaries/entry-point': ['error', {
+                    default: 'disallow',
+                    message: 'Import from ${dependency.type} must use its public API (index.ts)',
+                    rules: [
+                         // Haupt-Module müssen über index.ts importiert werden
+                         {
+                              target: ['logger', 'decorators', 'prettifiers'],
+                              allow: 'index.ts' // Nur über index.ts importieren
+                         },
+                         // Types und Utils sind flexibler
+                         {
+                              target: ['types', 'utils'],
+                              allow: ['index.ts', '*.ts'] // Direkte Imports erlaubt
+                         },
+                         // Examples haben keine Entry Point Restriktion
+                         {
+                              target: 'examples',
+                              allow: '*' // Beliebige Imports aus Examples
+                         }
+                    ]
+               }],
+               
+               // ===== PRIVATE ELEMENTS PROTECTION =====
+               'boundaries/no-private': ['error', {
+                    message: 'Cannot import private elements of ${dependency.type}'
+               }],
+               
+               // ===== UNKNOWN FILES PREVENTION =====
+               'boundaries/no-unknown-files': 'error' // Diese Regel akzeptiert keine Optionen
           }
      }
 )
