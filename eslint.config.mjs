@@ -508,9 +508,9 @@ export default tseslint.config(
                
                // ===== DEPENDENCY MANAGEMENT EXCELLENCE =====
                'package-json/restrict-dependency-ranges': ['error', [
-                    // BASE RULE: All dependencies should use caret (^) for controlled updates
+                    // BASE RULE: All dependencies should use tilde (~) for Enterprise-controlled updates
                     {
-                         rangeType: 'caret',
+                         rangeType: 'tilde',
                     },
                     
                     // SECURITY: Pin unstable versions (0.x.x) for production dependencies
@@ -520,17 +520,7 @@ export default tseslint.config(
                          rangeType: 'pin',
                     },
                     
-                    // STABILITY: Critical infrastructure packages should be pinned
-                    {
-                         forPackages: [
-                              'typescript', // TypeScript versions can have breaking changes
-                              'eslint', // ESLint major versions often break configs
-                              '@types/node', // Node types should match runtime
-                         ],
-                         rangeType: 'tilde', // ~5.8.0 - only patch updates
-                    },
-                    
-                    // FLEXIBILITY: Allow any valid range for peer dependencies
+                    // FLEXIBILITY: Allow any valid range for peer dependencies  
                     {
                          forDependencyTypes: ['peerDependencies'],
                          rangeType: ['caret', 'tilde', 'pin'], // All acceptable
