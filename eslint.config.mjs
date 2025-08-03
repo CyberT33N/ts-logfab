@@ -35,8 +35,9 @@ import pluginPromise from 'eslint-plugin-promise' // https://www.npmjs.com/packa
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow' // https://www.npmjs.com/package/eslint-plugin-prefer-arrow
 
 // ===== IMPORTS & MODULES =====
-import importPlugin from 'eslint-plugin-import'
+import importPlugin from 'eslint-plugin-import' // https://www.npmjs.com/package/eslint-plugin-import
 import unusedImports from 'eslint-plugin-unused-imports' // https://www.npmjs.com/package/eslint-plugin-unused-imports
+import boundaries from "eslint-plugin-boundaries"; // https://github.com/mxschmitt/eslint-plugin-boundaries
 
 // ===== NODE.JS SPECIFIC =====
 import nodePlugin from 'eslint-plugin-n' // https://github.com/eslint-community/eslint-plugin-n
@@ -54,6 +55,7 @@ import packageJson from 'eslint-plugin-package-json' // https://www.npmjs.com/pa
 
 // ===== SORTING & ORDERING =====
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys' // https://github.com/infctr/eslint-plugin-typescript-sort-keys
+
 
 // ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
 // eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
@@ -908,6 +910,9 @@ export default tseslint.config(
      // ===== NODE PLUGIN =====
      nodePlugin.configs["flat/all"],
      {
+          plugins: {
+               n: nodePlugin,
+          },
           rules: {
                'n/no-missing-import': 'off',
                'n/no-unpublished-import': 'off',
@@ -920,6 +925,14 @@ export default tseslint.config(
      {
           plugins: {
                "unused-imports": unusedImports,
+          }
+     },
+
+     // ===== BOUNDARIES PLUGIN =====
+     boundaries.configs.strict,
+     {
+          plugins: {
+               boundaries,
           }
      },
 
@@ -2234,7 +2247,6 @@ export default tseslint.config(
      },
 
      // ===== TYPESCRIPT SORT KEYS =====
-
      {
           plugins: {
                'typescript-sort-keys': eslintPluginTypescriptSortKeys
