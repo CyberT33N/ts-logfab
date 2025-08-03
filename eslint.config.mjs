@@ -29,7 +29,7 @@ import nodePlugin from 'eslint-plugin-n'
 // https://www.npmjs.com/package/eslint-plugin-security
 import pluginSecurity from 'eslint-plugin-security'
 // https://www.npmjs.com/package/eslint-plugin-sonarjs
-import sonarjs from 'eslint-plugin-sonarjs';
+import sonarjs from 'eslint-plugin-sonarjs'
 
 export default tseslint.config(
      {
@@ -282,6 +282,63 @@ export default tseslint.config(
 
      // ===== SONARJS PLUGIN =====
      sonarjs.configs.recommended,
+     {
+          rules: {
+               // ===== ENTERPRISE-CRITICAL COMPLEXITY RULES =====
+               // 'sonarjs/cyclomatic-complexity': 'off', // REDUNDANT: Bereits durch ESLint Core 'complexity' abgedeckt
+               // 'sonarjs/max-lines-per-function': 'off', // REDUNDANT: Bereits durch ESLint Core abgedeckt
+               
+               // ===== CODE MAINTAINABILITY (Google/Microsoft Standards) =====
+               'sonarjs/max-lines': ['error', { maximum: 400 }], // Enterprise: Maximale Dateigröße
+               'sonarjs/expression-complexity': 'error', // Verhindert überkomplexe Ausdrücke
+               'sonarjs/no-duplicate-string': ['error', { threshold: 3 }], // String darf max 2x vorkommen
+               
+               // ===== TYPE SAFETY & ARCHITECTURE =====
+               'sonarjs/no-implicit-dependencies': 'error', // Prüft implizite Dependencies
+               'sonarjs/arguments-usage': 'error', // Verhindert unsichere 'arguments' Nutzung
+               
+               // ===== DEFENSIVE PROGRAMMING (Enterprise Best Practice) =====
+               'sonarjs/elseif-without-else': 'error', // Erzwingt else-Block für Vollständigkeit
+               'sonarjs/bool-param-default': 'error', // Boolean Parameter brauchen Defaults
+               
+               // ===== CODE CLARITY & MODERN SYNTAX =====
+               'sonarjs/no-collapsible-if': 'error', // Vereinfacht verschachtelte if-Statements
+               'sonarjs/prefer-object-literal': 'error', // Moderne Object-Literal Syntax
+               'sonarjs/prefer-immediate-return': 'error', // Return direkt statt Variable
+               
+               // ===== FUNCTION DESIGN (Clean Code) =====
+               'sonarjs/function-name': ['error', {
+                    format: '^[a-z][a-zA-Z0-9]*$' // camelCase enforcement
+               }],
+               
+               // ===== TESTING BEST PRACTICES =====
+               'sonarjs/no-identical-functions': 'error', // Identische Funktionen verhindern
+               
+               // ===== LOOP & CONTROL FLOW SAFETY =====
+               'sonarjs/no-for-in-iterable': 'error', // for...in nicht für Iterables
+               'sonarjs/no-nested-switch': 'error', // Keine verschachtelten switch
+               'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }], // Max 3 Ebenen Verschachtelung
+               
+               // ===== REGEX SAFETY (Performance & Security) =====
+               // Viele Regex-Regeln sind TypeScript-aware und ergänzen unicorn/regexp
+               'sonarjs/no-empty-character-class': 'error', // Leere Character Classes verhindern
+               'sonarjs/single-char-in-character-classes': 'error', // [a] -> a
+               'sonarjs/no-control-regex': 'error', // Keine Control Characters in Regex
+               
+               // ===== VARIABLE & PARAMETER HYGIENE =====
+               'sonarjs/no-parameter-reassignment': 'error', // Parameter Reassignment verhindern
+               'sonarjs/variable-name': 'error', // Variable naming conventions
+               
+               // ===== ASYNC/PROMISE PATTERNS =====
+               'sonarjs/no-ignored-return': 'error', // Return values müssen verwendet werden
+               'sonarjs/no-invariant-returns': 'error', // Funktionen sollten nicht immer dasselbe returnen
+               
+               // ===== REACT SPECIFIC (Falls React verwendet wird) =====
+               // Diese sind NICHT redundant mit react-plugin, da sie andere Aspekte prüfen
+               'sonarjs/jsx-no-leaked-render': 'error', // Verhindert && mit non-boolean
+               'sonarjs/no-hook-setter-in-body': 'error' // useState nicht direkt in render
+          }
+     },
 
      // ===== UNICORN PLUGIN =====
      eslintPluginUnicorn.configs.all,
