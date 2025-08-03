@@ -14,7 +14,7 @@
  */
 
 // ==== Imports ====
-import { AnomalyDetectionManager, type IAnomalyDetectionResult } from './AnomalyDetectionManager.ts'
+import { AnomalyDetectionManager, type IAnomalyDetectionResult } from './anomaly-detection-manager.ts'
 import { configurePerformanceMonitoring, type IConfigurationResult } from './ConfigurationManager.ts'
 import { PerformanceHelpers, type IPerformanceHelpers } from './PerformanceHelpers.ts'
 import { PerformanceMarksManager, type IPerformanceMarksResult } from './PerformanceMarksManager.ts'

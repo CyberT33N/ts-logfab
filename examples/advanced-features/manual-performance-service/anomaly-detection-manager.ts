@@ -15,16 +15,15 @@
 
 // ==== Imports ====
 import { setTimeout } from 'node:timers/promises'
+
 import { ReadonlyDeep } from 'type-fest'
-import {
-    trackMethodPerformance,
-    getPerformanceBaseline
-} from '@/logger/performance/utils/index.ts'
+
+import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance/utils/index.ts'
 import { toWritable } from '@/utils/data-utils.ts'
 
 /**
  * 📊 Represents the comprehensive result of performance anomaly detection analysis.
- *
+ *2
  * @remarks
  * This interface encapsulates all relevant data from a performance monitoring session,
  * including the raw execution result, detailed tracking metrics, and baseline comparisons
@@ -67,7 +66,7 @@ export interface IAnomalyDetectionResult {
  * @see {@link trackMethodPerformance} for underlying tracking mechanism
  */
 export class AnomalyDetectionManager {
-    private readonly _performanceLog: {
+    readonly #performanceLog: {
         operation: string
         metrics: Record<string, unknown>
         timestamp: Readonly<Date>
@@ -86,7 +85,7 @@ export class AnomalyDetectionManager {
             readonly timestamp: Readonly<Date>
         }[]>
     ) {
-        this._performanceLog = toWritable(
+        this.#performanceLog = toWritable(
             performanceLog
         )
     }
@@ -138,17 +137,17 @@ export class AnomalyDetectionManager {
         // Perform operation
         let result = 0
 
-        for (let i = 0; i < iterations; i++) {
+        for (let index = 0; index < iterations; index++) {
             result += Math.sqrt(
-                i
+                index
             ) * Math.sin(
-                i
+                index
             ) * Math.cos(
-                i
+                index
             )
 
             // Variable delay to potentially trigger anomalies
-            if (i % 5000 === 0) {
+            if (index % 5000 === 0) {
                 const delay = Math.random() > 0.7 ? 10 : 1
 
                 await setTimeout(
@@ -176,7 +175,7 @@ export class AnomalyDetectionManager {
             methodName
         )
 
-        this._performanceLog.push(
+        this.#performanceLog.push(
             {
                 operation: methodName,
                 metrics: {
