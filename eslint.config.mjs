@@ -1299,63 +1299,423 @@ export default tseslint.config(
           }
      },
 
+     // ===== REACT HOOKS =====
+     reactHooksPlugin.configs['recommended-latest'],
+
      // ===== REACT RULES =====
+     reactPlugin.configs.flat.all,
+     // reactPlugin.configs.flat['jsx-runtime'],
      {
-          plugins: {
-               react: reactPlugin,
-               'react-hooks': reactHooksPlugin,
-               'jsx-a11y': a11yPlugin
-          },
-          languageOptions: {
-               parserOptions: {
-                    ecmaFeatures: {
-                         jsx: true
-                    }
-               }
-          },
           settings: {
                react: {
-                    version: 'detect'
-               }
+                    version: 'detect',
+                    // Enterprise settings for better component detection
+                    createClass: 'createReactClass',
+                    pragma: 'React',
+                    fragment: 'Fragment',
+                    // Support for common HOCs and wrappers
+                    componentWrapperFunctions: [
+                         'observer', // MobX
+                         'memo', // React.memo
+                         'forwardRef', // React.forwardRef
+                         { property: 'styled' }, // styled-components
+                         { property: 'connect' } // Redux
+                    ],
+                    // Form component detection
+                    formComponents: [
+                         'Form',
+                         { name: 'Formik', formAttribute: 'onSubmit' }
+                    ],
+                    // Link component detection
+                    linkComponents: [
+                         'Link',
+                         { name: 'NavLink', linkAttribute: 'to' },
+                         { name: 'RouterLink', linkAttribute: 'to' }
+                    ]
+               },
+               // PropTypes wrapper functions (for teams still using PropTypes)
+               propWrapperFunctions: [
+                    'forbidExtraProps',
+                    { property: 'freeze', object: 'Object' },
+                    { property: 'myFavoriteWrapper' }
+               ]
           },
           rules: {
-               // React rules
-               'react/react-in-jsx-scope': 'off',
-               'react/prop-types': 'off',
+               // ===== SECURITY & BUG PREVENTION (CRITICAL) =====
+               'react/jsx-no-target-blank': ['error', {
+                    enforceDynamicLinks: 'always',
+                    warnOnSpreadAttributes: true
+               }],
+               'react/no-danger-with-children': 'error',
+               'react/jsx-no-script-url': 'error',
+               'react/no-direct-mutation-state': 'error',
+               'react/no-find-dom-node': 'error',
+               'react/no-render-return-value': 'error',
+               'react/no-string-refs': 'error',
+               'react/no-is-mounted': 'error',
+               'react/no-deprecated': 'error',
+               'react/jsx-key': ['error', {
+                    checkFragmentShorthand: true,
+                    checkKeyMustBeforeSpread: true,
+                    warnOnDuplicates: true
+               }],
+
+               // ===== HOOKS BEST PRACTICES (ENTERPRISE STANDARD) =====
                'react-hooks/rules-of-hooks': 'error',
-               'react-hooks/exhaustive-deps': 'error', // Stricter than original
+               'react-hooks/exhaustive-deps': ['error', {
+                    enableDangerousAutofixThisMayCauseInfiniteLoops: false
+               }],
+               'react/hook-use-state': ['error', {
+                    allowDestructuredState: true
+               }],
+
+               // ===== PERFORMANCE OPTIMIZATIONS =====
+               'react/no-array-index-key': 'warn', // Warn statt error für Flexibilität
+               'react/no-unstable-nested-components': ['error', {
+                    allowAsProps: false
+               }],
+               'react/jsx-no-constructed-context-values': 'error',
+               'react/no-unused-state': 'error',
+               'react/no-unused-class-component-methods': 'error',
+               'react/no-unused-prop-types': ['error', {
+                    skipShapeProps: true // Shape props oft nur teilweise genutzt
+               }],
+
+               // ===== CODE QUALITY & CONSISTENCY =====
+               'react/jsx-pascal-case': 'off', // Abgedeckt durch @stylistic/jsx-pascal-case
+               'react/jsx-fragments': ['error', 'syntax'], // Prefer <> over React.Fragment
+               'react/self-closing-comp': 'off', // Abgedeckt durch @stylistic/jsx-self-closing-comp
+               'react/jsx-boolean-value': ['error', 'never'],
+               'react/jsx-curly-brace-presence': 'off', // Abgedeckt durch @stylistic/jsx-curly-brace-presence
+               'react/jsx-no-useless-fragment': ['error', {
+                    allowExpressions: true
+               }],
+               'react/jsx-handler-names': ['error', {
+                    eventHandlerPrefix: 'handle',
+                    eventHandlerPropPrefix: 'on',
+                    checkLocalVariables: false, // Zu restriktiv
+                    checkInlineFunction: false
+               }],
+
+               // ===== MODERN REACT PATTERNS =====
+               'react/function-component-definition': ['error', {
+                    namedComponents: 'arrow-function',
+                    unnamedComponents: 'arrow-function'
+               }],
+               'react/prefer-stateless-function': 'error',
+               'react/prefer-es6-class': ['error', 'always'],
+               'react/static-property-placement': ['error', 'static public field'],
+               'react/state-in-constructor': ['error', 'never'], // Modern class fields
+
+               // ===== LIFECYCLE & STATE MANAGEMENT =====
                'react/no-access-state-in-setstate': 'error',
-               'react/no-array-index-key': 'error',
-               'react/no-danger': 'error',
                'react/no-did-mount-set-state': 'error',
                'react/no-did-update-set-state': 'error',
-               'react/no-direct-mutation-state': 'error',
+               'react/no-will-update-set-state': 'error',
                'react/no-redundant-should-component-update': 'error',
                'react/no-typos': 'error',
                'react/no-this-in-sfc': 'error',
-               'react/no-unescaped-entities': 'error',
-               'react/no-unknown-property': 'error',
-               'react/no-unused-state': 'error',
-               'react/no-will-update-set-state': 'error',
-               'react/prefer-es6-class': ['error', 'always'],
-               'react/prefer-stateless-function': 'error',
-               'react/self-closing-comp': 'error',
-               'react/sort-comp': 'error',
-               'react/jsx-no-bind': ['error', {
-                    'allowArrowFunctions': true
-               }],
-               'react/jsx-no-useless-fragment': 'error',
-               'react/jsx-pascal-case': 'error',
+               'react/void-dom-elements-no-children': 'error',
+               'react/style-prop-object': 'error',
 
-               // A11y rules
-               'jsx-a11y/alt-text': 'error',
-               'jsx-a11y/anchor-has-content': 'error',
-               'jsx-a11y/anchor-is-valid': 'error',
-               'jsx-a11y/aria-props': 'error',
-               'jsx-a11y/aria-role': 'error',
-               'jsx-a11y/heading-has-content': 'error',
-               'jsx-a11y/no-autofocus': 'error',
-               'jsx-a11y/no-redundant-roles': 'error'
+               // ===== JSX FORMATTING =====
+               // WICHTIG: Alle JSX-Formatting-Regeln werden durch @stylistic/* abgedeckt
+               // Diese React-spezifischen Formatting-Regeln sind deaktiviert, um Konflikte zu vermeiden
+               'react/jsx-closing-bracket-location': 'off', // Abgedeckt durch @stylistic/jsx-closing-bracket-location
+               'react/jsx-closing-tag-location': 'off', // Abgedeckt durch @stylistic/jsx-closing-tag-location
+               'react/jsx-first-prop-new-line': 'off', // Abgedeckt durch @stylistic/jsx-first-prop-new-line
+               'react/jsx-indent': 'off', // Abgedeckt durch @stylistic/indent (JSX wird mit abgedeckt)
+               'react/jsx-indent-props': 'off', // Abgedeckt durch @stylistic/jsx-indent-props
+               'react/jsx-max-props-per-line': 'off', // Abgedeckt durch @stylistic/jsx-max-props-per-line
+               'react/jsx-tag-spacing': 'off', // Abgedeckt durch @stylistic/jsx-tag-spacing
+               'react/jsx-wrap-multilines': 'off', // Abgedeckt durch @stylistic/jsx-wrap-multilines
+               'react/jsx-curly-spacing': 'off', // Abgedeckt durch @stylistic/jsx-curly-spacing
+               'react/jsx-equals-spacing': 'off', // Abgedeckt durch @stylistic/jsx-equals-spacing
+               
+               // ===== ZUSÄTZLICHE ENTERPRISE STANDARDS =====
+               'react/button-has-type': ['error', {
+                    button: true,
+                    submit: true,
+                    reset: true
+               }],
+               'react/forward-ref-uses-ref': 'error',
+               'react/no-children-prop': 'error',
+               'react/jsx-no-comment-textnodes': 'error',
+               'react/jsx-no-duplicate-props': ['error', {
+                    ignoreCase: true
+               }],
+               'react/jsx-no-undef': ['error', {
+                    allowGlobals: true
+               }],
+               'react/jsx-uses-react': 'error',
+               'react/jsx-uses-vars': 'error',
+               'react/no-unescaped-entities': ['error', {
+                    forbid: ['>', '"', '\'', '}']
+               }],
+               'react/jsx-no-leaked-render': ['error', {
+                    validStrategies: ['coerce', 'ternary']
+               }],
+
+               // ===== DISABLED RULES (ENTERPRISE FLEXIBILITY) =====
+               // Diese Regeln sind aus flat.all übernommen, aber für Enterprise zu restriktiv
+               'react/destructuring-assignment': 'off', // Zu opinion-based
+               'react/jsx-props-no-spreading': 'off', // Spreading oft nützlich
+               'react/require-default-props': 'off', // Mit TypeScript redundant
+               'react/jsx-sort-props': 'off', // Kein echter Mehrwert
+               'react/sort-comp': 'off', // Zu arbiträr, moderne IDEs helfen
+               'react/forbid-prop-types': 'off', // Zu restriktiv
+               'react/no-multi-comp': 'off', // Utility components oft in gleicher Datei
+               'react/jsx-max-depth': 'off', // Zu arbiträr
+               'react/jsx-no-literals': 'off', // Zu restriktiv für i18n
+               'react/no-set-state': 'off', // setState manchmal notwendig
+               'react/jsx-no-bind': 'off', // Mit modernen Engines kein Performance-Problem
+               'react/prop-types': 'off', // TypeScript macht PropTypes obsolet
+               'react/display-name': 'off', // DevTools zeigen meist richtige Namen
+               'react/react-in-jsx-scope': 'off', // React 17+ JSX Transform
+               'react/jsx-sort-default-props': 'off', // Deprecated
+               'react/sort-default-props': 'off', // Nicht nützlich mit TypeScript
+               'react/jsx-one-expression-per-line': 'off', // Zu restriktiv für JSX
+               'react/jsx-props-no-multi-spaces': 'off', // Prettier handled das
+               'react/jsx-space-before-closing': 'off', // Deprecated
+               'react/require-optimization': 'off', // Nicht immer notwendig
+               'react/no-adjacent-inline-elements': 'off', // Zu restriktiv
+               'react/forbid-component-props': 'off', // Zu restriktiv
+               'react/forbid-dom-props': 'off', // Zu restriktiv
+               'react/forbid-elements': 'off', // Zu restriktiv
+               'react/forbid-foreign-prop-types': 'off', // Edge cases existieren
+               'react/jsx-filename-extension': 'off', // .tsx ist Standard
+               'react/jsx-newline': 'off', // Zu opinion-based
+               'react/jsx-props-no-spread-multi': 'off', // Spread patterns sind oft valid
+               'react/no-namespace': 'off', // Namespaces manchmal nötig
+               'react/prefer-read-only-props': 'off', // Zu restriktiv
+               'react/jsx-child-element-spacing': 'off', // Prettier handled das
+               'react/no-arrow-function-lifecycle': 'off', // Moderne Patterns erlauben das
+               'react/no-invalid-html-attribute': 'off', // Zu viele false positives
+               'react/no-object-type-as-default-prop': 'off', // TypeScript handled das
+               'react/sort-prop-types': 'off', // Nicht relevant mit TypeScript
+               'react/boolean-prop-naming': 'off', // Zu opinion-based
+               'react/default-props-match-prop-types': 'off', // TypeScript redundant
+               'react/prefer-exact-props': 'off', // Zu restriktiv
+               'react/no-danger': 'warn', // Warn statt error - manchmal notwendig
+               'react/iframe-missing-sandbox': 'warn', // Warn für graduelle Adoption
+               'react/checked-requires-onchange-or-readonly': 'warn' // Warn für Flexibilität
+          }
+     },
+
+     // ===== JSX ACCESSIBILITY (A11Y) RULES =====
+     // Enterprise-Grade Accessibility Standards
+     // Based on WCAG 2.1 AA, Google/Microsoft/Meta Accessibility Guidelines
+     a11yPlugin.flatConfigs.strict, // Basiert auf strict config
+     {
+          settings: {
+               'jsx-a11y': {
+                    // Polymorphe Komponenten-Unterstützung (Material-UI, Chakra UI, etc.)
+                    polymorphicPropName: 'as',
+                    
+                    // Custom Component Mapping für Enterprise UI Libraries
+                    components: {
+                         // Form Controls
+                         'Input': 'input',
+                         'TextInput': 'input',
+                         'NumberInput': 'input',
+                         'Select': 'select',
+                         'Dropdown': 'select',
+                         'TextArea': 'textarea',
+                         'TextField': 'input',
+                         'FormField': 'input',
+                         'Checkbox': 'input',
+                         'Radio': 'input',
+                         'Switch': 'input',
+                         'Toggle': 'input',
+                         
+                         // Buttons
+                         'Button': 'button',
+                         'IconButton': 'button',
+                         'PrimaryButton': 'button',
+                         'SecondaryButton': 'button',
+                         'SubmitButton': 'button',
+                         'ActionButton': 'button',
+                         'FloatingActionButton': 'button',
+                         'Fab': 'button',
+                         
+                         // Links
+                         'Link': 'a',
+                         'NavLink': 'a',
+                         'RouterLink': 'a',
+                         'ExternalLink': 'a',
+                         
+                         // Structure
+                         'Nav': 'nav',
+                         'Navigation': 'nav',
+                         'Header': 'header',
+                         'Footer': 'footer',
+                         'Main': 'main',
+                         'Section': 'section',
+                         'Article': 'article',
+                         'Aside': 'aside',
+                         
+                         // Lists
+                         'List': 'ul',
+                         'OrderedList': 'ol',
+                         'ListItem': 'li',
+                         
+                         // Media
+                         'Image': 'img',
+                         'Picture': 'img',
+                         'Video': 'video',
+                         'Audio': 'audio',
+                         
+                         // Tables
+                         'Table': 'table',
+                         'TableRow': 'tr',
+                         'TableCell': 'td',
+                         'TableHeader': 'th'
+                    },
+                    
+                    // Attribute Mapping für verschiedene Prop-Namen
+                    attributes: {
+                         'for': ['htmlFor', 'for'],
+                         'id': ['id', 'htmlId']
+                    }
+               }
+          },
+          rules: {
+               // ===== WCAG 2.1 LEVEL A (MANDATORY) =====
+               'jsx-a11y/alt-text': ['error', {
+                    elements: ['img', 'object', 'area', 'input[type="image"]'],
+                    img: [],
+                    object: [],
+                    area: [],
+                    'input[type="image"]': []
+               }],
+               'jsx-a11y/anchor-has-content': ['error', {
+                    components: ['Link', 'NavLink', 'RouterLink']
+               }],
+               'jsx-a11y/anchor-is-valid': ['error', {
+                    components: ['Link', 'NavLink', 'RouterLink'],
+                    specialLink: ['to', 'href'],
+                    aspects: ['noHref', 'invalidHref', 'preferButton']
+               }],
+               'jsx-a11y/aria-props': 'error', // ARIA attributes müssen korrekt sein
+               'jsx-a11y/aria-proptypes': 'error', // ARIA prop values müssen valid sein
+               'jsx-a11y/aria-role': ['error', {
+                    ignoreNonDOM: true,
+                    allowedInvalidRoles: [] // Keine invaliden Roles erlaubt
+               }],
+               'jsx-a11y/aria-unsupported-elements': 'error', // Keine ARIA auf unsupported elements
+               'jsx-a11y/heading-has-content': ['error', {
+                    components: ['Heading', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6']
+               }],
+               'jsx-a11y/html-has-lang': 'error', // html element muss lang attribute haben
+               'jsx-a11y/iframe-has-title': 'error', // iframes brauchen title
+               'jsx-a11y/img-redundant-alt': ['error', {
+                    components: ['Image', 'Picture'],
+                    words: ['image', 'photo', 'picture', 'bild', 'foto']
+               }],
+               'jsx-a11y/no-access-key': 'error', // accessKey conflicts mit Screen Reader shortcuts
+               'jsx-a11y/no-distracting-elements': ['error', {
+                    elements: ['marquee', 'blink']
+               }],
+               'jsx-a11y/no-redundant-roles': ['error', {
+                    nav: ['navigation'],
+                    // Weitere redundante roles werden automatisch erkannt
+               }],
+               'jsx-a11y/role-has-required-aria-props': 'error', // Roles brauchen required ARIA props
+               'jsx-a11y/role-supports-aria-props': 'error', // Nur supported ARIA props für roles
+               'jsx-a11y/scope': 'error', // scope nur auf th elements
+               'jsx-a11y/tabindex-no-positive': 'error', // Kein tabindex > 0 (stört keyboard navigation)
+               
+               // ===== WCAG 2.1 LEVEL AA (ENTERPRISE STANDARD) =====
+               'jsx-a11y/autocomplete-valid': ['error', {
+                    inputComponents: ['Input', 'TextField', 'TextInput']
+               }],
+               'jsx-a11y/label-has-associated-control': ['error', {
+                    controlComponents: ['Input', 'Select', 'TextArea', 'TextField', 'Checkbox', 'Radio', 'Switch'],
+                    assert: 'either', // either nesting or htmlFor
+                    depth: 3, // Wie tief nach control component suchen
+                    labelComponents: ['Label', 'FormLabel'],
+                    labelAttributes: ['label']
+               }],
+               'jsx-a11y/lang': 'error', // lang attribute muss valid language code sein
+               'jsx-a11y/no-aria-hidden-on-focusable': 'error', // Focusable elements nicht mit aria-hidden verstecken
+               
+               // ===== INTERACTION ACCESSIBILITY =====
+               'jsx-a11y/click-events-have-key-events': 'error', // Click handlers brauchen keyboard support
+               'jsx-a11y/interactive-supports-focus': ['error', {
+                    tabbable: ['button', 'checkbox', 'link', 'searchbox', 'spinbutton', 'switch', 'textbox']
+               }],
+               'jsx-a11y/mouse-events-have-key-events': ['error', {
+                    hoverInHandlers: ['onMouseOver', 'onMouseEnter', 'onPointerOver', 'onPointerEnter'],
+                    hoverOutHandlers: ['onMouseOut', 'onMouseLeave', 'onPointerOut', 'onPointerLeave']
+               }],
+               'jsx-a11y/no-static-element-interactions': ['error', {
+                    handlers: ['onClick', 'onMouseDown', 'onMouseUp', 'onKeyPress', 'onKeyDown', 'onKeyUp'],
+                    allowExpressionValues: true
+               }],
+               'jsx-a11y/no-noninteractive-element-interactions': ['error', {
+                    handlers: ['onClick', 'onMouseDown', 'onMouseUp', 'onKeyPress', 'onKeyDown', 'onKeyUp'],
+                    alert: ['onKeyUp', 'onKeyDown', 'onKeyPress'],
+                    body: ['onError', 'onLoad'],
+                    dialog: ['onKeyUp', 'onKeyDown', 'onKeyPress'],
+                    iframe: ['onError', 'onLoad'],
+                    img: ['onError', 'onLoad']
+               }],
+               
+               // ===== FORM ACCESSIBILITY =====
+               'jsx-a11y/control-has-associated-label': ['error', {
+                    controlComponents: ['Button', 'IconButton'],
+                    ignoreElements: ['audio', 'canvas', 'embed', 'input', 'textarea', 'tr', 'video'],
+                    ignoreRoles: ['grid', 'listbox', 'menu', 'menubar', 'radiogroup', 'row', 'tablist', 'toolbar', 'tree', 'treegrid'],
+                    depth: 3
+               }],
+               
+               // ===== SEMANTIC HTML ENFORCEMENT =====
+               'jsx-a11y/no-noninteractive-element-to-interactive-role': ['error', {
+                    ul: ['listbox', 'menu', 'menubar', 'radiogroup', 'tablist', 'tree', 'treegrid'],
+                    ol: ['listbox', 'menu', 'menubar', 'radiogroup', 'tablist', 'tree', 'treegrid'],
+                    li: ['menuitem', 'option', 'row', 'tab', 'treeitem'],
+                    table: ['grid'],
+                    td: ['gridcell'],
+                    fieldset: ['radiogroup', 'presentation']
+               }],
+               'jsx-a11y/no-interactive-element-to-noninteractive-role': ['error', {
+                    tr: ['none', 'presentation'],
+                    canvas: ['img'] // Canvas kann als img behandelt werden
+               }],
+               'jsx-a11y/prefer-tag-over-role': 'error', // Semantic HTML > ARIA roles
+               
+               // ===== MEDIA ACCESSIBILITY =====
+               'jsx-a11y/media-has-caption': ['error', {
+                    audio: ['Audio'],
+                    video: ['Video'],
+                    track: ['Track']
+               }],
+               
+               // ===== FOCUS MANAGEMENT =====
+               'jsx-a11y/no-autofocus': ['warn', {
+                    ignoreNonDOM: true
+               }], // Warn level - manchmal für UX notwendig
+               'jsx-a11y/no-noninteractive-tabindex': ['error', {
+                    tags: [],
+                    roles: ['tabpanel', 'dialog'],
+                    allowExpressionValues: true
+               }],
+               
+               // ===== ARIA BEST PRACTICES =====
+               'jsx-a11y/aria-activedescendant-has-tabindex': 'error', // Elements mit aria-activedescendant müssen tabbable sein
+               'jsx-a11y/no-interactive-element-to-noninteractive-role': ['error', {
+                    canvas: ['img', 'presentation'] // Canvas exceptions
+               }],
+               
+               // ===== DEPRECATED BUT STILL IN DOCS =====
+               // 'jsx-a11y/accessible-emoji': 'off', // Deprecated - modern emoji sind accessible
+               // 'jsx-a11y/label-has-for': 'off', // Deprecated - use label-has-associated-control
+               // 'jsx-a11y/no-onchange': 'off', // Deprecated - onchange ist jetzt accessible
+               
+               // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
+               'jsx-a11y/anchor-ambiguous-text': ['warn', {
+                    words: ['click here', 'here', 'link', 'a link', 'learn more', 'more', 'read more', 'mehr', 'hier', 'klicken']
+               }] // Warn level - manchmal design requirements
           }
      },
 
@@ -1416,7 +1776,7 @@ export default tseslint.config(
                         Note: .ts files always parse as false, .jsx/.tsx always as true
                         Only affects unknown extensions (.md, .vue) when project is not provided
                         */
-                        // jsx: true,
+                        jsx: true,
 
                         /* 
                         - https://typescript-eslint.io/packages/parser/#globalreturn
