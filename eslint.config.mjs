@@ -26,6 +26,10 @@ import tseslint from 'typescript-eslint'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 // https://github.com/eslint-community/eslint-plugin-n
 import nodePlugin from 'eslint-plugin-n'
+// https://www.npmjs.com/package/eslint-plugin-security
+import pluginSecurity from 'eslint-plugin-security'
+// https://www.npmjs.com/package/eslint-plugin-sonarjs
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default tseslint.config(
      {
@@ -272,6 +276,12 @@ export default tseslint.config(
                'no-useless-return': 'error' // No redundant returns
           }
      },
+
+     // ===== SECURITY PLUGIN =====
+     pluginSecurity.configs.recommended,
+
+     // ===== SONARJS PLUGIN =====
+     sonarjs.configs.recommended,
 
      // ===== UNICORN PLUGIN =====
      eslintPluginUnicorn.configs.all,
