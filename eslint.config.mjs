@@ -42,6 +42,8 @@ import noSecrets from "eslint-plugin-no-secrets"
 import eslintPluginJsonc from 'eslint-plugin-jsonc'
 // https://www.npmjs.com/package/eslint-plugin-prefer-arrow
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow'
+// https://www.npmjs.com/package/eslint-plugin-package-json
+import packageJson from 'eslint-plugin-package-json'
 
 // ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
 // eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
@@ -49,8 +51,6 @@ import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow'
 // Alternative: Use eslint-plugin-security for XSS prevention
 // https://www.npmjs.com/package/eslint-plugin-xss
 // import eslintPluginXss from 'eslint-plugin-xss'
-
-
 
 export default tseslint.config(
      {
@@ -369,7 +369,7 @@ export default tseslint.config(
                          'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
                          'Bearer Token': 'Bearer [A-Za-z0-9\\-_]+',
                          'Private Key': '-----BEGIN (RSA |EC |DSA |OPENSSH |)?(PRIVATE|ENCRYPTED) KEY-----',
-                         'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
+                         // 'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
                          
                          // ===== ENTERPRISE SPECIFIC =====
                          'Artifactory Token': 'AKC[a-zA-Z0-9]{10,}',
@@ -491,6 +491,50 @@ export default tseslint.config(
 
                // SPECIAL CASES FOR CONFIGURATION FILES
                'jsonc/auto': 'off' // Too aggressive for mixed JSON/JSONC environments
+          }
+     },
+
+     // ===== PACKAGE JSON PLUGIN =====
+     packageJson.configs.recommended,
+     // ===== PACKAGE.JSON EXCLUSIVE HANDLING =====
+     {
+          files: ['**/package.json'],
+          rules: {
+               // ===== DISABLE ALL JSONC RULES FOR PACKAGE.JSON =====
+               // Only eslint-plugin-package-json should handle package.json files
+               'jsonc/indent': 'off',
+               'jsonc/sort-keys': 'off',
+               'jsonc/key-name-casing': 'off',
+               'jsonc/quotes': 'off',
+               'jsonc/comma-dangle': 'off',
+               'jsonc/no-comments': 'off',
+               'jsonc/object-curly-spacing': 'off',
+               'jsonc/key-spacing': 'off',
+               'jsonc/comma-style': 'off',
+               'jsonc/array-bracket-newline': 'off',
+               'jsonc/array-element-newline': 'off',
+               'jsonc/object-curly-newline': 'off',
+               'jsonc/object-property-newline': 'off',
+               'jsonc/no-dupe-keys': 'off',
+               'jsonc/no-sparse-arrays': 'off',
+               'jsonc/no-octal-escape': 'off',
+               'jsonc/no-useless-escape': 'off',
+               'jsonc/no-irregular-whitespace': 'off',
+               'jsonc/no-hexadecimal-numeric-literals': 'off',
+               'jsonc/no-binary-numeric-literals': 'off',
+               'jsonc/no-octal-numeric-literals': 'off',
+               'jsonc/no-numeric-separators': 'off',
+               'jsonc/no-plus-sign': 'off',
+               'jsonc/no-floating-decimal': 'off',
+               'jsonc/array-bracket-spacing': 'off',
+               'jsonc/quote-props': 'off',
+               'jsonc/sort-array-values': 'off',
+               'jsonc/no-bigint-literals': 'off',
+               'jsonc/no-undefined-value': 'off',
+               'jsonc/no-nan': 'off',
+               'jsonc/no-infinity': 'off',
+               'jsonc/auto': 'off'
+               // Note: Only package-json/* rules should apply to package.json files
           }
      },
 
@@ -833,9 +877,10 @@ export default tseslint.config(
           }
      },
 
-     // ===== ENTERPRISE-GRADE @STYLISTIC CONFIGURATION =====
+     // ===== @STYLISTIC CONFIGURATION =====
      stylistic.configs.all,
      {
+          files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
           plugins: {
                '@stylistic': stylistic
           },
@@ -1286,14 +1331,22 @@ export default tseslint.config(
 
      // ===== TYPESCRIPT-ESLINT CONFIGURATIONS =====
      // Include ALL strict TypeScript rules (includes recommended)
-     tseslint.configs.strictTypeChecked,
-     tseslint.configs.stylisticTypeChecked,
+     ...tseslint.configs.strictTypeChecked.map(config => ({
+          ...config,
+          files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'] // Only apply to TypeScript files
+     })),
+     ...tseslint.configs.stylisticTypeChecked.map(config => ({
+          ...config,
+          files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'] // Only apply to TypeScript files
+     })),
 
      // ===== TYPESCRIPT PARSER CONFIG =====
      {
+          files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'], // Only apply to TypeScript files
           languageOptions: {
                parser: tseslint.parser,
                parserOptions: {
+                    // extraFileExtensions: ['.json'], // Removed: JSON files should be handled by jsonc-eslint-parser
                     /*
                     - https://typescript-eslint.io/blog/announcing-typescript-eslint-v8/#project-service
                     The project service will automatically find the closest tsconfig.json for each file (like project: true)
@@ -1310,6 +1363,7 @@ export default tseslint.config(
 
      // ===== TSDOC PLUGIN =====
      {
+          files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'], // Only apply to TypeScript files
           plugins: {
                'tsdoc': pluginTsDoc
           },
@@ -1320,6 +1374,7 @@ export default tseslint.config(
 
      // ===== ADDITIONAL TYPESCRIPT RULES =====
      {
+          files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'], // Only apply to TypeScript files
           rules: {
                // Additional typescript-eslint rules not included in strict
                '@typescript-eslint/explicit-function-return-type': 'error',
