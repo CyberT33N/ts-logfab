@@ -521,9 +521,7 @@ export default tseslint.config(
                     maxSize: 50,
                     inlineMaxSize: 10
                }],
-               'vitest/prefer-snapshot-hint': ['error', {
-                    multi: true
-               }],
+               'vitest/prefer-snapshot-hint': 'error', // Enterprise: Snapshot hints für bessere Test-Dokumentation
                
                // ===== MATCHER PREFERENCES (Alle von warn zu error) =====
                'vitest/prefer-each': 'error',
