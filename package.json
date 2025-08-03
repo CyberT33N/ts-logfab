@@ -82,6 +82,7 @@
     "eslint-plugin-tsdoc": "~0.4.0",
     "eslint-plugin-unicorn": "~60.0.0",
     "eslint-plugin-unused-imports": "~4.1.4",
+    "eslint-plugin-vitest": "^0.5.4",
     "eslint-plugin-xss": "~0.1.12",
     "husky": "~9.1.7",
     "pino-pretty": "~13.0.0",

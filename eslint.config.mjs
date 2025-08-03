@@ -44,6 +44,8 @@ import eslintPluginJsonc from 'eslint-plugin-jsonc'
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow'
 // https://www.npmjs.com/package/eslint-plugin-package-json
 import packageJson from 'eslint-plugin-package-json'
+// https://www.npmjs.com/package/eslint-plugin-vitest
+import vitest from "eslint-plugin-vitest"
 
 // ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
 // eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
@@ -405,6 +407,131 @@ export default tseslint.config(
                          'Connection String': /(?:mongodb|postgres|mysql|redis):\/\/[^:]+:[^@]+@[^/]+/
                     }
                }]
+          }
+     },
+
+     // ===== VITEST TESTING STANDARDS =====
+     // Enterprise-Grade Testing Configuration
+     // Based on Google Testing Blog, Microsoft Testing Guidelines, Meta Jest Best Practices
+     vitest.configs.all, // Alle Vitest-Regeln als Basis
+     {
+          files: ['**/*.test.{ts,tsx,js,jsx}', '**/*.spec.{ts,tsx,js,jsx}', '**/test/**/*.{ts,tsx,js,jsx}'],
+          plugins: {
+               vitest
+          },
+          settings: {
+               vitest: {
+                    // Enable type-testing support for better type assertions
+                    typecheck: true
+               }
+          },
+          languageOptions: {
+               globals: {
+                    ...vitest.environments.env.globals
+               }
+          },
+          rules: {
+               // ===== ENTERPRISE REGEL-ANPASSUNGEN (Überschreibt vitest.configs.all) =====
+               // HINWEIS: vitest.configs.all setzt alle Regeln auf 'warn' (🌐)
+               // Wir upgraden kritische Regeln auf 'error' und konfigurieren Enterprise-Standards
+               
+               // ===== TEST STRUCTURE & ORGANIZATION (Google Testing Standards) =====
+               'vitest/consistent-test-filename': ['error', {
+                    pattern: '\\.(test|spec)\\.[jt]sx?$' // Enforce .test.ts or .spec.ts
+               }],
+               'vitest/consistent-test-it': ['error', {
+                    fn: 'test', // Google/MS Standard: 'test' über 'it'
+                    withinDescribe: 'test' // Auch in describe blocks
+               }],
+               'vitest/require-top-level-describe': 'error', // Upgrade von warn zu error
+               'vitest/max-nested-describe': ['error', {
+                    max: 3 // Maximum 3 Ebenen (default ist höher)
+               }],
+               'vitest/prefer-lowercase-title': ['error', {
+                    ignore: ['describe'] // describe darf PascalCase
+               }],
+               
+               // ===== TEST QUALITY & ASSERTIONS =====
+               'vitest/expect-expect': ['error', {
+                    assertFunctionNames: ['expect', 'assert', 'expectTypeOf'], // Type assertions
+                    additionalTestBlockFunctions: ['test.concurrent', 'test.each', 'test.failing']
+               }],
+               'vitest/max-expects': ['error', {
+                    max: 5 // Strenger als default
+               }],
+               'vitest/no-identical-title': 'error', // Upgrade von warn
+               'vitest/valid-title': ['error', {
+                    mustNotMatch: {
+                         test: ['/^should/', '/^must/', '/^can/'], // Google style
+                         describe: ['/^should/', '/^must/', '/^can/']
+                    },
+                    mustMatch: {
+                         test: ['/^(returns|throws|calls|handles|processes|validates|transforms|creates|updates|deletes)/'],
+                         describe: ['/^[A-Z]\\w*/', '/^when /', '/^with /', '/^without /']
+                    }
+               }],
+               'vitest/valid-expect': ['error', {
+                    alwaysAwait: true,
+                    minArgs: 1,
+                    maxArgs: 2
+               }],
+               
+               // ===== UPGRADES VON WARN ZU ERROR (Enterprise Critical) =====
+               'vitest/no-conditional-expect': 'error', // War warn in all
+               'vitest/no-conditional-in-test': 'error', // War warn in all
+               'vitest/no-conditional-tests': 'error', // War warn in all
+               'vitest/prefer-hooks-on-top': 'error', // War warn in all
+               'vitest/prefer-hooks-in-order': 'error', // War warn in all
+               'vitest/no-duplicate-hooks': 'error', // War warn in all
+               'vitest/require-hook': 'error', // War warn in all
+               'vitest/prefer-spy-on': 'error', // War warn in all
+               'vitest/prefer-mock-promise-shorthand': 'error', // War warn in all
+               'vitest/no-mocks-import': 'error', // War warn in all
+               'vitest/no-interpolation-in-snapshots': 'error', // War warn in all
+               'vitest/no-focused-tests': 'error', // War warn in all
+               'vitest/no-commented-out-tests': 'error', // Recommended only
+               'vitest/no-import-node-test': 'error', // Recommended only
+               'vitest/require-to-throw-message': 'error', // War warn in all
+               'vitest/no-test-return-statement': 'error', // War warn in all
+               'vitest/no-standalone-expect': 'error', // War warn in all
+               
+               // ===== ENTERPRISE-SPEZIFISCHE KONFIGURATIONEN =====
+               'vitest/no-restricted-vi-methods': ['error', {
+                    'vi.unmock': 'Use explicit mock restoration in afterEach',
+                    'vi.resetModules': 'Use isolated test environments instead'
+               }],
+               'vitest/no-large-snapshots': ['error', { // Strenger als default warn
+                    maxSize: 50,
+                    inlineMaxSize: 10
+               }],
+               'vitest/prefer-snapshot-hint': ['error', {
+                    multi: true
+               }],
+               
+               // ===== MATCHER PREFERENCES (Alle von warn zu error) =====
+               'vitest/prefer-each': 'error',
+               'vitest/prefer-to-be': 'error',
+               'vitest/prefer-to-be-truthy': 'error',
+               'vitest/prefer-to-be-falsy': 'error',
+               'vitest/prefer-to-be-object': 'error',
+               'vitest/prefer-to-contain': 'error',
+               'vitest/prefer-to-have-length': 'error',
+               'vitest/prefer-equality-matcher': 'error',
+               'vitest/prefer-strict-equal': 'error',
+               'vitest/prefer-comparison-matcher': 'error',
+               'vitest/prefer-called-with': 'error',
+               'vitest/prefer-todo': 'error',
+               'vitest/no-alias-methods': 'error',
+               
+               // ===== EXPLIZIT DEAKTIVIERTE REGELN (Zu restriktiv) =====
+               'vitest/prefer-expect-assertions': 'off', // Zu restriktiv
+               'vitest/no-hooks': 'off', // Hooks sind notwendig
+               'vitest/no-test-prefixes': 'off', // 'test' prefix ist okay
+               'vitest/no-restricted-matchers': 'off', // Team-spezifisch
+               'vitest/no-disabled-tests': 'warn', // Bleibt warn für Flexibilität
+               
+               // ===== DEPRECATED REGEL EXPLIZIT AUS =====
+               'vitest/no-done-callback': 'off' // Deprecated laut Docs
           }
      },
 
