@@ -282,7 +282,8 @@ export default tseslint.config(
           rules: {
                'n/no-missing-import': 'off',
                'n/no-unpublished-import': 'off',
-               'n/prefer-node-protocol': 'off' // Already handled by unicorn/prefer-node-protocol
+               'n/prefer-node-protocol': 'off', // Already handled by unicorn/prefer-node-protocol
+               'n/prefer-global/process': ['error', 'never'] // Enterprise: Force explicit imports
           }
      },
 
@@ -650,9 +651,7 @@ export default tseslint.config(
                }],
 
                // ===== FUNCTIONS =====
-               '@stylistic/function-paren-newline': ['error', {
-                    'minItems': 1
-               }],
+               '@stylistic/function-paren-newline': ['error', 'multiline-arguments'],
                '@stylistic/function-call-argument-newline': ['error', 'consistent'],
                '@stylistic/function-call-spacing': ['error', 'never'],
                '@stylistic/arrow-parens': ['error', 'as-needed', {
