@@ -13,39 +13,47 @@
 ███████████████████████████████████████████████████████████████████████████████
 */
 
-// ==== Imports ====
+// ===== CORE ESLINT & TYPESCRIPT =====
 import eslint from '@eslint/js'
-import importPlugin from 'eslint-plugin-import'
-import a11yPlugin from 'eslint-plugin-jsx-a11y'
+import tseslint from 'typescript-eslint'
+import stylistic from '@stylistic/eslint-plugin' // https://github.com/eslint-stylistic/eslint-stylistic
+import pluginTsDoc from 'eslint-plugin-tsdoc' // https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/
+
+// ===== REACT & JSX ECOSYSTEM =====
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
-// https://github.com/eslint-stylistic/eslint-stylistic
-import stylistic from '@stylistic/eslint-plugin'
-import tseslint from 'typescript-eslint'
-// https://github.com/sindresorhus/eslint-plugin-unicorn
-import eslintPluginUnicorn from 'eslint-plugin-unicorn'
-// https://github.com/eslint-community/eslint-plugin-n
-import nodePlugin from 'eslint-plugin-n'
-// https://www.npmjs.com/package/eslint-plugin-security
-import pluginSecurity from 'eslint-plugin-security'
-// https://www.npmjs.com/package/eslint-plugin-sonarjs
-import sonarjs from 'eslint-plugin-sonarjs'
-// https://www.npmjs.com/package/eslint-plugin-promise
-import pluginPromise from 'eslint-plugin-promise'
-// https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/
-import pluginTsDoc from 'eslint-plugin-tsdoc'
-// https://www.npmjs.com/package/eslint-plugin-unused-imports
-import unusedImports from "eslint-plugin-unused-imports"
-// https://www.npmjs.com/package/eslint-plugin-no-secrets
-import noSecrets from "eslint-plugin-no-secrets"
-// https://www.npmjs.com/package/eslint-plugin-jsonc
-import eslintPluginJsonc from 'eslint-plugin-jsonc'
-// https://www.npmjs.com/package/eslint-plugin-prefer-arrow
-import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow'
-// https://www.npmjs.com/package/eslint-plugin-package-json
-import packageJson from 'eslint-plugin-package-json'
-// https://www.npmjs.com/package/eslint-plugin-vitest
-import vitest from "eslint-plugin-vitest"
+import reactPerfPlugin from 'eslint-plugin-react-perf' // https://www.npmjs.com/package/eslint-plugin-react-perf
+import a11yPlugin from 'eslint-plugin-jsx-a11y'
+
+// ===== TESTING FRAMEWORKS =====
+import vitest from 'eslint-plugin-vitest' // https://www.npmjs.com/package/eslint-plugin-vitest
+
+// ===== CODE QUALITY & BEST PRACTICES =====
+import eslintPluginUnicorn from 'eslint-plugin-unicorn' // https://github.com/sindresorhus/eslint-plugin-unicorn
+import sonarjs from 'eslint-plugin-sonarjs' // https://www.npmjs.com/package/eslint-plugin-sonarjs
+import pluginPromise from 'eslint-plugin-promise' // https://www.npmjs.com/package/eslint-plugin-promise
+import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow' // https://www.npmjs.com/package/eslint-plugin-prefer-arrow
+
+// ===== IMPORTS & MODULES =====
+import importPlugin from 'eslint-plugin-import'
+import unusedImports from 'eslint-plugin-unused-imports' // https://www.npmjs.com/package/eslint-plugin-unused-imports
+
+// ===== NODE.JS SPECIFIC =====
+import nodePlugin from 'eslint-plugin-n' // https://github.com/eslint-community/eslint-plugin-n
+
+// ===== SECURITY =====
+import pluginSecurity from 'eslint-plugin-security' // https://www.npmjs.com/package/eslint-plugin-security
+import noSecrets from 'eslint-plugin-no-secrets' // https://www.npmjs.com/package/eslint-plugin-no-secrets
+
+// ===== REGULAR EXPRESSIONS =====
+import * as regexpPlugin from 'eslint-plugin-regexp' // https://github.com/ota-meshi/eslint-plugin-regexp
+
+// ===== FILE FORMAT SPECIFIC =====
+import eslintPluginJsonc from 'eslint-plugin-jsonc' // https://www.npmjs.com/package/eslint-plugin-jsonc
+import packageJson from 'eslint-plugin-package-json' // https://www.npmjs.com/package/eslint-plugin-package-json
+
+// ===== SORTING & ORDERING =====
+import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys' // https://github.com/infctr/eslint-plugin-typescript-sort-keys
 
 // ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
 // eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
@@ -532,6 +540,99 @@ export default tseslint.config(
                
                // ===== DEPRECATED REGEL EXPLIZIT AUS =====
                'vitest/no-done-callback': 'off' // Deprecated laut Docs
+          }
+     },
+
+     // ===== REGEXP PLUGIN =====
+     // Enterprise-Grade Regular Expression Standards
+     // Based on Google RE2, Microsoft .NET Regex Guidelines, Meta Pattern Standards
+     regexpPlugin.configs['flat/all'],
+     {
+          rules: {
+               // ===== PERFORMANCE & SECURITY (CRITICAL) =====
+               // Diese Regeln verhindern ReDoS (Regular Expression Denial of Service)
+               'regexp/no-super-linear-backtracking': 'error', // ReDoS-Schutz
+               'regexp/no-super-linear-move': 'error', // Quadratische Moves verhindern
+               'regexp/no-contradiction-with-assertion': 'error', // Logische Widersprüche
+               'regexp/no-control-character': 'error', // Keine Control Characters
+               'regexp/strict': 'error', // Strenge RegExp Validierung
+               
+               // ===== UNICODE & MODERN PATTERNS (Google/MS Standard) =====
+               'regexp/require-unicode-regexp': 'error', // /u flag ist Pflicht für Unicode
+               'regexp/require-unicode-sets-regexp': 'off', // /v flag noch zu neu (ES2024)
+               'regexp/unicode-escape': 'error', // \u{1F600} statt \uD83D\uDE00
+               'regexp/unicode-property': 'error', // Korrekte Unicode Property Nutzung
+               
+               // ===== WARTBARKEIT & LESBARKEIT (Meta Standards) =====
+               'regexp/prefer-named-capture-group': 'error', // (?<name>...) für Klarheit
+               'regexp/prefer-named-backreference': 'error', // \k<name> statt \1
+               'regexp/prefer-named-replacement': 'error', // $<name> in replace()
+               'regexp/no-misleading-capturing-group': 'error', // Verwirrende Gruppen
+               'regexp/no-misleading-unicode-character': 'error', // Multi-codepoint chars
+               'regexp/no-obscure-range': 'error', // [A-z] ist verwirrend
+               'regexp/prefer-quantifier': 'error', // a{1,} → a+
+               'regexp/prefer-question-quantifier': 'error', // a{0,1} → a?
+               'regexp/sort-alternatives': 'error', // Sortiere Alternativen für Konsistenz
+               
+               // ===== BEST PRACTICES (Enterprise Consensus) =====
+               'regexp/optimal-lookaround-quantifier': 'error', // Optimierte Lookarounds
+               'regexp/optimal-quantifier-concatenation': 'error', // a+a* → a+
+               'regexp/no-useless-lazy': 'error', // Unnötige non-greedy quantifiers
+               'regexp/no-useless-quantifier': 'error', // a{1} → a
+               'regexp/no-useless-range': 'error', // [a-a] → a
+               'regexp/prefer-character-class': 'error', // (a|b|c) → [abc]
+               'regexp/prefer-d': 'error', // [0-9] → \d
+               'regexp/prefer-w': 'error', // [a-zA-Z0-9_] → \w
+               'regexp/prefer-range': 'error', // [abcdef] → [a-f]
+               'regexp/prefer-set-operation': 'error', // Moderne Set Operations
+               'regexp/simplify-set-operations': 'error', // Vereinfache Set Ops
+               'regexp/use-ignore-case': 'error', // [a-zA-Z] → [a-z]/i
+               
+               // ===== CONSISTENCY & STYLE (Google Style Guide) =====
+               'regexp/hexadecimal-escape': ['error', 'never'], // \x61 → a (lesbar)
+               'regexp/sort-character-class-elements': 'error', // Sortiere Zeichen in character classes
+               'regexp/sort-flags': 'error', // Alphabetische Flag-Sortierung
+               'regexp/match-any': ['error', { 
+                    allows: ['dotAll'] // . mit /s flag für multiline matching
+               }],
+               'regexp/letter-case': ['error', {
+                    caseInsensitive: 'lowercase', // Lowercase mit /i flag
+                    unicodeEscape: 'uppercase' // \u{1F600} mit Uppercase
+               }],
+               
+               // ===== ERROR PREVENTION =====
+               'regexp/no-empty-alternative': 'error', // (a|) ist verwirrend
+               'regexp/no-empty-capturing-group': 'error', // () ohne Inhalt
+               'regexp/no-empty-character-class': 'error', // [] matcht nichts
+               'regexp/no-empty-group': 'error', // (?:) ist nutzlos
+               'regexp/no-empty-lookarounds-assertion': 'error', // (?=) ist nutzlos
+               'regexp/no-invalid-regexp': 'error', // Ungültige RegExp
+               'regexp/no-lazy-ends': 'error', // a+?$ ist ineffizient
+               'regexp/no-optional-assertion': 'error', // ^? macht keinen Sinn
+               'regexp/no-useless-assertions': 'error', // ^\b ist redundant
+               'regexp/no-useless-backreference': 'error', // Referenz zu nicht-existenter Gruppe
+               'regexp/no-zero-quantifier': 'error', // a{0} ist nutzlos
+               
+               // ===== SPEZIELLE ANPASSUNGEN =====
+               'regexp/no-unused-capturing-group': ['error', {
+                    // Ungenutzte Gruppen entfernen, außer für named groups
+                    allowNamed: false // Auch named groups müssen genutzt werden
+               }],
+               'regexp/prefer-result-array-groups': 'off', // .groups ist optional
+               'regexp/prefer-lookaround': 'off', // Lookarounds sind oft komplexer
+               'regexp/no-standalone-backslash': 'error', // Einzelne \ sind Fehler
+               'regexp/prefer-escape-replacement-dollar-char': 'error', // $$ in replace
+               'regexp/prefer-predefined-assertion': 'error', // \b statt (?=\W|$)
+               
+               // ===== EXPLIZIT DEAKTIVIERTE REGELN =====
+               'regexp/require-unicode-sets-regexp': 'off', // /v flag zu neu
+               'regexp/grapheme-string-literal': 'off', // Zu spezifisch
+               'regexp/prefer-regexp-exec': 'off', // match() ist oft klarer
+               'regexp/prefer-regexp-test': 'off', // match() für truthy check ist ok
+               'regexp/no-octal': 'off', // Octal escapes manchmal nützlich
+               'regexp/confusing-quantifier': 'warn', // Nur Warnung, nicht Error
+               'regexp/no-useless-flag': 'warn', // Manche flags zur Klarheit ok
+               'regexp/control-character-escape': 'warn' // \n ist klarer als \x0a
           }
      },
 
@@ -1426,6 +1527,9 @@ export default tseslint.config(
           }
      },
 
+     // ===== REACT PERFORMANCE =====
+     reactPerfPlugin.configs.flat.all,
+
      // ===== REACT HOOKS =====
      reactHooksPlugin.configs['recommended-latest'],
 
@@ -2126,6 +2230,18 @@ export default tseslint.config(
                     */
                     // warnOnUnsupportedTypeScriptVersion: true
                }
+          }
+     },
+
+     // ===== TYPESCRIPT SORT KEYS =====
+
+     {
+          plugins: {
+               'typescript-sort-keys': eslintPluginTypescriptSortKeys
+          },
+          rules: {
+               'typescript-sort-keys/interface': 'error',
+               'typescript-sort-keys/string-enum': 'error'
           }
      },
 
