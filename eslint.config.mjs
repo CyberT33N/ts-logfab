@@ -496,10 +496,50 @@ export default tseslint.config(
 
      // ===== PACKAGE JSON PLUGIN =====
      packageJson.configs.recommended,
-     // ===== PACKAGE.JSON EXCLUSIVE HANDLING =====
+     // ===== ENTERPRISE-GRADE PACKAGE.JSON CONFIGURATION =====
      {
           files: ['**/package.json'],
           rules: {
+               // ===== ENTERPRISE SECURITY & COMPLIANCE =====
+               'package-json/require-engines': 'error', // MANDATORY: Node.js version constraints for reproducible builds
+               'package-json/require-author': 'error', // MANDATORY: Clear ownership and accountability
+               'package-json/require-files': 'warn', // RECOMMENDED: Explicit file inclusion for security
+               'package-json/no-redundant-files': 'error', // SECURITY: Prevent accidental sensitive data exposure
+               
+               // ===== DEPENDENCY MANAGEMENT EXCELLENCE =====
+               'package-json/restrict-dependency-ranges': ['error', [
+                    // BASE RULE: All dependencies should use caret (^) for controlled updates
+                    {
+                         rangeType: 'caret',
+                    },
+                    
+                    // SECURITY: Pin unstable versions (0.x.x) for production dependencies
+                    {
+                         forDependencyTypes: ['dependencies'],
+                         forVersions: '<1',
+                         rangeType: 'pin',
+                    },
+                    
+                    // STABILITY: Critical infrastructure packages should be pinned
+                    {
+                         forPackages: [
+                              'typescript', // TypeScript versions can have breaking changes
+                              'eslint', // ESLint major versions often break configs
+                              '@types/node', // Node types should match runtime
+                         ],
+                         rangeType: 'tilde', // ~5.8.0 - only patch updates
+                    },
+                    
+                    // FLEXIBILITY: Allow any valid range for peer dependencies
+                    {
+                         forDependencyTypes: ['peerDependencies'],
+                         rangeType: ['caret', 'tilde', 'pin'], // All acceptable
+                    },
+               ]],
+               
+               // ===== METADATA COMPLETENESS =====
+               'package-json/require-keywords': 'warn', // RECOMMENDED: Better discoverability
+               
                // ===== DISABLE ALL JSONC RULES FOR PACKAGE.JSON =====
                // Only eslint-plugin-package-json should handle package.json files
                'jsonc/indent': 'off',
