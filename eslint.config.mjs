@@ -30,6 +30,8 @@ import nodePlugin from 'eslint-plugin-n'
 import pluginSecurity from 'eslint-plugin-security'
 // https://www.npmjs.com/package/eslint-plugin-sonarjs
 import sonarjs from 'eslint-plugin-sonarjs'
+// https://www.npmjs.com/package/eslint-plugin-promise
+import pluginPromise from 'eslint-plugin-promise'
 
 export default tseslint.config(
      {
@@ -276,6 +278,31 @@ export default tseslint.config(
                'no-useless-return': 'error' // No redundant returns
           }
      },
+
+           // ===== PROMISE PLUGIN =====
+      pluginPromise.configs['flat/recommended'],
+      {
+           rules: {
+                // ===== ENTERPRISE PROMISE STANDARDS (Google/Microsoft/Meta) =====
+                
+                // UPGRADE: Warnings zu Errors (Zero-Tolerance für Promise Anti-Patterns)
+                'promise/no-callback-in-promise': 'error', // War 'warn' - Mixing Callbacks/Promises ist Enterprise Anti-Pattern
+                'promise/no-promise-in-callback': 'error', // War 'warn' - Callback-Promise-Mixing verhindert Clean Architecture
+                'promise/no-nesting': 'error', // War 'warn' - Nested Promises = Code Smell (use async/await)
+                'promise/no-return-in-finally': 'error', // War 'warn' - Finally sollte NIEMALS returnen
+                'promise/valid-params': 'error', // War 'warn' - Falsche Promise-Parameter = Runtime Errors
+                
+                // NEUE REGELN: Modern JavaScript Best Practices
+                'promise/prefer-await-to-then': 'error', // Google/MS Standard: async/await > then/catch
+                'promise/prefer-await-to-callbacks': 'error', // Enterprise: Callbacks sind Legacy
+                'promise/no-multiple-resolved': 'error', // Verhindert Promise Race Conditions
+                'promise/spec-only': 'error', // Nur Standard Promise Methods (keine Bluebird etc.)
+                
+                // PRAGMATISCHE AUSNAHMEN
+                'promise/avoid-new': 'off', // Manchmal notwendig für Custom Promise Wrapping
+                'promise/no-native': 'off' // TypeScript Projekte nutzen immer native Promises
+           }
+      },
 
      // ===== SECURITY PLUGIN =====
      pluginSecurity.configs.recommended,
