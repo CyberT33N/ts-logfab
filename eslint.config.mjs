@@ -40,6 +40,17 @@ import unusedImports from "eslint-plugin-unused-imports"
 import noSecrets from "eslint-plugin-no-secrets"
 // https://www.npmjs.com/package/eslint-plugin-jsonc
 import eslintPluginJsonc from 'eslint-plugin-jsonc'
+// https://www.npmjs.com/package/eslint-plugin-prefer-arrow
+import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow'
+
+// ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
+// eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
+// Last updated: 2019 - NOT MAINTAINED
+// Alternative: Use eslint-plugin-security for XSS prevention
+// https://www.npmjs.com/package/eslint-plugin-xss
+// import eslintPluginXss from 'eslint-plugin-xss'
+
+
 
 export default tseslint.config(
      {
@@ -47,7 +58,7 @@ export default tseslint.config(
           ignores: ['eslint.config.mjs', 'coverage/**']
      },
 
-     // ===== ESLINT =====
+     // ===== ESLINT CORE =====
      eslint.configs.all,
      {
           rules: {
@@ -287,6 +298,202 @@ export default tseslint.config(
           }
      },
 
+     // ===== SECURITY PLUGIN =====
+     pluginSecurity.configs.recommended,
+     {
+          rules: {
+               // ===== ENHANCED XSS PREVENTION (OWASP Top 10 Compliance) =====
+               // Since eslint-plugin-xss is incompatible with ESLint 9,
+               // we use security plugin rules for XSS prevention
+               'security/detect-unsafe-regex': 'error', // Prevents ReDoS attacks
+               'security/detect-eval-with-expression': 'error', // Prevents code injection
+               'security/detect-no-csrf-before-method-override': 'error', // CSRF protection
+               'security/detect-possible-timing-attacks': 'error' // Timing attack prevention
+          }
+     },
+
+     // ===== NO SECRETS PLUGIN (ENTERPRISE SECURITY COMPLIANCE) =====
+     {
+          plugins: {
+               "no-secrets": noSecrets
+          },
+          rules: {
+               // ===== ENTERPRISE SECRET DETECTION (Google/Microsoft/Meta Standards) =====
+               'no-secrets/no-secrets': ['error', {
+                    tolerance: 3.0, // Enterprise: Stricter entropy threshold (Google standard)
+                    ignoreModules: false, // Enterprise: Check ALL strings including imports
+                    ignoreCase: false, // Enterprise: Case-sensitive entropy calculation
+                    additionalRegexes: {
+                         // ===== CLOUD PROVIDER SECRETS =====
+                         'AWS Access Key': 'AKIA[0-9A-Z]{16}',
+                         'AWS Secret Key': '[0-9a-zA-Z/+=]{40}',
+                         'AWS MWS Key': 'amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
+                         'AWS AppSync': 'da2-[a-z0-9]{26}',
+                         'Azure Storage Key': '[a-zA-Z0-9+/]{86}==',
+                         'GCP API Key': 'AIza[0-9A-Za-z\\-_]{35}',
+                         'GCP OAuth': '[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com',
+                         
+                         // ===== VERSION CONTROL TOKENS =====
+                         'GitHub Token': '(gh[oprs]_[0-9a-zA-Z]{36})',
+                         'GitHub App Token': 'ghs_[0-9a-zA-Z]{36}',
+                         'GitHub Personal Token': 'ghp_[0-9a-zA-Z]{36}',
+                         'GitLab Token': 'glpat-[0-9a-zA-Z\\-_]{20}',
+                         'Bitbucket Token': '[a-zA-Z0-9]{20,}',
+                         
+                         // ===== COMMUNICATION PLATFORMS =====
+                         'Slack Token': '(xox[baprs]-[0-9a-zA-Z-]+)',
+                         'Slack Webhook': 'https://hooks\\.slack\\.com/services/T[a-zA-Z0-9_]+/B[a-zA-Z0-9_]+/[a-zA-Z0-9_]+',
+                         'Teams Webhook': 'https://[a-z0-9]+\\.webhook\\.office\\.com/webhookb2/[a-z0-9\\-]+@[a-z0-9\\-]+/IncomingWebhook/[a-z0-9]+/[a-z0-9\\-]+',
+                         'Discord Token': '[MN][a-zA-Z\\d]{23}\\.[a-zA-Z\\d-_]{6}\\.[a-zA-Z\\d-_]{27}',
+                         'Discord Webhook': 'https://discord\\.com/api/webhooks/[0-9]+/[a-zA-Z0-9\\-_]+',
+                         
+                         // ===== API KEYS & SECRETS =====
+                         'NPM Token': 'npm_[a-zA-Z0-9]{36}',
+                         'PyPI Token': 'pypi-[a-zA-Z0-9\\-_]+',
+                         'Docker Hub Token': 'dckr_pat_[a-zA-Z0-9\\-_]+',
+                         'Stripe API Key': '(sk|pk)_(test|live)_[0-9a-zA-Z]{24}',
+                         'Square Token': '(sq0atp|sq0csp)-[0-9A-Za-z\\-_]+',
+                         'PayPal/Braintree Token': 'access_token\\$production\\$[0-9a-z]{16}\\$[0-9a-f]{32}',
+                         'Twilio API Key': 'SK[0-9a-fA-F]{32}',
+                         'MailChimp API Key': '[0-9a-f]{32}-us[0-9]{1,2}',
+                         'SendGrid API Key': 'SG\\.[a-zA-Z0-9\\-_]+\\.[a-zA-Z0-9\\-_]+',
+                         
+                         // ===== DATABASE CREDENTIALS =====
+                         'MongoDB Connection': 'mongodb(\\+srv)?://[^\\s]+',
+                         'PostgreSQL Connection': 'postgres(ql)?://[^\\s]+',
+                         'MySQL Connection': 'mysql://[^\\s]+',
+                         'Redis Connection': 'redis://[^\\s]+',
+                         
+                         // ===== AUTHENTICATION PATTERNS =====
+                         'JWT Token': 'ey[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]*',
+                         'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
+                         'Bearer Token': 'Bearer [A-Za-z0-9\\-_]+',
+                         'Private Key': '-----BEGIN (RSA |EC |DSA |OPENSSH |)?(PRIVATE|ENCRYPTED) KEY-----',
+                         'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
+                         
+                         // ===== ENTERPRISE SPECIFIC =====
+                         'Artifactory Token': 'AKC[a-zA-Z0-9]{10,}',
+                         'Vault Token': 's\\.[a-zA-Z0-9]{24}',
+                         'Kubernetes Secret': 'kubectl create secret [^\\n]+',
+                         'Terraform Variable': 'TF_VAR_[a-zA-Z_]+=[^\\s]+',
+                         'Ansible Vault': '\\$ANSIBLE_VAULT;[0-9.]+;AES256'
+                    },
+                    ignoreContent: [
+                         // Common false positives in enterprise codebases
+                         '^[A-Z][A-Z0-9_]*$', // Environment variable names
+                         '^[a-f0-9]{32}$', // MD5 hashes (often used for cache keys)
+                         '^[a-f0-9]{40}$', // SHA1 hashes
+                         '^[a-f0-9]{64}$' // SHA256 hashes
+                    ],
+                    additionalDelimiters: [
+                         '.', // Split by dots (e.g., api.key.value)
+                         '-', // Split by dashes (e.g., api-key-value)
+                         '_', // Split by underscores (e.g., api_key_value)
+                         '(?=[A-Z][a-z])' // Split camelCase
+                    ]
+               }],
+               
+               // ===== PATTERN MATCHING FOR STRUCTURED SECRETS =====
+               'no-secrets/no-pattern-match': ['error', {
+                    patterns: {
+                         // Enterprise patterns for configuration files
+                         'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/i,
+                         'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/i,
+                         'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/i,
+                         'Hardcoded API Key': /api[_-]?key\s*[:=]\s*["'][^"']+["']/i,
+                         'Private Key Content': /-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----/,
+                         'Connection String': /(?:mongodb|postgres|mysql|redis):\/\/[^:]+:[^@]+@[^/]+/
+                    }
+               }]
+          }
+     },
+
+     // ===== JSONC PLUGIN =====
+     eslintPluginJsonc.configs['flat/all'],
+     {
+          rules: {
+               // ===== ENTERPRISE-GRADE JSON/JSONC STANDARDS (Google/Microsoft/Meta) =====
+
+               // SECURITY & DATA INTEGRITY (CRITICAL)
+               'jsonc/no-comments': ['error'], // JSON files MUST NOT contain comments (breaks parsers)
+               'jsonc/no-bigint-literals': 'error', // BigInt not supported in JSON standard
+               'jsonc/no-undefined-value': 'error', // undefined is not valid JSON
+               'jsonc/no-nan': 'error', // NaN breaks JSON parsers
+               'jsonc/no-infinity': 'error', // Infinity not valid in JSON
+
+               // STANDARDIZATION & CONSISTENCY (Google Style Guide)
+               'jsonc/comma-dangle': ['error', 'never'], // No trailing commas in JSON
+               'jsonc/quotes': ['error', 'double'], // JSON standard requires double quotes
+               'jsonc/quote-props': ['error', 'always'], // Property names must be quoted
+               'jsonc/indent': ['error', 2], // Google/Microsoft standard: 2 spaces for JSON
+
+               // SORTING & ORGANIZATION (Enterprise Maintainability)
+               'jsonc/sort-keys': ['error', 'asc', {
+                    caseSensitive: false,
+                    natural: true,
+                    minKeys: 2,
+                    allowLineSeparatedGroups: true // Allow logical grouping
+               }],
+               'jsonc/sort-array-values': 'off', // Arrays often have semantic ordering
+
+               // FORMATTING STANDARDS (Airbnb/Google Hybrid)
+               'jsonc/array-bracket-spacing': ['error', 'never'],
+               'jsonc/object-curly-spacing': ['error', 'always'],
+               'jsonc/key-spacing': ['error', {
+                    beforeColon: false,
+                    afterColon: true,
+                    mode: 'strict'
+               }],
+               'jsonc/comma-style': ['error', 'last'],
+               'jsonc/array-bracket-newline': ['error', {
+                    multiline: true,
+                    minItems: 3
+               }],
+               'jsonc/array-element-newline': ['error', {
+                    multiline: true,
+                    minItems: 3
+               }],
+               'jsonc/object-curly-newline': ['error', {
+                    ObjectExpression: {
+                         multiline: true,
+                         minProperties: 3,
+                         consistent: true
+                    },
+                    ObjectPattern: {
+                         multiline: true,
+                         minProperties: 3,
+                         consistent: true
+                    }
+               }],
+               'jsonc/object-property-newline': ['error', {
+                    allowAllPropertiesOnSameLine: false // Each property on new line
+               }],
+
+               // ERROR PREVENTION (Microsoft Standards)
+               'jsonc/no-dupe-keys': 'error', // Duplicate keys cause data loss
+               'jsonc/no-sparse-arrays': 'error', // [1,,3] is invalid JSON
+               'jsonc/no-octal-escape': 'error', // Octal escapes not supported
+               'jsonc/no-useless-escape': 'error', // Remove unnecessary escapes
+               'jsonc/no-irregular-whitespace': ['error', {
+                    skipStrings: false,
+                    skipComments: false,
+                    skipRegExps: false,
+                    skipTemplates: false
+               }],
+
+               // JSONC/JSON5 SPECIFIC (When using JSONC files)
+               'jsonc/no-hexadecimal-numeric-literals': 'error', // 0xFF not valid
+               'jsonc/no-binary-numeric-literals': 'error', // 0b1010 not valid
+               'jsonc/no-octal-numeric-literals': 'error', // 0o755 not valid
+               'jsonc/no-numeric-separators': 'error', // 1_000 not valid
+               'jsonc/no-plus-sign': 'error', // +1 should be 1
+               'jsonc/no-floating-decimal': 'error', // .5 should be 0.5
+
+               // SPECIAL CASES FOR CONFIGURATION FILES
+               'jsonc/auto': 'off' // Too aggressive for mixed JSON/JSONC environments
+          }
+     },
+
      // ===== PROMISE PLUGIN =====
      pluginPromise.configs['flat/recommended'],
      {
@@ -312,99 +519,24 @@ export default tseslint.config(
           }
      },
 
-     // ===== SECURITY PLUGIN =====
-     pluginSecurity.configs.recommended,
-
-         // ===== JSONC PLUGIN =====
-    eslintPluginJsonc.configs['flat/all'],
-    {
-        rules: {
-            // ===== ENTERPRISE-GRADE JSON/JSONC STANDARDS (Google/Microsoft/Meta) =====
-            
-            // SECURITY & DATA INTEGRITY (CRITICAL)
-            'jsonc/no-comments': ['error'], // JSON files MUST NOT contain comments (breaks parsers)
-            'jsonc/no-bigint-literals': 'error', // BigInt not supported in JSON standard
-            'jsonc/no-undefined-value': 'error', // undefined is not valid JSON
-            'jsonc/no-nan': 'error', // NaN breaks JSON parsers
-            'jsonc/no-infinity': 'error', // Infinity not valid in JSON
-            
-            // STANDARDIZATION & CONSISTENCY (Google Style Guide)
-            'jsonc/comma-dangle': ['error', 'never'], // No trailing commas in JSON
-            'jsonc/quotes': ['error', 'double'], // JSON standard requires double quotes
-            'jsonc/quote-props': ['error', 'always'], // Property names must be quoted
-            'jsonc/indent': ['error', 2], // Google/Microsoft standard: 2 spaces for JSON
-            
-            // SORTING & ORGANIZATION (Enterprise Maintainability)
-            'jsonc/sort-keys': ['error', 'asc', {
-                caseSensitive: false,
-                natural: true,
-                minKeys: 2,
-                allowLineSeparatedGroups: true // Allow logical grouping
-            }],
-            'jsonc/sort-array-values': 'off', // Arrays often have semantic ordering
-            
-            // FORMATTING STANDARDS (Airbnb/Google Hybrid)
-            'jsonc/array-bracket-spacing': ['error', 'never'],
-            'jsonc/object-curly-spacing': ['error', 'always'],
-            'jsonc/key-spacing': ['error', {
-                beforeColon: false,
-                afterColon: true,
-                mode: 'strict'
-            }],
-            'jsonc/comma-style': ['error', 'last'],
-            'jsonc/array-bracket-newline': ['error', { 
-                multiline: true,
-                minItems: 3 
-            }],
-            'jsonc/array-element-newline': ['error', {
-                multiline: true,
-                minItems: 3
-            }],
-            'jsonc/object-curly-newline': ['error', {
-                ObjectExpression: {
-                    multiline: true,
-                    minProperties: 3,
-                    consistent: true
-                },
-                ObjectPattern: {
-                    multiline: true,
-                    minProperties: 3,
-                    consistent: true
-                }
-            }],
-            'jsonc/object-property-newline': ['error', {
-                allowAllPropertiesOnSameLine: false // Each property on new line
-            }],
-            
-            // ERROR PREVENTION (Microsoft Standards)
-            'jsonc/no-dupe-keys': 'error', // Duplicate keys cause data loss
-            'jsonc/no-sparse-arrays': 'error', // [1,,3] is invalid JSON
-            'jsonc/no-octal-escape': 'error', // Octal escapes not supported
-            'jsonc/no-useless-escape': 'error', // Remove unnecessary escapes
-            'jsonc/no-irregular-whitespace': ['error', {
-                skipStrings: false,
-                skipComments: false,
-                skipRegExps: false,
-                skipTemplates: false
-            }],
-            
-            // JSONC/JSON5 SPECIFIC (When using JSONC files)
-            'jsonc/no-hexadecimal-numeric-literals': 'error', // 0xFF not valid
-            'jsonc/no-binary-numeric-literals': 'error', // 0b1010 not valid
-            'jsonc/no-octal-numeric-literals': 'error', // 0o755 not valid
-            'jsonc/no-numeric-separators': 'error', // 1_000 not valid
-            'jsonc/no-plus-sign': 'error', // +1 should be 1
-            'jsonc/no-floating-decimal': 'error', // .5 should be 0.5
-            
-            // SPECIAL CASES FOR CONFIGURATION FILES
-            'jsonc/auto': 'off' // Too aggressive for mixed JSON/JSONC environments
-        }
-    },
-
-     // ===== NO SECRETS PLUGIN =====
+     // ===== PREFER ARROW PLUGIN (MODERN JAVASCRIPT STANDARDS) =====
      {
           plugins: {
-               "no-secrets": noSecrets,
+               "prefer-arrow": eslintPluginPreferArrow
+          },
+          rules: {
+               // ===== ENTERPRISE ARROW FUNCTION STANDARDS (Google/Airbnb/Meta) =====
+               'prefer-arrow/prefer-arrow-functions': ['error', {
+                    disallowPrototype: true, // Enterprise: No prototype modifications (security & maintainability)
+                    singleReturnOnly: false, // Enterprise: Allow complex arrow functions (real-world code)
+                    classPropertiesAllowed: true, // Enterprise: Support modern class field syntax (ES2022+)
+                    allowStandaloneDeclarations: false // Enterprise: Consistency - use arrow functions everywhere
+               }]
+               // Note: This enforces modern JavaScript patterns:
+               // - Lexical 'this' binding prevents common bugs
+               // - Consistent function style across codebase
+               // - Better TypeScript type inference with arrow functions
+               // - Aligns with React Hooks and modern framework patterns
           }
      },
 

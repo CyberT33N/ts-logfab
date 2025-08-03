@@ -103,6 +103,9 @@ devDependencies:
   eslint-plugin-no-secrets:
     specifier: ^2.2.1
     version: 2.2.1(eslint@9.31.0)
+  eslint-plugin-prefer-arrow:
+    specifier: ^1.2.3
+    version: 1.2.3(eslint@9.31.0)
   eslint-plugin-promise:
     specifier: ^7.2.1
     version: 7.2.1(eslint@9.31.0)
@@ -127,6 +130,9 @@ devDependencies:
   eslint-plugin-unused-imports:
     specifier: ^4.1.4
     version: 4.1.4(eslint@9.31.0)
+  eslint-plugin-xss:
+    specifier: ^0.1.12
+    version: 0.1.12
   husky:
     specifier: ^9.1.7
     version: 9.1.7
@@ -2236,6 +2242,14 @@ packages:
       eslint: 9.31.0(supports-color@10.0.0)
     dev: true
 
+  /eslint-plugin-prefer-arrow@1.2.3(eslint@9.31.0):
+    resolution: {integrity: sha512-J9I5PKCOJretVuiZRGvPQxCbllxGAV/viI20JO3LYblAodofBxyMnZAJ+WGeClHgANnSJberTNoFWWjrWKBuXQ==}
+    peerDependencies:
+      eslint: '>=2.0.0'
+    dependencies:
+      eslint: 9.31.0(supports-color@10.0.0)
+    dev: true
+
   /eslint-plugin-promise@7.2.1(eslint@9.31.0):
     resolution: {integrity: sha512-SWKjd+EuvWkYaS+uN2csvj0KoP43YTu7+phKQ5v+xw6+A0gutVX2yqCeCkC3uLCJFiPfR2dD8Es5L7yUsmvEaA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -2351,6 +2365,13 @@ packages:
         optional: true
     dependencies:
       eslint: 9.31.0(supports-color@10.0.0)
+    dev: true
+
+  /eslint-plugin-xss@0.1.12:
+    resolution: {integrity: sha512-L5oYaD//ZE7fKNtWUfVgYTRW19jrZlvaHe2swyFLxXQ5pwVQLivi5m92rtXd/ww8yqg4Drasqyi0hlBmhf9YQg==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      requireindex: 1.1.0
     dev: true
 
   /eslint-scope@8.4.0:
@@ -3656,6 +3677,11 @@ packages:
   /require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /requireindex@1.1.0:
+    resolution: {integrity: sha512-LBnkqsDE7BZKvqylbmn7lTIVdpx4K/QCduRATpO5R+wtPmky/a8pN1bO2D6wXppn1497AJF9mNjqAXr6bdl9jg==}
+    engines: {node: '>=0.10.5'}
     dev: true
 
   /resolve-from@4.0.0:
