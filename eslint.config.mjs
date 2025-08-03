@@ -55,6 +55,7 @@ import packageJson from 'eslint-plugin-package-json' // https://www.npmjs.com/pa
 
 // ===== SORTING & ORDERING =====
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys' // https://github.com/infctr/eslint-plugin-typescript-sort-keys
+import perfectionist from 'eslint-plugin-perfectionist' // https://perfectionist.dev
 
 
 // ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
@@ -2254,6 +2255,140 @@ export default tseslint.config(
           rules: {
                'typescript-sort-keys/interface': 'error',
                'typescript-sort-keys/string-enum': 'error'
+          }
+     },
+
+     // ===== PERFECTIONIST PLUGIN =====
+     // Enterprise-Grade Sorting Standards
+     // Based on Google/Microsoft/Meta Natural Sorting Preferences
+     perfectionist.configs['recommended-natural'], // Natural sorting (human-readable)
+     {
+          rules: {
+               // ===== DEAKTIVIERTE REGELN (BEREITS ABGEDECKT) =====
+               // Diese Regeln sind bereits durch andere Plugins mit besserer Konfiguration abgedeckt
+               'perfectionist/sort-imports': 'off', // ✅ Abgedeckt durch import/order (komplexere Enterprise-Konfiguration)
+               'perfectionist/sort-named-imports': 'off', // ✅ Abgedeckt durch import/order
+               'perfectionist/sort-interfaces': 'off', // ✅ Abgedeckt durch typescript-sort-keys/interface
+               'perfectionist/sort-jsx-props': 'off', // ✅ Abgedeckt durch @stylistic/jsx-sort-props (bessere JSX-Integration)
+               'perfectionist/sort-objects': 'off', // ✅ Abgedeckt durch ESLint Core sort-keys
+               'perfectionist/sort-enums': 'off', // ✅ Abgedeckt durch typescript-sort-keys/string-enum
+               
+               // ===== ENTERPRISE-AKTIVIERTE REGELN (NOCH NICHT ABGEDECKT) =====
+               
+               // ===== TYPESCRIPT TYPE SORTING =====
+               'perfectionist/sort-union-types': ['error', {
+                    type: 'natural',
+                    order: 'asc',
+                    groups: [
+                         'conditional', // A extends B ? C : D
+                         'function', // () => void
+                         'import', // import('module')
+                         'intersection', // A & B
+                         'keyword', // string, number, boolean
+                         'literal', // 'literal', 123, true
+                         'named', // CustomType, Interface
+                         'object', // { key: value }
+                         'operator', // keyof, typeof
+                         'tuple', // [string, number]
+                         'union', // A | B
+                         'nullish' // null, undefined
+                    ]
+               }],
+               'perfectionist/sort-intersection-types': ['error', {
+                    type: 'natural',
+                    order: 'asc',
+                    groups: [
+                         'conditional',
+                         'function', 
+                         'import',
+                         'intersection',
+                         'keyword',
+                         'literal',
+                         'named',
+                         'object',
+                         'operator', 
+                         'tuple',
+                         'union',
+                         'nullish'
+                    ]
+               }],
+               'perfectionist/sort-object-types': ['error', {
+                    type: 'natural',
+                    order: 'asc',
+                    groups: [
+                         'multiline', // Komplexe Properties zuerst
+                         'method', // Methods nach Properties (Airbnb Standard)
+                         'property' // Einfache Properties zuletzt
+                    ]
+               }],
+               
+               // ===== CLASS & INHERITANCE SORTING =====
+               'perfectionist/sort-classes': ['error', {
+                    type: 'natural',
+                    order: 'asc',
+                    groups: [
+                         'index-signature', // [key: string]: any
+                         'static-property', // Static Properties zuerst (Google Standard)
+                         'private-property', // Private Properties
+                         'property', // Public Properties
+                         'constructor', // Constructor nach Properties (Clean Code)
+                         'static-method', // Static Methods
+                         'private-method', // Private Methods  
+                         'method', // Public Methods
+                         'get-method', // Getters
+                         'set-method' // Setters zuletzt
+                    ]
+               }],
+               'perfectionist/sort-heritage-clauses': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // extends/implements clauses
+               
+               // ===== MODERN JAVASCRIPT FEATURES =====
+               'perfectionist/sort-sets': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // new Set([...]) values
+               'perfectionist/sort-maps': ['error', {
+                    type: 'natural', 
+                    order: 'asc'
+               }], // new Map([...]) entries
+               'perfectionist/sort-array-includes': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // array.includes() arguments
+               
+               // ===== VARIABLE & DECLARATION SORTING =====
+               'perfectionist/sort-variable-declarations': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // const a, b, c = destructuring
+               
+               // ===== CONTROL FLOW SORTING =====
+               'perfectionist/sort-switch-case': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // switch case statements (alphabetical für bessere Lesbarkeit)
+               
+               // ===== EXPORT/IMPORT MODULE SORTING =====
+               'perfectionist/sort-exports': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // Export statements sorting
+               'perfectionist/sort-named-exports': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // export { a, b, c }
+               'perfectionist/sort-modules': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }], // Module member sorting
+               
+               // ===== DECORATOR SORTING (ENTERPRISE TYPESCRIPT) =====
+               'perfectionist/sort-decorators': ['error', {
+                    type: 'natural',
+                    order: 'asc'
+               }] // @decorator sorting für Enterprise TypeScript Apps
           }
      },
 
