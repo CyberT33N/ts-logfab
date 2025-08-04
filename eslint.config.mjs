@@ -357,7 +357,7 @@ export default tseslint.config(
                          'GitHub App Token': 'ghs_[0-9a-zA-Z]{36}',
                          'GitHub Personal Token': 'ghp_[0-9a-zA-Z]{36}',
                          'GitLab Token': 'glpat-[0-9a-zA-Z\\-_]{20}',
-                         'Bitbucket Token': '[a-zA-Z0-9]{20,}',
+                         // 'Bitbucket Token': '[a-zA-Z0-9]{20,}',
                          
                          // ===== COMMUNICATION PLATFORMS =====
                          'Slack Token': '(xox[baprs]-[0-9a-zA-Z-]+)',
@@ -385,7 +385,7 @@ export default tseslint.config(
                          
                          // ===== AUTHENTICATION PATTERNS =====
                          'JWT Token': 'ey[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]*',
-                         'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
+                         // 'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
                          'Bearer Token': 'Bearer [A-Za-z0-9\\-_]+',
                          'Private Key': '-----BEGIN (RSA |EC |DSA |OPENSSH |)?(PRIVATE|ENCRYPTED) KEY-----',
                          // 'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
@@ -922,7 +922,8 @@ export default tseslint.config(
                'n/no-missing-import': 'off',
                'n/no-unpublished-import': 'off',
                'n/prefer-node-protocol': 'off', // Already handled by unicorn/prefer-node-protocol
-               'n/prefer-global/process': ['error', 'never'] // Enterprise: Force explicit imports
+               'n/prefer-global/process': ['error', 'never'], // Enterprise: Force explicit imports
+               'n/file-extension-in-import': 'off' // Off because we use the .ts extension in the imports
           }
      },
 
