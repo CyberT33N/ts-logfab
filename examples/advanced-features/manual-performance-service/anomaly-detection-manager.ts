@@ -169,7 +169,9 @@ export class AnomalyDetectionManager {
      * @returns Object containing tracking results and performance baseline data
      */
     static readonly #retrievePerformanceData = (
-        methodName: string, duration: number, memoryDelta: number
+        methodName: string,
+        duration: number,
+        memoryDelta: number
     ): {
         performanceBaseline: ReturnType<typeof getPerformanceBaseline>
         trackingResult: ReturnType<typeof trackMethodPerformance>

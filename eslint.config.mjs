@@ -1170,7 +1170,7 @@ export default tseslint.config(
                'import/no-default-export': 'off', // Diese Regel hat keine exceptions Option - deaktiviert für Flexibilität
 
                // ===== TYPE IMPORTS (TypeScript Specific) =====
-               'import/consistent-type-specifier-style': ['error', 'prefer-inline'], // import { type Foo }
+               'import/consistent-type-specifier-style': ['error', 'prefer-top-level'], // import type { Foo } - Enterprise Standard für TypeScript 5.0+
                'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
                'import/no-empty-named-blocks': 'error', // import {} from 'foo' verhindert
                'import/no-anonymous-default-export': ['error', { // Named Defaults

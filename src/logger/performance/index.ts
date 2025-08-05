@@ -19,17 +19,10 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-/*
- * Core Performance Monitor
- * ═══════════════════════════════════════════════════════════════════════════════
- * 🏭 FACTORY FUNCTIONS
- * ═══════════════════════════════════════════════════════════════════════════════
- */
+import { PerformanceMonitor } from './core/index.ts'
 
-import type { ReadonlyDeep } from 'type-fest'
-
-import { PerformanceMonitor } from './core'
 import type { IPerformanceMonitorConfig } from './types.ts'
+import type { ReadonlyDeep } from 'type-fest'
 
 export { PerformanceMonitor } from './core'
 
