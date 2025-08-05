@@ -39,6 +39,24 @@ export interface AnomalyDetectionResult {
     trackingResult: ReturnType<typeof trackMethodPerformance>
 }
 
+export const test = 123
+
+/**
+ * 📝 Properties for logging comprehensive performance metrics.
+ *
+ * @remarks
+ * This interface defines the parameters required for logging detailed performance data
+ * including execution metrics, anomaly detection results, and baseline comparison status.
+ */
+interface LogPerformanceMetricsProperties {
+    duration: number
+    iterations: number
+    memoryDelta: number
+    methodName: string
+    performanceBaseline: ReturnType<typeof getPerformanceBaseline>
+    trackingResult: ReturnType<typeof trackMethodPerformance>
+}
+
 /**
  * ⚙️ Advanced performance monitoring manager with integrated anomaly detection capabilities.
  *
@@ -220,21 +238,22 @@ export class AnomalyDetectionManager {
      * This method records detailed performance data including execution metrics,
      * anomaly detection results, and baseline comparison status for historical tracking.
      *
-     * @param methodName - Unique identifier for the operation being monitored
-     * @param iterations - Number of computational iterations performed
-     * @param duration - Execution duration in milliseconds
-     * @param memoryDelta - Memory consumption change in bytes
-     * @param trackingResult - Anomaly detection tracking results
-     * @param performanceBaseline - Historical baseline data for comparison
+     * @param props - Object containing all parameters for logging performance metrics
+     * @param props.methodName - Unique identifier for the operation being monitored
+     * @param props.iterations - Number of computational iterations performed
+     * @param props.duration - Execution duration in milliseconds
+     * @param props.memoryDelta - Memory consumption change in bytes
+     * @param props.trackingResult - Anomaly detection tracking results
+     * @param props.performanceBaseline - Historical baseline data for comparison
      */
-    #logPerformanceMetrics(
-        methodName: string,
-        iterations: number,
-        duration: number,
-        memoryDelta: number,
-        trackingResult: ReturnType<typeof trackMethodPerformance>,
-        performanceBaseline: ReturnType<typeof getPerformanceBaseline>
-    ): void {
+    #logPerformanceMetrics({
+        methodName,
+        iterations,
+        duration,
+        memoryDelta,
+        trackingResult,
+        performanceBaseline
+    }: LogPerformanceMetricsProperties): void {
         this.#performanceLog.push({
             operation: methodName,
             metrics: {
@@ -310,14 +329,14 @@ export class AnomalyDetectionManager {
             memoryDelta
         )
 
-        this.#logPerformanceMetrics(
+        this.#logPerformanceMetrics({
             methodName,
             iterations,
             duration,
             memoryDelta,
             trackingResult,
             performanceBaseline
-        )
+        })
 
         return {
             executionResult,

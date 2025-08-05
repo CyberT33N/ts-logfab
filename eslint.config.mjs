@@ -1167,8 +1167,6 @@ export default tseslint.config(
                'import/export': 'error', // Validiert alle Exports
                'import/no-named-as-default': 'error', // Verhindert Konfusion
                'import/no-named-as-default-member': 'error',
-               'import/no-default-export': 'off', // Diese Regel hat keine exceptions Option - deaktiviert für Flexibilität
-
                // ===== TYPE IMPORTS (TypeScript Specific) =====
                'import/consistent-type-specifier-style': ['error', 'prefer-top-level'], // import type { Foo } - Enterprise Standard für TypeScript 5.0+
                'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
@@ -1233,8 +1231,12 @@ export default tseslint.config(
                          '@babel/polyfill'
                     ]
                }],
-               'import/group-exports': 'error', // Gruppierte Exports am Ende
-               'import/exports-last': 'error' // Alle Exports am Ende der Datei
+               // ===== ENTERPRISE EXPORT STRATEGY =====
+               // Types/Interfaces: Export at definition site (Enterprise Standard)
+               // Values/Functions: Group exports at end when beneficial
+               'import/group-exports': 'error',                    // Group value exports together
+               'import/exports-last': 'off',                       // Too generic, conflicts with type exports
+               'import/no-default-export': 'error',                // Google/Microsoft Standard: NEVER use default exports
           }
      },
 
@@ -2548,20 +2550,32 @@ export default tseslint.config(
                          'prefix': ['T']
                     },
                     
-                    // ✅ Private Class Members - underscore prefix required
-                    {
-                         'selector': 'memberLike',
-                         'modifiers': ['private'],
-                         'format': ['camelCase'],
-                         'leadingUnderscore': 'require'
-                    },
-                    
-                    // ✅ Private Fields mit # - kein underscore (Modern JS)
+                    // 🚀 MODERN ONLY: # Private Fields (ECMA Standard) - Enterprise Future
                     {
                          'selector': 'classProperty',
                          'modifiers': ['#private'],
                          'format': ['camelCase'],
                          'leadingUnderscore': 'forbid'
+                    },
+                    
+                    // 🚀 MODERN ONLY: # Private Methods (ECMA Standard)
+                    {
+                         'selector': 'classMethod',
+                         'modifiers': ['#private'],
+                         'format': ['camelCase'],
+                         'leadingUnderscore': 'forbid'
+                    },
+                    
+                    // 🚫 VERBIETE Legacy underscore für private (erzwinge # private fields)
+                    {
+                         'selector': 'memberLike',
+                         'modifiers': ['private'],
+                         'format': ['camelCase'],
+                         'leadingUnderscore': 'forbid',
+                         'custom': {
+                              'regex': '^_',
+                              'match': false
+                         }
                     },
                     
                     // ✅ Protected Members - underscore optional
@@ -2693,6 +2707,7 @@ export default tseslint.config(
                // Import/Export Hygiene (Google/Microsoft Standards)
                '@typescript-eslint/no-import-type-side-effects': 'error', // Performance: Verhindert Side Effects bei Type Imports
                '@typescript-eslint/consistent-type-exports': 'error', // Konsistente Type Exports
+               '@typescript-eslint/consistent-type-imports': 'error',  // Enforce type-only imports
                '@typescript-eslint/no-useless-empty-export': 'error', // Verhindert leere Exports
 
                // Code Quality & Maintainability
