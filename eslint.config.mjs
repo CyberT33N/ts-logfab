@@ -1378,6 +1378,22 @@ export default tseslint.config(
                          'multiline': true,
                          'minProperties': 3,
                          'consistent': true
+                    },
+                    // ===== ENTERPRISE TYPE SAFETY: TypeScript Return-Type Formatting =====
+                    'TSTypeLiteral': {
+                         'multiline': true,
+                         'minProperties': 1, // STRICT: Schon ab 1 Property neue Zeilen erzwingen
+                         'consistent': true
+                    },
+                    'TSInterfaceBody': {
+                         'multiline': true,
+                         'minProperties': 1, // CONSISTENT: Gleiche Regeln für Interface Bodies
+                         'consistent': true
+                    },
+                    'TSEnumBody': {
+                         'multiline': true,
+                         'minProperties': 1, // CONSISTENT: Gleiche Regeln für Enum Bodies
+                         'consistent': true
                     }
                }],
                '@stylistic/object-property-newline': ['error', {

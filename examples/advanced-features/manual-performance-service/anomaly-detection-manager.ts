@@ -142,8 +142,10 @@ export class AnomalyDetectionManager {
      *
      * @returns Object containing start time and memory measurements for performance tracking
      */
-    static readonly #initializePerformanceMeasurement = (): { startMemory: number
-        startTime: number } => {
+    static readonly #initializePerformanceMeasurement = (): {
+        startMemory: number
+        startTime: number
+    } => {
         const startTime = performance.now()
         const startMemory = memoryUsage().heapUsed
 
