@@ -17,10 +17,10 @@
 import { memoryUsage } from 'node:process'
 import { setTimeout } from 'node:timers/promises'
 
-import { ReadonlyDeep } from 'type-fest'
-
 import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance'
 import { toWritable } from '@/utils/data-utils'
+
+import type { ReadonlyDeep } from 'type-fest'
 
 /**
  * 📊 Represents the comprehensive result of performance anomaly detection analysis.
@@ -39,8 +39,6 @@ export interface AnomalyDetectionResult {
     trackingResult: ReturnType<typeof trackMethodPerformance>
 }
 
-export const test = 123
-
 /**
  * 📝 Properties for logging comprehensive performance metrics.
  *
@@ -49,12 +47,12 @@ export const test = 123
  * including execution metrics, anomaly detection results, and baseline comparison status.
  */
 interface LogPerformanceMetricsProperties {
-    duration: number
-    iterations: number
-    memoryDelta: number
-    methodName: string
-    performanceBaseline: ReturnType<typeof getPerformanceBaseline>
-    trackingResult: ReturnType<typeof trackMethodPerformance>
+    readonly duration: number
+    readonly iterations: number
+    readonly memoryDelta: number
+    readonly methodName: string
+    readonly performanceBaseline: ReturnType<typeof getPerformanceBaseline>
+    readonly trackingResult: ReturnType<typeof trackMethodPerformance>
 }
 
 /**
@@ -238,22 +236,21 @@ export class AnomalyDetectionManager {
      * This method records detailed performance data including execution metrics,
      * anomaly detection results, and baseline comparison status for historical tracking.
      *
-     * @param props - Object containing all parameters for logging performance metrics
-     * @param props.methodName - Unique identifier for the operation being monitored
-     * @param props.iterations - Number of computational iterations performed
-     * @param props.duration - Execution duration in milliseconds
-     * @param props.memoryDelta - Memory consumption change in bytes
-     * @param props.trackingResult - Anomaly detection tracking results
-     * @param props.performanceBaseline - Historical baseline data for comparison
+     * @param methodName - Unique identifier for the operation being monitored
+     * @param iterations - Number of computational iterations performed
+     * @param duration - Execution duration in milliseconds
+     * @param memoryDelta - Memory consumption change in bytes
+     * @param trackingResult - Anomaly detection tracking results
+     * @param performanceBaseline - Historical baseline data for comparison
      */
-    #logPerformanceMetrics({
+    readonly #logPerformanceMetrics = ({
         methodName,
         iterations,
         duration,
         memoryDelta,
         trackingResult,
         performanceBaseline
-    }: LogPerformanceMetricsProperties): void {
+    }: LogPerformanceMetricsProperties): void => {
         this.#performanceLog.push({
             operation: methodName,
             metrics: {
