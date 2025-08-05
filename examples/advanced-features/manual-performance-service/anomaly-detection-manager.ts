@@ -33,7 +33,7 @@ import { toWritable } from '@/utils/data-utils'
  * @see {@link trackMethodPerformance} for tracking implementation details
  * @see {@link getPerformanceBaseline} for baseline comparison functionality
  */
-export interface IAnomalyDetectionResult {
+export interface AnomalyDetectionResult {
     executionResult: number
     performanceBaseline: ReturnType<typeof getPerformanceBaseline>
     trackingResult: ReturnType<typeof trackMethodPerformance>
@@ -63,7 +63,7 @@ export interface IAnomalyDetectionResult {
  * console.log(`Anomalies detected: ${result.trackingResult.anomalies.length}`);
  * ```
  *
- * @see {@link IAnomalyDetectionResult} for return value structure
+ * @see {@link AnomalyDetectionResult} for return value structure
  * @see {@link trackMethodPerformance} for underlying tracking mechanism
  */
 export class AnomalyDetectionManager {
@@ -284,12 +284,12 @@ export class AnomalyDetectionManager {
      * }
      * ```
      *
-     * @see {@link IAnomalyDetectionResult} for detailed return value structure
+     * @see {@link AnomalyDetectionResult} for detailed return value structure
      * @see {@link trackMethodPerformance} for anomaly detection implementation
      */
     public async performWithAnomalyDetection(
         methodName: string, iterations: number
-    ): Promise<IAnomalyDetectionResult> {
+    ): Promise<AnomalyDetectionResult> {
         const {
             startTime, startMemory
         } = AnomalyDetectionManager.#initializePerformanceMeasurement()

@@ -272,7 +272,7 @@ export default tseslint.config(
                ],
 
                // Function Design
-               'max-params': ['error', { max: 4 }], // Limit function parameters
+               'max-params': ['error', { max: 3 }], // Limit function parameters
                'max-depth': ['error', { max: 4 }], // Limit nesting depth
                'max-nested-callbacks': ['error', { max: 3 }], // Limit callback nesting
                'max-statements': ['error', 15], // Limit function complexity
@@ -2513,47 +2513,154 @@ export default tseslint.config(
                '@typescript-eslint/dot-notation': 'off', // Disabled to allow bracket notation for private method testing
                '@typescript-eslint/naming-convention': [
                     'error',
+                    // ===== BIG TECH ENTERPRISE STANDARDS (Google, Meta, Microsoft) =====
+                    
+                    // 🚫 KRITISCH: Verbiete I-Prefix für Interfaces (veraltetes Anti-Pattern)
                     {
-                         'selector': 'default',
-                         'format': ['camelCase']
+                         'selector': 'interface',
+                         'format': ['PascalCase'],
+                         'custom': {
+                              'regex': '^I[A-Z]',
+                              'match': false
+                         }
                     },
+                    
+                    // 🚫 KRITISCH: Verbiete E-Prefix für Enums (veraltetes Anti-Pattern)
                     {
-                         'selector': 'variable',
-                         'format': ['camelCase', 'UPPER_CASE']
+                         'selector': 'enum',
+                         'format': ['PascalCase'],
+                         'custom': {
+                              'regex': '^E[A-Z]',
+                              'match': false
+                         }
                     },
+                    
+                    // ✅ Type-Like (Interfaces, Classes, Types, Enums) - PascalCase
                     {
-                         'selector': 'parameter',
-                         'format': ['camelCase'],
-                         'leadingUnderscore': 'allow'
+                         'selector': 'typeLike',
+                         'format': ['PascalCase']
                     },
+                    
+                    // ✅ Type Parameters (Generics) - T-Prefix (Google/MS Standard)
+                    {
+                         'selector': 'typeParameter',
+                         'format': ['PascalCase'],
+                         'prefix': ['T']
+                    },
+                    
+                    // ✅ Private Class Members - underscore prefix required
                     {
                          'selector': 'memberLike',
                          'modifiers': ['private'],
                          'format': ['camelCase'],
                          'leadingUnderscore': 'require'
                     },
+                    
+                    // ✅ Private Fields mit # - kein underscore (Modern JS)
                     {
-                         'selector': 'typeLike',
-                         'format': ['PascalCase']
+                         'selector': 'classProperty',
+                         'modifiers': ['#private'],
+                         'format': ['camelCase'],
+                         'leadingUnderscore': 'forbid'
                     },
+                    
+                    // ✅ Protected Members - underscore optional
                     {
-                         'selector': 'interface',
+                         'selector': 'memberLike',
+                         'modifiers': ['protected'],
+                         'format': ['camelCase'],
+                         'leadingUnderscore': 'allow'
+                    },
+                    
+                    // ✅ Static Readonly Constants - UPPER_CASE (Google Standard)
+                    {
+                         'selector': 'classProperty',
+                         'modifiers': ['static', 'readonly'],
+                         'format': ['UPPER_CASE']
+                    },
+                    
+                    // ✅ Global Constants - UPPER_CASE
+                    {
+                         'selector': 'variable',
+                         'modifiers': ['const', 'global'],
+                         'format': ['UPPER_CASE']
+                    },
+                    
+                    // ✅ Enum Members - PascalCase (Meta/React Standard)
+                    {
+                         'selector': 'enumMember',
+                         'format': ['PascalCase', 'UPPER_CASE']
+                    },
+                    
+                    // ✅ Boolean Variables - Verb Prefixes (Google Best Practice)
+                    {
+                         'selector': 'variable',
+                         'types': ['boolean'],
                          'format': ['PascalCase'],
-                         'prefix': ['I']
+                         'prefix': ['is', 'has', 'can', 'should', 'will', 'did', 'does', 'was', 'were'],
+                         'filter': {
+                              // Erlaube auch normale camelCase für destructured oder spezielle Fälle
+                              'regex': '^(__|_)',
+                              'match': false
+                         }
                     },
+                    
+                    // ✅ Variables - camelCase oder UPPER_CASE
                     {
-                         'selector': 'enum',
-                         'format': ['PascalCase'],
-                         'prefix': ['E']
+                         'selector': 'variable',
+                         'format': ['camelCase', 'UPPER_CASE'],
+                         'leadingUnderscore': 'allow'
                     },
-                    // ANPASSUNG FÜR OBJEKT-PROPERTIES (wie _errors oder Zods required_error)
+                    
+                    // ✅ Functions - camelCase oder PascalCase (für React Components)
                     {
-                         'selector': ['objectLiteralProperty', 'typeProperty'], // Gilt für Properties in Objektliteralen und Typdefinitionen
-                         'format': ['camelCase', 'snake_case', 'PascalCase'], // Erlaube verschiedene Formate
-                         'leadingUnderscore': 'allow' // WICHTIG: Erlaube hier führende Unterstriche
-                         // Optional: Wenn du es *nur* für spezifische Namen wie '_errors' erlauben willst:
-                         // 'filter': { 'regex': '^_errors$', 'match': true }
-                         // Aber 'allow' ist oft einfacher, wenn mehrere solcher Fälle von externen Bibliotheken kommen.
+                         'selector': 'function',
+                         'format': ['camelCase', 'PascalCase']
+                    },
+                    
+                    // ✅ Parameters - camelCase mit underscore erlaubt
+                    {
+                         'selector': 'parameter',
+                         'format': ['camelCase'],
+                         'leadingUnderscore': 'allow'
+                    },
+                    
+                    // ✅ Destructured Variables - flexible Naming (externe APIs)
+                    {
+                         'selector': 'variable',
+                         'modifiers': ['destructured'],
+                         'format': null
+                    },
+                    
+                    // ✅ Object/Type Properties - verschiedene Formate für externe Libraries (Zod, etc.)
+                    {
+                         'selector': ['objectLiteralProperty', 'typeProperty'],
+                         'format': ['camelCase', 'snake_case', 'PascalCase'],
+                         'leadingUnderscore': 'allow'
+                    },
+                    
+                    // ✅ Properties die Quotes brauchen - keine Format-Checks
+                    {
+                         'selector': [
+                              'classProperty',
+                              'objectLiteralProperty',
+                              'typeProperty',
+                              'classMethod',
+                              'objectLiteralMethod',
+                              'typeMethod',
+                              'accessor',
+                              'enumMember'
+                         ],
+                         'format': null,
+                         'modifiers': ['requiresQuotes']
+                    },
+                    
+                    // ✅ Default Fallback - camelCase
+                    {
+                         'selector': 'default',
+                         'format': ['camelCase'],
+                         'leadingUnderscore': 'allow',
+                         'trailingUnderscore': 'forbid'
                     }
                ],
                '@typescript-eslint/no-explicit-any': 'error',
