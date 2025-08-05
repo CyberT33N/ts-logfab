@@ -19,8 +19,8 @@ import { setTimeout } from 'node:timers/promises'
 
 import { ReadonlyDeep } from 'type-fest'
 
-import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance/index.ts'
-import { toWritable } from '@/utils/data-utils.ts'
+import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance'
+import { toWritable } from '@/utils/data-utils'
 
 /**
  * 📊 Represents the comprehensive result of performance anomaly detection analysis.
@@ -67,6 +67,26 @@ export interface IAnomalyDetectionResult {
  * @see {@link trackMethodPerformance} for underlying tracking mechanism
  */
 export class AnomalyDetectionManager {
+    readonly #performanceLog: {
+        metrics: Record<string, unknown>
+        operation: string
+        timestamp: Readonly<Date>
+    }[]
+
+    /**
+     * 🏗️ Initializes the anomaly detection manager with historical performance data.
+     *
+     * @param performanceLog - Historical performance data used for baseline calculations
+     * and anomaly detection. This log provides context for identifying performance deviations.
+     */
+    public constructor(performanceLog: ReadonlyDeep<{
+        readonly metrics: Record<string, unknown>
+        readonly operation: string
+        readonly timestamp: Readonly<Date>
+    }[]>) {
+        this.#performanceLog = toWritable(performanceLog)
+    }
+
     /**
      * � Calculates performance metrics by comparing start and end measurements.
      *
@@ -188,29 +208,9 @@ export class AnomalyDetectionManager {
         const performanceBaseline = getPerformanceBaseline(methodName)
 
         return {
-            trackingResult,
-            performanceBaseline
+            performanceBaseline,
+            trackingResult
         }
-    }
-
-    readonly #performanceLog: {
-        metrics: Record<string, unknown>
-        operation: string
-        timestamp: Readonly<Date>
-    }[]
-
-    /**
-     * 🏗️ Initializes the anomaly detection manager with historical performance data.
-     *
-     * @param performanceLog - Historical performance data used for baseline calculations
-     * and anomaly detection. This log provides context for identifying performance deviations.
-     */
-    public constructor(performanceLog: ReadonlyDeep<{
-        readonly metrics: Record<string, unknown>
-        readonly operation: string
-        readonly timestamp: Readonly<Date>
-    }[]>) {
-        this.#performanceLog = toWritable(performanceLog)
     }
 
     /**

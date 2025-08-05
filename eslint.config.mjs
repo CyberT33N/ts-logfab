@@ -2428,22 +2428,7 @@ export default tseslint.config(
                }],
                
                // ===== CLASS & INHERITANCE SORTING =====
-               'perfectionist/sort-classes': ['error', {
-                    type: 'natural',
-                    order: 'asc',
-                    groups: [
-                         'index-signature', // [key: string]: any
-                         'static-property', // Static Properties zuerst (Google Standard)
-                         'private-property', // Private Properties
-                         'property', // Public Properties
-                         'constructor', // Constructor nach Properties (Clean Code)
-                         'static-method', // Static Methods
-                         'private-method', // Private Methods  
-                         'method', // Public Methods
-                         'get-method', // Getters
-                         'set-method' // Setters zuletzt
-                    ]
-               }],
+               "perfectionist/sort-classes": "off", // we use @typescript-eslint/member-ordering
                'perfectionist/sort-heritage-clauses': ['error', {
                     type: 'natural',
                     order: 'asc'
@@ -2515,7 +2500,16 @@ export default tseslint.config(
                // Additional typescript-eslint rules not included in strict
                '@typescript-eslint/explicit-function-return-type': 'error',
                '@typescript-eslint/explicit-member-accessibility': 'error',
-               '@typescript-eslint/member-ordering': 'error',
+               "@typescript-eslint/member-ordering": ["error", {
+                    "default": {
+                        // Keep all default memberTypes (sie sind enterprise-optimal!)
+                        // ADD: Alphabetical sorting within groups
+                        "order": "alphabetically-case-insensitive",
+                        
+                        // ADD: Optional members preference (Enterprise consistency)
+                        "optionalityOrder": "required-first"
+                    }
+                }],
                '@typescript-eslint/dot-notation': 'off', // Disabled to allow bracket notation for private method testing
                '@typescript-eslint/naming-convention': [
                     'error',
