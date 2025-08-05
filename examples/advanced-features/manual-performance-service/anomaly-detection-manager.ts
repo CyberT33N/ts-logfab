@@ -230,42 +230,6 @@ export class AnomalyDetectionManager {
     }
 
     /**
-     * 📝 Logs comprehensive performance metrics to the internal performance log.
-     *
-     * @remarks
-     * This method records detailed performance data including execution metrics,
-     * anomaly detection results, and baseline comparison status for historical tracking.
-     *
-     * @param methodName - Unique identifier for the operation being monitored
-     * @param iterations - Number of computational iterations performed
-     * @param duration - Execution duration in milliseconds
-     * @param memoryDelta - Memory consumption change in bytes
-     * @param trackingResult - Anomaly detection tracking results
-     * @param performanceBaseline - Historical baseline data for comparison
-     */
-    readonly #logPerformanceMetrics = ({
-        methodName,
-        iterations,
-        duration,
-        memoryDelta,
-        trackingResult,
-        performanceBaseline
-    }: LogPerformanceMetricsProperties): void => {
-        this.#performanceLog.push({
-            metrics: {
-                anomaliesDetected: trackingResult.anomalies.length,
-                baselineExists: Boolean(performanceBaseline),
-                duration,
-                iterations,
-                memoryDelta,
-                thresholdViolations: trackingResult.thresholdViolations.length
-            },
-            operation: methodName,
-            timestamp: new Date()
-        })
-    }
-
-    /**
      * ⚙️ Executes a performance-intensive operation with comprehensive anomaly detection monitoring.
      *
      * @remarks
@@ -303,9 +267,9 @@ export class AnomalyDetectionManager {
      * @see {@link AnomalyDetectionResult} for detailed return value structure
      * @see {@link trackMethodPerformance} for anomaly detection implementation
      */
-    public async performWithAnomalyDetection(
+    public readonly performWithAnomalyDetection = async (
         methodName: string, iterations: number
-    ): Promise<AnomalyDetectionResult> {
+    ): Promise<AnomalyDetectionResult> => {
         const {
             startTime, startMemory
         } = AnomalyDetectionManager.#initializePerformanceMeasurement()
@@ -340,5 +304,41 @@ export class AnomalyDetectionManager {
             performanceBaseline,
             trackingResult
         }
+    }
+
+    /**
+     * 📝 Logs comprehensive performance metrics to the internal performance log.
+     *
+     * @remarks
+     * This method records detailed performance data including execution metrics,
+     * anomaly detection results, and baseline comparison status for historical tracking.
+     *
+     * @param methodName - Unique identifier for the operation being monitored
+     * @param iterations - Number of computational iterations performed
+     * @param duration - Execution duration in milliseconds
+     * @param memoryDelta - Memory consumption change in bytes
+     * @param trackingResult - Anomaly detection tracking results
+     * @param performanceBaseline - Historical baseline data for comparison
+     */
+    readonly #logPerformanceMetrics = ({
+        methodName,
+        iterations,
+        duration,
+        memoryDelta,
+        trackingResult,
+        performanceBaseline
+    }: LogPerformanceMetricsProperties): void => {
+        this.#performanceLog.push({
+            metrics: {
+                anomaliesDetected: trackingResult.anomalies.length,
+                baselineExists: Boolean(performanceBaseline),
+                duration,
+                iterations,
+                memoryDelta,
+                thresholdViolations: trackingResult.thresholdViolations.length
+            },
+            operation: methodName,
+            timestamp: new Date()
+        })
     }
 }
