@@ -19,7 +19,7 @@ import { setTimeout } from 'node:timers/promises'
 
 import { ReadonlyDeep } from 'type-fest'
 
-import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance/utils/index.ts'
+import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance/index.ts'
 import { toWritable } from '@/utils/data-utils.ts'
 
 /**
@@ -67,30 +67,6 @@ export interface IAnomalyDetectionResult {
  * @see {@link trackMethodPerformance} for underlying tracking mechanism
  */
 export class AnomalyDetectionManager {
-    readonly #performanceLog: {
-        metrics: Record<string, unknown>
-        operation: string
-        timestamp: Readonly<Date>
-    }[]
-
-    /**
-     * 🏗️ Initializes the anomaly detection manager with historical performance data.
-     *
-     * @param performanceLog - Historical performance data used for baseline calculations
-     * and anomaly detection. This log provides context for identifying performance deviations.
-     */
-    public constructor(
-        performanceLog: ReadonlyDeep<{
-            readonly metrics: Record<string, unknown>
-            readonly operation: string
-            readonly timestamp: Readonly<Date>
-        }[]>
-    ) {
-        this.#performanceLog = toWritable(
-            performanceLog
-        )
-    }
-
     /**
      * � Calculates performance metrics by comparing start and end measurements.
      *
@@ -101,10 +77,14 @@ export class AnomalyDetectionManager {
      * @param startTime - Initial time measurement when operation began
      * @param startMemory - Initial memory usage when operation began
      *
-     * @returns Object containing calculated duration and memory delta metrics
+     * @returns bject containing calculated duration and memory delta metrics
      */
-    static #calculatePerformanceMetrics(startTime: number, startMemory: number): { duration: number
-        memoryDelta: number } {
+    static readonly #calculatePerformanceMetrics = (
+        startTime: number, startMemory: number
+    ): {
+        duration: number
+        memoryDelta: number
+    } => {
         const endTime = performance.now()
         const endMemory = memoryUsage().heapUsed
 
@@ -128,21 +108,25 @@ export class AnomalyDetectionManager {
      *
      * @returns Promise resolving to the computational result value
      */
-    static async #executeComputationalOperation(
-        iterations: number
-    ): Promise<number> {
+    static readonly #executeComputationalOperation = async (iterations: number): Promise<number> => {
+        const ANOMALY_CHECK_INTERVAL = 5000
+        const ANOMALY_PROBABILITY = 0.7
+        const ANOMALY_DELAY = 10
+
         let result = 0
 
         for (const index of Array.from({ length: iterations }).keys()) {
             result += Math.sqrt(index) * Math.sin(index) * Math.cos(index)
 
             // Variable delay to potentially trigger anomalies
-            if (index % 5000 === 0) {
-                const delay = Math.random() > 0.7 ? 10 : 1
+            if (index % ANOMALY_CHECK_INTERVAL === 0) {
+                // Performance/Load Testing:
+                // eslint-disable-next-line sonarjs/pseudo-random -- Performance simulation only, not security-sensitive
+                const delay = Math.random() > ANOMALY_PROBABILITY ? ANOMALY_DELAY : 1
 
-                await setTimeout(
-                    delay
-                )
+                // Timing Control:
+                // eslint-disable-next-line no-await-in-loop -- Intentional sequential timing for [specific purpose]
+                await setTimeout(delay)
             }
         }
 
@@ -158,8 +142,8 @@ export class AnomalyDetectionManager {
      *
      * @returns Object containing start time and memory measurements for performance tracking
      */
-    static #initializePerformanceMeasurement(): { startMemory: number
-        startTime: number } {
+    static readonly #initializePerformanceMeasurement = (): { startMemory: number
+        startTime: number } => {
         const startTime = performance.now()
         const startMemory = memoryUsage().heapUsed
 
@@ -182,10 +166,12 @@ export class AnomalyDetectionManager {
      *
      * @returns Object containing tracking results and performance baseline data
      */
-    static #retrievePerformanceData(methodName: string, duration: number, memoryDelta: number): {
+    static readonly #retrievePerformanceData = (
+        methodName: string, duration: number, memoryDelta: number
+    ): {
         performanceBaseline: ReturnType<typeof getPerformanceBaseline>
         trackingResult: ReturnType<typeof trackMethodPerformance>
-    } {
+    } => {
         // Track method performance with anomaly detection
         const trackingResult = trackMethodPerformance(
             methodName,
@@ -195,14 +181,32 @@ export class AnomalyDetectionManager {
         )
 
         // Get performance baseline
-        const performanceBaseline = getPerformanceBaseline(
-            methodName
-        )
+        const performanceBaseline = getPerformanceBaseline(methodName)
 
         return {
             trackingResult,
             performanceBaseline
         }
+    }
+
+    readonly #performanceLog: {
+        metrics: Record<string, unknown>
+        operation: string
+        timestamp: Readonly<Date>
+    }[]
+
+    /**
+     * 🏗️ Initializes the anomaly detection manager with historical performance data.
+     *
+     * @param performanceLog - Historical performance data used for baseline calculations
+     * and anomaly detection. This log provides context for identifying performance deviations.
+     */
+    public constructor(performanceLog: ReadonlyDeep<{
+        readonly metrics: Record<string, unknown>
+        readonly operation: string
+        readonly timestamp: Readonly<Date>
+    }[]>) {
+        this.#performanceLog = toWritable(performanceLog)
     }
 
     /**
@@ -227,22 +231,18 @@ export class AnomalyDetectionManager {
         trackingResult: ReturnType<typeof trackMethodPerformance>,
         performanceBaseline: ReturnType<typeof getPerformanceBaseline>
     ): void {
-        this.#performanceLog.push(
-            {
-                operation: methodName,
-                metrics: {
-                    iterations,
-                    duration,
-                    memoryDelta,
-                    anomaliesDetected: trackingResult.anomalies.length,
-                    thresholdViolations: trackingResult.thresholdViolations.length,
-                    baselineExists: Boolean(
-                        performanceBaseline
-                    )
-                },
-                timestamp: new Date()
-            }
-        )
+        this.#performanceLog.push({
+            operation: methodName,
+            metrics: {
+                iterations,
+                duration,
+                memoryDelta,
+                anomaliesDetected: trackingResult.anomalies.length,
+                thresholdViolations: trackingResult.thresholdViolations.length,
+                baselineExists: Boolean(performanceBaseline)
+            },
+            timestamp: new Date()
+        })
     }
 
     /**
@@ -283,18 +283,20 @@ export class AnomalyDetectionManager {
      * @see {@link IAnomalyDetectionResult} for detailed return value structure
      * @see {@link trackMethodPerformance} for anomaly detection implementation
      */
-    public async performWithAnomalyDetection(methodName: string, iterations: number): Promise<IAnomalyDetectionResult> {
+    public async performWithAnomalyDetection(
+        methodName: string, iterations: number
+    ): Promise<IAnomalyDetectionResult> {
         const {
             startTime, startMemory
         } = AnomalyDetectionManager.#initializePerformanceMeasurement()
 
-        const executionResult = await AnomalyDetectionManager.#executeComputationalOperation(
-            iterations
-        )
+        const executionResult = await AnomalyDetectionManager.#executeComputationalOperation(iterations)
 
         const {
             duration, memoryDelta
-        } = AnomalyDetectionManager.#calculatePerformanceMetrics(startTime, startMemory)
+        } = AnomalyDetectionManager.#calculatePerformanceMetrics(
+            startTime, startMemory
+        )
 
         const {
             trackingResult, performanceBaseline

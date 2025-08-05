@@ -20,6 +20,7 @@
  */
 
 import type { ReadonlyDeep } from 'type-fest'
+
 import { DEFAULT_LOG_CONFIG, type ILogDecoratorConfig } from '@/decorators/types.ts'
 import {
     AnomalyDetector,
@@ -45,21 +46,9 @@ export interface IEnterprisePerformanceConfig {
      * 📊 **Performance Baseline Configuration**
      */
     readonly baseline: {
-        readonly trackingEnabled: boolean
-        readonly minSampleSize: number
         readonly maxHistoryDays: number
-    }
-
-    /**
-     * 🎚️ **Performance Thresholds Configuration**
-     */
-    readonly thresholds: {
-        readonly slowMethodWarning: number // ms
-        readonly slowMethodCritical: number // ms
-        readonly memoryWarning: number // bytes
-        readonly memoryCritical: number // bytes
-        readonly cpuWarning: number // percentage
-        readonly cpuCritical: number // percentage
+        readonly minSampleSize: number
+        readonly trackingEnabled: boolean
     }
 
     /**
@@ -69,6 +58,28 @@ export interface IEnterprisePerformanceConfig {
         readonly logAnomalies: boolean
         readonly logBaselines: boolean
         readonly logThresholdViolations: boolean
+    }
+
+    /**
+     * 🎚️ **Performance Thresholds Configuration**
+     */
+    readonly thresholds: {
+
+        // Percentage
+        readonly cpuCritical: number
+
+        // Bytes
+        readonly cpuWarning: number
+
+        // Bytes
+        readonly memoryCritical: number
+
+        // Ms
+        readonly memoryWarning: number
+
+        // Ms
+        readonly slowMethodCritical: number
+        readonly slowMethodWarning: number // Percentage
     }
 }
 
@@ -113,6 +124,39 @@ let anomalyDetector: AnomalyDetector | undefined
 const performanceBaselines = new Map<string, IPerformanceBaseline>()
 
 /**
+ * 🎯 **Clear All Anomaly Detection Data**
+ */
+export function clearAnomalyDetectionData(): void {
+    anomalyDetector?.clearAll()
+}
+
+/**
+ * 🎯 **Clear Performance Baselines**
+ *
+ * @param olderThanDays - Optional: only clear baselines older than specified days
+ */
+export function clearPerformanceBaselines(
+    olderThanDays?: number
+): void {
+    if (olderThanDays !== undefined && olderThanDays > 0 && !Number.isNaN(
+        olderThanDays
+    )) {
+        const cutoffTime = Date.now() - (olderThanDays * 24 * 60 * 60 * 1000)
+
+        for (const [method, baseline] of performanceBaselines.entries()) {
+            if (baseline.lastUpdated < cutoffTime) {
+                performanceBaselines.delete(
+                    method
+                )
+            }
+        }
+    }
+    else {
+        performanceBaselines.clear()
+    }
+}
+
+/**
  * 🎯 **Configure Enterprise Performance Monitoring**
  *
  * @param config - The enterprise performance configuration
@@ -146,20 +190,20 @@ export function configureEnterprisePerformanceMonitoring(
         // Convert Enterprise config to Anomaly Detector config format
         const anomalyConfig = {
             performance: {
-                slowThreshold: 3.0,
+                slowThreshold: 3,
                 fastThreshold: 0.1,
                 stdDevSensitivity: enterprisePerformanceConfig.anomalyDetection.thresholdMultiplier ?? 2.5,
                 minSampleSize: enterprisePerformanceConfig.anomalyDetection.minSamples ?? 10
             },
             memory: {
-                highThreshold: 2.0,
+                highThreshold: 2,
                 lowThreshold: 0.1,
-                stdDevSensitivity: 2.0
+                stdDevSensitivity: 2
             },
             frequency: {
                 highThreshold: 100,
                 lowThreshold: 1,
-                timeWindow: 60000 // 1 minute
+                timeWindow: 60_000 // 1 minute
             },
             error: {
                 spikeThreshold: 0.1,
@@ -187,12 +231,73 @@ export function configureEnterprisePerformanceMonitoring(
 }
 
 /**
+ * 🎯 **Get All Performance Baselines**
+ *
+ * @returns Map of all baseline data
+ */
+export function getAllPerformanceBaselines(): ReadonlyMap<string, IPerformanceBaseline> {
+    return new Map(
+        performanceBaselines
+    )
+}
+
+/**
+ * 🎯 **Get Anomaly Detection Statistics**
+ *
+ * @returns Current anomaly detector statistics
+ */
+export function getAnomalyDetectionStatistics(): {
+    readonly isEnabled: boolean
+    readonly totalMethods: number
+    readonly trackedMethods: readonly string[]
+} {
+    if (!anomalyDetector) {
+        return {
+            trackedMethods: [],
+            totalMethods: 0,
+            isEnabled: false
+        }
+    }
+
+    const trackedMethods = anomalyDetector.getTrackedMethods()
+
+    return {
+        trackedMethods,
+        totalMethods: trackedMethods.length,
+        isEnabled: enterprisePerformanceConfig.anomalyDetection.enabled ?? false
+    }
+}
+
+/**
  * 🎯 **Get Current Enterprise Performance Configuration**
  *
  * @returns The current enterprise configuration
  */
 export function getEnterprisePerformanceConfiguration(): ReadonlyDeep<IEnterprisePerformanceConfig> {
     return enterprisePerformanceConfig
+}
+
+/**
+ * 🎯 **Get Global Anomaly Detector Instance**
+ *
+ * @returns The current anomaly detector instance
+ */
+export function getGlobalAnomalyDetector(): AnomalyDetector | undefined {
+    return anomalyDetector
+}
+
+/**
+ * 🎯 **Get Performance Baseline for a Method**
+ *
+ * @param method - The method name
+ * @returns The baseline data or undefined
+ */
+export function getPerformanceBaseline(
+    method: string
+): IPerformanceBaseline | undefined {
+    return performanceBaselines.get(
+        method
+    )
 }
 
 /**
@@ -227,9 +332,7 @@ export function updatePerformanceBaseline(
         method
     )
     const timestamp = Date.now()
-    const validMemoryDelta = Math.max(
-        0, memory
-    ) // Ensure memory delta is not negative for averaging
+    const validMemoryDelta = Math.max(0, memory) // Ensure memory delta is not negative for averaging
 
     if (!existing) {
         const newBaseline: IPerformanceBaseline = {
@@ -243,9 +346,7 @@ export function updatePerformanceBaseline(
             semantic
         }
 
-        performanceBaselines.set(
-            method, newBaseline
-        )
+        performanceBaselines.set(method, newBaseline)
 
         return newBaseline
     }
@@ -258,114 +359,16 @@ export function updatePerformanceBaseline(
         method,
         averageDuration: existing.averageDuration + alpha * (duration - existing.averageDuration),
         medianDuration: existing.medianDuration, // Keep existing for now (complex to update incrementally)
-        p95Duration: Math.max(
-            existing.p95Duration, duration
-        ), // Simplified P95 approximation
+        p95Duration: Math.max(existing.p95Duration, duration), // Simplified P95 approximation
         averageMemory: existing.averageMemory + alpha * (validMemoryDelta - existing.averageMemory),
         sampleSize: newSampleSize,
         lastUpdated: timestamp,
         semantic: semantic ?? existing.semantic
     }
 
-    performanceBaselines.set(
-        method, updatedBaseline
-    )
+    performanceBaselines.set(method, updatedBaseline)
 
     return updatedBaseline
-}
-
-/**
- * 🎯 **Get Performance Baseline for a Method**
- *
- * @param method - The method name
- * @returns The baseline data or undefined
- */
-export function getPerformanceBaseline(
-    method: string
-): IPerformanceBaseline | undefined {
-    return performanceBaselines.get(
-        method
-    )
-}
-
-/**
- * 🎯 **Get All Performance Baselines**
- *
- * @returns Map of all baseline data
- */
-export function getAllPerformanceBaselines(): ReadonlyMap<string, IPerformanceBaseline> {
-    return new Map(
-        performanceBaselines
-    )
-}
-
-/**
- * 🎯 **Clear Performance Baselines**
- *
- * @param olderThanDays - Optional: only clear baselines older than specified days
- */
-export function clearPerformanceBaselines(
-    olderThanDays?: number
-): void {
-    if (olderThanDays !== undefined && olderThanDays > 0 && !Number.isNaN(
-        olderThanDays
-    )) {
-        const cutoffTime = Date.now() - (olderThanDays * 24 * 60 * 60 * 1000)
-
-        for (const [method, baseline] of performanceBaselines.entries()) {
-            if (baseline.lastUpdated < cutoffTime) {
-                performanceBaselines.delete(
-                    method
-                )
-            }
-        }
-    }
-    else {
-        performanceBaselines.clear()
-    }
-}
-
-/**
- * 🎯 **Get Anomaly Detection Statistics**
- *
- * @returns Current anomaly detector statistics
- */
-export function getAnomalyDetectionStatistics(): {
-    readonly trackedMethods: readonly string[]
-    readonly totalMethods: number
-    readonly isEnabled: boolean
-} {
-    if (!anomalyDetector) {
-        return {
-            trackedMethods: [],
-            totalMethods: 0,
-            isEnabled: false
-        }
-    }
-
-    const trackedMethods = anomalyDetector.getTrackedMethods()
-
-    return {
-        trackedMethods,
-        totalMethods: trackedMethods.length,
-        isEnabled: enterprisePerformanceConfig.anomalyDetection.enabled ?? false
-    }
-}
-
-/**
- * 🎯 **Clear All Anomaly Detection Data**
- */
-export function clearAnomalyDetectionData(): void {
-    anomalyDetector?.clearAll()
-}
-
-/**
- * 🎯 **Get Global Anomaly Detector Instance**
- *
- * @returns The current anomaly detector instance
- */
-export function getGlobalAnomalyDetector(): AnomalyDetector | undefined {
-    return anomalyDetector
 }
 
 /*

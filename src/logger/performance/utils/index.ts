@@ -21,34 +21,34 @@
 
 // Enhanced Configuration & Baseline Management
 export {
-    configureEnterprisePerformanceMonitoring,
-    getEnterprisePerformanceConfiguration,
-    updatePerformanceBaseline,
-    getPerformanceBaseline,
-    getAllPerformanceBaselines,
-    clearPerformanceBaselines,
-    getAnomalyDetectionStatistics,
     clearAnomalyDetectionData,
-    getGlobalAnomalyDetector
+    clearPerformanceBaselines,
+    configureEnterprisePerformanceMonitoring,
+    getAllPerformanceBaselines,
+    getAnomalyDetectionStatistics,
+    getEnterprisePerformanceConfiguration,
+    getGlobalAnomalyDetector,
+    getPerformanceBaseline,
+    updatePerformanceBaseline
 } from './enhanced-config.ts'
-
-// Performance Tracking
-export { trackMethodPerformance } from './tracking.ts'
-
-// Performance Snapshots
-export {
-    createEnhancedPerformanceSnapshot,
-    createPerformanceSnapshot,
-    calculatePerformanceDifference
-} from './snapshots.ts'
 
 // Performance Observer & perf_hooks
 export {
+    clearPerformanceData,
     createPerformanceMark,
     createPerformanceMeasure,
     getGCPerformanceData,
     getPerformanceMarks,
     getPerformanceMeasures,
-    getResourceTimings,
-    clearPerformanceData
+    getResourceTimings
 } from './perf-hooks.ts'
+
+// Performance Snapshots
+export {
+    calculatePerformanceDifference,
+    createEnhancedPerformanceSnapshot,
+    createPerformanceSnapshot
+} from './snapshots.ts'
+
+// Performance Tracking
+export { trackMethodPerformance } from './tracking.ts'

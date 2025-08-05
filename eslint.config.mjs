@@ -77,6 +77,8 @@ export default tseslint.config(
           rules: {
                // Migrated to @stylistic - now commented out
                // 'arrow-parens': ['error', 'as-needed'],
+               'no-magic-numbers': ["error", { "ignore": [0, 1] }],
+               'no-ternary': 'off',
                'no-var': 'error',
                'no-eval': 'error',
                // 'indent': ['error', 4], // Migrated to @stylistic
@@ -1388,7 +1390,7 @@ export default tseslint.config(
                }],
 
                // ===== FUNCTIONS =====
-               '@stylistic/function-paren-newline': ['error', 'multiline-arguments'],
+               '@stylistic/function-paren-newline': ['error', { "minItems": 2 }], 
                '@stylistic/function-call-argument-newline': ['error', 'consistent'],
                '@stylistic/function-call-spacing': ['error', 'never'],
                '@stylistic/arrow-parens': ['error', 'as-needed', {
@@ -1398,7 +1400,7 @@ export default tseslint.config(
                     'before': true,
                     'after': true
                }],
-               '@stylistic/implicit-arrow-linebreak': ['error', 'beside'],
+               '@stylistic/implicit-arrow-linebreak': ['error', 'below'],
                '@stylistic/wrap-iife': ['error', 'inside', {
                     'functionPrototypeMethods': true
                }],

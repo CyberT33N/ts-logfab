@@ -1,105 +1,20 @@
 /*
-███████████████████████████████████████████████████████████████████████████████
-██******************** PRESENTED BY t33n Software ***************************██
-██                                                                           ██
-██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
-██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
-██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
-██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
-██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
-██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
-██                                                                           ██
-███████████████████████████████████████████████████████████████████████████████
-███████████████████████████████████████████████████████████████████████████████
-*/
+ *███████████████████████████████████████████████████████████████████████████████
+ *██******************** PRESENTED BY t33n Software ***************************██
+ *██                                                                           ██
+ *██                  ████████╗██████╗ ██████╗ ███╗   ██╗                      ██
+ *██                  ╚══██╔══╝╚════██╗╚════██╗████╗  ██║                      ██
+ *██                     ██║    █████╔╝ █████╔╝██╔██╗ ██║                      ██
+ *██                     ██║    ╚═══██╗ ╚═══██╗██║╚██╗██║                      ██
+ *██                     ██║   ██████╔╝██████╔╝██║ ╚████║                      ██
+ *██                     ╚═╝   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝                      ██
+ *██                                                                           ██
+ *███████████████████████████████████████████████████████████████████████████████
+ *███████████████████████████████████████████████████████████████████████████████
+ */
 
 // ==== Imports ====
-import type { ReadonlyDeep } from 'type-fest'
-
-export interface ILogContext {
-    readonly className?: string
-    readonly methodName?: string
-    readonly methodSignature?: string
-    readonly operationId?: string
-    readonly requestId?: string
-    readonly userId?: string
-    readonly args?: Record<string, unknown>
-    readonly metadata?: Record<string, unknown>
-}
-
-export interface IPerformanceMetrics {
-    readonly startTime: number
-    readonly duration?: number
-    readonly memoryUsage?: NodeJS.MemoryUsage
-    readonly cpuUsage?: NodeJS.CpuUsage
-    readonly gcPerformance?: PerformanceEntry[]
-    readonly markEntries?: PerformanceEntry[]
-    readonly measureEntries?: PerformanceEntry[]
-    readonly resourceTimings?: PerformanceEntry[]
-}
-
-// ==== Enhanced Types for Advanced Features ====
-
-/**
- * 🔗 Correlation Context Interface
- * Manages correlation IDs, workflow IDs, and request context
- */
-export interface ICorrelationContext {
-    readonly correlationId: string
-    readonly workflowId?: string
-    readonly requestId?: string
-    readonly sessionId?: string
-    readonly userId?: string
-    readonly parentCorrelationId?: string
-    readonly depth: number
-    readonly timestamp: number
-}
-
-/**
- * 🎯 Semantic Context Interface  
- * Business context and domain information
- */
-export interface ISemanticContext {
-    readonly operation: 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'COMPUTE' | 'UNKNOWN'
-    readonly domain: 'USER' | 'ORDER' | 'PRODUCT' | 'FINANCE' | 'SYSTEM' | 'GENERAL'
-    readonly complexity: 'LOW' | 'MEDIUM' | 'HIGH'
-    readonly businessKey?: string
-    readonly tags?: readonly string[]
-}
-
-/**
- * 🚨 Anomaly Detection Result Interface
- * Statistical anomaly information
- */
-export interface IAnomalyResult {
-    readonly isAnomaly: boolean
-    readonly severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
-    readonly confidence: number
-    readonly deviation: number
-    readonly baseline: number
-    readonly current: number
-    readonly threshold: number
-    readonly methodKey: string
-    readonly timestamp: number
-    readonly description?: string
-}
-
-/**
- * 📊 Performance Baseline Interface
- * Historical performance tracking
- */
-export interface IPerformanceBaseline {
-    readonly methodKey: string
-    readonly samples: readonly number[]
-    readonly average: number
-    readonly standardDeviation: number
-    readonly minimum: number
-    readonly maximum: number
-    readonly lastUpdated: number
-    readonly sampleCount: number
-    readonly warningThreshold: number
-    readonly criticalThreshold: number
-}
+import  { type ReadonlyDeep } from 'type-fest'
 
 /**
  * 🌍 Logging Environment Enum
@@ -107,8 +22,8 @@ export interface IPerformanceBaseline {
  */
 export enum ELoggingEnvironment {
     development = 'development',
-    staging = 'staging', 
     production = 'production',
+    staging = 'staging',
     test = 'test'
 }
 
@@ -117,9 +32,43 @@ export enum ELoggingEnvironment {
  * Output format configuration
  */
 export enum ELoggingFormat {
+    auto = 'auto',
     human = 'human',
-    machine = 'machine',
-    auto = 'auto'
+    machine = 'machine'
+}
+
+// ==== Enhanced Types for Advanced Features ====
+
+/**
+ * 🚨 Anomaly Detection Result Interface
+ * Statistical anomaly information
+ */
+export interface IAnomalyResult {
+    readonly baseline: number
+    readonly confidence: number
+    readonly current: number
+    readonly description?: string
+    readonly deviation: number
+    readonly isAnomaly: boolean
+    readonly methodKey: string
+    readonly severity: 'CRITICAL' | 'HIGH' | 'LOW' | 'MEDIUM'
+    readonly threshold: number
+    readonly timestamp: number
+}
+
+/**
+ * 🔗 Correlation Context Interface
+ * Manages correlation IDs, workflow IDs, and request context
+ */
+export interface ICorrelationContext {
+    readonly correlationId: string
+    readonly depth: number
+    readonly parentCorrelationId?: string
+    readonly requestId?: string
+    readonly sessionId?: string
+    readonly timestamp: number
+    readonly userId?: string
+    readonly workflowId?: string
 }
 
 /**
@@ -127,41 +76,95 @@ export enum ELoggingFormat {
  * Extended logging context with new features
  */
 export interface IEnhancedLogContext extends ILogContext {
-    readonly correlationContext?: ICorrelationContext
-    readonly semanticContext?: ISemanticContext
-    readonly performanceBaseline?: IPerformanceBaseline
     readonly anomalyResult?: IAnomalyResult
+    readonly correlationContext?: ICorrelationContext
     readonly environment?: ELoggingEnvironment
     readonly format?: ELoggingFormat
+    readonly performanceBaseline?: IPerformanceBaseline
+    readonly semanticContext?: ISemanticContext
 }
 
 /**
- * 🚀 Enhanced Logger Interface
+ * � Enhanced Logger Interface
  * Extended logger with anomaly and performance features
  */
 export interface IEnhancedLogger {
-    // Core logging methods
-    info(message: string, context?: ReadonlyDeep<IEnhancedLogContext>): void
-    warn(message: string, context?: ReadonlyDeep<IEnhancedLogContext>): void
-    error(message: string, context?: ReadonlyDeep<IEnhancedLogContext>): void
-    debug(message: string, context?: ReadonlyDeep<IEnhancedLogContext>): void
-    
-    // Performance tracking
-    startPerformanceTracking(methodKey: string): void
-    endPerformanceTracking(methodKey: string): IAnomalyResult | null
-    
+
+    debug: (message: string, context?: ReadonlyDeep<IEnhancedLogContext>) => void
+    endPerformanceTracking: (methodKey: string) => IAnomalyResult | null
+    error: (message: string, context?: ReadonlyDeep<IEnhancedLogContext>) => void
+
     // Anomaly statistics
-    getAnomalyStatistics(): {
-        readonly totalAnomalies: number
+    getAnomalyStatistics: () => {
         readonly anomaliesByMethod: Record<string, number>
         readonly anomaliesBySeverity: Record<string, number>
+        readonly totalAnomalies: number
     }
-    
+
     // Baseline management
-    getPerformanceBaseline(methodKey: string): IPerformanceBaseline | null
-    resetPerformanceBaseline(methodKey: string): void
-    
+    getPerformanceBaseline: (methodKey: string) => IPerformanceBaseline | null
+
+    // Core logging methods
+    info: (message: string, context?: ReadonlyDeep<IEnhancedLogContext>) => void
+
+    resetPerformanceBaseline: (methodKey: string) => void
+
+    // Performance tracking
+    startPerformanceTracking: (methodKey: string) => void
+    warn: (message: string, context?: ReadonlyDeep<IEnhancedLogContext>) => void
+
     // Context management
-    withCorrelationContext(context: ReadonlyDeep<ICorrelationContext>): IEnhancedLogger
-    withSemanticContext(context: ReadonlyDeep<ISemanticContext>): IEnhancedLogger
-} 
+    withCorrelationContext: (context: ReadonlyDeep<ICorrelationContext>) => IEnhancedLogger
+    withSemanticContext: (context: ReadonlyDeep<ISemanticContext>) => IEnhancedLogger
+}
+
+export interface ILogContext {
+    readonly args?: Record<string, unknown>
+    readonly className?: string
+    readonly metadata?: Record<string, unknown>
+    readonly methodName?: string
+    readonly methodSignature?: string
+    readonly operationId?: string
+    readonly requestId?: string
+    readonly userId?: string
+}
+
+/**
+ * � Performance Baseline Interface
+ * Historical performance tracking
+ */
+export interface IPerformanceBaseline {
+    readonly average: number
+    readonly criticalThreshold: number
+    readonly lastUpdated: number
+    readonly maximum: number
+    readonly methodKey: string
+    readonly minimum: number
+    readonly sampleCount: number
+    readonly samples: readonly number[]
+    readonly standardDeviation: number
+    readonly warningThreshold: number
+}
+
+export interface IPerformanceMetrics {
+    readonly cpuUsage?: NodeJS.CpuUsage
+    readonly duration?: number
+    readonly gcPerformance?: PerformanceEntry[]
+    readonly markEntries?: PerformanceEntry[]
+    readonly measureEntries?: PerformanceEntry[]
+    readonly memoryUsage?: NodeJS.MemoryUsage
+    readonly resourceTimings?: PerformanceEntry[]
+    readonly startTime: number
+}
+
+/**
+ * 🎯 Semantic Context Interface
+ * Business context and domain information
+ */
+export interface ISemanticContext {
+    readonly businessKey?: string
+    readonly complexity: 'HIGH' | 'LOW' | 'MEDIUM'
+    readonly domain: 'FINANCE' | 'GENERAL' | 'ORDER' | 'PRODUCT' | 'SYSTEM' | 'USER'
+    readonly operation: 'COMPUTE' | 'DELETE' | 'READ' | 'UNKNOWN' | 'UPDATE' | 'WRITE'
+    readonly tags?: readonly string[]
+}
