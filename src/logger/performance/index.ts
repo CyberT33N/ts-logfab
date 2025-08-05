@@ -19,9 +19,9 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-import { PerformanceMonitor } from './core/index.ts'
+import { PerformanceMonitor } from './core'
 
-import type { IPerformanceMonitorConfig } from './types.ts'
+import type { IPerformanceMonitorConfig } from './types'
 import type { ReadonlyDeep } from 'type-fest'
 
 export { PerformanceMonitor } from './core'

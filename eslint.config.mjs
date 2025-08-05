@@ -1099,7 +1099,7 @@ export default tseslint.config(
                'import/no-webpack-loader-syntax': 'error', // Keine Webpack-spezifische Syntax
                'import/no-self-import': 'error', // Verhindert Selbst-Imports
                'import/no-useless-path-segments': ['error', {
-                    'noUselessIndex': true,
+                    'noUselessIndex': true,   // Enterprise Standard: ./core statt ./core/index.ts
                     'commonjs': true
                }],
 
@@ -1184,15 +1184,16 @@ export default tseslint.config(
                     'allowLiteral': false
                }],
 
-               // ===== FILE EXTENSIONS (TypeScript/React Ready) =====
-               'import/extensions': ['error', 'always', {
-                    'ts': 'always',
-                    'tsx': 'always',
-                    'js': 'never',
-                    'jsx': 'never',
-                    'json': 'always',
-                    'css': 'always',
-                    'scss': 'always'
+               // ===== FILE EXTENSIONS (Enterprise Barrel Pattern Standard) =====
+               // Optimal für Enterprise: Barrel Pattern + direkte .ts Imports
+               'import/extensions': ['error', 'ignorePackages', {
+                    'js': 'never',       // JavaScript: ./file (ohne .js für Node-Kompatibilität)  
+                    'jsx': 'never',      // React JS: ./Component (ohne .jsx)
+                    'ts': 'never',       // TypeScript: ./core (Barrel) - Enterprise Standard
+                    'tsx': 'never',      // React TS: ./Component (Barrel Pattern)
+                    'json': 'always',    // Daten: ./config.json (explizit)
+                    'css': 'always',     // Styles: ./styles.css (explizit)
+                    'scss': 'always'     // Sass: ./styles.scss (explizit)
                }],
 
                // ===== MONOREPO & NAMESPACE SUPPORT =====

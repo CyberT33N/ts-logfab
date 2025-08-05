@@ -1,153 +1,224 @@
 {
-     "exclude": [
-          "node_modules", // Ignoriere den `node_modules`-Ordner (keine Typprüfung für Abhängigkeiten)
-          "out" // Ignoriere den `out`-Ordner (falls du Build-Output generierst)
-     ],
-     "compilerOptions": {
-          /*
-         ✅ ECMAScript-Zielversion auf ES2023 gesetzt.
-         - Node.js 20.19 unterstützt ES2023 (siehe Electron 29 Docs)
-           - https://compat-table.github.io/compat-table/es2016plus/
-           - https://www.electronjs.org/docs/latest/tutorial/electron-timelines
-         - Keine automatische Downleveling-Transpilation nötig.
-       */
-          "target": "ES2023",
-          /*
-         ✅ Klasseneigenschaften mit `Object.defineProperty` setzen.
-         - Wichtig für React/Vue, um sich wie standardmäßige JS-Klassen zu verhalten.
-       */
-          "useDefineForClassFields": true,
-          /*
-         ✅ Eingebundene Standardbibliotheken.
-         - ES2023: Aktuellste JavaScript-Funktionen.
-         - DOM: Zugriff auf `document`, `window` usw. (wichtig für Renderer-Prozess).
-         - DOM.Iterable: Erlaubt `for...of` auf NodeLists.
-       */
-          "lib": [
-               "ES2023",
-               "DOM",
-               "DOM.Iterable"
-          ],
-          /*
-         ✅ Module auf `NodeNext` gesetzt.
-         - Unterstützt sowohl CommonJS (`require()`) als auch ESM (`import`).
-         - Wichtig für moderne Node.js-Module.
-       */
-          "module": "NodeNext",
-          /*
-         ✅ Überspringt Typprüfung für Bibliotheken.
-         - Erhöht die Kompiliergeschwindigkeit.
-         - Sollte **deaktiviert** werden, wenn du unsichere Abhängigkeiten prüfst.
-       */
-          "skipLibCheck": true,
-          /*
-         ✅ Modulauflösung auf `node` gesetzt.
-         - Erlaubt das Importieren von `.js`/`.mjs`/`.cjs`-Dateien.
-       */
-          "moduleResolution": "NodeNext",
-          /*
-         ✅ Erlaubt das Importieren von `.ts`-Dateien mit Erweiterung.
-         - Notwendig für TypeScript ES-Module (`import "./file.ts"`).
-       */
-          "allowImportingTsExtensions": true,
-          /*
-         ✅ Erlaubt das Importieren von `.json`-Dateien.
-         - Ohne diese Option würde TypeScript einen Fehler werfen.
-       */
-          "resolveJsonModule": true,
-          /*
-         ✅ Erzwingt, dass jede `.ts`-Datei als ein isoliertes Modul behandelt wird.
-         - Erforderlich für den ESBuild- und Babel-Transpiler.
-       */
-          "isolatedModules": true,
-          /*
-         ✅ Deaktiviert die Ausgabe von `.js`-Dateien.
-         - Wichtig für TypeScript-only-Projekte oder wenn eine separate Build-Pipeline existiert.
-       */
-          "noEmit": true,
-          /*
-         ✅ Aktiviert den "Strict Mode" für TypeScript.
-         - Hilft, viele potenzielle Fehler frühzeitig zu erkennen.
-       */
-          "strict": true,
-          /*
-         ✅ Fehler werfen, wenn unbenutzte Variablen vorhanden sind.
-         - Hilft, toten Code zu vermeiden.
-       */
-          "noUnusedLocals": true,
-          /*
-         ✅ Fehler werfen, wenn unbenutzte Funktionsparameter vorhanden sind.
-         - Hilft, unnötigen Code zu reduzieren.
-       */
-          "noUnusedParameters": true,
-          /*
-         ✅ Fehler werfen, wenn `switch`-Statements Fälle ohne `break` haben.
-         - Verhindert unerwartetes Verhalten.
-       */
-          "noFallthroughCasesInSwitch": true,
-          /*
-         ✅ Erlaubt das Importieren von Modulen, die keinen `default`-Export haben.
-         - Nützlich für CommonJS-Module (`import fs from "fs"`).
-       */
-          "allowSyntheticDefaultImports": true,
-          /*
-         ⚠️ **Erzeugt Metadaten für Dekoratoren (z. B. für NestJS, TypeORM).**
-         - **Nur aktiv lassen, wenn du Reflection brauchst.**
-       */
-          // "emitDecoratorMetadata": true,
-          /*
-         ✅ Erlaubt experimentelle Dekoratoren (z. B. `@Injectable()` in NestJS).
-         - Dekoratoren sind noch nicht offiziell in JavaScript, daher "experimentell".
-       */
-          "experimentalDecorators": true,
-          /*
-         ✅ Erzwingt explizite Typdeklarationen (kein `any` erlaubt).
-         - Reduziert unerwartetes Verhalten durch dynamische Typen.
-       */
-          "strictNullChecks": true,
-          /*
-         ✅ Erzwingt explizite Typdeklarationen (kein `any` erlaubt).
-         - Reduziert unerwartetes Verhalten durch dynamische Typen.
-       */
-          "noImplicitAny": true,
-          /*
-         ✅ Deaktiviert Source Maps.
-         - Falls Debugging nötig ist, setze auf `true`.
-       */
-          "sourceMap": true,
-          /*
-         ✅ Erlaubt Interoperabilität zwischen CommonJS und ES-Modulen.
-         - Falls du CJS (`require()`) und ESM (`import`) mischst, **essentiell**.
-       */
-          "esModuleInterop": true,
-          /*
-         ✅ Erzwingt konsistente Groß-/Kleinschreibung in Imports.
-         - Verhindert Bugs bei case-sensitive Dateisystemen (z. B. Linux).
-       */
-          "forceConsistentCasingInFileNames": true,
-          /*
-         ✅ Fehler werfen, wenn eine Funktion nicht explizit `return` hat.
-         - Verhindert Bugs durch unerwartete `undefined`-Rückgaben.
-       */
-          "noImplicitReturns": true,
-          /*
-         ✅ Basisverzeichnis für `paths`-Aliase.
-         - Erlaubt z. B. `import foo from "@/utils/foo"` statt `import foo from "../../utils/foo"`.
-       */
-          "baseUrl": ".",
-          /*
-         ✅ Definiert TypeScript-Module mit Aliassen.
-         - `@main/*` -> `src/main/*`
-         - `@/*` -> `src/*`
-         - Vermeidet tiefe, relative Import-Pfade.
-       */
-          "paths": {
-               "@test/*": [
-                    "test/*"
-               ],
-               "@/*": [
-                    "src/*"
-               ]
-          }
-     }
+  "compilerOptions": {
+
+    /*
+     *✅ Eingebundene Standardbibliotheken.
+     *- ES2023: Aktuellste JavaScript-Funktionen.
+     *- DOM: Zugriff auf `document`, `window` usw. (wichtig für Renderer-Prozess).
+     *- DOM.Iterable: Erlaubt `for...of` auf NodeLists.
+     */
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+
+    /*
+     *✅ ECMAScript-Zielversion auf ES2023 gesetzt.
+     *- Node.js 20.19 unterstützt ES2023 (siehe Electron 29 Docs)
+     *  - https://compat-table.github.io/compat-table/es2016plus/
+     *  - https://www.electronjs.org/docs/latest/tutorial/electron-timelines
+     *- Keine automatische Downleveling-Transpilation nötig.
+     */
+    "target": "ES2023",
+
+    /*
+     *✅ Klasseneigenschaften mit `Object.defineProperty` setzen.
+     *- Wichtig für React/Vue, um sich wie standardmäßige JS-Klassen zu verhalten.
+     */
+    "useDefineForClassFields": true,
+
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * 📦 MODULE SYSTEM CONFIGURATION
+     * ═══════════════════════════════════════════════════════════════
+     *
+     * VERFÜGBARE OPTIONEN:
+     *
+     * • "None"        → Keine Module, alles global (Legacy)
+     * • "CommonJS"    → Node.js require() System (Legacy/Backend)
+     * • "AMD"         → Asynchronous Module Definition (Browser Legacy)
+     * • "UMD"         → Universal Module Definition (Library Builds)
+     * • "System"      → SystemJS Module System (Selten verwendet)
+     * • "ES6/ES2015"  → Basis ES-Module (Statische Imports/Exports)
+     * • "ES2020"      → ES-Module + Dynamic Imports (import())
+     * • "ES2022"      → ES-Module + Top-Level Await Support
+     * • "ESNext"      → Neueste ES-Module Features (🎯 AKTUELL)
+     * • "Node16"      → Node.js 16+ ESM/CJS Hybrid (Sehr strikt)
+     * • "NodeNext"    → Node.js Latest ESM/CJS (Sehr strikt)
+     *
+     * ENTERPRISE WAHL: "ESNext"
+     * ✅ Moderne ES-Module mit maximaler Flexibilität
+     * ✅ Barrel Pattern Support ohne Index-Zwang
+     * ✅ Kompatibel mit allen Bundlern (Vite, Webpack, esbuild)
+     * ✅ Perfekte Balance zwischen modern und praktisch
+     */
+    "module": "ESNext",
+
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * 🔍 MODULE RESOLUTION STRATEGY
+     * ═══════════════════════════════════════════════════════════════
+     *
+     * VERFÜGBARE OPTIONEN:
+     *
+     * • "classic"     → TypeScript Original (DEPRECATED, nicht verwenden)
+     *                   Sucht relativ zu importierender Datei
+     *                   Für Legacy-Projekte vor TS 2.0
+     *
+     * • "node"        → Node.js Kompatibel (🎯 AKTUELL)
+     *                   ./module → ./module.ts → ./module/index.ts
+     *                   ✅ Barrel Pattern Support (./core funktioniert)
+     *                   ✅ node_modules Auflösung wie Node.js
+     *                   ✅ Enterprise Standard (Google, Microsoft, Meta)
+     *                   ✅ Entwicklerfreundlich und flexibel
+     *
+     * • "node16"      → Node.js 16+ ESM/CJS Hybrid (Sehr strikt)
+     *                   Erzwingt explizite Dateierweiterungen
+     *                   ./module.js (auch für .ts Dateien!)
+     *                   Respektiert package.json "type": "module"
+     *                   ⚠️ Komplex für tägliche Entwicklung
+     *
+     * • "nodenext"    → Node.js Latest (Sehr strikt)
+     *                   Wie node16 aber mit neuesten Node.js Features
+     *                   ./core/index.ts MUSS explizit sein
+     *                   ⚠️ Bricht Barrel Pattern Eleganz
+     *
+     * ENTERPRISE WAHL: "node"
+     * ✅ Perfekte Balance zwischen modern und praktisch
+     * ✅ Barrel Pattern: ./core → ./core/index.ts (automatisch)
+     * ✅ Maximale IDE-Integration und IntelliSense
+     * ✅ Kompatibel mit allen Tools (Bundler, Linter, etc.)
+     */
+    "moduleResolution": "node",
+
+    /*
+     *✅ Überspringt Typprüfung für Bibliotheken.
+     *- Erhöht die Kompiliergeschwindigkeit.
+     *- Sollte **deaktiviert** werden, wenn du unsichere Abhängigkeiten prüfst.
+     */
+    "skipLibCheck": true,
+
+    /*
+     *✅ Erlaubt das Importieren von `.ts`-Dateien mit Erweiterung.
+     *- Notwendig für TypeScript ES-Module (`import "./file.ts"`).
+     */
+    "allowImportingTsExtensions": true,
+
+    /*
+     *✅ Erzwingt, dass jede `.ts`-Datei als ein isoliertes Modul behandelt wird.
+     *- Erforderlich für den ESBuild- und Babel-Transpiler.
+     */
+    "isolatedModules": true,
+
+    /*
+     *✅ Erlaubt das Importieren von `.json`-Dateien.
+     *- Ohne diese Option würde TypeScript einen Fehler werfen.
+     */
+    "resolveJsonModule": true,
+
+    /*
+     *✅ Deaktiviert die Ausgabe von `.js`-Dateien.
+     *- Wichtig für TypeScript-only-Projekte oder wenn eine separate Build-Pipeline existiert.
+     */
+    "noEmit": true,
+
+    /*
+     *✅ Fehler werfen, wenn unbenutzte Variablen vorhanden sind.
+     *- Hilft, toten Code zu vermeiden.
+     */
+    "noUnusedLocals": true,
+
+    /*
+     *✅ Aktiviert den "Strict Mode" für TypeScript.
+     *- Hilft, viele potenzielle Fehler frühzeitig zu erkennen.
+     */
+    "strict": true,
+
+    /*
+     *✅ Fehler werfen, wenn unbenutzte Funktionsparameter vorhanden sind.
+     *- Hilft, unnötigen Code zu reduzieren.
+     */
+    "noUnusedParameters": true,
+
+    /*
+     *✅ Fehler werfen, wenn `switch`-Statements Fälle ohne `break` haben.
+     *- Verhindert unerwartetes Verhalten.
+     */
+    "noFallthroughCasesInSwitch": true,
+
+    /*
+     *✅ Erlaubt das Importieren von Modulen, die keinen `default`-Export haben.
+     *- Nützlich für CommonJS-Module (`import fs from "fs"`).
+     */
+    "allowSyntheticDefaultImports": true,
+
+    /*
+     *✅ Erlaubt Interoperabilität zwischen CommonJS und ES-Modulen.
+     *- Falls du CJS (`require()`) und ESM (`import`) mischst, **essentiell**.
+     */
+    "esModuleInterop": true,
+
+    /*
+     *⚠️ **Erzeugt Metadaten für Dekoratoren (z. B. für NestJS, TypeORM).**
+     *- **Nur aktiv lassen, wenn du Reflection brauchst.**
+     */
+    // "emitDecoratorMetadata": true,
+    /*
+     *✅ Erlaubt experimentelle Dekoratoren (z. B. `@Injectable()` in NestJS).
+     *- Dekoratoren sind noch nicht offiziell in JavaScript, daher "experimentell".
+     */
+    "experimentalDecorators": true,
+
+    /*
+     *✅ Erzwingt explizite Typdeklarationen (kein `any` erlaubt).
+     *- Reduziert unerwartetes Verhalten durch dynamische Typen.
+     */
+    "noImplicitAny": true,
+
+    /*
+     *✅ Erzwingt explizite Typdeklarationen (kein `any` erlaubt).
+     *- Reduziert unerwartetes Verhalten durch dynamische Typen.
+     */
+    "strictNullChecks": true,
+
+    /*
+     *✅ Deaktiviert Source Maps.
+     *- Falls Debugging nötig ist, setze auf `true`.
+     */
+    "sourceMap": true,
+
+    /*
+     *✅ Erzwingt konsistente Groß-/Kleinschreibung in Imports.
+     *- Verhindert Bugs bei case-sensitive Dateisystemen (z. B. Linux).
+     */
+    "forceConsistentCasingInFileNames": true,
+
+    /*
+     *✅ Fehler werfen, wenn eine Funktion nicht explizit `return` hat.
+     *- Verhindert Bugs durch unerwartete `undefined`-Rückgaben.
+     */
+    "noImplicitReturns": true,
+
+    /*
+     *✅ Basisverzeichnis für `paths`-Aliase.
+     *- Erlaubt z. B. `import foo from "@/utils/foo"` statt `import foo from "../../utils/foo"`.
+     */
+    "baseUrl": ".",
+
+    /*
+     *✅ Definiert TypeScript-Module mit Aliassen.
+     *- `@main/*` -> `src/main/*`
+     *- `@/*` -> `src/*`
+     *- Vermeidet tiefe, relative Import-Pfade.
+     */
+    "paths": {
+      "@/*": ["src/*"],
+      "@test/*": ["test/*"]
+    }
+  },
+  "exclude": [
+    "node_modules", // Ignoriere den `node_modules`-Ordner (keine Typprüfung für Abhängigkeiten)
+    "out" // Ignoriere den `out`-Ordner (falls du Build-Output generierst)
+  ]
 }
