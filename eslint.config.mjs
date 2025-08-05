@@ -75,7 +75,7 @@ export default tseslint.config(
      eslint.configs.all,
      {
           rules: {
-               /*
+               /*   ✅ ==== VERIFIED ====
                     Google (Angular, TypeScript):
                     Standard: 250 Zeilen
                     Begründung: Optimal für Code-Review-Zyklen und Cognitive Load Management
@@ -98,8 +98,12 @@ export default tseslint.config(
                 // Migrated to @stylistic - now commented out
                // 'arrow-parens': ['error', 'as-needed'],
 
+               // ✅ ==== VERIFIED ====
                'no-magic-numbers': ["error", { "ignore": [0, 1] }],
+
+               // ✅ ==== VERIFIED ====
                'no-ternary': 'off',
+
                'no-var': 'error',
                'no-eval': 'error',
                // 'indent': ['error', 4], // Migrated to @stylistic
@@ -293,7 +297,10 @@ export default tseslint.config(
                ],
 
                // Function Design
+
+               // ✅ ==== VERIFIED ====
                'max-params': ['error', { max: 3 }], // Limit function parameters
+
                'max-depth': ['error', { max: 4 }], // Limit nesting depth
                'max-nested-callbacks': ['error', { max: 3 }], // Limit callback nesting
                'max-statements': ['error', 15], // Limit function complexity
@@ -1188,8 +1195,11 @@ export default tseslint.config(
                'import/export': 'error', // Validiert alle Exports
                'import/no-named-as-default': 'error', // Verhindert Konfusion
                'import/no-named-as-default-member': 'error',
+
                // ===== TYPE IMPORTS (TypeScript Specific) =====
+               // ✅ ==== VERIFIED ====
                'import/consistent-type-specifier-style': ['error', 'prefer-top-level'], // import type { Foo } - Enterprise Standard für TypeScript 5.0+
+
                'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
                'import/no-empty-named-blocks': 'error', // import {} from 'foo' verhindert
                'import/no-anonymous-default-export': ['error', { // Named Defaults
@@ -1204,6 +1214,8 @@ export default tseslint.config(
                }],
 
                // ===== FILE EXTENSIONS (Enterprise Barrel Pattern Standard) =====
+               
+               // ✅ ==== VERIFIED ====
                // Optimal für Enterprise: Barrel Pattern + direkte .ts Imports
                'import/extensions': ['error', 'ignorePackages', {
                     'js': 'never',       // JavaScript: ./file (ohne .js für Node-Kompatibilität)  
@@ -1255,8 +1267,13 @@ export default tseslint.config(
                // ===== ENTERPRISE EXPORT STRATEGY =====
                // Types/Interfaces: Export at definition site (Enterprise Standard)
                // Values/Functions: Group exports at end when beneficial
+               // ✅ ==== VERIFIED ====
                'import/group-exports': 'error',                    // Group value exports together
-               'import/exports-last': 'off',                       // Too generic, conflicts with type exports
+
+               // ✅ ==== VERIFIED ====
+               'import/exports-last': 'off',  
+               
+               // ✅ ==== VERIFIED ====// Too generic, conflicts with type exports
                'import/no-default-export': 'error',                // Google/Microsoft Standard: NEVER use default exports
           }
      },
@@ -1381,7 +1398,10 @@ export default tseslint.config(
                }],
 
                // ===== OBJECTS =====
+
                '@stylistic/object-curly-spacing': ['error', 'always'],
+
+               // ✅ ==== VERIFIED ====
                '@stylistic/object-curly-newline': ['error', {
                     'ObjectExpression': {
                          'multiline': true,
@@ -1430,7 +1450,10 @@ export default tseslint.config(
                }],
 
                // ===== FUNCTIONS =====
+               // ✅ ==== VERIFIED ====
                '@stylistic/function-paren-newline': ['error', { "minItems": 2 }], 
+
+
                '@stylistic/function-call-argument-newline': ['error', 'consistent'],
                '@stylistic/function-call-spacing': ['error', 'never'],
                '@stylistic/arrow-parens': ['error', 'as-needed', {
@@ -1440,7 +1463,10 @@ export default tseslint.config(
                     'before': true,
                     'after': true
                }],
+
+               // ✅ ==== VERIFIED ====
                '@stylistic/implicit-arrow-linebreak': ['error', 'below'],
+
                '@stylistic/wrap-iife': ['error', 'inside', {
                     'functionPrototypeMethods': true
                }],
@@ -2451,7 +2477,10 @@ export default tseslint.config(
                }],
                
                // ===== CLASS & INHERITANCE SORTING =====
+
+               // ✅ ==== VERIFIED ====
                "perfectionist/sort-classes": "off", // we use @typescript-eslint/member-ordering
+
                'perfectionist/sort-heritage-clauses': ['error', {
                     type: 'natural',
                     order: 'asc'
@@ -2523,6 +2552,8 @@ export default tseslint.config(
                // Additional typescript-eslint rules not included in strict
                '@typescript-eslint/explicit-function-return-type': 'error',
                '@typescript-eslint/explicit-member-accessibility': 'error',
+
+               // ✅ ==== VERIFIED ====
                "@typescript-eslint/member-ordering": ["error", {
                     "default": {
                         // Keep all default memberTypes (sie sind enterprise-optimal!)
@@ -2533,7 +2564,10 @@ export default tseslint.config(
                         "optionalityOrder": "required-first"
                     }
                 }],
+                
                '@typescript-eslint/dot-notation': 'off', // Disabled to allow bracket notation for private method testing
+               
+               // ✅ ==== VERIFIED ====
                '@typescript-eslint/naming-convention': [
                     'error',
                     // ===== BIG TECH ENTERPRISE STANDARDS (Google, Meta, Microsoft) =====
@@ -2726,8 +2760,14 @@ export default tseslint.config(
                '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error', // Verhindert redundante Zuweisungen
 
                // Import/Export Hygiene (Google/Microsoft Standards)
+
+               // ✅ ==== VERIFIED ====
                '@typescript-eslint/no-import-type-side-effects': 'error', // Performance: Verhindert Side Effects bei Type Imports
+
+               // ✅ ==== VERIFIED ====
                '@typescript-eslint/consistent-type-exports': 'error', // Konsistente Type Exports
+
+               // ✅ ==== VERIFIED ====
                '@typescript-eslint/consistent-type-imports': 'error',  // Enforce type-only imports
                '@typescript-eslint/no-useless-empty-export': 'error', // Verhindert leere Exports
 
