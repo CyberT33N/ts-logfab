@@ -252,15 +252,15 @@ export class AnomalyDetectionManager {
         performanceBaseline
     }: LogPerformanceMetricsProperties): void => {
         this.#performanceLog.push({
-            operation: methodName,
             metrics: {
-                iterations,
-                duration,
-                memoryDelta,
                 anomaliesDetected: trackingResult.anomalies.length,
-                thresholdViolations: trackingResult.thresholdViolations.length,
-                baselineExists: Boolean(performanceBaseline)
+                baselineExists: Boolean(performanceBaseline),
+                duration,
+                iterations,
+                memoryDelta,
+                thresholdViolations: trackingResult.thresholdViolations.length
             },
+            operation: methodName,
             timestamp: new Date()
         })
     }
@@ -327,12 +327,12 @@ export class AnomalyDetectionManager {
         )
 
         this.#logPerformanceMetrics({
-            methodName,
-            iterations,
             duration,
+            iterations,
             memoryDelta,
-            trackingResult,
-            performanceBaseline
+            methodName,
+            performanceBaseline,
+            trackingResult
         })
 
         return {

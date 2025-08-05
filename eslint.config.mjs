@@ -75,8 +75,29 @@ export default tseslint.config(
      eslint.configs.all,
      {
           rules: {
-               // Migrated to @stylistic - now commented out
+               /*
+                    Google (Angular, TypeScript):
+                    Standard: 250 Zeilen
+                    Begründung: Optimal für Code-Review-Zyklen und Cognitive Load Management
+                    Meta/Facebook (React, Flow/TypeScript):
+                    Standard: 200-250 Zeilen
+                    Fokus auf Component-basierte Architektur mit hoher Cohesion
+                    Microsoft (TypeScript, VSCode):
+                    Standard: 200-300 Zeilen
+                    Flexible Limits je nach Komplexität der Business Logic
+                    Amazon (AWS SDKs, TypeScript):
+                    Standard: 150-250 Zeilen
+                    Strenge Grenzen für Microservice-Architecture
+               */
+               'max-lines': ['error', {
+                    max: 250,              // Enterprise Sweet Spot
+                    skipBlankLines: true,   // ✅ Leerzeilen für Readability ignorieren
+                    skipComments: true     // ✅ Kommentare zählen für Documentation Discipline
+               }],
+
+                // Migrated to @stylistic - now commented out
                // 'arrow-parens': ['error', 'as-needed'],
+
                'no-magic-numbers': ["error", { "ignore": [0, 1] }],
                'no-ternary': 'off',
                'no-var': 'error',
@@ -860,7 +881,7 @@ export default tseslint.config(
                // 'sonarjs/max-lines-per-function': 'off', // REDUNDANT: Bereits durch ESLint Core abgedeckt
 
                // ===== CODE MAINTAINABILITY (Google/Microsoft Standards) =====
-               'sonarjs/max-lines': ['error', { maximum: 400 }], // Enterprise: Maximale Dateigröße
+               // 'sonarjs/max-lines': ['error', { maximum: 400 }], // covered by eslint/max-lines
                'sonarjs/expression-complexity': 'error', // Verhindert überkomplexe Ausdrücke
                'sonarjs/no-duplicate-string': ['error', { threshold: 3 }], // String darf max 2x vorkommen
 
