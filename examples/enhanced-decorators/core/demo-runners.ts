@@ -30,7 +30,7 @@
  * evaluation purposes.
  * 
  * @fileoverview Comprehensive demo runners for enhanced decorator system evaluation
- * @module DemoRunners
+ * @module demo-runner
  * @version 1.0.0
  * @since 1.0.0
  * 

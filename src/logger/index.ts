@@ -28,7 +28,7 @@ export {
     createProductionLogger,
     getCurrentLoggingFormat,
     isStructuredLoggingEnabled
-} from './adaptive-logging/index.ts'
+} from './adaptive-logging'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -44,7 +44,7 @@ export {
     createPerformanceMetric,
     type IAnomalyConfig,
     type IAnomalyDetection
-} from './anomaly-detector.js'
+} from './anomaly-detector'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -67,7 +67,7 @@ export {
     type IContextRunOptions,
     type ICorrelationContext,
     runWithCorrelationContext
-} from './correlation-context.js'
+} from './correlation-context'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -88,7 +88,7 @@ export {
     logErrorsOnly,
     logPerformance,
     logSilent
-} from './decorators.js'
+} from './decorators'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -103,7 +103,7 @@ export {
     logger,
     resetLogger,
     startPerformanceTracking
-} from './logger-factory.ts.js'
+} from './logger-factory'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -120,7 +120,7 @@ export {
     type IPerformanceSession,
     type IPerformanceStatsSummary,
     PerformanceMonitor
-} from './performance.js'
+} from './performance'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -138,7 +138,7 @@ export {
     type IPatternConfig,
     type ISemanticContext,
     type OperationType
-} from './semantic-detector.js'
+} from './semantic-detector'
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -149,4 +149,4 @@ export {
 export {
     type ILogContext,
     type IPerformanceMetrics
-} from './types.ts.js'
+} from './types'

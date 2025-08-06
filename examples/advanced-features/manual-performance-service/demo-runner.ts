@@ -14,8 +14,9 @@
  */
 
 // ==== Imports ====
-import { logger } from '@/logger/index.ts'
-import { ManualPerformanceService } from './index.ts'
+import { logger } from '@/logger'
+
+import { ManualPerformanceService } from '.'
 
 /**
  * ⚡ **Demo Function for Manual Performance Service**
@@ -40,7 +41,7 @@ import { ManualPerformanceService } from './index.ts'
  * @example
  * Running the manual performance demonstration:
  * ```typescript
- * import { runManualPerformanceDemo } from './DemoRunner.ts';
+ * import { runManualPerformanceDemo } from './demo-runner.ts';
  *
  * async function main() {
  *   try {
@@ -56,20 +57,16 @@ import { ManualPerformanceService } from './index.ts'
  * @see {@link logger} for logging implementation used throughout the demo
  */
 export async function runManualPerformanceDemo(): Promise<void> {
-    logger.info(
-        '⚡ Starting Manual Performance Demo (Performance Utils)'
-    )
+    logger.info('⚡ Starting Manual Performance Demo (Performance Utils)')
 
     const service = new ManualPerformanceService()
 
     try {
         // ⚡ Manual performance marks and measures
-        logger.info(
-            '⚡ Testing Manual Performance Marks and Measures'
-        )
+        logger.info('⚡ Testing Manual Performance Marks and Measures')
 
         const marksResult = await service.performWithManualMarks(
-            'computation-task', 50000
+            'computation-task', 50_000
         )
 
         logger.info(
@@ -82,9 +79,7 @@ export async function runManualPerformanceDemo(): Promise<void> {
         )
 
         // ⚡ Performance snapshots and calculations
-        logger.info(
-            '⚡ Testing Performance Snapshots and Calculations'
-        )
+        logger.info('⚡ Testing Performance Snapshots and Calculations')
 
         const operations = [
             'data-processing',
@@ -107,9 +102,7 @@ export async function runManualPerformanceDemo(): Promise<void> {
         }
 
         // ⚡ Enhanced performance monitoring with anomaly detection
-        logger.info(
-            '⚡ Testing Enhanced Performance Monitoring'
-        )
+        logger.info('⚡ Testing Enhanced Performance Monitoring')
 
         // Configure performance monitoring
         const configResult = ManualPerformanceService.configurePerformanceMonitoring()
@@ -130,24 +123,18 @@ export async function runManualPerformanceDemo(): Promise<void> {
 
         for (let iteration = 0; iteration < 15; iteration++) {
             for (const method of methods) {
-                const iterations = 10000 + Math.floor(
-                    Math.random() * 20000
-                )
+                const iterations = 10_000 + Math.floor(Math.random() * 20_000)
                 const anomalyResult = await service.performWithAnomalyDetection(
                     method, iterations
                 )
 
                 if (iteration % 5 === 0) {
                     logger.info(
-                        `✅ Anomaly detection iteration ${String(
-                            iteration + 1
-                        )} for ${method}:`, {
+                        `✅ Anomaly detection iteration ${String(iteration + 1)} for ${method}:`, {
                             result: anomalyResult.executionResult,
                             anomaliesDetected: anomalyResult.trackingResult.anomalies.length,
                             thresholdViolations: anomalyResult.trackingResult.thresholdViolations.length,
-                            hasBaseline: Boolean(
-                                anomalyResult.performanceBaseline
-                            )
+                            hasBaseline: Boolean(anomalyResult.performanceBaseline)
                         }
                     )
                 }
@@ -155,9 +142,7 @@ export async function runManualPerformanceDemo(): Promise<void> {
         }
 
         // ⚡ Performance statistics and management
-        logger.info(
-            '⚡ Testing Performance Statistics and Management'
-        )
+        logger.info('⚡ Testing Performance Statistics and Management')
 
         const stats = service.getPerformanceStatistics()
 
@@ -175,21 +160,15 @@ export async function runManualPerformanceDemo(): Promise<void> {
         for (const [method, baseline] of stats.allBaselines.entries()) {
             logger.info(
                 `✅ Baseline for ${method}:`, {
-                    averageDuration: baseline.averageDuration.toFixed(
-                        2
-                    ),
+                    averageDuration: baseline.averageDuration.toFixed(2),
                     sampleSize: baseline.sampleSize,
-                    lastUpdated: new Date(
-                        baseline.lastUpdated
-                    ).toISOString()
+                    lastUpdated: new Date(baseline.lastUpdated).toISOString()
                 }
             )
         }
 
         // Clear performance data
-        logger.info(
-            '⚡ Testing Performance Data Cleanup'
-        )
+        logger.info('⚡ Testing Performance Data Cleanup')
         const clearResult = service.clearAllPerformanceData()
 
         logger.info(
@@ -217,7 +196,5 @@ export async function runManualPerformanceDemo(): Promise<void> {
         throw error
     }
 
-    logger.info(
-        '🎉 Manual Performance Demo completed successfully!'
-    )
+    logger.info('🎉 Manual Performance Demo completed successfully!')
 }
