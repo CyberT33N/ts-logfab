@@ -60,9 +60,6 @@ import importPlugin from 'eslint-plugin-import'
 // https://www.npmjs.com/package/eslint-plugin-unused-imports
 import unusedImports from 'eslint-plugin-unused-imports'
 
-// https://github.com/mxschmitt/eslint-plugin-boundaries
-// import boundaries from "eslint-plugin-boundaries";
-
 // ===== [NODE.JS SPECIFIC] =====
 // https://github.com/eslint-community/eslint-plugin-n
 import nodePlugin from 'eslint-plugin-n'
@@ -92,6 +89,7 @@ import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 // https://perfectionist.dev
 import perfectionist from 'eslint-plugin-perfectionist'
 
+// ------------------------------------------------
 
 // ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
 // eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
@@ -99,6 +97,31 @@ import perfectionist from 'eslint-plugin-perfectionist'
 // Alternative: Use eslint-plugin-security for XSS prevention
 // https://www.npmjs.com/package/eslint-plugin-xss
 // import eslintPluginXss from 'eslint-plugin-xss'
+
+// ------------------------------------------------
+
+// ===== ENTERPRISE DECISION: BOUNDARIES PLUGIN DEAKTIVIERT =====
+// BEGRÜNDUNG: Nach Analyse der Big Tech Standards (Google, Meta, Microsoft, Amazon)
+// wird eslint-plugin-boundaries in KEINEM der großen Open Source Projekte verwendet.
+// 
+// ENTERPRISE ANTI-PATTERN EVIDENZ:
+// ❌ Hoher Maintenance Overhead: Jede neue Datei = ESLint Config Update
+// ❌ Developer Friction: Team-Blockierung bei undefinierten Strukturen  
+// ❌ Over-Engineering: Zu granulare Kontrolle für Library-Entwicklung
+// ❌ Performance Impact: Zusätzliche Linter-Rules verlangsamen Build
+//
+// BIG TECH PROVEN ALTERNATIVES IMPLEMENTIERT:
+// ✅ import/no-restricted-paths: Für kritische Architectural Boundaries
+// ✅ TypeScript-native Boundaries: Compiler-enforced statt Linter-enforced
+// ✅ Konventionsbasierte Architektur: Self-documenting Code Structure
+// ✅ Code Review Governance: Human-in-the-loop für Architecture Decisions
+
+// ENTERPRISE STANDARD: Focus auf Developer Experience + Produktivität
+// Ref: Google Angular (konventionsbasiert), Meta React (feature-based),
+//      Microsoft TypeScript (type-driven), Amazon AWS SDK (service-oriented)
+// https://github.com/mxschmitt/eslint-plugin-boundaries
+// import boundaries from "eslint-plugin-boundaries";
+
 
 export default tseslint.config(
      {
@@ -998,49 +1021,6 @@ export default tseslint.config(
                "unused-imports": unusedImports,
           }
      },
-
-     // ✅ ==== VERIFIED ====
-     
-     // ===== ENTERPRISE DECISION: BOUNDARIES PLUGIN DEAKTIVIERT =====
-     // BEGRÜNDUNG: Nach Analyse der Big Tech Standards (Google, Meta, Microsoft, Amazon)
-     // wird eslint-plugin-boundaries in KEINEM der großen Open Source Projekte verwendet.
-     // 
-     // ENTERPRISE ANTI-PATTERN EVIDENZ:
-     // ❌ Hoher Maintenance Overhead: Jede neue Datei = ESLint Config Update
-     // ❌ Developer Friction: Team-Blockierung bei undefinierten Strukturen  
-     // ❌ Over-Engineering: Zu granulare Kontrolle für Library-Entwicklung
-     // ❌ Performance Impact: Zusätzliche Linter-Rules verlangsamen Build
-     //
-     // BIG TECH PROVEN ALTERNATIVES IMPLEMENTIERT:
-     // ✅ import/no-restricted-paths: Für kritische Architectural Boundaries
-     // ✅ TypeScript-native Boundaries: Compiler-enforced statt Linter-enforced
-     // ✅ Konventionsbasierte Architektur: Self-documenting Code Structure
-     // ✅ Code Review Governance: Human-in-the-loop für Architecture Decisions
-
-     // ENTERPRISE STANDARD: Focus auf Developer Experience + Produktivität
-     // Ref: Google Angular (konventionsbasiert), Meta React (feature-based),
-     //      Microsoft TypeScript (type-driven), Amazon AWS SDK (service-oriented)
-
-     // ===== BOUNDARIES PLUGIN =====
-     // boundaries.configs.strict,
-     // {
-     //      plugins: {
-     //           boundaries,
-     //      },
-     //      settings: {
-     //           // ===== ENTERPRISE CLEAN ARCHITECTURE LAYERS =====
-     //           // Ignoriere Build-Ausgaben und Dependencies
-     //           'boundaries/ignore': [
-     //                'node_modules/**/*',
-     //                'dist/**/*',
-     //                'coverage/**/*',
-     //                '**/*.d.ts' // Generierte Type Definitions
-     //           ]
-     //      },
-     //      rules: {
-     //           'boundaries/no-unknown-files': 'off',
-     //      }
-     // },
 
      // ===== IMPORT PLUGIN =====
      importPlugin.flatConfigs.typescript,
@@ -2850,148 +2830,6 @@ export default tseslint.config(
                // TypeScript 5.x Features
                '@typescript-eslint/no-unsafe-declaration-merging': 'error', // TypeScript 5.x Declaration Merging Safety
                '@typescript-eslint/no-unsafe-enum-comparison': 'error' // TypeScript 5.x Enum Comparison Safety
-          }
-     },
-
-     // ===== BOUNDARIES PLUGIN CONFIGURATION =====
-     // Enterprise-Grade Clean Architecture Enforcement
-     {
-          rules: {
-               // ===== ELEMENT TYPES BOUNDARIES =====
-               'boundaries/element-types': ['error', {
-                    default: 'disallow', // Enterprise: Explizit erlauben statt implizit
-                    message: 'Enterprise Architecture Violation: ${file.type} cannot import ${dependency.type}',
-                    rules: [
-                         // Domain Layer (innerste Schicht)
-                         {
-                              from: 'domain',
-                              allow: ['domain'], // Domain darf nur Domain importieren
-                              message: 'Domain layer must be independent of outer layers'
-                         },
-                         // Application Layer (Use Cases)
-                         {
-                              from: 'application', 
-                              allow: ['domain', 'application'], // Application darf Domain und sich selbst
-                              message: 'Application layer can only depend on Domain layer'
-                         },
-                         // Infrastructure Layer (äußerste Schicht)
-                         {
-                              from: 'infrastructure',
-                              allow: ['domain', 'application', 'infrastructure'], // Infrastructure darf alles
-                              message: 'Infrastructure must implement interfaces from inner layers'
-                         },
-                         // Utils/Helpers (Shared Code)
-                         {
-                              from: 'utils',
-                              allow: ['utils'], // Utils sind self-contained
-                              message: 'Utils must not depend on business logic'
-                         },
-                         // Logger System (Kern des ts-logfab)
-                         {
-                              from: 'logger',
-                              allow: ['logger', 'utils', 'types', 'prettifiers'], // Logger kann Prettifiers nutzen
-                              message: 'Logger must not depend on decorators or examples'
-                         },
-                         // Decorators (höhere Abstraktionsebene)
-                         {
-                              from: 'decorators',
-                              allow: ['logger', 'types', 'utils'], // Decorators nutzen Logger
-                              message: 'Decorators should only decorate logger functionality'
-                         },
-                         // Prettifiers (Output Formatting)
-                         {
-                              from: 'prettifiers',
-                              allow: ['prettifiers', 'types', 'utils'], // Prettifiers sind unabhängig
-                              message: 'Prettifiers must not depend on logger internals'
-                         },
-                         // Type Definitions
-                         {
-                              from: 'types',
-                              allow: ['types'], // Types haben keine Dependencies
-                              message: 'Type definitions must be self-contained'
-                         },
-                         // Examples (Dokumentation)
-                         {
-                              from: 'examples',
-                              allow: ['logger', 'decorators', 'prettifiers', 'types', 'utils', 'examples'], // Examples dürfen alles nutzen
-                              message: 'Examples can demonstrate all features'
-                         },
-                         // Test Files
-                         {
-                              from: 'test',
-                              allow: ['logger', 'decorators', 'prettifiers', 'types', 'utils', 'test'], // Tests dürfen alles
-                              message: 'Test files have unrestricted access'
-                         }
-                    ]
-               }],
-               
-               // ===== EXTERNAL DEPENDENCIES CONTROL =====
-               'boundaries/external': ['error', {
-                    default: 'allow', // Enterprise: Externe Deps sind erlaubt außer explizit verboten
-                    rules: [
-                         // Logger Core (minimale externe Dependencies)
-                         {
-                              from: 'logger',
-                              disallow: [
-                                   // Logger darf keine UI/Web Frameworks haben
-                                   'express', 'fastify', 'koa',
-                                   'react', 'vue', 'angular',
-                                   // Keine ORMs oder Datenbanken
-                                   'typeorm', 'sequelize', 'mongoose',
-                                   'pg', 'mysql', 'sqlite3'
-                              ],
-                              message: 'Logger core must remain lightweight with minimal dependencies'
-                         },
-                         // Type Definitions (keine externen Dependencies)
-                         {
-                              from: 'types',
-                              disallow: '*', // Types dürfen KEINE externen Dependencies haben
-                              message: 'Type definitions must not have any external dependencies'
-                         },
-                         // Prettifiers (nur Formatting-Libraries)
-                         {
-                              from: 'prettifiers',
-                              allow: [
-                                   // Nur Formatting-bezogene Libraries
-                                   'chalk', 'ansi-colors', 'cli-color', // Farben
-                                   'cli-table3', 'table', 'ascii-table', // Tabellen
-                                   'strip-ansi', 'ansi-regex' // ANSI Handling
-                              ],
-                              message: 'Prettifiers should only use formatting-related libraries'
-                         }
-                    ]
-               }],
-               
-               // ===== ENTRY POINT ENFORCEMENT =====
-               'boundaries/entry-point': ['error', {
-                    default: 'disallow',
-                    message: 'Import from ${dependency.type} must use its public API (index.ts)',
-                    rules: [
-                         // Haupt-Module müssen über index.ts importiert werden
-                         {
-                              target: ['logger', 'decorators', 'prettifiers'],
-                              allow: 'index.ts' // Nur über index.ts importieren
-                         },
-                         // Types und Utils sind flexibler
-                         {
-                              target: ['types', 'utils'],
-                              allow: ['index.ts', '*.ts'] // Direkte Imports erlaubt
-                         },
-                         // Examples haben keine Entry Point Restriktion
-                         {
-                              target: 'examples',
-                              allow: '*' // Beliebige Imports aus Examples
-                         }
-                    ]
-               }],
-               
-               // ===== PRIVATE ELEMENTS PROTECTION =====
-               'boundaries/no-private': ['error', {
-                    message: 'Cannot import private elements of ${dependency.type}'
-               }],
-               
-               // ===== UNKNOWN FILES PREVENTION =====
-               'boundaries/no-unknown-files': 'error' // Diese Regel akzeptiert keine Optionen
           }
      }
 )
