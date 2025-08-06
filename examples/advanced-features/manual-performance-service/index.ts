@@ -14,25 +14,25 @@
  */
 
 // ==== Imports ====
-import { AnomalyDetectionManager, type IAnomalyDetectionResult } from './anomaly-detection-manager.ts'
-import { configurePerformanceMonitoring, type IConfigurationResult } from './ConfigurationManager.ts'
+import { AnomalyDetectionManager } from './anomaly-detection-manager.ts'
+import { configurePerformanceMonitoring  } from './configuration-manager'
+import type {ConfigurationResult} from './configuration-manager';
 import { PerformanceHelpers, type IPerformanceHelpers } from './PerformanceHelpers.ts'
-import { PerformanceMarksManager, type IPerformanceMarksResult } from './PerformanceMarksManager.ts'
-import { PerformanceSnapshotManager, type IPerformanceSnapshotResult } from './PerformanceSnapshotManager.ts'
+import { PerformanceMarksManager ,type  IPerformanceMarksResult } from './PerformanceMarksManager.ts'
+
+import { PerformanceSnapshotManager } from './PerformanceSnapshotManager.ts'
+
+
 import {
-    StatisticsManager, type IPerformanceStatistics, type IClearResult
+    StatisticsManager
+ 
+ 
 } from './StatisticsManager.ts'
+import type { IAnomalyDetectionResult } from './anomaly-detection-manager.ts'
+import type { IPerformanceSnapshotResult } from './PerformanceSnapshotManager.ts'
+import type { IPerformanceStatistics, IClearResult } from './StatisticsManager.ts'
 
 // Re-export types for external use
-export type {
-    IPerformanceMarksResult,
-    IPerformanceSnapshotResult,
-    IAnomalyDetectionResult,
-    IConfigurationResult,
-    IPerformanceStatistics,
-    IClearResult,
-    IPerformanceHelpers
-}
 
 /**
  * ⚡ **Manual Performance Service**
@@ -67,7 +67,7 @@ export type {
  *
  * // 1. Configure performance monitoring (static method)
  * const config = ManualPerformanceService.configurePerformanceMonitoring();
- * console.log('Anomaly detection enabled:', config.newConfig.anomalyDetection.enabled);
+ * console.log('Anomaly detection enabled:', config.updatedConfig.anomalyDetection.enabled);
  *
  * // 2. Execute operations with different tracking methods
  *
@@ -108,8 +108,8 @@ export type {
  */
 export class ManualPerformanceService {
     private readonly _performanceLog: {
-        operation: string
         metrics: Record<string, unknown>
+        operation: string
         timestamp: Date
     }[] = []
 
@@ -143,18 +143,12 @@ export class ManualPerformanceService {
      */
     public constructor() {
         this._helpers = new PerformanceHelpers()
-        this._marksManager = new PerformanceMarksManager(
-            this._performanceLog
-        )
+        this._marksManager = new PerformanceMarksManager(this._performanceLog)
         this._snapshotManager = new PerformanceSnapshotManager(
             this._performanceLog, this._helpers
         )
-        this._anomalyManager = new AnomalyDetectionManager(
-            this._performanceLog
-        )
-        this._statsManager = new StatisticsManager(
-            this._performanceLog
-        )
+        this._anomalyManager = new AnomalyDetectionManager(this._performanceLog)
+        this._statsManager = new StatisticsManager(this._performanceLog)
     }
 
     /*
@@ -175,7 +169,7 @@ export class ManualPerformanceService {
      *
      * @see {@link configurePerformanceMonitoring} for configuration details
      */
-    public static configurePerformanceMonitoring(): IConfigurationResult {
+    public static configurePerformanceMonitoring(): ConfigurationResult {
         return configurePerformanceMonitoring()
     }
 
@@ -208,11 +202,9 @@ export class ManualPerformanceService {
     public async performWithManualMarks(
         taskName: string, iterations: number
     ): Promise<IPerformanceMarksResult> {
-        const result = await this._marksManager.performWithManualMarks(
+        return await this._marksManager.performWithManualMarks(
             taskName, iterations
         )
-
-        return result
     }
 
     /*
@@ -245,11 +237,9 @@ export class ManualPerformanceService {
     public async performWithSnapshots(
         operationName: string, workload: number
     ): Promise<IPerformanceSnapshotResult> {
-        const result = await this._snapshotManager.performWithSnapshots(
+        return await this._snapshotManager.performWithSnapshots(
             operationName, workload
         )
-
-        return result
     }
 
     /*
@@ -283,11 +273,9 @@ export class ManualPerformanceService {
     public async performWithAnomalyDetection(
         methodName: string, iterations: number
     ): Promise<IAnomalyDetectionResult> {
-        const result = await this._anomalyManager.performWithAnomalyDetection(
+        return await this._anomalyManager.performWithAnomalyDetection(
             methodName, iterations
         )
-
-        return result
     }
 
     /*
@@ -349,10 +337,17 @@ export class ManualPerformanceService {
      * @see {@link StatisticsManager.getPerformanceLog} for log access details
      */
     public getPerformanceLog(): readonly {
-        operation: string
         metrics: Record<string, unknown>
+        operation: string
         timestamp: Date
     }[] {
         return this._statsManager.getPerformanceLog()
     }
 }
+
+export { type IAnomalyDetectionResult } from './anomaly-detection-manager.ts'
+export { type ConfigurationResult } from './configuration-manager.ts'
+export { type IPerformanceHelpers } from './PerformanceHelpers.ts'
+export { type IPerformanceMarksResult } from './PerformanceMarksManager.ts'
+export { type IPerformanceSnapshotResult } from './PerformanceSnapshotManager.ts'
+export { type IClearResult, type IPerformanceStatistics } from './StatisticsManager.ts'

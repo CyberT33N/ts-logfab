@@ -17,7 +17,7 @@
 import {
     configureEnterprisePerformanceMonitoring,
     getEnterprisePerformanceConfiguration
-} from '@/logger/performance/utils/index.ts'
+} from '@/logger/performance'
 
 /**
  * ⚙️ Result structure for performance monitoring configuration changes.
@@ -32,9 +32,9 @@ import {
  * @see {@link getEnterprisePerformanceConfiguration} for configuration retrieval
  * @see {@link configureEnterprisePerformanceMonitoring} for configuration application
  */
-export interface IConfigurationResult {
+export interface ConfigurationResult {
     previousConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
-    newConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
+    updatedConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
 }
 
 /**
@@ -82,12 +82,12 @@ export interface IConfigurationResult {
  * const result = configurePerformanceMonitoring();
  *
  * console.log('Previous anomaly detection:', result.previousConfig.anomalyDetection.enabled);
- * console.log('New anomaly detection:', result.newConfig.anomalyDetection.enabled);
- * console.log('Critical alerts enabled:', result.newConfig.anomalyDetection.enableCriticalAlerts);
+ * console.log('New anomaly detection:', result.updatedConfig.anomalyDetection.enabled);
+ * console.log('Critical alerts enabled:', result.updatedConfig.anomalyDetection.enableCriticalAlerts);
  *
  * // Access specific threshold configurations
- * console.log('Slow method warning:', result.newConfig.thresholds.slowMethodWarning);
- * console.log('Memory warning threshold:', result.newConfig.thresholds.memoryWarning);
+ * console.log('Slow method warning:', result.updatedConfig.thresholds.slowMethodWarning);
+ * console.log('Memory warning threshold:', result.updatedConfig.thresholds.memoryWarning);
  * ```
  *
  * @example
@@ -96,69 +96,67 @@ export interface IConfigurationResult {
  * const result = configurePerformanceMonitoring();
  *
  * // Verify anomaly detection is enabled
- * if (result.newConfig.anomalyDetection.enabled) {
+ * if (result.updatedConfig.anomalyDetection.enabled) {
  *   console.log('Anomaly detection successfully enabled');
- *   console.log('Critical alerts enabled:', result.newConfig.anomalyDetection.enableCriticalAlerts);
+ *   console.log('Critical alerts enabled:', result.updatedConfig.anomalyDetection.enableCriticalAlerts);
  * }
  *
  * // Check threshold configuration
- * const thresholds = result.newConfig.thresholds;
+ * const thresholds = result.updatedConfig.thresholds;
  * console.log(`Method thresholds: ${thresholds.slowMethodWarning}ms warning,
  *  ${thresholds.slowMethodCritical}ms critical`);
  *
  * // Verify baseline tracking
- * console.log('Baseline tracking enabled:', result.newConfig.baseline.trackingEnabled);
- * console.log('Min sample size:', result.newConfig.baseline.minSampleSize);
+ * console.log('Baseline tracking enabled:', result.updatedConfig.baseline.trackingEnabled);
+ * console.log('Min sample size:', result.updatedConfig.baseline.minSampleSize);
  * ```
  *
- * @see {@link IConfigurationResult} for detailed return value structure
+ * @see {@link ConfigurationResult} for detailed return value structure
  * @see {@link getEnterprisePerformanceConfiguration} for configuration state retrieval
  * @see {@link configureEnterprisePerformanceMonitoring} for underlying configuration utility
  */
-export function configurePerformanceMonitoring(): IConfigurationResult {
+export const configurePerformanceMonitoring = (): ConfigurationResult => {
     // Get current configuration
     const previousConfig = getEnterprisePerformanceConfiguration()
 
     // Configure enhanced performance monitoring
-    configureEnterprisePerformanceMonitoring(
-        {
-            anomalyDetection: {
-                enabled: true,
-                minSamples: 10,
-                thresholdMultiplier: 2.5,
-                enableCriticalAlerts: true,
-                enableWarningAlerts: true
-            },
-            baseline: {
-                trackingEnabled: true,
-                minSampleSize: 10,
-                maxHistoryDays: 7
-            },
-            thresholds: {
-                slowMethodWarning: 500,
-                slowMethodCritical: 2000,
+    configureEnterprisePerformanceMonitoring({
+        anomalyDetection: {
+            enabled: true,
+            minSamples: 10,
+            thresholdMultiplier: 2.5,
+            enableCriticalAlerts: true,
+            enableWarningAlerts: true
+        },
+        baseline: {
+            trackingEnabled: true,
+            minSampleSize: 10,
+            maxHistoryDays: 7
+        },
+        thresholds: {
+            slowMethodWarning: 500,
+            slowMethodCritical: 2000,
 
-                // 25MB
-                memoryWarning: 25 * 1024 * 1024,
+            // 25MB
+            memoryWarning: 25 * 1024 * 1024,
 
-                // 50MB
-                memoryCritical: 50 * 1024 * 1024,
-                cpuWarning: 70,
-                cpuCritical: 90
-            },
-            reporting: {
-                logAnomalies: true,
-                logBaselines: true,
-                logThresholdViolations: true
-            }
+            // 50MB
+            memoryCritical: 50 * 1024 * 1024,
+            cpuWarning: 70,
+            cpuCritical: 90
+        },
+        reporting: {
+            logAnomalies: true,
+            logBaselines: true,
+            logThresholdViolations: true
         }
-    )
+    })
 
     // Get updated configuration
-    const newConfig = getEnterprisePerformanceConfiguration()
+    const updatedConfig = getEnterprisePerformanceConfiguration()
 
     return {
         previousConfig,
-        newConfig
+        updatedConfig
     }
 }

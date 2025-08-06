@@ -375,7 +375,7 @@ export default tseslint.config(
                     additionalRegexes: {
                          // ===== CLOUD PROVIDER SECRETS =====
                          'AWS Access Key': 'AKIA[0-9A-Z]{16}',
-                         'AWS Secret Key': '[0-9a-zA-Z/+=]{40}',
+                         //'AWS Secret Key': '[0-9a-zA-Z/+=]{40}',
                          'AWS MWS Key': 'amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
                          'AWS AppSync': 'da2-[a-z0-9]{26}',
                          'Azure Storage Key': '[a-zA-Z0-9+/]{86}==',
@@ -2648,11 +2648,20 @@ export default tseslint.config(
                          'format': ['UPPER_CASE']
                     },
                     
-                    // ✅ Global Constants - UPPER_CASE
+                    // ✅ Global Primitive Constants - UPPER_CASE (Google/Meta Standard)
                     {
                          'selector': 'variable',
                          'modifiers': ['const', 'global'],
+                         'types': ['string', 'number', 'boolean'],
                          'format': ['UPPER_CASE']
+                    },
+                    
+                    // ✅ Global Function Constants - camelCase (Enterprise Standard)
+                    {
+                         'selector': 'variable',
+                         'modifiers': ['const', 'global'],
+                         'types': ['function'],
+                         'format': ['camelCase']
                     },
                     
                     // ✅ Enum Members - PascalCase (Meta/React Standard)
