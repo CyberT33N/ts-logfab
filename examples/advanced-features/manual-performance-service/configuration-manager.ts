@@ -19,6 +19,39 @@ import {
     getEnterprisePerformanceConfiguration
 } from '@/logger/performance'
 
+// ==== Constants ====
+/**
+ * 📊 Performance monitoring configuration constants.
+ *
+ * @remarks
+ * Centralized constants for performance monitoring thresholds and configuration values
+ * to eliminate magic numbers and improve maintainability.
+ */
+
+// Anomaly Detection
+const ANOMALY_MIN_SAMPLES = 10
+const ANOMALY_THRESHOLD_MULTIPLIER = 2.5
+
+// Baseline Tracking
+const BASELINE_MIN_SAMPLE_SIZE = 10
+const BASELINE_MAX_HISTORY_DAYS = 7
+
+// Memory Thresholds (in MB)
+const MEMORY_WARNING_MB = 25
+const MEMORY_CRITICAL_MB = 50
+
+// Method Execution Thresholds (in ms)
+const METHOD_WARNING_MS = 500
+const METHOD_CRITICAL_MS = 2000
+
+// CPU Thresholds (in %)
+const CPU_WARNING_PERCENT = 70
+const CPU_CRITICAL_PERCENT = 90
+
+// Conversion
+const BYTES_PER_KB = 1024
+const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB
+
 /**
  * ⚙️ Result structure for performance monitoring configuration changes.
  *
@@ -122,33 +155,29 @@ export const configurePerformanceMonitoring = (): ConfigurationResult => {
     // Configure enhanced performance monitoring
     configureEnterprisePerformanceMonitoring({
         anomalyDetection: {
-            enabled: true,
-            minSamples: 10,
-            thresholdMultiplier: 2.5,
             enableCriticalAlerts: true,
-            enableWarningAlerts: true
+            enableWarningAlerts: true,
+            enabled: true,
+            minSamples: ANOMALY_MIN_SAMPLES,
+            thresholdMultiplier: ANOMALY_THRESHOLD_MULTIPLIER
         },
         baseline: {
-            trackingEnabled: true,
-            minSampleSize: 10,
-            maxHistoryDays: 7
-        },
-        thresholds: {
-            slowMethodWarning: 500,
-            slowMethodCritical: 2000,
-
-            // 25MB
-            memoryWarning: 25 * 1024 * 1024,
-
-            // 50MB
-            memoryCritical: 50 * 1024 * 1024,
-            cpuWarning: 70,
-            cpuCritical: 90
+            maxHistoryDays: BASELINE_MAX_HISTORY_DAYS,
+            minSampleSize: BASELINE_MIN_SAMPLE_SIZE,
+            trackingEnabled: true
         },
         reporting: {
             logAnomalies: true,
             logBaselines: true,
             logThresholdViolations: true
+        },
+        thresholds: {
+            cpuCritical: CPU_CRITICAL_PERCENT,
+            cpuWarning: CPU_WARNING_PERCENT,
+            memoryCritical: MEMORY_CRITICAL_MB * BYTES_PER_MB,
+            memoryWarning: MEMORY_WARNING_MB * BYTES_PER_MB,
+            slowMethodCritical: METHOD_CRITICAL_MS,
+            slowMethodWarning: METHOD_WARNING_MS
         }
     })
 
