@@ -122,6 +122,8 @@ import perfectionist from 'eslint-plugin-perfectionist'
 // https://github.com/mxschmitt/eslint-plugin-boundaries
 // import boundaries from "eslint-plugin-boundaries";
 
+// ===== LOCAL PLUGIN =====
+import localFunctionDefinitionParenNewline from './eslint-rules/function-definition-paren-newline.js'
 
 export default tseslint.config(
      {
@@ -351,6 +353,10 @@ export default tseslint.config(
                     {
                          selector: 'CallExpression[callee.property.name="assign"][callee.object.name="Object"][arguments.0.type="ObjectExpression"]',
                          message: 'Use object spread instead of Object.assign with object literal'
+                    },
+                    {
+                      selector: 'ExportDefaultDeclaration',
+                      message: 'Default exports are forbidden. Use named exports.'
                     }
                ],
 
@@ -362,6 +368,8 @@ export default tseslint.config(
                'max-depth': ['error', { max: 4 }], // Limit nesting depth
                'max-nested-callbacks': ['error', { max: 3 }], // Limit callback nesting
                'max-statements': ['error', 15], // Limit function complexity
+
+               // ✅ ==== VERIFIED ====
                'max-lines-per-function': ['error', {
                     max: 50,
                     skipBlankLines: true,
@@ -1172,16 +1180,6 @@ export default tseslint.config(
                // ✅ ==== VERIFIED ====
                'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
                'import/no-empty-named-blocks': 'error', // import {} from 'foo' verhindert
-               'import/no-anonymous-default-export': ['error', { // Named Defaults
-                    'allowArray': false,
-                    'allowArrowFunction': false,
-                    'allowAnonymousClass': false,
-                    'allowAnonymousFunction': false,
-                    'allowCallExpression': false,
-                    'allowNew': false,
-                    'allowObject': false,
-                    'allowLiteral': false
-               }],
 
                // ===== FILE EXTENSIONS (Enterprise Barrel Pattern Standard) =====
                
@@ -1213,7 +1211,25 @@ export default tseslint.config(
                'import/no-namespace': ['error', { // Wildcard imports vermeiden
                     'ignore': ['*.d.ts'] // Außer für Type Definitions
                }],
+
+               // ✅ ==== VERIFIED ====
                'import/prefer-default-export': 'off', // Named exports bevorzugt
+
+               // ✅ ==== VERIFIED ====
+               'import/no-anonymous-default-export': ['error', { // Named Defaults
+                    'allowArray': false,
+                    'allowArrowFunction': false,
+                    'allowAnonymousClass': false,
+                    'allowAnonymousFunction': false,
+                    'allowCallExpression': false,
+                    'allowNew': false,
+                    'allowObject': false,
+                    'allowLiteral': false
+               }],
+
+               // ✅ ==== VERIFIED ====
+               'import/no-default-export': 'error', // Google/Microsoft Standard: NEVER use default exports
+
                'import/max-dependencies': ['error', {
                     'max': 15, // Maximale Dependencies pro File
                     'ignoreTypeImports': true
@@ -1241,10 +1257,7 @@ export default tseslint.config(
                'import/group-exports': 'error',                    // Group value exports together
 
                // ✅ ==== VERIFIED ====
-               'import/exports-last': 'off',  
-               
-               // ✅ ==== VERIFIED ====// Too generic, conflicts with type exports
-               'import/no-default-export': 'error',                // Google/Microsoft Standard: NEVER use default exports
+               'import/exports-last': 'off'
           }
      },
 
@@ -1421,7 +1434,7 @@ export default tseslint.config(
 
                // ===== FUNCTIONS =====
                // ✅ ==== VERIFIED ====
-               '@stylistic/function-paren-newline': ['error', { "minItems": 2 }], 
+               '@stylistic/function-paren-newline': ['error', 'consistent'], // We use custom rules for formatting function definitions
 
 
                '@stylistic/function-call-argument-newline': ['error', 'consistent'],
@@ -1442,7 +1455,11 @@ export default tseslint.config(
                }],
 
                // ===== BLOCKS & BRACES =====
-               '@stylistic/brace-style': ['error', 'stroustrup', {
+
+               // ✅ ==== VERIFIED ====
+               // 1tbs: One True Brace Style (Enterprise Standard)
+               // stroustrup: Stroustrup Style (Legacy)
+               '@stylistic/brace-style': ['error', '1tbs', {
                     'allowSingleLine': false
                }],
                '@stylistic/block-spacing': ['error', 'always'],
@@ -1662,6 +1679,17 @@ export default tseslint.config(
                '@stylistic/multiline-ternary': ['error', 'always-multiline'],
                '@stylistic/new-parens': ['error', 'always'],
                '@stylistic/one-var-declaration-per-line': ['error', 'always']
+          }
+     },
+
+     // ===== FUNCTION DEFINITION =====
+     // functionDefinitionPlugin.configs.flat.all,
+     {
+          plugins: {
+               'local-rules': localFunctionDefinitionParenNewline,
+          },
+          rules: {
+               'local-rules/function-definition-paren-newline': ['error', { minParams: 2 }]
           }
      },
 
