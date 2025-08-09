@@ -13,9 +13,36 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
+import type { TSESTree, AST } from '@typescript-eslint/types'
+import type { Rule } from 'eslint'
+
+// Structural type for nodes that carry a params array
+type NodeWithParameters = TSESTree.Node & {
+    params?: TSESTree.Node[]
+}
+
+// Minimal interface for the subset of SourceCode we use
+interface SourceCodeLike {
+    getTokenAfter: (
+        nodeOrToken: AST.Token | TSESTree.Node,
+        filterOrOptions?: ((token: AST.Token) => boolean) | {
+            includeComments?: boolean
+        }
+    ) => AST.Token | null
+    getTokenBefore: (
+        nodeOrToken: AST.Token | TSESTree.Node,
+        filterOrOptions?: ((token: AST.Token) => boolean) | {
+            includeComments?: boolean
+        }
+    ) => AST.Token | null
+}
+
 const _enforceNewlinesForFunctionLike = (
-    functionNode, sourceCode, minParameters, context
-) => {
+    functionNode: NodeWithParameters | null | undefined,
+    sourceCode: SourceCodeLike,
+    minParameters: number,
+    context: Rule.RuleContext
+): void => {
     if (!functionNode || !Array.isArray(functionNode.params)) {
         return
     }
@@ -48,16 +75,22 @@ const _enforceNewlinesForFunctionLike = (
     _reportMissingNewlines(functionNode, openingParen, closingParen, tokenAfterOpen, tokenBeforeClose, context)
 }
 
-// Add top-level helpers extracted from create(context)
 const _findWrappingParens = (
-    firstParameter, lastParameter, sourceCode
-) => {
+    firstParameter: TSESTree.Node,
+    lastParameter: TSESTree.Node,
+    sourceCode: SourceCodeLike
+): {
+    closingParen: AST.Token | null
+    openingParen: AST.Token | null
+} => {
     const openingParen = sourceCode.getTokenBefore(
-        firstParameter, token =>
+        firstParameter,
+        token =>
             token.value === '('
     )
     const closingParen = sourceCode.getTokenAfter(
-        lastParameter, token =>
+        lastParameter,
+        token =>
             token.value === ')'
     )
 
@@ -67,15 +100,23 @@ const _findWrappingParens = (
     }
 }
 
-function _getBoundaryTokens(
-    openingParen, closingParen, sourceCode
-) {
-    const tokenAfterOpen = sourceCode.getTokenAfter(
-        openingParen, { includeComments: true }
-    )
-    const tokenBeforeClose = sourceCode.getTokenBefore(
-        closingParen, { includeComments: true }
-    )
+const _getBoundaryTokens = (
+    openingParen: AST.Token | null,
+    closingParen: AST.Token | null,
+    sourceCode: SourceCodeLike
+): {
+    tokenAfterOpen: AST.Token | null
+    tokenBeforeClose: AST.Token | null
+} => {
+    if (!openingParen || !closingParen) {
+        return {
+            tokenAfterOpen: null,
+            tokenBeforeClose: null
+        }
+    }
+
+    const tokenAfterOpen = sourceCode.getTokenAfter(openingParen, { includeComments: true })
+    const tokenBeforeClose = sourceCode.getTokenBefore(closingParen, { includeComments: true })
 
     return {
         tokenAfterOpen,
@@ -83,9 +124,14 @@ function _getBoundaryTokens(
     }
 }
 
-function _reportMissingNewlines(
-    functionNode, openingParen, closingParen, tokenAfterOpen, tokenBeforeClose, context
-) {
+const _reportMissingNewlines = (
+    functionNode: NodeWithParameters,
+    openingParen: AST.Token,
+    closingParen: AST.Token,
+    tokenAfterOpen: AST.Token,
+    tokenBeforeClose: AST.Token,
+    context: Rule.RuleContext
+): void => {
     const openAndNextSameLine = openingParen.loc.end.line === tokenAfterOpen.loc.start.line
     const previousAndCloseSameLine = tokenBeforeClose.loc.end.line === closingParen.loc.start.line
 
@@ -95,9 +141,7 @@ function _reportMissingNewlines(
             loc: openingParen.loc,
             messageId: 'expectedAfter',
             fix: fixer =>
-                fixer.insertTextAfter(
-                    openingParen, '\n'
-                )
+                fixer.insertTextAfter(openingParen, '\n')
         })
     }
 
@@ -107,9 +151,7 @@ function _reportMissingNewlines(
             loc: closingParen.loc,
             messageId: 'expectedBefore',
             fix: fixer =>
-                fixer.insertTextBefore(
-                    closingParen, '\n'
-                )
+                fixer.insertTextBefore(closingParen, '\n')
         })
     }
 }
@@ -117,43 +159,44 @@ function _reportMissingNewlines(
 export const functionDefinitionParenNewlinePlugin = {
     rules: {
         'function-definition-paren-newline': {
-            create(context) {
-                const sourceCode = context.getSourceCode()
-                const option = context.options && context.options[0] ? context.options[0] : {}
-                const minParameters = typeof option.minParams === 'number' ? option.minParams : 2
+            create(context: Rule.RuleContext) {
+                const sourceCode = context.getSourceCode() as unknown as SourceCodeLike
+                const rawOption = context.options?.[0]
 
-                /**
-                 * Report missing newlines inside parens for a given function-like node
-                 */
-                // Replace nested helper with calls to top-level helpers
+                let minParameters = 2
+
+                if (typeof rawOption === 'object' && rawOption !== null) {
+                    const rawMinParameters: unknown = Reflect.get(rawOption, 'minParams')
+
+                    if (typeof rawMinParameters === 'number') {
+                        minParameters = rawMinParameters
+                    }
+                }
+
                 return {
-                    // Function declarations: function foo(a, b) {}
-                    FunctionDeclaration(node) {
+                    FunctionDeclaration(node: TSESTree.FunctionDeclaration) {
                         _enforceNewlinesForFunctionLike(node, sourceCode, minParameters, context)
                     },
 
-                    // Function expressions: const x = function(a, b) {}
-                    FunctionExpression(node) {
+                    FunctionExpression(node: TSESTree.FunctionExpression) {
                         _enforceNewlinesForFunctionLike(node, sourceCode, minParameters, context)
                     },
 
-                    // Arrow function expressions: const x = (a, b) => {}
-                    ArrowFunctionExpression(node) {
+                    ArrowFunctionExpression(node: TSESTree.ArrowFunctionExpression) {
                         _enforceNewlinesForFunctionLike(node, sourceCode, minParameters, context)
                     },
 
-                    // Class methods: class A { m(a, b) {} }
-                    MethodDefinition(node) {
+                    MethodDefinition(node: TSESTree.MethodDefinition) {
                         if (node && node.value) {
-                            _enforceNewlinesForFunctionLike(node.value, sourceCode, minParameters, context)
+                            _enforceNewlinesForFunctionLike(node.value as unknown as NodeWithParameters, sourceCode, minParameters, context)
                         }
                     }
                 }
             },
             meta: {
                 docs: {
-                    // eslint-disable-next-line @stylistic/max-len
-                    description: 'Enforce newlines just inside parentheses for function/method definitions only (not calls), when params >= minParams',
+                    description:
+            'Enforce newlines just inside parentheses for function/method definitions only (not calls), when params >= minParams',
                     recommended: false
                 },
                 fixable: 'whitespace',
