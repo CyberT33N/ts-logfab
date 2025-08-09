@@ -1038,6 +1038,25 @@ export default tseslint.config(
 
      // ===== UNICORN PLUGIN =====
      eslintPluginUnicorn.configs.all,
+     {
+          rules: {
+               // ✅ ==== VERIFIED ====
+               "unicorn/filename-case": [
+                    "error",
+                    {
+                         case: "kebabCase",
+                         multipleFileExtensions: true,
+                         ignore: [
+                              "^README\\.md$",
+                              "^CHANGELOG\\.md$",
+                              // Next/Nuxt dynamic routes
+                              "^\\[.+\\]\\.(ts|tsx)$",
+                              // Keep index.* as-is (plugin already ignores index.*)
+                         ]
+                    }
+               ]
+          }
+     },
 
      // ===== NODE PLUGIN =====
      nodePlugin.configs["flat/all"],
