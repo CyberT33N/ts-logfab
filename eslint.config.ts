@@ -194,6 +194,10 @@ export default tseslint.config(
             // ✅ ==== VERIFIED ====
             'no-ternary': 'off',
 
+             // ✅ ==== VERIFIED ====
+             // Kernregel: Zeilenumbrüche in Imports erst ab N Specifiers
+            'object-curly-newline': 'off',
+ 
             // ✅ ==== VERIFIED ====
             'no-underscore-dangle': [
                 'error',
@@ -252,11 +256,14 @@ export default tseslint.config(
             ],
 
             'no-use-before-define': 'off', // Let typescript-eslint handle this
+
+            // ✅ ==== VERIFIED ====
             /*
              * 'object-curly-spacing': ['error', 'always'], // Migrated to @stylistic
              * 'comma-dangle': ['error', 'never'], // Migrated to @stylistic
              * 'semi': ['error', 'never'], // Migrated to @stylistic
              */
+
             'new-cap': [
                 'error',
                 { // Stricter than original
@@ -1863,6 +1870,7 @@ export default tseslint.config(
 
             // ===== OBJECTS =====
 
+            // ✅ ==== VERIFIED ====
             '@stylistic/object-curly-spacing': ['error', 'always'],
 
             // ✅ ==== VERIFIED ====
@@ -1880,9 +1888,8 @@ export default tseslint.config(
                         consistent: true
                     },
                     ImportDeclaration: {
-                        multiline: true,
                         minProperties: 3,
-                        consistent: true
+                        consistent: false
                     },
                     ExportDeclaration: {
                         multiline: true,
@@ -1908,6 +1915,7 @@ export default tseslint.config(
                     }
                 }
             ],
+            
             '@stylistic/object-property-newline': [
                 'error',
                 {
