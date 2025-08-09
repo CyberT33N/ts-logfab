@@ -1084,8 +1084,8 @@ export default tseslint.config(
                     },
                     ObjectPattern: {
                         multiline: true,
-                        minProperties: 2,
-                        consistent: true
+                        minProperties: 3,
+                        consistent: false
                     },
                     ImportDeclaration: {
                         minProperties: 3,
@@ -1896,8 +1896,8 @@ export default tseslint.config(
                     },
                     ObjectPattern: {
                         multiline: true,
-                        minProperties: 2,
-                        consistent: true
+                        minProperties: 3,
+                        consistent: false
                     },
                     ImportDeclaration: {
                         minProperties: 3,

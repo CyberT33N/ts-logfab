@@ -21,12 +21,12 @@ import type { TSESTree, TSESLint } from '@typescript-eslint/utils'
 const DEFAULT_MIN_PARAMETERS = 2
 const LAST_INDEX_OFFSET = 1
 
-type EnforceParameters = Readonly<{
-    context: TSESLint.RuleContext<MessageIds, Options>
-    functionNode: FunctionLikeWithParameters
-    minParameters: number
-    sourceCode: TSESLint.SourceCode
-}>
+interface EnforceParameters {
+    readonly context: TSESLint.RuleContext<MessageIds, Options>
+    readonly functionNode: FunctionLikeWithParameters
+    readonly minParameters: number
+    readonly sourceCode: TSESLint.SourceCode
+}
 
 // Function-like nodes that have a params array
 type FunctionLikeWithParameters = | TSESTree.ArrowFunctionExpression
@@ -43,6 +43,18 @@ type Options = [
   }?
 ]
 
+/**
+ * Enforce newlines just inside parentheses for function/method definitions only (not calls),
+ * when the number of parameters is greater than or equal to minParams
+ *
+ * @param functionNode - The function node to check
+ * @param sourceCode - The source code to check
+ * @param minParameters - The minimum number of parameters
+ * @param context - The context of the rule
+ *
+ * @returns void
+ */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const enforceNewlinesForFunctionLike = ({
     functionNode, sourceCode, minParameters, context
 }: EnforceParameters): void => {
@@ -55,17 +67,13 @@ const enforceNewlinesForFunctionLike = ({
     const [firstParameter] = functionParameters
     const lastParameter = functionParameters[Math.max(0, functionParameters.length - LAST_INDEX_OFFSET)]
 
-    const {
-        closingParen, openingParen
-    } = findWrappingParens({
+    const { closingParen, openingParen } = findWrappingParens({
         firstParameter,
         lastParameter,
         sourceCode
     })
 
-    const {
-        tokenAfterOpen, tokenBeforeClose
-    } = getBoundaryTokens({
+    const { tokenAfterOpen, tokenBeforeClose } = getBoundaryTokens({
         closingParen,
         openingParen,
         sourceCode
@@ -81,17 +89,18 @@ const enforceNewlinesForFunctionLike = ({
     })
 }
 
-type FindParensParameters = Readonly<{
-    firstParameter: TSESTree.Node
-    lastParameter: TSESTree.Node
-    sourceCode: TSESLint.SourceCode
-}>
+interface FindParensParameters {
+    readonly firstParameter: TSESTree.Node
+    readonly lastParameter: TSESTree.Node
+    readonly sourceCode: TSESLint.SourceCode
+}
 
 type ParensResult = Readonly<{
     closingParen: TSESTree.Token
     openingParen: TSESTree.Token
 }>
 
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const findWrappingParens = ({
     firstParameter, lastParameter, sourceCode
 }: FindParensParameters): ParensResult => {
@@ -111,17 +120,18 @@ const findWrappingParens = ({
     }
 }
 
-type BoundaryTokens = Readonly<{
-    tokenAfterOpen: TSESTree.Comment | TSESTree.Token
-    tokenBeforeClose: TSESTree.Comment | TSESTree.Token
-}>
+interface BoundaryTokens {
+    readonly tokenAfterOpen: TSESTree.Comment | TSESTree.Token
+    readonly tokenBeforeClose: TSESTree.Comment | TSESTree.Token
+}
 
-type GetBoundaryTokensParameters = Readonly<{
+interface GetBoundaryTokensParameters {
     closingParen: TSESTree.Token
     openingParen: TSESTree.Token
     sourceCode: TSESLint.SourceCode
-}>
+}
 
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const getBoundaryTokens = ({
     openingParen, closingParen, sourceCode
 }: GetBoundaryTokensParameters): BoundaryTokens => {
@@ -141,15 +151,16 @@ const getBoundaryTokens = ({
     }
 }
 
-type ReportParameters = Readonly<{
+interface ReportParameters {
     closingParen: TSESTree.Token
     context: TSESLint.RuleContext<MessageIds, Options>
     functionNode: FunctionLikeWithParameters
     openingParen: TSESTree.Token
     tokenAfterOpen: TSESTree.Comment | TSESTree.Token
     tokenBeforeClose: TSESTree.Comment | TSESTree.Token
-}>
+}
 
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const reportMissingNewlines = ({
     functionNode, openingParen, closingParen, tokenAfterOpen, tokenBeforeClose, context
 }: ReportParameters): void => {
@@ -178,10 +189,9 @@ const reportMissingNewlines = ({
 }
 
 const rule: TSESLint.RuleModule<MessageIds, Options> = {
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     create(context: TSESLint.RuleContext<MessageIds, Options>): TSESLint.RuleListener {
-        const {
-            sourceCode, options
-        } = context
+        const { sourceCode, options } = context
         const [option] = options
 
         const minParameters: number = typeof option?.minParams === 'number' && option.minParams > 0
