@@ -40,6 +40,7 @@
   "dependencies": {
     "@sindresorhus/is": "~7.0.2",
     "@types/cli-progress": "~3.11.6",
+    "@typescript-eslint/utils": "^8.39.0",
     "ansi-styles": "~6.2.1",
     "chalk": "~5.4.1",
     "cli-progress": "~3.12.0",
