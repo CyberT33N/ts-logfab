@@ -47,34 +47,40 @@ import stylistic from '@stylistic/eslint-plugin'
 // https://www.npmjs.com/package/eslint-plugin-promise
 
 // https://www.npmjs.com/package/eslint-plugin-prefer-arrow-functions
-import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 
-// ===== IMPORTS & MODULES =====
-// https://www.npmjs.com/package/eslint-plugin-import
+/*
+ * ===== IMPORTS & MODULES =====
+ * https://www.npmjs.com/package/eslint-plugin-import
+ */
 import importPlugin from 'eslint-plugin-import'
 
 // https://www.npmjs.com/package/eslint-plugin-unused-imports
-import unusedImports from 'eslint-plugin-unused-imports'
 
-// ===== [NODE.JS SPECIFIC] =====
-// https://github.com/eslint-community/eslint-plugin-n
-import nodePlugin from 'eslint-plugin-n'
+/*
+ * ===== [NODE.JS SPECIFIC] =====
+ * https://github.com/eslint-community/eslint-plugin-n
+ */
 
-// ===== [SECURITY] =====
-// https://www.npmjs.com/package/eslint-plugin-security
-import pluginSecurity from 'eslint-plugin-security'
+/*
+ * ===== [SECURITY] =====
+ * https://www.npmjs.com/package/eslint-plugin-security
+ */
 
 // https://www.npmjs.com/package/eslint-plugin-no-secrets
-import noSecrets from 'eslint-plugin-no-secrets'
 
-// ===== [REGULAR EXPRESSIONS] =====
-// https://github.com/ota-meshi/eslint-plugin-regexp
-import * as regexpPlugin from 'eslint-plugin-regexp'
+/*
+ * ===== [REGULAR EXPRESSIONS] =====
+ * https://github.com/ota-meshi/eslint-plugin-regexp
+ */
 
-// ===== [FILE FORMAT SPECIFIC] =====
-// https://www.npmjs.com/package/eslint-plugin-jsonc
+/*
+ * ===== [FILE FORMAT SPECIFIC] =====
+ * https://www.npmjs.com/package/eslint-plugin-jsonc
+ */
 import eslintPluginJsonc from 'eslint-plugin-jsonc'
 import a11yPlugin from 'eslint-plugin-jsx-a11y'
+import nodePlugin from 'eslint-plugin-n'
+import noSecrets from 'eslint-plugin-no-secrets'
 
 // https://www.npmjs.com/package/eslint-plugin-package-json
 import packageJson from 'eslint-plugin-package-json'
@@ -86,14 +92,18 @@ import packageJson from 'eslint-plugin-package-json'
 
 // https://perfectionist.dev
 import perfectionist from 'eslint-plugin-perfectionist'
+import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import pluginPromise from 'eslint-plugin-promise'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
+import { configs } from 'eslint-plugin-regexp'
+import pluginSecurity from 'eslint-plugin-security'
 import sonarjs from 'eslint-plugin-sonarjs'
 import pluginTsDoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
+import unusedImports from 'eslint-plugin-unused-imports'
 import vitest from 'eslint-plugin-vitest'
 import tseslint from 'typescript-eslint'
 
@@ -256,11 +266,13 @@ export default tseslint.config(
             ],
             'one-var': ['error', 'never'], // Stricter than original
             'guard-for-in': 'error', // Stricter than original
-            /*
-             * ENTERPRISE: import/no-duplicates hat mehr Features (inline types, query strings)
-             * 'no-duplicate-imports': 'error', // ❌ REDUNDANT: Übernommen von import/no-duplicates
-             * 'no-return-await': 'error', // Handled by @typescript-eslint/return-await
-             */
+
+            // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-return-await
+            'no-return-await': 'off',
+
+            // ❌ REDUNDANT: Übernommen von import/no-duplicates hat mehr Features (inline types, query strings)
+            'no-duplicate-imports': 'off',
+
             'no-template-curly-in-string': 'error',
             'require-atomic-updates': 'error',
             'accessor-pairs': 'error',
@@ -891,7 +903,7 @@ export default tseslint.config(
      * Enterprise-Grade Regular Expression Standards
      * Based on Google RE2, Microsoft .NET Regex Guidelines, Meta Pattern Standards
      */
-    regexpPlugin.configs['flat/all'],
+    configs['flat/all'],
     {
         rules: {
             /*
@@ -1388,13 +1400,39 @@ export default tseslint.config(
         rules: {
             // ===== IMPORT ORDER & STYLE (Google/Airbnb Standards) =====
             'import/first': 'error',
+
+            /*
+             * ✅ ==== VERIFIED ====
+             * ✅ Ersetzt die Kernregel und erlaubt bewusst getrennte Type-/Value-Imports.
+             *    prefer-inline: false  → verhindert erzwungenes Zusammenführen in ein Statement (erlaubt zwei Imports).
+             *    considerQueryString: true → unterstützt Importe mit Query-Strings/Loadern korrekt.
+             */
+
+            /*
+             * ===== ENTERPRISE STANDARD: Type- und Wert-Importe strikt trennen (Top-Level `import type`) =====
+             * Warum (Rationale):
+             * - Klare Semantik: Typen sind Compile-Time, Werte sind Runtime – vermeidet mentale Last und Fehlerquellen.
+             * - Side-Effect-Sicherheit: Keine unbeabsichtigten Side-Effects beim Import von reinen Typen.
+             * - Tree-Shaking/Bundling: Typen werden vom TS-Compiler entfernt; bessere Paketgröße und Dead-Code-Elimination.
+             * - Lesbarkeit & Tooling: Entspricht TS-ESLint-Empfehlungen und verbreiteter Praxis in großen TS-Codebases.
+             * Policy (Was wir erzwingen):
+             * - Typen ausschließlich über Top-Level `import type { ... } from 'pkg'`.
+             * - Werte über reguläre `import { ... } from 'pkg'`.
+             * - Zwei Import-Statements aus demselben Modul sind gewollt und kein Fehler.
+             * - Inline-Type-Spezifizierer (z. B. `import { type Foo }`) vermeiden wir zugunsten der Top-Level-Variante.
+             * Hinweis zur Sortierung/Gruppe:
+             * - In `import/order` soll `type` als eigene Gruppe konfiguriert sein. Außerdem `pathGroupsExcludedImportTypes: ['type']`,
+             *   Damit Typ-Imports separat gruppiert und alphabetisiert werden (bereits in deiner Config vorhanden).
+             */
+
             'import/no-duplicates': [
                 'error',
                 {
-                    'prefer-inline': true, // TypeScript type imports inline
+                    'prefer-inline': false,
                     considerQueryString: true
                 }
             ],
+
             'import/order': [
                 'error',
                 {
@@ -1524,11 +1562,13 @@ export default tseslint.config(
             'import/no-named-as-default': 'error', // Verhindert Konfusion
             'import/no-named-as-default-member': 'error',
 
+            // ===== TYPE IMPORTS (TypeScript Specific) =====
+
             /*
-             * ===== TYPE IMPORTS (TypeScript Specific) =====
-             * ✅ ==== VERIFIED ====
+             *✅ ==== VERIFIED ====
+             *Import type { Foo } - Enterprise Standard für TypeScript 5.0+
              */
-            'import/consistent-type-specifier-style': ['error', 'prefer-top-level'], // Import type { Foo } - Enterprise Standard für TypeScript 5.0+
+            'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
 
             // ✅ ==== VERIFIED ====
             'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
@@ -3776,8 +3816,21 @@ export default tseslint.config(
             // ✅ ==== VERIFIED ====
             '@typescript-eslint/consistent-type-exports': 'error', // Konsistente Type Exports
 
-            // ✅ ==== VERIFIED ====
-            '@typescript-eslint/consistent-type-imports': 'error', // Enforce type-only imports
+            /*
+             * ✅ ==== VERIFIED ====
+             * ✅ Erzwingt Konsistenz in TypeScript und steuert den Auto-Fixer.
+             *    prefer: 'type-imports'          → immer `import type` statt Wert-Import für Typen.
+             *    fixStyle: 'separate-type-imports' → separater Top-Level-Block für Typen (kein Inline-Mixing).
+             */
+
+            '@typescript-eslint/consistent-type-imports': [
+                'error',
+                {
+                    prefer: 'type-imports',
+                    fixStyle: 'separate-type-imports'
+                }
+            ],
+
             '@typescript-eslint/no-useless-empty-export': 'error', // Verhindert leere Exports
 
             // Code Quality & Maintainability

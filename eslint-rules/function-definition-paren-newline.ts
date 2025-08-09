@@ -13,13 +13,13 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
+import {
+    ASTUtils, ESLintUtils
+} from '@typescript-eslint/utils'
+
 import type {
     TSESTree,
     TSESLint
-} from '@typescript-eslint/utils'
-
-import {
-    ASTUtils, ESLintUtils
 } from '@typescript-eslint/utils'
 
 // Constants to avoid magic numbers in calculations and defaults
