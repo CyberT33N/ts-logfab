@@ -13,9 +13,9 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
-function _enforceNewlinesForFunctionLike(
+const _enforceNewlinesForFunctionLike = (
     functionNode, sourceCode, minParameters, context
-) {
+) => {
     if (!functionNode || !Array.isArray(functionNode.params)) {
         return
     }
@@ -49,9 +49,9 @@ function _enforceNewlinesForFunctionLike(
 }
 
 // Add top-level helpers extracted from create(context)
-function _findWrappingParens(
+const _findWrappingParens = (
     firstParameter, lastParameter, sourceCode
-) {
+) => {
     const openingParen = sourceCode.getTokenBefore(
         firstParameter, token =>
             token.value === '('

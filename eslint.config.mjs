@@ -50,8 +50,8 @@ import sonarjs from 'eslint-plugin-sonarjs'
 // https://www.npmjs.com/package/eslint-plugin-promise
 import pluginPromise from 'eslint-plugin-promise'
 
-// https://www.npmjs.com/package/eslint-plugin-prefer-arrow
-import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow'
+// https://www.npmjs.com/package/eslint-plugin-prefer-arrow-functions
+import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 
 // ===== IMPORTS & MODULES =====
 // https://www.npmjs.com/package/eslint-plugin-import
@@ -123,7 +123,7 @@ import perfectionist from 'eslint-plugin-perfectionist'
 // import boundaries from "eslint-plugin-boundaries";
 
 // ===== LOCAL PLUGIN =====
-import localFunctionDefinitionParenNewline from './eslint-rules/function-definition-paren-newline.js'
+import { functionDefinitionParenNewlinePlugin } from './eslint-rules/function-definition-paren-newline.js'
 
 export default tseslint.config(
      {
@@ -155,7 +155,7 @@ export default tseslint.config(
                     skipComments: true     // ✅ Kommentare zählen für Documentation Discipline
                }],
 
-                // Migrated to @stylistic - now commented out
+               // Migrated to @stylistic - now commented out
                // 'arrow-parens': ['error', 'as-needed'],
 
                // ✅ ==== VERIFIED ====
@@ -163,6 +163,14 @@ export default tseslint.config(
 
                // ✅ ==== VERIFIED ====
                'no-ternary': 'off',
+
+               // ✅ ==== VERIFIED ====
+               'no-underscore-dangle': ['error', { allow: ['__dirname', '__filename'], allowFunctionParams: true }],
+
+               // ✅ ==== VERIFIED ====
+               'arrow-body-style': ['error', 'as-needed', {
+                    'requireReturnForObjectLiteral': false
+               }],
 
                'no-var': 'error',
                'no-eval': 'error',
@@ -175,6 +183,12 @@ export default tseslint.config(
                     allowNamedFunctions: true
                }],
                'func-names': ['error', 'never'],
+
+               // ✅ ==== VERIFIED ====
+               'func-style': ['error', 'expression', {
+                    overrides: { namedExports: 'expression' }
+               }],
+
                'no-use-before-define': 'off', // Let typescript-eslint handle this
                // 'object-curly-spacing': ['error', 'always'], // Migrated to @stylistic
                // 'comma-dangle': ['error', 'never'], // Migrated to @stylistic
@@ -319,6 +333,15 @@ export default tseslint.config(
                          {
                               group: ['**/test/**', '**/tests/**', '**/*.test.*', '**/*.spec.*'],
                               message: 'Do not import test files in production code'
+                         },
+                         // ✅ ==== VERIFIED ====
+                         {
+                              group: ['@/**/internal/**'],
+                              message: 'Internal modules are private; import via index or from tests.'
+                         },
+                         {
+                              group: ['**/internal/**'],
+                              message: 'Internal modules are private; import via index or from tests.'
                          }
                     ]
                }],
@@ -355,8 +378,8 @@ export default tseslint.config(
                          message: 'Use object spread instead of Object.assign with object literal'
                     },
                     {
-                      selector: 'ExportDefaultDeclaration',
-                      message: 'Default exports are forbidden. Use named exports.'
+                         selector: 'ExportDefaultDeclaration',
+                         message: 'Default exports are forbidden. Use named exports.'
                     }
                ],
 
@@ -412,6 +435,15 @@ export default tseslint.config(
                'no-useless-return': 'error' // No redundant returns
           }
      },
+     {
+          files: [
+               'src/**/index.ts',                  // Erlaubt intern für Service-Index & Modul-Barrel
+               'test/**/*.{ts,tsx,js,mjs,cjs}',
+               '**/*.test.{ts,tsx,js}',
+               '**/*.spec.{ts,tsx,js}',
+          ],
+          rules: { 'no-restricted-imports': 'off' },
+     },
 
      // ===== SECURITY PLUGIN =====
      pluginSecurity.configs.recommended,
@@ -447,21 +479,21 @@ export default tseslint.config(
                          'Azure Storage Key': '[a-zA-Z0-9+/]{86}==',
                          'GCP API Key': 'AIza[0-9A-Za-z\\-_]{35}',
                          'GCP OAuth': '[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com',
-                         
+
                          // ===== VERSION CONTROL TOKENS =====
                          'GitHub Token': '(gh[oprs]_[0-9a-zA-Z]{36})',
                          'GitHub App Token': 'ghs_[0-9a-zA-Z]{36}',
                          'GitHub Personal Token': 'ghp_[0-9a-zA-Z]{36}',
                          'GitLab Token': 'glpat-[0-9a-zA-Z\\-_]{20}',
                          // 'Bitbucket Token': '[a-zA-Z0-9]{20,}',
-                         
+
                          // ===== COMMUNICATION PLATFORMS =====
                          'Slack Token': '(xox[baprs]-[0-9a-zA-Z-]+)',
                          'Slack Webhook': 'https://hooks\\.slack\\.com/services/T[a-zA-Z0-9_]+/B[a-zA-Z0-9_]+/[a-zA-Z0-9_]+',
                          'Teams Webhook': 'https://[a-z0-9]+\\.webhook\\.office\\.com/webhookb2/[a-z0-9\\-]+@[a-z0-9\\-]+/IncomingWebhook/[a-z0-9]+/[a-z0-9\\-]+',
                          'Discord Token': '[MN][a-zA-Z\\d]{23}\\.[a-zA-Z\\d-_]{6}\\.[a-zA-Z\\d-_]{27}',
                          'Discord Webhook': 'https://discord\\.com/api/webhooks/[0-9]+/[a-zA-Z0-9\\-_]+',
-                         
+
                          // ===== API KEYS & SECRETS =====
                          'NPM Token': 'npm_[a-zA-Z0-9]{36}',
                          'PyPI Token': 'pypi-[a-zA-Z0-9\\-_]+',
@@ -472,20 +504,20 @@ export default tseslint.config(
                          'Twilio API Key': 'SK[0-9a-fA-F]{32}',
                          'MailChimp API Key': '[0-9a-f]{32}-us[0-9]{1,2}',
                          'SendGrid API Key': 'SG\\.[a-zA-Z0-9\\-_]+\\.[a-zA-Z0-9\\-_]+',
-                         
+
                          // ===== DATABASE CREDENTIALS =====
                          'MongoDB Connection': 'mongodb(\\+srv)?://[^\\s]+',
                          'PostgreSQL Connection': 'postgres(ql)?://[^\\s]+',
                          'MySQL Connection': 'mysql://[^\\s]+',
                          'Redis Connection': 'redis://[^\\s]+',
-                         
+
                          // ===== AUTHENTICATION PATTERNS =====
                          'JWT Token': 'ey[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]*',
                          // 'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
                          'Bearer Token': 'Bearer [A-Za-z0-9\\-_]+',
                          'Private Key': '-----BEGIN (RSA |EC |DSA |OPENSSH |)?(PRIVATE|ENCRYPTED) KEY-----',
                          // 'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
-                         
+
                          // ===== ENTERPRISE SPECIFIC =====
                          'Artifactory Token': 'AKC[a-zA-Z0-9]{10,}',
                          'Vault Token': 's\\.[a-zA-Z0-9]{24}',
@@ -507,7 +539,7 @@ export default tseslint.config(
                          '(?=[A-Z][a-z])' // Split camelCase
                     ]
                }],
-               
+
                // ===== PATTERN MATCHING FOR STRUCTURED SECRETS =====
                'no-secrets/no-pattern-match': ['error', {
                     patterns: {
@@ -547,7 +579,7 @@ export default tseslint.config(
                // ===== ENTERPRISE REGEL-ANPASSUNGEN (Überschreibt vitest.configs.all) =====
                // HINWEIS: vitest.configs.all setzt alle Regeln auf 'warn' (🌐)
                // Wir upgraden kritische Regeln auf 'error' und konfigurieren Enterprise-Standards
-               
+
                // ===== TEST STRUCTURE & ORGANIZATION (Google Testing Standards) =====
                'vitest/consistent-test-filename': ['error', {
                     pattern: '\\.(test|spec)\\.[jt]sx?$' // Enforce .test.ts or .spec.ts
@@ -563,7 +595,7 @@ export default tseslint.config(
                'vitest/prefer-lowercase-title': ['error', {
                     ignore: ['describe'] // describe darf PascalCase
                }],
-               
+
                // ===== TEST QUALITY & ASSERTIONS =====
                'vitest/expect-expect': ['error', {
                     assertFunctionNames: ['expect', 'assert', 'expectTypeOf'], // Type assertions
@@ -588,7 +620,7 @@ export default tseslint.config(
                     minArgs: 1,
                     maxArgs: 2
                }],
-               
+
                // ===== UPGRADES VON WARN ZU ERROR (Enterprise Critical) =====
                'vitest/no-conditional-expect': 'error', // War warn in all
                'vitest/no-conditional-in-test': 'error', // War warn in all
@@ -607,7 +639,7 @@ export default tseslint.config(
                'vitest/require-to-throw-message': 'error', // War warn in all
                'vitest/no-test-return-statement': 'error', // War warn in all
                'vitest/no-standalone-expect': 'error', // War warn in all
-               
+
                // ===== ENTERPRISE-SPEZIFISCHE KONFIGURATIONEN =====
                'vitest/no-restricted-vi-methods': ['error', {
                     'vi.unmock': 'Use explicit mock restoration in afterEach',
@@ -618,7 +650,7 @@ export default tseslint.config(
                     inlineMaxSize: 10
                }],
                'vitest/prefer-snapshot-hint': 'error', // Enterprise: Snapshot hints für bessere Test-Dokumentation
-               
+
                // ===== MATCHER PREFERENCES (Alle von warn zu error) =====
                'vitest/prefer-each': 'error',
                'vitest/prefer-to-be': 'error',
@@ -633,14 +665,14 @@ export default tseslint.config(
                'vitest/prefer-called-with': 'error',
                'vitest/prefer-todo': 'error',
                'vitest/no-alias-methods': 'error',
-               
+
                // ===== EXPLIZIT DEAKTIVIERTE REGELN (Zu restriktiv) =====
                'vitest/prefer-expect-assertions': 'off', // Zu restriktiv
                'vitest/no-hooks': 'off', // Hooks sind notwendig
                'vitest/no-test-prefixes': 'off', // 'test' prefix ist okay
                'vitest/no-restricted-matchers': 'off', // Team-spezifisch
                'vitest/no-disabled-tests': 'warn', // Bleibt warn für Flexibilität
-               
+
                // ===== DEPRECATED REGEL EXPLIZIT AUS =====
                'vitest/no-done-callback': 'off' // Deprecated laut Docs
           }
@@ -659,13 +691,13 @@ export default tseslint.config(
                'regexp/no-contradiction-with-assertion': 'error', // Logische Widersprüche
                'regexp/no-control-character': 'error', // Keine Control Characters
                'regexp/strict': 'error', // Strenge RegExp Validierung
-               
+
                // ===== UNICODE & MODERN PATTERNS (Google/MS Standard) =====
                'regexp/require-unicode-regexp': 'error', // /u flag ist Pflicht für Unicode
                'regexp/require-unicode-sets-regexp': 'off', // /v flag noch zu neu (ES2024)
                'regexp/unicode-escape': 'error', // \u{1F600} statt \uD83D\uDE00
                'regexp/unicode-property': 'error', // Korrekte Unicode Property Nutzung
-               
+
                // ===== WARTBARKEIT & LESBARKEIT (Meta Standards) =====
                'regexp/prefer-named-capture-group': 'error', // (?<name>...) für Klarheit
                'regexp/prefer-named-backreference': 'error', // \k<name> statt \1
@@ -676,7 +708,7 @@ export default tseslint.config(
                'regexp/prefer-quantifier': 'error', // a{1,} → a+
                'regexp/prefer-question-quantifier': 'error', // a{0,1} → a?
                'regexp/sort-alternatives': 'error', // Sortiere Alternativen für Konsistenz
-               
+
                // ===== BEST PRACTICES (Enterprise Consensus) =====
                'regexp/optimal-lookaround-quantifier': 'error', // Optimierte Lookarounds
                'regexp/optimal-quantifier-concatenation': 'error', // a+a* → a+
@@ -690,19 +722,19 @@ export default tseslint.config(
                'regexp/prefer-set-operation': 'error', // Moderne Set Operations
                'regexp/simplify-set-operations': 'error', // Vereinfache Set Ops
                'regexp/use-ignore-case': 'error', // [a-zA-Z] → [a-z]/i
-               
+
                // ===== CONSISTENCY & STYLE (Google Style Guide) =====
                'regexp/hexadecimal-escape': ['error', 'never'], // \x61 → a (lesbar)
                'regexp/sort-character-class-elements': 'error', // Sortiere Zeichen in character classes
                'regexp/sort-flags': 'error', // Alphabetische Flag-Sortierung
-               'regexp/match-any': ['error', { 
+               'regexp/match-any': ['error', {
                     allows: ['dotAll'] // . mit /s flag für multiline matching
                }],
                'regexp/letter-case': ['error', {
                     caseInsensitive: 'lowercase', // Lowercase mit /i flag
                     unicodeEscape: 'uppercase' // \u{1F600} mit Uppercase
                }],
-               
+
                // ===== ERROR PREVENTION =====
                'regexp/no-empty-alternative': 'error', // (a|) ist verwirrend
                'regexp/no-empty-capturing-group': 'error', // () ohne Inhalt
@@ -715,7 +747,7 @@ export default tseslint.config(
                'regexp/no-useless-assertions': 'error', // ^\b ist redundant
                'regexp/no-useless-backreference': 'error', // Referenz zu nicht-existenter Gruppe
                'regexp/no-zero-quantifier': 'error', // a{0} ist nutzlos
-               
+
                // ===== SPEZIELLE ANPASSUNGEN =====
                'regexp/no-unused-capturing-group': ['error', {
                     // Ungenutzte Gruppen entfernen, außer für named groups
@@ -726,7 +758,7 @@ export default tseslint.config(
                'regexp/no-standalone-backslash': 'error', // Einzelne \ sind Fehler
                'regexp/prefer-escape-replacement-dollar-char': 'error', // $$ in replace
                'regexp/prefer-predefined-assertion': 'error', // \b statt (?=\W|$)
-               
+
                // ===== EXPLIZIT DEAKTIVIERTE REGELN =====
                'regexp/require-unicode-sets-regexp': 'off', // /v flag zu neu
                'regexp/grapheme-string-literal': 'off', // Zu spezifisch
@@ -836,31 +868,31 @@ export default tseslint.config(
                'package-json/require-author': 'error', // MANDATORY: Clear ownership and accountability
                'package-json/require-files': 'warn', // RECOMMENDED: Explicit file inclusion for security
                'package-json/no-redundant-files': 'error', // SECURITY: Prevent accidental sensitive data exposure
-               
+
                // ===== DEPENDENCY MANAGEMENT EXCELLENCE =====
                'package-json/restrict-dependency-ranges': ['error', [
                     // BASE RULE: All dependencies should use tilde (~) for Enterprise-controlled updates
                     {
                          rangeType: 'tilde',
                     },
-                    
+
                     // SECURITY: Pin unstable versions (0.x.x) for production dependencies
                     {
                          forDependencyTypes: ['dependencies'],
                          forVersions: '<1',
                          rangeType: 'pin',
                     },
-                    
+
                     // FLEXIBILITY: Allow any valid range for peer dependencies  
                     {
                          forDependencyTypes: ['peerDependencies'],
                          rangeType: ['caret', 'tilde', 'pin'], // All acceptable
                     },
                ]],
-               
+
                // ===== METADATA COMPLETENESS =====
                'package-json/require-keywords': 'warn', // RECOMMENDED: Better discoverability
-               
+
                // ===== DISABLE ALL JSONC RULES FOR PACKAGE.JSON =====
                // Only eslint-plugin-package-json should handle package.json files
                'jsonc/indent': 'off',
@@ -927,21 +959,20 @@ export default tseslint.config(
      // ===== PREFER ARROW PLUGIN (MODERN JAVASCRIPT STANDARDS) =====
      {
           plugins: {
-               "prefer-arrow": eslintPluginPreferArrow
+               "prefer-arrow-functions": eslintPluginPreferArrow
           },
           rules: {
+               // ✅ ==== VERIFIED ====
                // ===== ENTERPRISE ARROW FUNCTION STANDARDS (Google/Airbnb/Meta) =====
-               'prefer-arrow/prefer-arrow-functions': ['error', {
-                    disallowPrototype: true, // Enterprise: No prototype modifications (security & maintainability)
-                    singleReturnOnly: false, // Enterprise: Allow complex arrow functions (real-world code)
-                    classPropertiesAllowed: true, // Enterprise: Support modern class field syntax (ES2022+)
-                    allowStandaloneDeclarations: false // Enterprise: Consistency - use arrow functions everywhere
+               'prefer-arrow-functions/prefer-arrow-functions': ['error', {
+                    "allowedNames": [],
+                    "allowNamedFunctions": false,
+                    "allowObjectProperties": true,
+                    "classPropertiesAllowed": false,
+                    "disallowPrototype": false,
+                    "returnStyle": "unchanged",
+                    "singleReturnOnly": false
                }]
-               // Note: This enforces modern JavaScript patterns:
-               // - Lexical 'this' binding prevents common bugs
-               // - Consistent function style across codebase
-               // - Better TypeScript type inference with arrow functions
-               // - Aligns with React Hooks and modern framework patterns
           }
      },
 
@@ -1176,13 +1207,13 @@ export default tseslint.config(
                // ===== TYPE IMPORTS (TypeScript Specific) =====
                // ✅ ==== VERIFIED ====
                'import/consistent-type-specifier-style': ['error', 'prefer-top-level'], // import type { Foo } - Enterprise Standard für TypeScript 5.0+
-               
+
                // ✅ ==== VERIFIED ====
                'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
                'import/no-empty-named-blocks': 'error', // import {} from 'foo' verhindert
 
                // ===== FILE EXTENSIONS (Enterprise Barrel Pattern Standard) =====
-               
+
                // ✅ ==== VERIFIED ====
                // Optimal für Enterprise: Barrel Pattern + direkte .ts Imports
                'import/extensions': ['error', 'ignorePackages', {
@@ -1442,6 +1473,7 @@ export default tseslint.config(
                '@stylistic/arrow-parens': ['error', 'as-needed', {
                     'requireForBlockBody': true
                }],
+
                '@stylistic/arrow-spacing': ['error', {
                     'before': true,
                     'after': true
@@ -1686,7 +1718,7 @@ export default tseslint.config(
      // functionDefinitionPlugin.configs.flat.all,
      {
           plugins: {
-               'local-rules': localFunctionDefinitionParenNewline,
+               'local-rules': functionDefinitionParenNewlinePlugin,
           },
           rules: {
                'local-rules/function-definition-paren-newline': ['error', { minParams: 2 }]
@@ -1828,7 +1860,7 @@ export default tseslint.config(
                'react/jsx-wrap-multilines': 'off', // Abgedeckt durch @stylistic/jsx-wrap-multilines
                'react/jsx-curly-spacing': 'off', // Abgedeckt durch @stylistic/jsx-curly-spacing
                'react/jsx-equals-spacing': 'off', // Abgedeckt durch @stylistic/jsx-equals-spacing
-               
+
                // ===== ZUSÄTZLICHE ENTERPRISE STANDARDS =====
                'react/button-has-type': ['error', {
                     button: true,
@@ -1908,7 +1940,7 @@ export default tseslint.config(
                'jsx-a11y': {
                     // Polymorphe Komponenten-Unterstützung (Material-UI, Chakra UI, etc.)
                     polymorphicPropName: 'as',
-                    
+
                     // Custom Component Mapping für Enterprise UI Libraries
                     components: {
                          // Form Controls
@@ -1924,7 +1956,7 @@ export default tseslint.config(
                          'Radio': 'input',
                          'Switch': 'input',
                          'Toggle': 'input',
-                         
+
                          // Buttons
                          'Button': 'button',
                          'IconButton': 'button',
@@ -1934,13 +1966,13 @@ export default tseslint.config(
                          'ActionButton': 'button',
                          'FloatingActionButton': 'button',
                          'Fab': 'button',
-                         
+
                          // Links
                          'Link': 'a',
                          'NavLink': 'a',
                          'RouterLink': 'a',
                          'ExternalLink': 'a',
-                         
+
                          // Structure
                          'Nav': 'nav',
                          'Navigation': 'nav',
@@ -1950,25 +1982,25 @@ export default tseslint.config(
                          'Section': 'section',
                          'Article': 'article',
                          'Aside': 'aside',
-                         
+
                          // Lists
                          'List': 'ul',
                          'OrderedList': 'ol',
                          'ListItem': 'li',
-                         
+
                          // Media
                          'Image': 'img',
                          'Picture': 'img',
                          'Video': 'video',
                          'Audio': 'audio',
-                         
+
                          // Tables
                          'Table': 'table',
                          'TableRow': 'tr',
                          'TableCell': 'td',
                          'TableHeader': 'th'
                     },
-                    
+
                     // Attribute Mapping für verschiedene Prop-Namen
                     attributes: {
                          'for': ['htmlFor', 'for'],
@@ -2021,7 +2053,7 @@ export default tseslint.config(
                'jsx-a11y/role-supports-aria-props': 'error', // Nur supported ARIA props für roles
                'jsx-a11y/scope': 'error', // scope nur auf th elements
                'jsx-a11y/tabindex-no-positive': 'error', // Kein tabindex > 0 (stört keyboard navigation)
-               
+
                // ===== WCAG 2.1 LEVEL AA (ENTERPRISE STANDARD) =====
                'jsx-a11y/autocomplete-valid': ['error', {
                     inputComponents: ['Input', 'TextField', 'TextInput']
@@ -2035,7 +2067,7 @@ export default tseslint.config(
                }],
                'jsx-a11y/lang': 'error', // lang attribute muss valid language code sein
                'jsx-a11y/no-aria-hidden-on-focusable': 'error', // Focusable elements nicht mit aria-hidden verstecken
-               
+
                // ===== INTERACTION ACCESSIBILITY =====
                'jsx-a11y/click-events-have-key-events': 'error', // Click handlers brauchen keyboard support
                'jsx-a11y/interactive-supports-focus': ['error', {
@@ -2057,7 +2089,7 @@ export default tseslint.config(
                     iframe: ['onError', 'onLoad'],
                     img: ['onError', 'onLoad']
                }],
-               
+
                // ===== FORM ACCESSIBILITY =====
                'jsx-a11y/control-has-associated-label': ['error', {
                     controlComponents: ['Button', 'IconButton'],
@@ -2065,7 +2097,7 @@ export default tseslint.config(
                     ignoreRoles: ['grid', 'listbox', 'menu', 'menubar', 'radiogroup', 'row', 'tablist', 'toolbar', 'tree', 'treegrid'],
                     depth: 3
                }],
-               
+
                // ===== SEMANTIC HTML ENFORCEMENT =====
                'jsx-a11y/no-noninteractive-element-to-interactive-role': ['error', {
                     ul: ['listbox', 'menu', 'menubar', 'radiogroup', 'tablist', 'tree', 'treegrid'],
@@ -2080,14 +2112,14 @@ export default tseslint.config(
                     canvas: ['img'] // Canvas kann als img behandelt werden
                }],
                'jsx-a11y/prefer-tag-over-role': 'error', // Semantic HTML > ARIA roles
-               
+
                // ===== MEDIA ACCESSIBILITY =====
                'jsx-a11y/media-has-caption': ['error', {
                     audio: ['Audio'],
                     video: ['Video'],
                     track: ['Track']
                }],
-               
+
                // ===== FOCUS MANAGEMENT =====
                'jsx-a11y/no-autofocus': ['warn', {
                     ignoreNonDOM: true
@@ -2097,18 +2129,18 @@ export default tseslint.config(
                     roles: ['tabpanel', 'dialog'],
                     allowExpressionValues: true
                }],
-               
+
                // ===== ARIA BEST PRACTICES =====
                'jsx-a11y/aria-activedescendant-has-tabindex': 'error', // Elements mit aria-activedescendant müssen tabbable sein
                'jsx-a11y/no-interactive-element-to-noninteractive-role': ['error', {
                     canvas: ['img', 'presentation'] // Canvas exceptions
                }],
-               
+
                // ===== DEPRECATED BUT STILL IN DOCS =====
                // 'jsx-a11y/accessible-emoji': 'off', // Deprecated - modern emoji sind accessible
                // 'jsx-a11y/label-has-for': 'off', // Deprecated - use label-has-associated-control
                // 'jsx-a11y/no-onchange': 'off', // Deprecated - onchange ist jetzt accessible
-               
+
                // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
                'jsx-a11y/anchor-ambiguous-text': ['warn', {
                     words: ['click here', 'here', 'link', 'a link', 'learn more', 'more', 'read more', 'mehr', 'hier', 'klicken']
@@ -2166,21 +2198,21 @@ export default tseslint.config(
                     Additional options for raw syntax parsing
                     */
                     // ecmaFeatures: {
-                        /* 
-                        - https://typescript-eslint.io/packages/parser/#jsx
-                        Default: false
-                        Enable JSX parsing. Auto-detected for .jsx/.tsx files.
-                        Note: .ts files always parse as false, .jsx/.tsx always as true
-                        Only affects unknown extensions (.md, .vue) when project is not provided
-                        */
-                        jsx: true,
+                    /* 
+                    - https://typescript-eslint.io/packages/parser/#jsx
+                    Default: false
+                    Enable JSX parsing. Auto-detected for .jsx/.tsx files.
+                    Note: .ts files always parse as false, .jsx/.tsx always as true
+                    Only affects unknown extensions (.md, .vue) when project is not provided
+                    */
+                    jsx: true,
 
-                        /* 
-                        - https://typescript-eslint.io/packages/parser/#globalreturn
-                        Default: false
-                        Allow global return statements in codebase (useful for scripts)
-                        */
-                        // globalReturn: false
+                    /* 
+                    - https://typescript-eslint.io/packages/parser/#globalreturn
+                    Default: false
+                    Allow global return statements in codebase (useful for scripts)
+                    */
+                    // globalReturn: false
                     // },
 
                     /* 
@@ -2335,43 +2367,43 @@ export default tseslint.config(
                     */
                     projectService: true,
                     // projectService: {
-                        /* 
-                        - https://typescript-eslint.io/packages/parser/#allowdefaultproject
-                        Default: [] (none)
-                        Globs for files to run with default project despite not being in tsconfig.
-                        For config files like eslint.config.js not in sibling tsconfig.json.
-                        Performance Warning: Each file incurs non-trivial overhead - use sparingly.
-                        Restrictions: No ** globs, files can't be in nearest tsconfig.json
-                        */
-                        // allowDefaultProject: ['*.js', '*.mjs'],
+                    /* 
+                    - https://typescript-eslint.io/packages/parser/#allowdefaultproject
+                    Default: [] (none)
+                    Globs for files to run with default project despite not being in tsconfig.
+                    For config files like eslint.config.js not in sibling tsconfig.json.
+                    Performance Warning: Each file incurs non-trivial overhead - use sparingly.
+                    Restrictions: No ** globs, files can't be in nearest tsconfig.json
+                    */
+                    // allowDefaultProject: ['*.js', '*.mjs'],
 
-                        /* 
-                        - https://typescript-eslint.io/packages/parser/#defaultproject
-                        Default: 'tsconfig.json'
-                        TSConfig path for default project instead of TypeScript defaults.
-                        Only affects files included by allowDefaultProject.
-                        Resolved relative to tsconfigRootDir.
-                        */
-                        // defaultProject: './tsconfig.eslint.json',
+                    /* 
+                    - https://typescript-eslint.io/packages/parser/#defaultproject
+                    Default: 'tsconfig.json'
+                    TSConfig path for default project instead of TypeScript defaults.
+                    Only affects files included by allowDefaultProject.
+                    Resolved relative to tsconfigRootDir.
+                    */
+                    // defaultProject: './tsconfig.eslint.json',
 
-                        /* 
-                        - https://typescript-eslint.io/packages/parser/#loadtypescriptplugins
-                        Default: false
-                        Allow project service to load TypeScript plugins.
-                        False by default to prevent persistent watchers that block ESLint exit.
-                        Useful for custom rules interacting with TypeScript plugins.
-                        Enterprise: Enable conditionally (e.g., only in VS Code)
-                        */
-                        // loadTypeScriptPlugins: !!process.env.VSCODE_PID,
+                    /* 
+                    - https://typescript-eslint.io/packages/parser/#loadtypescriptplugins
+                    Default: false
+                    Allow project service to load TypeScript plugins.
+                    False by default to prevent persistent watchers that block ESLint exit.
+                    Useful for custom rules interacting with TypeScript plugins.
+                    Enterprise: Enable conditionally (e.g., only in VS Code)
+                    */
+                    // loadTypeScriptPlugins: !!process.env.VSCODE_PID,
 
-                        /* 
-                        - https://typescript-eslint.io/packages/parser/#maximumdefaultprojectfilematchcount_this_will_slow_down_linting
-                        Default: 8
-                        Maximum files allowDefaultProject may match.
-                        Each match slows linting significantly.
-                        Enterprise: File issue explaining need if you must increase this.
-                        */
-                        // maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 8
+                    /* 
+                    - https://typescript-eslint.io/packages/parser/#maximumdefaultprojectfilematchcount_this_will_slow_down_linting
+                    Default: 8
+                    Maximum files allowDefaultProject may match.
+                    Each match slows linting significantly.
+                    Enterprise: File issue explaining need if you must increase this.
+                    */
+                    // maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 8
                     // },
 
                     /* 
@@ -2424,9 +2456,9 @@ export default tseslint.config(
                'perfectionist/sort-jsx-props': 'off', // ✅ Abgedeckt durch @stylistic/jsx-sort-props (bessere JSX-Integration)
                'perfectionist/sort-objects': 'off', // ✅ Abgedeckt durch ESLint Core sort-keys
                'perfectionist/sort-enums': 'off', // ✅ Abgedeckt durch typescript-sort-keys/string-enum
-               
+
                // ===== ENTERPRISE-AKTIVIERTE REGELN (NOCH NICHT ABGEDECKT) =====
-               
+
                // ===== TYPESCRIPT TYPE SORTING =====
                'perfectionist/sort-union-types': ['error', {
                     type: 'natural',
@@ -2451,14 +2483,14 @@ export default tseslint.config(
                     order: 'asc',
                     groups: [
                          'conditional',
-                         'function', 
+                         'function',
                          'import',
                          'intersection',
                          'keyword',
                          'literal',
                          'named',
                          'object',
-                         'operator', 
+                         'operator',
                          'tuple',
                          'union',
                          'nullish'
@@ -2473,7 +2505,7 @@ export default tseslint.config(
                          'property' // Einfache Properties zuletzt
                     ]
                }],
-               
+
                // ===== CLASS & INHERITANCE SORTING =====
 
                // ✅ ==== VERIFIED ====
@@ -2483,33 +2515,33 @@ export default tseslint.config(
                     type: 'natural',
                     order: 'asc'
                }], // extends/implements clauses
-               
+
                // ===== MODERN JAVASCRIPT FEATURES =====
                'perfectionist/sort-sets': ['error', {
                     type: 'natural',
                     order: 'asc'
                }], // new Set([...]) values
                'perfectionist/sort-maps': ['error', {
-                    type: 'natural', 
+                    type: 'natural',
                     order: 'asc'
                }], // new Map([...]) entries
                'perfectionist/sort-array-includes': ['error', {
                     type: 'natural',
                     order: 'asc'
                }], // array.includes() arguments
-               
+
                // ===== VARIABLE & DECLARATION SORTING =====
                'perfectionist/sort-variable-declarations': ['error', {
                     type: 'natural',
                     order: 'asc'
                }], // const a, b, c = destructuring
-               
+
                // ===== CONTROL FLOW SORTING =====
                'perfectionist/sort-switch-case': ['error', {
                     type: 'natural',
                     order: 'asc'
                }], // switch case statements (alphabetical für bessere Lesbarkeit)
-               
+
                // ===== EXPORT/IMPORT MODULE SORTING =====
                'perfectionist/sort-exports': ['error', {
                     type: 'natural',
@@ -2523,7 +2555,7 @@ export default tseslint.config(
                     type: 'natural',
                     order: 'asc'
                }], // Module member sorting
-               
+
                // ===== DECORATOR SORTING (ENTERPRISE TYPESCRIPT) =====
                'perfectionist/sort-decorators': ['error', {
                     type: 'natural',
@@ -2554,22 +2586,22 @@ export default tseslint.config(
                // ✅ ==== VERIFIED ====
                "@typescript-eslint/member-ordering": ["error", {
                     "default": {
-                        // Keep all default memberTypes (sie sind enterprise-optimal!)
-                        // ADD: Alphabetical sorting within groups
-                        "order": "alphabetically-case-insensitive",
-                        
-                        // ADD: Optional members preference (Enterprise consistency)
-                        "optionalityOrder": "required-first"
+                         // Keep all default memberTypes (sie sind enterprise-optimal!)
+                         // ADD: Alphabetical sorting within groups
+                         "order": "alphabetically-case-insensitive",
+
+                         // ADD: Optional members preference (Enterprise consistency)
+                         "optionalityOrder": "required-first"
                     }
-                }],
-                
+               }],
+
                '@typescript-eslint/dot-notation': 'off', // Disabled to allow bracket notation for private method testing
-               
+
                // ✅ ==== VERIFIED ====
                '@typescript-eslint/naming-convention': [
                     'error',
                     // ===== BIG TECH ENTERPRISE STANDARDS (Google, Meta, Microsoft) =====
-                    
+
                     // 🚫 KRITISCH: Verbiete I-Prefix für Interfaces (veraltetes Anti-Pattern)
                     {
                          'selector': 'interface',
@@ -2579,7 +2611,7 @@ export default tseslint.config(
                               'match': false
                          }
                     },
-                    
+
                     // 🚫 KRITISCH: Verbiete E-Prefix für Enums (veraltetes Anti-Pattern)
                     {
                          'selector': 'enum',
@@ -2589,20 +2621,20 @@ export default tseslint.config(
                               'match': false
                          }
                     },
-                    
+
                     // ✅ Type-Like (Interfaces, Classes, Types, Enums) - PascalCase
                     {
                          'selector': 'typeLike',
                          'format': ['PascalCase']
                     },
-                    
+
                     // ✅ Type Parameters (Generics) - T-Prefix (Google/MS Standard)
                     {
                          'selector': 'typeParameter',
                          'format': ['PascalCase'],
                          'prefix': ['T']
                     },
-                    
+
                     // 🚀 MODERN ONLY: # Private Fields (ECMA Standard) - Enterprise Future
                     {
                          'selector': 'classProperty',
@@ -2610,7 +2642,7 @@ export default tseslint.config(
                          'format': ['camelCase'],
                          'leadingUnderscore': 'forbid'
                     },
-                    
+
                     // 🚀 MODERN ONLY: # Private Methods (ECMA Standard)
                     {
                          'selector': 'classMethod',
@@ -2618,7 +2650,7 @@ export default tseslint.config(
                          'format': ['camelCase'],
                          'leadingUnderscore': 'forbid'
                     },
-                    
+
                     // 🚫 VERBIETE Legacy underscore für private (erzwinge # private fields)
                     {
                          'selector': 'memberLike',
@@ -2630,7 +2662,7 @@ export default tseslint.config(
                               'match': false
                          }
                     },
-                    
+
                     // ✅ Protected Members - underscore optional
                     {
                          'selector': 'memberLike',
@@ -2638,14 +2670,14 @@ export default tseslint.config(
                          'format': ['camelCase'],
                          'leadingUnderscore': 'allow'
                     },
-                    
+
                     // ✅ Static Readonly Constants - UPPER_CASE (Google Standard)
                     {
                          'selector': 'classProperty',
                          'modifiers': ['static', 'readonly'],
                          'format': ['UPPER_CASE']
                     },
-                    
+
                     // ✅ Global Primitive Constants - UPPER_CASE (Google/Meta Standard)
                     {
                          'selector': 'variable',
@@ -2653,7 +2685,7 @@ export default tseslint.config(
                          'types': ['string', 'number', 'boolean'],
                          'format': ['UPPER_CASE']
                     },
-                    
+
                     // ✅ Global Function Constants - camelCase (Enterprise Standard)
                     {
                          'selector': 'variable',
@@ -2661,13 +2693,13 @@ export default tseslint.config(
                          'types': ['function'],
                          'format': ['camelCase']
                     },
-                    
+
                     // ✅ Enum Members - PascalCase (Meta/React Standard)
                     {
                          'selector': 'enumMember',
                          'format': ['PascalCase', 'UPPER_CASE']
                     },
-                    
+
                     // ✅ Boolean Variables - Verb Prefixes (Google Best Practice)
                     {
                          'selector': 'variable',
@@ -2680,41 +2712,41 @@ export default tseslint.config(
                               'match': false
                          }
                     },
-                    
+
                     // ✅ Variables - camelCase oder UPPER_CASE
                     {
                          'selector': 'variable',
                          'format': ['camelCase', 'UPPER_CASE'],
                          'leadingUnderscore': 'allow'
                     },
-                    
+
                     // ✅ Functions - camelCase oder PascalCase (für React Components)
                     {
                          'selector': 'function',
                          'format': ['camelCase', 'PascalCase']
                     },
-                    
+
                     // ✅ Parameters - camelCase mit underscore erlaubt
                     {
                          'selector': 'parameter',
                          'format': ['camelCase'],
                          'leadingUnderscore': 'allow'
                     },
-                    
+
                     // ✅ Destructured Variables - flexible Naming (externe APIs)
                     {
                          'selector': 'variable',
                          'modifiers': ['destructured'],
                          'format': null
                     },
-                    
+
                     // ✅ Object/Type Properties - verschiedene Formate für externe Libraries (Zod, etc.)
                     {
                          'selector': ['objectLiteralProperty', 'typeProperty'],
                          'format': ['camelCase', 'snake_case', 'PascalCase'],
                          'leadingUnderscore': 'allow'
                     },
-                    
+
                     // ✅ Properties die Quotes brauchen - keine Format-Checks
                     {
                          'selector': [
@@ -2730,7 +2762,7 @@ export default tseslint.config(
                          'format': null,
                          'modifiers': ['requiresQuotes']
                     },
-                    
+
                     // ✅ Default Fallback - camelCase
                     {
                          'selector': 'default',
