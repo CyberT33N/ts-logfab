@@ -294,7 +294,10 @@ export default tseslint.config(
             'dot-notation': 'off', // Disabled to allow bracket notation for private method testing
 
             // ===== IMPORT SORTING CONFLICT RESOLUTION =====
-            'sort-imports': 'off', // Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
+
+            // ✅ ==== VERIFIED ====
+            // Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
+            'sort-imports': 'off',
 
             // Additional critical rules for enterprise compliance
             'no-empty': ['error', { allowEmptyCatch: false }],
@@ -1433,41 +1436,49 @@ export default tseslint.config(
                 }
             ],
 
+            // ✅ ==== VERIFIED ====
             'import/order': [
-                'error',
-                {
+               'error', {
+                    // Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
                     groups: [
-                        'builtin', // Node.js built-in modules
-                        'external', // Npm packages
-                        'internal', // @/* aliases
-                        'parent', // ../ imports
-                        'sibling', // ./ imports
-                        'index', // ./index imports
-                        'object', // Import log = console.log
-                        'type' // Import type { Foo }
+                         'builtin',   // Node.js built-ins
+                         'external',  // npm packages
+                         'internal',  // aliases (z. B. @/**, ~/**)
+                         'parent',    // ../
+                         'sibling',   // ./
+                         'index',     // ./index
+                         'object',    // TS: import log = console.log
+                         'type'       // TS/Flow: import type { Foo } from 'foo'
                     ],
+
+                    // Aliase zuerst innerhalb der "internal"-Gruppe
                     pathGroups: [
-                        {
-                            pattern: '@/**',
-                            group: 'internal',
-                            position: 'before'
-                        },
-                        {
-                            pattern: '~/**',
-                            group: 'internal',
-                            position: 'before'
-                        }
+                         { pattern: '@/**', group: 'internal', position: 'before' },
+                         { pattern: '~/**', group: 'internal', position: 'before' }
                     ],
-                    pathGroupsExcludedImportTypes: ['type'],
-                    'newlines-between': 'always', // Enterprise: Klare Trennung
+
+                    // Wichtig: PathGroups nicht auf builtins/external/object/type anwenden
+                    // (verhindert Overreach, entspricht gängiger Praxis)
+                    pathGroupsExcludedImportTypes: ['builtin', 'external', 'object', 'type'],
+
+                    // Verhindert "Sub-Group"-Leerzeilen bei pathGroups + newlines-between=always
+                    // (Default wird sich künftig ändern -> explizit setzen für Stabilität)
+                    distinctGroup: false,
+
+                    // Eine Leerzeile zwischen den Hauptgruppen; keine Leerzeilen innerhalb
+                    'newlines-between': 'always',
+
+                    // Alphabetische Sortierung; Import-Kinds (type/typeof) aufsteigend
                     alphabetize: {
-                        order: 'asc',
-                        orderImportKind: 'asc',
-                        caseInsensitive: true
+                         order: 'asc',
+                         orderImportKind: 'asc',
+                         caseInsensitive: true
                     },
-                    warnOnUnassignedImports: true // Warnung bei Side-Effect Imports
-                }
-            ],
+
+                    // Unassigned (Side-Effect) Imports nicht bewegen, aber warnen
+                    warnOnUnassignedImports: true
+               }
+          ],
 
             // ===== RESOLUTION & SECURITY (Critical for Enterprise) =====
             'import/no-unresolved': [
