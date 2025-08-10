@@ -1,3 +1,12 @@
+
+# rules
+
+https://eslint.org/docs/latest/rules/consistent-return
+- Wir **MÜSSEN** diese Regel auf jeden Fall noch mal genauer prüfen. Wir haben sie deaktiviert für ESLint und für TypeScript ESLint. Aber mal prüfen, was hier der Enterprise Standard eigentlich ist.
+
+
+--------------
+
 Wir **MÜSSEN** ja auf jeden Fall noch das eigene MPM-Package erstellen mit dem ESLint Plugin Enterprise.
 
 
