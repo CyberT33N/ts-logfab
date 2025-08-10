@@ -13,7 +13,7 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
-import { ASTUtils, AST_NODE_TYPES } from '@typescript-eslint/utils'
+import { ASTUtils } from '@typescript-eslint/utils'
 
 import type { TSESTree, TSESLint } from '@typescript-eslint/utils'
 
@@ -280,32 +280,38 @@ const rule: TSESLint.RuleModule<MessageIds, Options> = {
             : DEFAULT_MIN_PARAMETERS
 
         return {
-
-            [[
-                'ArrowFunctionExpression',
-                'FunctionDeclaration',
-                'FunctionExpression',
-                'MethodDefinition'
-            ].join(', ')](
-                // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-                node: Readonly<
-                    | TSESTree.ArrowFunctionExpression
-                    | TSESTree.FunctionDeclaration
-                    | TSESTree.FunctionExpression
-                    | TSESTree.MethodDefinition
-                >
-            ): void {
-                const functionNode = node.type === AST_NODE_TYPES.MethodDefinition
-                    ? (node as Readonly<TSESTree.MethodDefinition>).value
-                    : (node as Readonly<
-                        | TSESTree.ArrowFunctionExpression
-                        | TSESTree.FunctionDeclaration
-                        | TSESTree.FunctionExpression
-                        >)
-
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'ArrowFunctionExpression'(node: Readonly<TSESTree.ArrowFunctionExpression>): void {
                 enforceNewlinesForFunctionLike({
                     context,
-                    functionNode,
+                    functionNode: node,
+                    minParameters,
+                    sourceCode
+                })
+            },
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'FunctionDeclaration'(node: Readonly<TSESTree.FunctionDeclaration>): void {
+                enforceNewlinesForFunctionLike({
+                    context,
+                    functionNode: node,
+                    minParameters,
+                    sourceCode
+                })
+            },
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'FunctionExpression'(node: Readonly<TSESTree.FunctionExpression>): void {
+                enforceNewlinesForFunctionLike({
+                    context,
+                    functionNode: node,
+                    minParameters,
+                    sourceCode
+                })
+            },
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'MethodDefinition'(node: Readonly<TSESTree.MethodDefinition>): void {
+                enforceNewlinesForFunctionLike({
+                    context,
+                    functionNode: node.value,
                     minParameters,
                     sourceCode
                 })
