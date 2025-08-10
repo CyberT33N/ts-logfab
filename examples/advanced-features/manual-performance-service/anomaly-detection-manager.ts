@@ -270,21 +270,15 @@ export class AnomalyDetectionManager {
     public readonly performWithAnomalyDetection = async (
         methodName: string, iterations: number
     ): Promise<AnomalyDetectionResult> => {
-        const {
-            startTime, startMemory
-        } = AnomalyDetectionManager.#initializePerformanceMeasurement()
+        const { startTime, startMemory } = AnomalyDetectionManager.#initializePerformanceMeasurement()
 
         const executionResult = await AnomalyDetectionManager.#executeComputationalOperation(iterations)
 
-        const {
-            duration, memoryDelta
-        } = AnomalyDetectionManager.#calculatePerformanceMetrics(
+        const { duration, memoryDelta } = AnomalyDetectionManager.#calculatePerformanceMetrics(
             startTime, startMemory
         )
 
-        const {
-            trackingResult, performanceBaseline
-        } = AnomalyDetectionManager.#retrievePerformanceData(
+        const { trackingResult, performanceBaseline } = AnomalyDetectionManager.#retrievePerformanceData(
             methodName,
             duration,
             memoryDelta

@@ -14,7 +14,7 @@
  */
 
 // ==== Imports ====
-import { ASTUtils } from '@typescript-eslint/utils'
+import { ASTUtils, ESLintUtils } from '@typescript-eslint/utils'
 
 // ==== Types ====
 import type { TSESTree, TSESLint } from '@typescript-eslint/utils'
@@ -22,6 +22,12 @@ import type { TSESTree, TSESLint } from '@typescript-eslint/utils'
 // Constants to avoid magic numbers in calculations and defaults
 const DEFAULT_MIN_PARAMETERS = 2
 const LAST_INDEX_OFFSET = 1
+
+// Create typed rule factory with docs URL
+const createRule = ESLintUtils.RuleCreator(
+    name =>
+        `https://docs.t33n.software/eslint-rules/${name}`
+)
 
 interface EnforceParameters {
     readonly context: TSESLint.RuleContext<MessageIds, Options>
@@ -271,7 +277,7 @@ const reportMissingNewlines = (
     }
 }
 
-const rule: TSESLint.RuleModule<MessageIds, Options> = {
+const rule = createRule<Options, MessageIds>({
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
         const { sourceCode, options } = context
@@ -349,8 +355,9 @@ const rule: TSESLint.RuleModule<MessageIds, Options> = {
             }
         ],
         type: 'layout'
-    }
-}
+    },
+    name: 'function-definition-paren-newline'
+})
 
 export const functionDefinitionParenNewlinePlugin: TSESLint.FlatConfig.Plugin = {
     rules: {

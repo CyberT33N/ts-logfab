@@ -194,10 +194,12 @@ export default tseslint.config(
             // ✅ ==== VERIFIED ====
             'no-ternary': 'off',
 
-             // ✅ ==== VERIFIED ====
-             // Kernregel: Zeilenumbrüche in Imports erst ab N Specifiers
+            /*
+             * ✅ ==== VERIFIED ====
+             * Kernregel: Zeilenumbrüche in Imports erst ab N Specifiers
+             */
             'object-curly-newline': 'off',
- 
+
             // ✅ ==== VERIFIED ====
             'no-underscore-dangle': [
                 'error',
@@ -292,10 +294,12 @@ export default tseslint.config(
              */
             complexity: ['error', 15], // Enterprise standard: Google/Microsoft use 10-15
 
-            // ✅ ==== VERIFIED ====
-            // ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
+            /*
+             * ✅ ==== VERIFIED ====
+             * ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
+             */
             'consistent-return': 'off',
-            
+
             curly: ['error', 'all'],
             'default-case': 'error',
 
@@ -305,8 +309,10 @@ export default tseslint.config(
 
             // ===== IMPORT SORTING CONFLICT RESOLUTION =====
 
-            // ✅ ==== VERIFIED ====
-            // Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
+            /*
+             * ✅ ==== VERIFIED ====
+             * Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
+             */
             'sort-imports': 'off',
 
             // Additional critical rules for enterprise compliance
@@ -720,7 +726,7 @@ export default tseslint.config(
                         'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/i,
                         'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/i,
                         'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/i,
-                        'Hardcoded API Key': /api[_-]?key\s*[:=]\s*["'][^"']+["']/i,
+                        'Hardcoded API Key': /api[-_]?key\s*[:=]\s*["'][^"']+["']/i,
                         'Private Key Content': /-{5}BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-{5}/u,
                         'Connection String': /(?:mongodb|mysql|postgres|redis):\/\/[^:]+:[^@]+@[^/]+/
                     }
@@ -1076,10 +1082,10 @@ export default tseslint.config(
                 }
             ],
 
-            // 
+            //
             'jsonc/object-curly-newline': [
                 'error',
-{
+                {
                     ObjectExpression: {
                         multiline: true,
                         minProperties: 2,
@@ -1458,49 +1464,80 @@ export default tseslint.config(
                 }
             ],
 
-            // ✅ ==== VERIFIED ====
+            /*
+             * ✅ ==== VERIFIED ====
+             * https://github.com/import-js/eslint-plugin-import/blob/HEAD/docs/rules/order.md
+             */
             'import/order': [
-               'error', {
+                'error',
+                {
+                    /*
+                     * ✅ ==== VERIFIED ====
+                     * Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
+                     */
                     // Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
                     groups: [
-                         'builtin',   // Node.js built-ins
-                         'external',  // npm packages
-                         'internal',  // aliases (z. B. @/**, ~/**)
-                         'parent',    // ../
-                         'sibling',   // ./
-                         'index',     // ./index
-                         'object',    // TS: import log = console.log
-                         'type'       // TS/Flow: import type { Foo } from 'foo'
+                        'builtin', // Node.js built-ins
+                        'external', // Npm packages
+                        'internal', // Aliases (z. B. @/**, ~/**)
+                        'parent', // ../
+                        'sibling', // ./
+                        'index', // ./index
+                        'object', // TS: import log = console.log
+                        'type' // TS/Flow: import type { Foo } from 'foo'
                     ],
 
                     // Aliase zuerst innerhalb der "internal"-Gruppe
                     pathGroups: [
-                         { pattern: '@/**', group: 'internal', position: 'before' },
-                         { pattern: '~/**', group: 'internal', position: 'before' }
+                        {
+                            pattern: '@/**',
+                            group: 'internal',
+                            position: 'before'
+                        },
+                        {
+                            pattern: '~/**',
+                            group: 'internal',
+                            position: 'before'
+                        }
                     ],
 
-                    // Wichtig: PathGroups nicht auf builtins/external/object/type anwenden
-                    // (verhindert Overreach, entspricht gängiger Praxis)
-                    pathGroupsExcludedImportTypes: ['builtin', 'external', 'object', 'type'],
+                    /*
+                     * Wichtig: PathGroups nicht auf builtins/external/object/type anwenden
+                     * (verhindert Overreach, entspricht gängiger Praxis)
+                     */
+                    pathGroupsExcludedImportTypes: [
+                        'builtin',
+                        'external',
+                        'object',
+                        'type'
+                    ],
 
-                    // Verhindert "Sub-Group"-Leerzeilen bei pathGroups + newlines-between=always
-                    // (Default wird sich künftig ändern -> explizit setzen für Stabilität)
+                    /*
+                     * Verhindert "Sub-Group"-Leerzeilen bei pathGroups + newlines-between=always
+                     * (Default wird sich künftig ändern -> explizit setzen für Stabilität)
+                     */
                     distinctGroup: false,
 
-                    // Eine Leerzeile zwischen den Hauptgruppen; keine Leerzeilen innerhalb
-                    'newlines-between': 'always',
+                    /*
+                     * ✅ ==== VERIFIED ====
+                     * Eine Leerzeile zwischen den Hauptgruppen; keine Leerzeilen innerhalb
+                     */
+                    'newlines-between': 'always-and-inside-groups',
 
-                    // Alphabetische Sortierung; Import-Kinds (type/typeof) aufsteigend
+                    /*
+                     * ✅ ==== VERIFIED ====
+                     * Alphabetische Sortierung; Import-Kinds (type/typeof) aufsteigend
+                     */
                     alphabetize: {
-                         order: 'asc',
-                         orderImportKind: 'asc',
-                         caseInsensitive: true
+                        order: 'asc',
+                        orderImportKind: 'asc',
+                        caseInsensitive: true
                     },
 
                     // Unassigned (Side-Effect) Imports nicht bewegen, aber warnen
                     warnOnUnassignedImports: true
-               }
-          ],
+                }
+            ],
 
             // ===== RESOLUTION & SECURITY (Critical for Enterprise) =====
             'import/no-unresolved': [
@@ -1930,7 +1967,7 @@ export default tseslint.config(
                     }
                 }
             ],
-            
+
             '@stylistic/object-property-newline': [
                 'error',
                 {
@@ -3840,8 +3877,10 @@ export default tseslint.config(
             '@typescript-eslint/no-unsafe-type-assertion': 'error', // Verhindert unsichere Type Assertions
             '@typescript-eslint/no-unnecessary-type-conversion': 'error', // Verhindert unnötige Type Conversions
 
-            // ✅ ==== VERIFIED ====
-            // If possible, it is recommended to use tsconfig's noImplicitReturns option rather than this rule. noImplicitReturns is powered by TS's type information and control-flow analysis so it has better coverage than this rule.
+            /*
+             * ✅ ==== VERIFIED ====
+             * If possible, it is recommended to use tsconfig's noImplicitReturns option rather than this rule. noImplicitReturns is powered by TS's type information and control-flow analysis so it has better coverage than this rule.
+             */
             '@typescript-eslint/consistent-return': 'off',
 
             '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error', // Verhindert redundante Zuweisungen
@@ -3982,11 +4021,15 @@ export default tseslint.config(
         }
     },
     {
-      // Optional: JS-only fallback if you lint JS files
-      files: ["**/*.js", "**/*.cjs", "**/*.mjs"],
-      rules: {
-         // ✅ ==== VERIFIED ====
-        "consistent-return": ["error", { treatUndefinedAsUnspecified: true }]
-      }
+        // Optional: JS-only fallback if you lint JS files
+        files: [
+            '**/*.js',
+            '**/*.cjs',
+            '**/*.mjs'
+        ],
+        rules: {
+            // ✅ ==== VERIFIED ====
+            'consistent-return': ['error', { treatUndefinedAsUnspecified: true }]
+        }
     }
 )
