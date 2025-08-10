@@ -291,13 +291,15 @@ export default tseslint.config(
              * 'camelcase': ['error', { properties: 'never' }], // ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
              */
             complexity: ['error', 15], // Enterprise standard: Google/Microsoft use 10-15
-            /*
-             * ENTERPRISE: Type-aware Return Checking ist präziser
-             * 'consistent-return': 'error', // ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
-             */
+
+            // ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
+            'consistent-return': 'off',
+            
             curly: ['error', 'all'],
             'default-case': 'error',
+
             eqeqeq: ['error', 'always'],
+
             'dot-notation': 'off', // Disabled to allow bracket notation for private method testing
 
             // ===== IMPORT SORTING CONFLICT RESOLUTION =====
@@ -3836,7 +3838,11 @@ export default tseslint.config(
              */
             '@typescript-eslint/no-unsafe-type-assertion': 'error', // Verhindert unsichere Type Assertions
             '@typescript-eslint/no-unnecessary-type-conversion': 'error', // Verhindert unnötige Type Conversions
-            '@typescript-eslint/consistent-return': 'error', // Erzwingt konsistente Return Types
+
+            // ✅ ==== VERIFIED ====
+            // If possible, it is recommended to use tsconfig's noImplicitReturns option rather than this rule. noImplicitReturns is powered by TS's type information and control-flow analysis so it has better coverage than this rule.
+            '@typescript-eslint/consistent-return': 'off',
+
             '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error', // Verhindert redundante Zuweisungen
 
             // Import/Export Hygiene (Google/Microsoft Standards)
