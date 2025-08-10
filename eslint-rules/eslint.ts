@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+/* eslint-disable no-magic-numbers */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -100,14 +102,15 @@ export const eslintRules: {
                     'trace'
                 ]
             }
-        ], // Stricter than original
+        ],
+
         /*
          * 'space-before-function-paren': ['error', 'never'], // Migrated to @stylistic
          * 'padded-blocks': ['error', 'never'], // Migrated to @stylistic
          */
         'prefer-arrow-callback': [
             'error',
-            { // Stricter than original
+            {
                 allowNamedFunctions: true
             }
         ],
@@ -122,7 +125,8 @@ export const eslintRules: {
             }
         ],
 
-        'no-use-before-define': 'off', // Let typescript-eslint handle this
+        // Let typescript-eslint handle this
+        'no-use-before-define': 'off',
 
         // ✅ ==== VERIFIED ====
         /*
@@ -130,16 +134,16 @@ export const eslintRules: {
          * 'comma-dangle': ['error', 'never'], // Migrated to @stylistic
          * 'semi': ['error', 'never'], // Migrated to @stylistic
          */
-
         'new-cap': [
             'error',
-            { // Stricter than original
-                newIsCap: true,
-                capIsNew: false
+            {
+                capIsNew: false,
+                // eslint-disable-next-line unicorn/no-keyword-prefix
+                newIsCap: true
             }
         ],
-        'one-var': ['error', 'never'], // Stricter than original
-        'guard-for-in': 'error', // Stricter than original
+        'one-var': ['error', 'never'],
+        'guard-for-in': 'error',
 
         // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-return-await
         'no-return-await': 'off',
@@ -157,7 +161,9 @@ export const eslintRules: {
          * ENTERPRISE: naming-convention ist viel mächtiger und granularer
          * 'camelcase': ['error', { properties: 'never' }], // ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
          */
-        complexity: ['error', 15], // Enterprise standard: Google/Microsoft use 10-15
+
+        // Enterprise standard: Google/Microsoft use 10-15
+        complexity: ['error', 15],
 
         /*
          * ✅ ==== VERIFIED ====
@@ -170,7 +176,8 @@ export const eslintRules: {
 
         eqeqeq: ['error', 'always'],
 
-        'dot-notation': 'off', // Disabled to allow bracket notation for private method testing
+        // Disabled to allow bracket notation for private method testing
+        'dot-notation': 'off',
 
         // ===== IMPORT SORTING CONFLICT RESOLUTION =====
 
@@ -206,7 +213,8 @@ export const eslintRules: {
         'no-await-in-loop': 'error', // Prevents performance issues with sequential awaits
         'no-promise-executor-return': [
             'error',
-            { // Prevents anti-patterns in Promise constructors
+            {
+                // Prevents anti-patterns in Promise constructors
                 allowVoid: false
             }
         ],
@@ -397,6 +405,7 @@ export const eslintRules: {
                 message: 'eval() is not allowed for security reasons'
             },
             {
+                // eslint-disable-next-line @stylistic/max-len
                 selector: 'CallExpression[callee.property.name="assign"][callee.object.name="Object"][arguments.0.type="ObjectExpression"]',
                 message: 'Use object spread instead of Object.assign with object literal'
             },
