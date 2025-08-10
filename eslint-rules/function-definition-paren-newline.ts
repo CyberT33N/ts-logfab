@@ -280,19 +280,12 @@ const rule: TSESLint.RuleModule<MessageIds, Options> = {
 
             // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
             'MethodDefinition'(node: TSESTree.MethodDefinition): void {
-                const { value } = node
-
-                if (
-                    value.type === 'FunctionExpression'
-                    || value.type === 'TSEmptyBodyFunctionExpression'
-                ) {
-                    enforceNewlinesForFunctionLike({
-                        context,
-                        functionNode: value,
-                        minParameters,
-                        sourceCode
-                    })
-                }
+                enforceNewlinesForFunctionLike({
+                    context,
+                    functionNode: node.value,
+                    minParameters,
+                    sourceCode
+                })
             }
         }
     },
