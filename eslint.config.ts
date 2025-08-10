@@ -1,3 +1,4 @@
+/* eslint-disable import/max-dependencies */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -149,7 +150,7 @@ import tseslint from 'typescript-eslint'
 // ===== LOCAL PLUGIN =====
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/function-definition-paren-newline'
 
-export default tseslint.config(
+const config = tseslint.config(
     {
         // Global ignores for other directories, but not for eslint.config.mjs itself regarding naming conventions
         ignores: ['coverage/**']
@@ -643,7 +644,7 @@ export default tseslint.config(
                     ignoreModules: false, // Enterprise: Check ALL strings including imports
                     ignoreCase: false, // Enterprise: Case-sensitive entropy calculation
                     additionalRegexes: {
-                    // ===== CLOUD PROVIDER SECRETS =====
+                        // ===== CLOUD PROVIDER SECRETS =====
                         'AWS Access Key': 'AKIA[0-9A-Z]{16}',
 
                         // 'AWS Secret Key': '[0-9a-zA-Z/+=]{40}',
@@ -702,7 +703,7 @@ export default tseslint.config(
                         'Ansible Vault': String.raw`\$ANSIBLE_VAULT;[0-9.]+;AES256`
                     },
                     ignoreContent: [
-                    // Common false positives in enterprise codebases
+                        // Common false positives in enterprise codebases
                         '^[A-Z][A-Z0-9_]*$', // Environment variable names
                         '^[a-f0-9]{32}$', // MD5 hashes (often used for cache keys)
                         '^[a-f0-9]{40}$', // SHA1 hashes
@@ -722,7 +723,7 @@ export default tseslint.config(
                 'error',
                 {
                     patterns: {
-                    // Enterprise patterns for configuration files
+                        // Enterprise patterns for configuration files
                         'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/i,
                         'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/i,
                         'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/i,
@@ -1001,7 +1002,7 @@ export default tseslint.config(
             'regexp/no-unused-capturing-group': [
                 'error',
                 {
-                // Ungenutzte Gruppen entfernen, außer für named groups
+                    // Ungenutzte Gruppen entfernen, außer für named groups
                     allowNamed: false // Auch named groups müssen genutzt werden
                 }
             ],
@@ -1160,7 +1161,7 @@ export default tseslint.config(
             'package-json/restrict-dependency-ranges': [
                 'error',
                 [
-                // BASE RULE: All dependencies should use tilde (~) for Enterprise-controlled updates
+                    // BASE RULE: All dependencies should use tilde (~) for Enterprise-controlled updates
                     {
                         rangeType: 'tilde'
                     },
@@ -1595,7 +1596,7 @@ export default tseslint.config(
                 'error',
                 {
                     zones: [
-                    // Domain Boundaries (Clean Architecture)
+                        // Domain Boundaries (Clean Architecture)
                         {
                             target: './src/domain',
                             from: './src/infrastructure',
@@ -3640,10 +3641,10 @@ export default tseslint.config(
                 'error',
                 {
                     default: {
-                    /*
-                     * Keep all default memberTypes (sie sind enterprise-optimal!)
-                     * ADD: Alphabetical sorting within groups
-                     */
+                        /*
+                         * Keep all default memberTypes (sie sind enterprise-optimal!)
+                         * ADD: Alphabetical sorting within groups
+                         */
                         order: 'alphabetically-case-insensitive',
 
                         // ADD: Optional members preference (Enterprise consistency)
@@ -4020,6 +4021,8 @@ export default tseslint.config(
             '@typescript-eslint/no-unsafe-enum-comparison': 'error' // TypeScript 5.x Enum Comparison Safety
         }
     },
+
+    // ===== JS-ONLY FALLBACK =====
     {
         // Optional: JS-only fallback if you lint JS files
         files: [
@@ -4031,5 +4034,59 @@ export default tseslint.config(
             // ✅ ==== VERIFIED ====
             'consistent-return': ['error', { treatUndefinedAsUnspecified: true }]
         }
+    },
+
+    /*
+     * ===== DEFAULT EXPORT OVERRIDE =====
+     *
+     * ✅ ==== VERIFIED ====
+     * Deaktiviert default- und anonymous-default-exports für JS-only-Konfigurationen
+     * (wird von eslint-plugin-import automatisch aktiviert)
+     */
+    {
+        files: [
+            // Build tools
+            '**/{vite,webpack,rollup,esbuild,turbo}.config.{ts,js,mts,cts,mjs,cjs}',
+
+            // Test frameworks
+            '**/{jest,vitest,playwright,cypress}.config.{ts,js,mts,cts,mjs,cjs}',
+
+            // Linting tools
+            '**/{eslint,prettier,stylelint}.config.{ts,js,mts,cts,mjs,cjs}',
+
+            // Next.js, Nuxt, etc.
+            '**/{next,nuxt,astro}.config.{ts,js,mts,cts,mjs,cjs}',
+
+            // Legacy configs
+            '**/.{eslintrc,prettierrc}.{js,cjs,mjs,ts}'
+        ],
+        rules: {
+
+            // ✅ ==== VERIFIED ====
+            'import/no-default-export': 'off',
+
+            // ✅ ==== VERIFIED ====
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: 'ForInStatement',
+                    message: 'Use for...of or Object.keys/entries/values instead'
+                },
+                {
+                    selector: 'WithStatement',
+                    message: 'With statements are not allowed'
+                },
+                {
+                    selector: 'CallExpression[callee.name=\"eval\"]',
+                    message: 'eval() is not allowed for security reasons'
+                },
+                {
+                    selector: 'CallExpression[callee.property.name=\"assign\"][callee.object.name=\"Object\"][arguments.0.type=\"ObjectExpression\"]',
+                    message: 'Use object spread instead of Object.assign with object literal'
+                }
+            ]
+        }
     }
 )
+
+export default config
