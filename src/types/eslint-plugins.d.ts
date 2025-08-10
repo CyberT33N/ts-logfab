@@ -58,3 +58,11 @@ declare module 'eslint-plugin-typescript-sort-keys' {
     const plugin: EslintPluginTypescriptSortKeys
     export = plugin
 }
+
+declare module 'eslint-plugin-jsx-a11y' {
+    interface EslintPluginJsxA11y {
+        readonly rules: Rules
+    }
+    const plugin: EslintPluginJsxA11y
+    export = plugin
+}
