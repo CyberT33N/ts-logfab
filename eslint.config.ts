@@ -292,6 +292,7 @@ export default tseslint.config(
              */
             complexity: ['error', 15], // Enterprise standard: Google/Microsoft use 10-15
 
+            // ✅ ==== VERIFIED ====
             // ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
             'consistent-return': 'off',
             
@@ -3979,5 +3980,13 @@ export default tseslint.config(
             '@typescript-eslint/no-unsafe-declaration-merging': 'error', // TypeScript 5.x Declaration Merging Safety
             '@typescript-eslint/no-unsafe-enum-comparison': 'error' // TypeScript 5.x Enum Comparison Safety
         }
+    },
+    {
+      // Optional: JS-only fallback if you lint JS files
+      files: ["**/*.js", "**/*.cjs", "**/*.mjs"],
+      rules: {
+         // ✅ ==== VERIFIED ====
+        "consistent-return": ["error", { treatUndefinedAsUnspecified: true }]
+      }
     }
 )
