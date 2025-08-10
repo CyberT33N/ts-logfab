@@ -13,7 +13,9 @@
 declare module 'eslint-plugin-promise' {
     interface EslintPluginPromise {
         readonly configs: {
-            readonly 'flat/recommended': unknown
+            readonly 'flat/recommended': {
+                readonly rules: Readonly<Linter.RulesRecord>
+            }
         }
     }
     const plugin: EslintPluginPromise
@@ -24,7 +26,9 @@ declare module 'eslint-plugin-react-perf' {
     interface EslintPluginReactPerf {
         readonly configs: {
             readonly flat: {
-                readonly all: unknown
+                readonly all: {
+                    readonly rules: Readonly<Linter.RulesRecord>
+                }
             }
         }
     }
@@ -35,7 +39,9 @@ declare module 'eslint-plugin-react-perf' {
 declare module 'eslint-plugin-security' {
     interface EslintPluginSecurity {
         readonly configs: {
-            readonly recommended: unknown
+            readonly recommended: {
+                readonly rules: Readonly<Linter.RulesRecord>
+            }
         }
     }
     const plugin: EslintPluginSecurity

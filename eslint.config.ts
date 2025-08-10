@@ -148,7 +148,7 @@ import tseslint from 'typescript-eslint'
  */
 
 // ===== LOCAL PLUGIN =====
-import { functionDefinitionParenNewlinePlugin } from './eslint-rules/function-definition-paren-newline'
+import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 
 const config = tseslint.config(
     {
