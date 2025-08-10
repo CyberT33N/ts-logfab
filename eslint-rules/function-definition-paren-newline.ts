@@ -28,15 +28,22 @@ interface EnforceParameters {
     readonly sourceCode: TSESLint.SourceCode
 }
 
-// Function-like nodes that have a params array
+/**
+ * Function-like nodes that have a params array
+ */
 type FunctionLikeWithParameters = | TSESTree.ArrowFunctionExpression
     | TSESTree.FunctionDeclaration
     | TSESTree.FunctionExpression
     | TSESTree.TSEmptyBodyFunctionExpression
 
-// Message and options types for the rule
+/**
+ * Message and options types for the rule
+ */
 type MessageIds = 'expectedAfter' | 'expectedBefore'
 
+/**
+ * Options for the rule
+ */
 type Options = [
   {
       minParams?: number
@@ -89,17 +96,32 @@ const enforceNewlinesForFunctionLike = ({
     })
 }
 
+/**
+ * Parameters for the findWrappingParens function
+ */
 interface FindParensParameters {
     readonly firstParameter: TSESTree.Node
     readonly lastParameter: TSESTree.Node
     readonly sourceCode: TSESLint.SourceCode
 }
 
+/**
+ * Result of the findWrappingParens function
+ */
 type ParensResult = Readonly<{
     closingParen: TSESTree.Token
     openingParen: TSESTree.Token
 }>
 
+/**
+ * Find the wrapping parentheses for the function parameters
+ *
+ * @param firstParameter - The first parameter of the function
+ * @param lastParameter - The last parameter of the function
+ * @param sourceCode - The source code to check
+ *
+ * @returns The wrapping parentheses for the function parameters
+ */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const findWrappingParens = ({
     firstParameter, lastParameter, sourceCode
@@ -120,17 +142,32 @@ const findWrappingParens = ({
     }
 }
 
+/**
+ * Boundary tokens for the function parameters
+ */
 interface BoundaryTokens {
     readonly tokenAfterOpen: TSESTree.Comment | TSESTree.Token
     readonly tokenBeforeClose: TSESTree.Comment | TSESTree.Token
 }
 
+/**
+ * Parameters for the getBoundaryTokens function
+ */
 interface GetBoundaryTokensParameters {
     closingParen: TSESTree.Token
     openingParen: TSESTree.Token
     sourceCode: TSESLint.SourceCode
 }
 
+/**
+ * Get the boundary tokens for the function parameters
+ *
+ * @param openingParen - The opening parenthesis of the function parameters
+ * @param closingParen - The closing parenthesis of the function parameters
+ * @param sourceCode - The source code to check
+ *
+ * @returns The boundary tokens for the function parameters
+ */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const getBoundaryTokens = ({
     openingParen, closingParen, sourceCode
@@ -138,12 +175,12 @@ const getBoundaryTokens = ({
     const tokenAfterOpen = ESLintUtils.nullThrows(
         sourceCode.getTokenAfter(openingParen, { includeComments: true }),
         'Missing token or comment after opening parenthesis.'
-    ) as TSESTree.Comment | TSESTree.Token
+    )
 
     const tokenBeforeClose = ESLintUtils.nullThrows(
         sourceCode.getTokenBefore(closingParen, { includeComments: true }),
         'Missing token or comment before closing parenthesis.'
-    ) as TSESTree.Comment | TSESTree.Token
+    )
 
     return {
         tokenAfterOpen,
@@ -151,6 +188,9 @@ const getBoundaryTokens = ({
     }
 }
 
+/**
+ * Parameters for the reportMissingNewlines function
+ */
 interface ReportParameters {
     closingParen: TSESTree.Token
     context: TSESLint.RuleContext<MessageIds, Options>
@@ -160,6 +200,15 @@ interface ReportParameters {
     tokenBeforeClose: TSESTree.Comment | TSESTree.Token
 }
 
+/**
+ * Report missing newlines for the function parameters
+ *
+ * @param functionNode - The function node to check
+ * @param openingParen - The opening parenthesis of the function parameters
+ * @param closingParen - The closing parenthesis of the function parameters
+ *
+ * @returns void
+ */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const reportMissingNewlines = ({
     functionNode, openingParen, closingParen, tokenAfterOpen, tokenBeforeClose, context
@@ -199,34 +248,38 @@ const rule: TSESLint.RuleModule<MessageIds, Options> = {
             : DEFAULT_MIN_PARAMETERS
 
         return {
-            'ArrowFunctionExpression'(node: Readonly<TSESTree.ArrowFunctionExpression>): void {
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'ArrowFunctionExpression'(node: TSESTree.ArrowFunctionExpression): void {
                 enforceNewlinesForFunctionLike({
                     context,
-                    functionNode: node as TSESTree.ArrowFunctionExpression,
+                    functionNode: node,
                     minParameters,
                     sourceCode
                 })
             },
 
-            'FunctionDeclaration'(node: Readonly<TSESTree.FunctionDeclaration>): void {
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'FunctionDeclaration'(node: TSESTree.FunctionDeclaration): void {
                 enforceNewlinesForFunctionLike({
                     context,
-                    functionNode: node as TSESTree.FunctionDeclaration,
+                    functionNode: node,
                     minParameters,
                     sourceCode
                 })
             },
 
-            'FunctionExpression'(node: Readonly<TSESTree.FunctionExpression>): void {
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'FunctionExpression'(node: TSESTree.FunctionExpression): void {
                 enforceNewlinesForFunctionLike({
                     context,
-                    functionNode: node as TSESTree.FunctionExpression,
+                    functionNode: node,
                     minParameters,
                     sourceCode
                 })
             },
 
-            'MethodDefinition'(node: Readonly<TSESTree.MethodDefinition>): void {
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/naming-convention
+            'MethodDefinition'(node: TSESTree.MethodDefinition): void {
                 const { value } = node
 
                 if (
@@ -243,12 +296,16 @@ const rule: TSESLint.RuleModule<MessageIds, Options> = {
             }
         }
     },
+    defaultOptions: [
+        {
+            minParams: DEFAULT_MIN_PARAMETERS
+        }
+    ],
     meta: {
         docs: {
             description:
-        'Enforce newlines just inside parentheses for function/method definitions only (not calls), '
-        + 'when the number of parameters is greater than or equal to minParams',
-            recommended: false
+                // eslint-disable-next-line @stylistic/max-len
+                'Enforce newlines just inside parentheses for function/method definitions only (not calls), when the number of parameters is greater than or equal to minParams'
         },
         fixable: 'whitespace',
         messages: {
