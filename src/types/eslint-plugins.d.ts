@@ -10,14 +10,17 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
+type Rules = Readonly<import('eslint').Linter.RulesRecord>
+
 declare module 'eslint-plugin-promise' {
     interface EslintPluginPromise {
         readonly configs: {
             readonly 'flat/recommended': {
-                readonly rules: Readonly<Linter.RulesRecord>
+                readonly rules: Rules
             }
         }
     }
+
     const plugin: EslintPluginPromise
     export = plugin
 }
@@ -27,7 +30,7 @@ declare module 'eslint-plugin-react-perf' {
         readonly configs: {
             readonly flat: {
                 readonly all: {
-                    readonly rules: Readonly<Linter.RulesRecord>
+                    readonly rules: Rules
                 }
             }
         }
@@ -40,7 +43,7 @@ declare module 'eslint-plugin-security' {
     interface EslintPluginSecurity {
         readonly configs: {
             readonly recommended: {
-                readonly rules: Readonly<Linter.RulesRecord>
+                readonly rules: Rules
             }
         }
     }

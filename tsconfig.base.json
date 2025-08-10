@@ -97,7 +97,7 @@
      *- Erhöht die Kompiliergeschwindigkeit.
      *- Sollte **deaktiviert** werden, wenn du unsichere Abhängigkeiten prüfst.
      */
-    "skipLibCheck": true,
+    "skipLibCheck": false,
 
     /*
      *✅ Erlaubt das Importieren von `.ts`-Dateien mit Erweiterung.
