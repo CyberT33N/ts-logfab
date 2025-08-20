@@ -15,13 +15,14 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
+// ==== TYPES ====
 import type { Linter } from 'eslint'
 
+// ==== RULES ====
 export const eslintRules: {
     rules: Linter.RulesRecord
 } = {
     rules: {
-
         'accessor-pairs': 'error',
 
         'array-callback-return': 'error',
@@ -38,9 +39,10 @@ export const eslintRules: {
         'block-scoped-var': 'error',
 
         /*
-         * ENTERPRISE: naming-convention ist viel mächtiger und granularer
-         * 'camelcase': ['error', { properties: 'never' }], // ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
+         * ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
+         * 'camelcase': ['error', { properties: 'never' }],
          */
+
         // Enterprise standard: Google/Microsoft use 10-15
         complexity: ['error', 15],
 
@@ -211,7 +213,8 @@ export const eslintRules: {
         // No empty constructors
         'no-implicit-globals': [
             'error',
-            { // No implicit globals
+            {
+                // No implicit globals
                 lexicalBindings: true
             }
         ],
@@ -428,7 +431,8 @@ export const eslintRules: {
          */
         'no-sequences': [
             'error',
-            { // Prevents comma operator abuse
+            {
+                // Prevents comma operator abuse
                 allowInParentheses: false
             }
         ],
@@ -503,7 +507,8 @@ export const eslintRules: {
         // Deprecated with statement
         'no-void': [
             'error',
-            { // Prevents void operator
+            {
+                // Prevents void operator
                 allowAsStatement: false
             }
         ],
@@ -557,7 +562,8 @@ export const eslintRules: {
         // Use spread over .apply()
         'prefer-regex-literals': [
             'error',
-            { // RegEx literals over new RegExp
+            {
+                // RegEx literals over new RegExp
                 disallowRedundantWrapping: true
             }
         ],
@@ -584,6 +590,6 @@ export const eslintRules: {
         'sort-imports': 'off',
 
         // Named groups in RegEx
-        'symbol-description': 'error' // No redundant returns
+        'symbol-description': 'error'
     }
 }
