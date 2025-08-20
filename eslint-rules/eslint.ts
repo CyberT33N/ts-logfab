@@ -21,6 +21,69 @@ export const eslintRules: {
     rules: Linter.RulesRecord
 } = {
     rules: {
+
+        'accessor-pairs': 'error',
+
+        'array-callback-return': 'error',
+
+        // ✅ ==== VERIFIED ====
+        'arrow-body-style': [
+            'error',
+            'as-needed',
+            {
+                requireReturnForObjectLiteral: false
+            }
+        ],
+
+        'block-scoped-var': 'error',
+
+        /*
+         * ENTERPRISE: naming-convention ist viel mächtiger und granularer
+         * 'camelcase': ['error', { properties: 'never' }], // ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
+         */
+        // Enterprise standard: Google/Microsoft use 10-15
+        complexity: ['error', 15],
+
+        /*
+         * ✅ ==== VERIFIED ====
+         * ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
+         */
+        'consistent-return': 'off',
+
+        curly: ['error', 'all'],
+
+        'default-case': 'error',
+
+        // No unnecessary blocks
+        'default-case-last': 'error',
+
+        // Disabled to allow bracket notation for private method testing
+        'dot-notation': 'off',
+
+        eqeqeq: ['error', 'always'],
+
+        'func-names': ['error', 'never'],
+
+        // ✅ ==== VERIFIED ====
+        'func-style': [
+            'error',
+            'expression',
+            {
+                overrides: { namedExports: 'expression' }
+            }
+        ],
+
+        // One class per file
+        'grouped-accessor-pairs': ['error', 'setBeforeGet'],
+
+        'guard-for-in': 'error',
+
+        // Class & OOP Standards
+        'max-classes-per-file': ['error', 1],
+
+        // Limit function parameters
+        'max-depth': ['error', { max: 4 }],
+
         /*
          *   ✅ ==== VERIFIED ====
          *   Google (Angular, TypeScript):
@@ -51,42 +114,64 @@ export const eslintRules: {
         ],
 
         /*
-         * Migrated to @stylistic - now commented out
-         * 'arrow-parens': ['error', 'as-needed'],
+         * Limit function complexity
+         * ✅ ==== VERIFIED ====
          */
+        'max-lines-per-function': [
+            'error',
+            {
+                IIFEs: true,
+                max: 50,
+                skipBlankLines: true,
+                skipComments: true
+            }
+        ],
 
-        // ✅ ==== VERIFIED ====
-        'no-magic-numbers': ['error', { ignore: [0, 1] }],
-
-        // ✅ ==== VERIFIED ====
-        'no-ternary': 'off',
+        // Limit nesting depth
+        'max-nested-callbacks': ['error', { max: 3 }],
 
         /*
+         * Function Design
          * ✅ ==== VERIFIED ====
-         * Kernregel: Zeilenumbrüche in Imports erst ab N Specifiers
          */
-        'object-curly-newline': 'off',
+        'max-params': ['error', { max: 3 }],
+
+        // Limit callback nesting
+        'max-statements': ['error', 15],
 
         // ✅ ==== VERIFIED ====
-        'no-underscore-dangle': [
+        /*
+         * 'object-curly-spacing': ['error', 'always'], // Migrated to @stylistic
+         * 'comma-dangle': ['error', 'never'], // Migrated to @stylistic
+         * 'semi': ['error', 'never'], // Migrated to @stylistic
+         */
+        'new-cap': [
             'error',
             {
-                allow: ['__dirname', '__filename'],
-                allowFunctionParams: true
+                capIsNew: false,
+                // eslint-disable-next-line unicorn/no-keyword-prefix
+                newIsCap: true
             }
         ],
 
-        // ✅ ==== VERIFIED ====
-        'arrow-body-style': [
-            'error',
-            'as-needed',
-            {
-                requireReturnForObjectLiteral: false
-            }
-        ],
+        // No chained assignments
+        /*
+         * 'prefer-const': ['error', {
+         *      Destructuring: 'all',
+         *      IgnoreReadBeforeAssign: false
+         * }], // Already defined above in base rules
+         */
+        // Additional Safety
+        'no-alert': 'error',
 
-        'no-var': 'error',
-        'no-eval': 'error',
+        /*
+         * ===== ENTERPRISE-GRADE ADDITIONAL RULES (Google/Microsoft Standards) =====
+         * Performance & Async Best Practices
+         */
+        'no-await-in-loop': 'error',
+
+        // No alert/confirm/prompt
+        'no-caller': 'error',
 
         /*
          * 'indent': ['error', 4], // Migrated to @stylistic
@@ -104,142 +189,87 @@ export const eslintRules: {
             }
         ],
 
-        /*
-         * 'space-before-function-paren': ['error', 'never'], // Migrated to @stylistic
-         * 'padded-blocks': ['error', 'never'], // Migrated to @stylistic
-         */
-        'prefer-arrow-callback': [
-            'error',
-            {
-                allowNamedFunctions: true
-            }
-        ],
-        'func-names': ['error', 'never'],
-
-        // ✅ ==== VERIFIED ====
-        'func-style': [
-            'error',
-            'expression',
-            {
-                overrides: { namedExports: 'expression' }
-            }
-        ],
-
-        // Let typescript-eslint handle this
-        'no-use-before-define': 'off',
-
-        // ✅ ==== VERIFIED ====
-        /*
-         * 'object-curly-spacing': ['error', 'always'], // Migrated to @stylistic
-         * 'comma-dangle': ['error', 'never'], // Migrated to @stylistic
-         * 'semi': ['error', 'never'], // Migrated to @stylistic
-         */
-        'new-cap': [
-            'error',
-            {
-                capIsNew: false,
-                // eslint-disable-next-line unicorn/no-keyword-prefix
-                newIsCap: true
-            }
-        ],
-        'one-var': ['error', 'never'],
-        'guard-for-in': 'error',
-
-        // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-return-await
-        'no-return-await': 'off',
+        // Setter before getter
+        'no-constructor-return': 'error',
 
         // ❌ REDUNDANT: Übernommen von import/no-duplicates hat mehr Features (inline types, query strings)
         'no-duplicate-imports': 'off',
 
-        'no-template-curly-in-string': 'error',
-        'require-atomic-updates': 'error',
-        'accessor-pairs': 'error',
-        'array-callback-return': 'error',
-        'block-scoped-var': 'error',
-
-        /*
-         * ENTERPRISE: naming-convention ist viel mächtiger und granularer
-         * 'camelcase': ['error', { properties: 'never' }], // ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
-         */
-
-        // Enterprise standard: Google/Microsoft use 10-15
-        complexity: ['error', 15],
-
-        /*
-         * ✅ ==== VERIFIED ====
-         * ❌ REDUNDANT: Übernommen von @typescript-eslint/consistent-return
-         */
-        'consistent-return': 'off',
-
-        curly: ['error', 'all'],
-        'default-case': 'error',
-
-        eqeqeq: ['error', 'always'],
-
-        // Disabled to allow bracket notation for private method testing
-        'dot-notation': 'off',
-
-        // ===== IMPORT SORTING CONFLICT RESOLUTION =====
-
-        /*
-         * ✅ ==== VERIFIED ====
-         * Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
-         */
-        'sort-imports': 'off',
-
         // Additional critical rules for enterprise compliance
         'no-empty': ['error', { allowEmptyCatch: false }],
+
+        'no-eval': 'error',
+
+        /*
+         * Prevents javascript: URLs (XSS prevention)
+         * Object & Prototype Safety
+         */
+        'no-extend-native': 'error',
+
         'no-fallthrough': ['error', { commentPattern: String.raw`falls?\s?through` }],
+
+        // No empty constructors
+        'no-implicit-globals': [
+            'error',
+            { // No implicit globals
+                lexicalBindings: true
+            }
+        ],
+
+        /*
+         * Prevents closure issues in loops
+         * Security & Code Injection Prevention
+         */
+        'no-implied-eval': 'error',
+
         'no-irregular-whitespace': [
             'error',
             {
-                skipStrings: false,
                 skipComments: false,
                 skipRegExps: false,
+                skipStrings: false,
                 skipTemplates: false
             }
         ],
-        'prefer-const': [
-            'error',
-            {
-                destructuring: 'all',
-                ignoreReadBeforeAssign: false
-            }
-        ],
 
-        // ===== ENTERPRISE-GRADE ADDITIONAL RULES (Google/Microsoft Standards) =====
+        // No arguments.caller/callee
+        'no-iterator': 'error',
 
-        // Performance & Async Best Practices
-        'no-await-in-loop': 'error', // Prevents performance issues with sequential awaits
-        'no-promise-executor-return': [
-            'error',
-            {
-                // Prevents anti-patterns in Promise constructors
-                allowVoid: false
-            }
-        ],
+        // No __iterator__
+        'no-labels': 'error',
 
-        // Loop & Control Flow Safety
-        'no-unmodified-loop-condition': 'error', // Prevents infinite loops
-        'no-unreachable-loop': 'error', // Detects loops that only run once
-        'no-loop-func': 'error', // Prevents closure issues in loops
+        // No labeled statements
+        'no-lone-blocks': 'error',
 
-        // Security & Code Injection Prevention
-        'no-implied-eval': 'error', // Prevents indirect eval() usage
-        'no-new-func': 'error', // Prevents new Function() constructor
-        'no-script-url': 'error', // Prevents javascript: URLs (XSS prevention)
+        // Detects loops that only run once
+        'no-loop-func': 'error',
 
-        // Object & Prototype Safety
-        'no-extend-native': 'error', // Prevents modifying native prototypes
-        'no-new-wrappers': 'error', // Prevents new String/Number/Boolean
-        'no-proto': 'error', // Disallows __proto__ usage
-        'prefer-object-has-own': 'error', // Modern hasOwn() over hasOwnProperty
+        /*
+         * Migrated to @stylistic - now commented out
+         * 'arrow-parens': ['error', 'as-needed'],
+         */
+        // ✅ ==== VERIFIED ====
+        'no-magic-numbers': ['error', { ignore: [0, 1] }],
 
-        // Variable & Parameter Management
+        // No assignments that aren't used
+        'no-multi-assign': 'error',
+
+        // No return in constructor
+        'no-new': 'error',
+
+        // Prevents indirect eval() usage
+        'no-new-func': 'error',
+
+        // Prevents modifying native prototypes
+        'no-new-wrappers': 'error',
+
+        /*
+         * Modern hasOwn() over hasOwnProperty
+         * Variable & Parameter Management
+         */
         'no-param-reassign': [
             'error',
-            { // Immutability best practice
-                props: true,
+            {
                 ignorePropertyModificationsFor: [
                     'acc',
                     'accumulator',
@@ -250,62 +280,29 @@ export const eslintRules: {
                     'res',
                     'response',
                     'state'
-                ]
+                ],
+
+                // Immutability best practice
+                props: true
             }
         ],
-        'no-shadow-restricted-names': 'error', // Prevents shadowing restricted names
+
+        // Prevents performance issues with sequential awaits
+        'no-promise-executor-return': [
+            'error',
+            {
+                // Prevents anti-patterns in Promise constructors
+                allowVoid: false
+            }
+        ],
+
+        // Prevents new String/Number/Boolean
+        'no-proto': 'error',
 
         /*
-         * Error Handling Excellence
-         * ENTERPRISE: @typescript-eslint/only-throw-error ist moderner als no-throw-literal
-         * 'no-throw-literal': 'error', // ❌ REDUNDANT: Übernommen von @typescript-eslint/only-throw-error
+         * Unicode flag for RegEx
+         * Restricted Usage (Enterprise Security)
          */
-        'no-useless-catch': 'error', // Prevents redundant catch blocks
-
-        // Code Quality & Maintainability
-        'no-sequences': [
-            'error',
-            { // Prevents comma operator abuse
-                allowInParentheses: false
-            }
-        ],
-
-        /*
-         * ENTERPRISE: @typescript-eslint/no-unused-expressions hat Type-aware Features
-         * 'no-unused-expressions': ['error', { // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-unused-expressions
-         *      allowShortCircuit: false,
-         *      allowTernary: false,
-         *      allowTaggedTemplates: false,
-         *      enforceForJSX: true
-         * }],
-         */
-        'no-useless-call': 'error', // Prevents unnecessary .call()/.apply()
-        'no-useless-concat': 'error', // Prevents unnecessary string concatenation
-        'no-useless-computed-key': 'error', // Prevents redundant computed properties
-        'no-useless-rename': 'error', // Prevents pointless destructuring renames
-        'no-with': 'error', // Deprecated with statement
-        'no-void': [
-            'error',
-            { // Prevents void operator
-                allowAsStatement: false
-            }
-        ],
-
-        // Modern JavaScript Best Practices
-        'prefer-rest-params': 'error', // Use ...args over arguments
-        'prefer-spread': 'error', // Use spread over .apply()
-        'prefer-regex-literals': [
-            'error',
-            { // RegEx literals over new RegExp
-                disallowRedundantWrapping: true
-            }
-        ],
-        'prefer-named-capture-group': 'error', // Named groups in RegEx
-        'symbol-description': 'error', // Symbols must have descriptions
-        radix: ['error', 'always'], // ParseInt must have radix
-        'require-unicode-regexp': 'error', // Unicode flag for RegEx
-
-        // Restricted Usage (Enterprise Security)
         'no-restricted-globals': [
             'error',
 
@@ -330,21 +327,22 @@ export const eslintRules: {
             'process',
             'global'
         ],
+
         'no-restricted-imports': [
             'error',
             {
                 paths: [
                     {
-                        name: 'lodash',
-                        message: 'Use lodash-es or specific lodash/* packages instead'
+                        message: 'Use lodash-es or specific lodash/* packages instead',
+                        name: 'lodash'
                     },
                     {
-                        name: 'moment',
-                        message: 'Use date-fns or native Temporal API instead'
+                        message: 'Use date-fns or native Temporal API instead',
+                        name: 'moment'
                     },
                     {
-                        name: 'underscore',
-                        message: 'Use lodash-es or native methods instead'
+                        message: 'Use lodash-es or native methods instead',
+                        name: 'underscore'
                     }
                 ],
                 patterns: [
@@ -374,97 +372,179 @@ export const eslintRules: {
                 ]
             }
         ],
+
         'no-restricted-properties': [
             'error',
             {
+                message: 'Use environment configuration module instead of direct process.env access',
                 object: 'process',
-                property: 'env',
-                message: 'Use environment configuration module instead of direct process.env access'
+                property: 'env'
             },
             {
-                property: '__defineGetter__',
-                message: 'Use Object.defineProperty instead'
+                message: 'Use Object.defineProperty instead',
+                property: '__defineGetter__'
             },
             {
-                property: '__defineSetter__',
-                message: 'Use Object.defineProperty instead'
+                message: 'Use Object.defineProperty instead',
+                property: '__defineSetter__'
             }
         ],
+
         'no-restricted-syntax': [
             'error',
             {
-                selector: 'ForInStatement',
-                message: 'Use for...of or Object.keys/entries/values instead'
+                message: 'Use for...of or Object.keys/entries/values instead',
+                selector: 'ForInStatement'
             },
             {
-                selector: 'WithStatement',
-                message: 'With statements are not allowed'
+                message: 'With statements are not allowed',
+                selector: 'WithStatement'
             },
             {
-                selector: 'CallExpression[callee.name="eval"]',
-                message: 'eval() is not allowed for security reasons'
+                message: 'eval() is not allowed for security reasons',
+                selector: 'CallExpression[callee.name="eval"]'
             },
             {
+
+                message: 'Use object spread instead of Object.assign with object literal',
                 // eslint-disable-next-line @stylistic/max-len
-                selector: 'CallExpression[callee.property.name="assign"][callee.object.name="Object"][arguments.0.type="ObjectExpression"]',
-                message: 'Use object spread instead of Object.assign with object literal'
+                selector: 'CallExpression[callee.property.name="assign"][callee.object.name="Object"][arguments.0.type="ObjectExpression"]'
             },
             {
-                selector: 'ExportDefaultDeclaration',
-                message: 'Default exports are forbidden. Use named exports.'
+                message: 'Default exports are forbidden. Use named exports.',
+                selector: 'ExportDefaultDeclaration'
             }
         ],
 
-        // Function Design
+        // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-return-await
+        'no-return-await': 'off',
+
+        // Prevents new Function() constructor
+        'no-script-url': 'error',
+
+        /*
+         * Prevents redundant catch blocks
+         * Code Quality & Maintainability
+         */
+        'no-sequences': [
+            'error',
+            { // Prevents comma operator abuse
+                allowInParentheses: false
+            }
+        ],
+
+        'no-shadow-restricted-names': 'error',
+
+        'no-template-curly-in-string': 'error',
 
         // ✅ ==== VERIFIED ====
-        'max-params': ['error', { max: 3 }], // Limit function parameters
-
-        'max-depth': ['error', { max: 4 }], // Limit nesting depth
-        'max-nested-callbacks': ['error', { max: 3 }], // Limit callback nesting
-        'max-statements': ['error', 15], // Limit function complexity
+        'no-ternary': 'off',
 
         // ✅ ==== VERIFIED ====
-        'max-lines-per-function': [
+        'no-underscore-dangle': [
             'error',
             {
-                max: 50,
-                skipBlankLines: true,
-                skipComments: true,
-                IIFEs: true
+                allow: ['__dirname', '__filename'],
+                allowFunctionParams: true
             }
         ],
 
-        // Class & OOP Standards
-        'max-classes-per-file': ['error', 1], // One class per file
-        'grouped-accessor-pairs': ['error', 'setBeforeGet'], // Setter before getter
-        'no-constructor-return': 'error', // No return in constructor
-        'no-new': 'error', // No new for side effects
+        // Loop & Control Flow Safety
+        'no-unmodified-loop-condition': 'error',
 
-        // Variable Declarations
-        'no-useless-assignment': 'error', // No assignments that aren't used
-        'no-multi-assign': 'error', // No chained assignments
+        // Prevents infinite loops
+        'no-unreachable-loop': 'error',
+
+        // Let typescript-eslint handle this
+        'no-use-before-define': 'off',
+
         /*
-         * 'prefer-const': ['error', {
-         *      Destructuring: 'all',
-         *      IgnoreReadBeforeAssign: false
-         * }], // Already defined above in base rules
+         * No new for side effects
+         * Variable Declarations
          */
+        'no-useless-assignment': 'error',
 
-        // Additional Safety
-        'no-alert': 'error', // No alert/confirm/prompt
-        'no-caller': 'error', // No arguments.caller/callee
-        'no-iterator': 'error', // No __iterator__
-        'no-labels': 'error', // No labeled statements
-        'no-lone-blocks': 'error', // No unnecessary blocks
-        'default-case-last': 'error', // Default case at end of switch
-        'no-useless-constructor': 'error', // No empty constructors
-        'no-implicit-globals': [
+        /*
+         * ENTERPRISE: @typescript-eslint/no-unused-expressions hat Type-aware Features
+         * 'no-unused-expressions': ['error', { // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-unused-expressions
+         *      allowShortCircuit: false,
+         *      allowTernary: false,
+         *      allowTaggedTemplates: false,
+         *      enforceForJSX: true
+         * }],
+         */
+        'no-useless-call': 'error',
+
+        // Prevents shadowing restricted names
+        /*
+         * Error Handling Excellence
+         * ENTERPRISE: @typescript-eslint/only-throw-error ist moderner als no-throw-literal
+         * 'no-throw-literal': 'error', // ❌ REDUNDANT: Übernommen von @typescript-eslint/only-throw-error
+         */
+        'no-useless-catch': 'error',
+
+        // Prevents unnecessary string concatenation
+        'no-useless-computed-key': 'error',
+
+        // Prevents unnecessary .call()/.apply()
+        'no-useless-concat': 'error',
+
+        // Default case at end of switch
+        'no-useless-constructor': 'error',
+
+        // Prevents redundant computed properties
+        'no-useless-rename': 'error',
+
+        // ** Over Math.pow
+        'no-useless-return': 'error',
+
+        'no-var': 'error',
+
+        // Deprecated with statement
+        'no-void': [
             'error',
-            { // No implicit globals
-                lexicalBindings: true
+            { // Prevents void operator
+                allowAsStatement: false
             }
         ],
+
+        // Prevents pointless destructuring renames
+        'no-with': 'error',
+
+        /*
+         * ✅ ==== VERIFIED ====
+         * Kernregel: Zeilenumbrüche in Imports erst ab N Specifiers
+         */
+        'object-curly-newline': 'off',
+
+        'one-var': ['error', 'never'],
+
+        /*
+         * 'space-before-function-paren': ['error', 'never'], // Migrated to @stylistic
+         * 'padded-blocks': ['error', 'never'], // Migrated to @stylistic
+         */
+        'prefer-arrow-callback': [
+            'error',
+            {
+                allowNamedFunctions: true
+            }
+        ],
+
+        'prefer-const': [
+            'error',
+            {
+                destructuring: 'all',
+                ignoreReadBeforeAssign: false
+            }
+        ],
+
+        // Object spread over Object.assign
+        'prefer-exponentiation-operator': 'error',
+
+        'prefer-named-capture-group': 'error',
+
+        // Disallows __proto__ usage
+        'prefer-object-has-own': 'error',
 
         /*
          * Modern Syntax Enforcement
@@ -472,8 +552,38 @@ export const eslintRules: {
          * 'prefer-destructuring': ['error', {...}], // ❌ REDUNDANT: Übernommen von @typescript-eslint/prefer-destructuring
          * 'prefer-template': 'error', // Handled by unicorn/prefer-template-literal which is more powerful
          */
-        'prefer-object-spread': 'error', // Object spread over Object.assign
-        'prefer-exponentiation-operator': 'error', // ** Over Math.pow
-        'no-useless-return': 'error' // No redundant returns
+        'prefer-object-spread': 'error',
+
+        // Use spread over .apply()
+        'prefer-regex-literals': [
+            'error',
+            { // RegEx literals over new RegExp
+                disallowRedundantWrapping: true
+            }
+        ],
+
+        // Modern JavaScript Best Practices
+        'prefer-rest-params': 'error',
+
+        // Use ...args over arguments
+        'prefer-spread': 'error',
+
+        // Symbols must have descriptions
+        radix: ['error', 'always'],
+
+        'require-atomic-updates': 'error',
+
+        // ParseInt must have radix
+        'require-unicode-regexp': 'error',
+
+        // ===== IMPORT SORTING CONFLICT RESOLUTION =====
+        /*
+         * ✅ ==== VERIFIED ====
+         * Deaktiviert - Konflikt mit import/order. Verwenden import/order für vollständige Import-Kontrolle
+         */
+        'sort-imports': 'off',
+
+        // Named groups in RegEx
+        'symbol-description': 'error' // No redundant returns
     }
 }

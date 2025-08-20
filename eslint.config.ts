@@ -31,8 +31,6 @@ import stylistic from '@stylistic/eslint-plugin'
 
 // https://www.npmjs.com/package/eslint-plugin-react-perf
 
-// https://www.npmjs.com/package/eslint-plugin-jsx-a11y
-
 /*
  * ===== TESTING FRAMEWORKS =====
  * https://www.npmjs.com/package/eslint-plugin-vitest
@@ -79,6 +77,7 @@ import importPlugin from 'eslint-plugin-import'
  * https://www.npmjs.com/package/eslint-plugin-jsonc
  */
 import eslintPluginJsonc from 'eslint-plugin-jsonc'
+// https://www.npmjs.com/package/eslint-plugin-jsx-a11y
 import a11yPlugin from 'eslint-plugin-jsx-a11y'
 import nodePlugin from 'eslint-plugin-n'
 import noSecrets from 'eslint-plugin-no-secrets'
@@ -101,6 +100,7 @@ import reactPerfPlugin from 'eslint-plugin-react-perf'
 import { configs } from 'eslint-plugin-regexp'
 import pluginSecurity from 'eslint-plugin-security'
 import sonarjs from 'eslint-plugin-sonarjs'
+import sortKeysFix from 'eslint-plugin-sort-keys-fix'
 import pluginTsDoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
@@ -169,19 +169,35 @@ const config = tseslint.config(
         rules: { 'no-restricted-imports': 'off' }
     },
 
+    {
+        plugins: {
+            'sort-keys-fix': sortKeysFix
+        },
+        rules: {
+            'sort-keys-fix/sort-keys-fix': 'warn'
+        }
+    },
+
     // ===== SECURITY PLUGIN =====
     pluginSecurity.configs.recommended,
     {
         rules: {
+
+            // Prevents ReDoS attacks
+            'security/detect-eval-with-expression': 'error',
+
+            // Prevents code injection
+            'security/detect-no-csrf-before-method-override': 'error',
+
+            // CSRF protection
+            'security/detect-possible-timing-attacks': 'error',
+
             /*
              * ===== ENHANCED XSS PREVENTION (OWASP Top 10 Compliance) =====
              * Since eslint-plugin-xss is incompatible with ESLint 9,
              * We use security plugin rules for XSS prevention
              */
-            'security/detect-unsafe-regex': 'error', // Prevents ReDoS attacks
-            'security/detect-eval-with-expression': 'error', // Prevents code injection
-            'security/detect-no-csrf-before-method-override': 'error', // CSRF protection
-            'security/detect-possible-timing-attacks': 'error' // Timing attack prevention
+            'security/detect-unsafe-regex': 'error' // Timing attack prevention
         }
     },
 
@@ -191,72 +207,127 @@ const config = tseslint.config(
             'no-secrets': noSecrets
         },
         rules: {
+
+            // ===== PATTERN MATCHING FOR STRUCTURED SECRETS =====
+            'no-secrets/no-pattern-match': [
+                'error',
+                {
+                    patterns: {
+
+                        'Connection String': /(?:mongodb|mysql|postgres|redis):\/\/[^:]+:[^@]+@[^/]+/,
+
+                        'Hardcoded API Key': /api[_-]?key\s*[:=]\s*["'][^"']+["']/i,
+
+                        // Enterprise patterns for configuration files
+                        'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/i,
+                        'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/i,
+                        'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/i,
+                        'Private Key Content': /-{5}BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-{5}/u
+                    }
+                }
+            ],
+
             // ===== ENTERPRISE SECRET DETECTION (Google/Microsoft/Meta Standards) =====
             'no-secrets/no-secrets': [
                 'error',
                 {
-                    tolerance: 3, // Enterprise: Stricter entropy threshold (Google standard)
-                    ignoreModules: false, // Enterprise: Check ALL strings including imports
-                    ignoreCase: false, // Enterprise: Case-sensitive entropy calculation
+
+                    additionalDelimiters: [
+                        '.', // Split by dots (e.g., api.key.value)
+                        '-', // Split by dashes (e.g., api-key-value)
+                        '_', // Split by underscores (e.g., api_key_value)
+                        '(?=[A-Z][a-z])' // Split camelCase
+                    ],
+
+                    // Enterprise: Case-sensitive entropy calculation
                     additionalRegexes: {
                         // ===== CLOUD PROVIDER SECRETS =====
                         'AWS Access Key': 'AKIA[0-9A-Z]{16}',
 
+                        'AWS AppSync': 'da2-[a-z0-9]{26}',
+
                         // 'AWS Secret Key': '[0-9a-zA-Z/+=]{40}',
                         'AWS MWS Key': String.raw`amzn\.mws\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`,
-                        'AWS AppSync': 'da2-[a-z0-9]{26}',
+
+                        'Ansible Vault': String.raw`\$ANSIBLE_VAULT;[0-9.]+;AES256`,
+
+                        /*
+                         * 'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
+                         * ===== ENTERPRISE SPECIFIC =====
+                         */
+                        'Artifactory Token': 'AKC[a-zA-Z0-9]{10,}',
+
                         'Azure Storage Key': '[a-zA-Z0-9+/]{86}==',
+
+                        // 'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
+                        'Bearer Token': String.raw`Bearer [A-Za-z0-9\-_]+`,
+
+                        'Discord Token': String.raw`[MN][a-zA-Z\d]{23}\.[a-zA-Z\d-_]{6}\.[a-zA-Z\d-_]{27}`,
+
+                        'Discord Webhook': String.raw`https://discord\.com/api/webhooks/[0-9]+/[a-zA-Z0-9\-_]+`,
+
+                        'Docker Hub Token': String.raw`dckr_pat_[a-zA-Z0-9\-_]+`,
+
                         'GCP API Key': String.raw`AIza[0-9A-Za-z\-_]{35}`,
+
                         'GCP OAuth': String.raw`[0-9]+-[0-9A-Za-z_]{32}\.apps\.googleusercontent\.com`,
+
+                        'GitHub App Token': 'ghs_[0-9a-zA-Z]{36}',
+
+                        'GitHub Personal Token': 'ghp_[0-9a-zA-Z]{36}',
 
                         // ===== VERSION CONTROL TOKENS =====
                         'GitHub Token': '(gh[oprs]_[0-9a-zA-Z]{36})',
-                        'GitHub App Token': 'ghs_[0-9a-zA-Z]{36}',
-                        'GitHub Personal Token': 'ghp_[0-9a-zA-Z]{36}',
+
                         'GitLab Token': String.raw`glpat-[0-9a-zA-Z\-_]{20}`,
-
-                        // 'Bitbucket Token': '[a-zA-Z0-9]{20,}',
-
-                        // ===== COMMUNICATION PLATFORMS =====
-                        'Slack Token': '(xox[baprs]-[0-9a-zA-Z-]+)',
-                        'Slack Webhook': String.raw`https://hooks\.slack\.com/services/T[a-zA-Z0-9_]+/B[a-zA-Z0-9_]+/[a-zA-Z0-9_]+`,
-                        'Teams Webhook': String.raw`https://[a-z0-9]+\.webhook\.office\.com/webhookb2/[a-z0-9\-]+@[a-z0-9\-]+/IncomingWebhook/[a-z0-9]+/[a-z0-9\-]+`,
-                        'Discord Token': String.raw`[MN][a-zA-Z\d]{23}\.[a-zA-Z\d-_]{6}\.[a-zA-Z\d-_]{27}`,
-                        'Discord Webhook': String.raw`https://discord\.com/api/webhooks/[0-9]+/[a-zA-Z0-9\-_]+`,
-
-                        // ===== API KEYS & SECRETS =====
-                        'NPM Token': 'npm_[a-zA-Z0-9]{36}',
-                        'PyPI Token': String.raw`pypi-[a-zA-Z0-9\-_]+`,
-                        'Docker Hub Token': String.raw`dckr_pat_[a-zA-Z0-9\-_]+`,
-                        'Stripe API Key': '(sk|pk)_(test|live)_[0-9a-zA-Z]{24}',
-                        'Square Token': String.raw`(sq0atp|sq0csp)-[0-9A-Za-z\-_]+`,
-                        'PayPal/Braintree Token': String.raw`access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32}`,
-                        'Twilio API Key': 'SK[0-9a-fA-F]{32}',
-                        'MailChimp API Key': '[0-9a-f]{32}-us[0-9]{1,2}',
-                        'SendGrid API Key': String.raw`SG\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+`,
-
-                        // ===== DATABASE CREDENTIALS =====
-                        'MongoDB Connection': String.raw`mongodb(\+srv)?://[^\s]+`,
-                        'PostgreSQL Connection': String.raw`postgres(ql)?://[^\s]+`,
-                        'MySQL Connection': String.raw`mysql://[^\s]+`,
-                        'Redis Connection': String.raw`redis://[^\s]+`,
 
                         // ===== AUTHENTICATION PATTERNS =====
                         'JWT Token': String.raw`ey[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*`,
 
-                        // 'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
-                        'Bearer Token': String.raw`Bearer [A-Za-z0-9\-_]+`,
+                        'Kubernetes Secret': String.raw`kubectl create secret [^\n]+`,
+
+                        'MailChimp API Key': '[0-9a-f]{32}-us[0-9]{1,2}',
+
+                        // ===== DATABASE CREDENTIALS =====
+                        'MongoDB Connection': String.raw`mongodb(\+srv)?://[^\s]+`,
+
+                        'MySQL Connection': String.raw`mysql://[^\s]+`,
+
+                        // ===== API KEYS & SECRETS =====
+                        'NPM Token': 'npm_[a-zA-Z0-9]{36}',
+
+                        'PayPal/Braintree Token': String.raw`access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32}`,
+
+                        'PostgreSQL Connection': String.raw`postgres(ql)?://[^\s]+`,
+
                         'Private Key': '-----BEGIN (RSA |EC |DSA |OPENSSH |)?(PRIVATE|ENCRYPTED) KEY-----',
 
-                        // 'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
+                        'PyPI Token': String.raw`pypi-[a-zA-Z0-9\-_]+`,
 
-                        // ===== ENTERPRISE SPECIFIC =====
-                        'Artifactory Token': 'AKC[a-zA-Z0-9]{10,}',
-                        'Vault Token': String.raw`s\.[a-zA-Z0-9]{24}`,
-                        'Kubernetes Secret': String.raw`kubectl create secret [^\n]+`,
+                        'Redis Connection': String.raw`redis://[^\s]+`,
+
+                        'SendGrid API Key': String.raw`SG\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+`,
+
+                        /*
+                         * 'Bitbucket Token': '[a-zA-Z0-9]{20,}',
+                         * ===== COMMUNICATION PLATFORMS =====
+                         */
+                        'Slack Token': '(xox[baprs]-[0-9a-zA-Z-]+)',
+
+                        'Slack Webhook': String.raw`https://hooks\.slack\.com/services/T[a-zA-Z0-9_]+/B[a-zA-Z0-9_]+/[a-zA-Z0-9_]+`,
+
+                        'Square Token': String.raw`(sq0atp|sq0csp)-[0-9A-Za-z\-_]+`,
+
+                        'Stripe API Key': '(sk|pk)_(test|live)_[0-9a-zA-Z]{24}',
+                        'Teams Webhook': String.raw`https://[a-z0-9]+\.webhook\.office\.com/webhookb2/[a-z0-9\-]+@[a-z0-9\-]+/IncomingWebhook/[a-z0-9]+/[a-z0-9\-]+`,
                         'Terraform Variable': String.raw`TF_VAR_[a-zA-Z_]+=[^\s]+`,
-                        'Ansible Vault': String.raw`\$ANSIBLE_VAULT;[0-9.]+;AES256`
+                        'Twilio API Key': 'SK[0-9a-fA-F]{32}',
+                        'Vault Token': String.raw`s\.[a-zA-Z0-9]{24}`
                     },
+
+                    // Enterprise: Check ALL strings including imports
+                    ignoreCase: false,
+
                     ignoreContent: [
                         // Common false positives in enterprise codebases
                         '^[A-Z][A-Z0-9_]*$', // Environment variable names
@@ -264,28 +335,10 @@ const config = tseslint.config(
                         '^[a-f0-9]{40}$', // SHA1 hashes
                         '^[a-f0-9]{64}$' // SHA256 hashes
                     ],
-                    additionalDelimiters: [
-                        '.', // Split by dots (e.g., api.key.value)
-                        '-', // Split by dashes (e.g., api-key-value)
-                        '_', // Split by underscores (e.g., api_key_value)
-                        '(?=[A-Z][a-z])' // Split camelCase
-                    ]
-                }
-            ],
 
-            // ===== PATTERN MATCHING FOR STRUCTURED SECRETS =====
-            'no-secrets/no-pattern-match': [
-                'error',
-                {
-                    patterns: {
-                        // Enterprise patterns for configuration files
-                        'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/i,
-                        'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/i,
-                        'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/i,
-                        'Hardcoded API Key': /api[-_]?key\s*[:=]\s*["'][^"']+["']/i,
-                        'Private Key Content': /-{5}BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-{5}/u,
-                        'Connection String': /(?:mongodb|mysql|postgres|redis):\/\/[^:]+:[^@]+@[^/]+/
-                    }
+                    // Enterprise: Stricter entropy threshold (Google standard)
+                    ignoreModules: false,
+                    tolerance: 3
                 }
             ]
         }
@@ -303,19 +356,13 @@ const config = tseslint.config(
             '**/*.spec.{ts,tsx,js,jsx}',
             '**/test/**/*.{ts,tsx,js,jsx}'
         ],
-        plugins: {
-            vitest
-        },
-        settings: {
-            vitest: {
-                // Enable type-testing support for better type assertions
-                typecheck: true
-            }
-        },
         languageOptions: {
             globals: {
                 ...vitest.environments.env.globals
             }
+        },
+        plugins: {
+            vitest
         },
         rules: {
             /*
@@ -338,13 +385,138 @@ const config = tseslint.config(
                     withinDescribe: 'test' // Auch in describe blocks
                 }
             ],
-            'vitest/require-top-level-describe': 'error', // Upgrade von warn zu error
+
+            // ===== TEST QUALITY & ASSERTIONS =====
+            'vitest/expect-expect': [
+                'error',
+                {
+                    // Type assertions
+                    additionalTestBlockFunctions: [
+                        'test.concurrent',
+                        'test.each',
+                        'test.failing'
+                    ],
+                    assertFunctionNames: [
+                        'expect',
+                        'assert',
+                        'expectTypeOf'
+                    ]
+                }
+            ],
+
+            'vitest/max-expects': [
+                'error',
+                {
+                    max: 5 // Strenger als default
+                }
+            ],
+
+            // Upgrade von warn zu error
             'vitest/max-nested-describe': [
                 'error',
                 {
                     max: 3 // Maximum 3 Ebenen (default ist höher)
                 }
             ],
+
+            'vitest/no-alias-methods': 'error',
+
+            // War warn in all
+            'vitest/no-commented-out-tests': 'error',
+
+            // ===== UPGRADES VON WARN ZU ERROR (Enterprise Critical) =====
+            'vitest/no-conditional-expect': 'error',
+
+            // War warn in all
+            'vitest/no-conditional-in-test': 'error',
+
+            // War warn in all
+            'vitest/no-conditional-tests': 'error',
+
+            // Team-spezifisch
+            'vitest/no-disabled-tests': 'warn',
+
+            /*
+             * Bleibt warn für Flexibilität
+             * ===== DEPRECATED REGEL EXPLIZIT AUS =====
+             */
+            'vitest/no-done-callback': 'off',
+
+            // War warn in all
+            'vitest/no-duplicate-hooks': 'error',
+
+            // War warn in all
+            'vitest/no-focused-tests': 'error',
+
+            // Zu restriktiv
+            'vitest/no-hooks': 'off',
+
+            'vitest/no-identical-title': 'error',
+
+            // Recommended only
+            'vitest/no-import-node-test': 'error',
+
+            // War warn in all
+            'vitest/no-interpolation-in-snapshots': 'error',
+
+            'vitest/no-large-snapshots': [
+                'error',
+                {
+                    inlineMaxSize: 10,
+
+                    // Strenger als default warn
+                    maxSize: 50
+                }
+            ],
+
+            // War warn in all
+            'vitest/no-mocks-import': 'error',
+
+            // 'test' prefix ist okay
+            'vitest/no-restricted-matchers': 'off',
+
+            /*
+             * War warn in all
+             * ===== ENTERPRISE-SPEZIFISCHE KONFIGURATIONEN =====
+             */
+            'vitest/no-restricted-vi-methods': [
+                'error',
+                {
+                    'vi.resetModules': 'Use isolated test environments instead',
+                    'vi.unmock': 'Use explicit mock restoration in afterEach'
+                }
+            ],
+
+            // War warn in all
+            'vitest/no-standalone-expect': 'error',
+
+            // Hooks sind notwendig
+            'vitest/no-test-prefixes': 'off',
+
+            // War warn in all
+            'vitest/no-test-return-statement': 'error',
+
+            'vitest/prefer-called-with': 'error',
+
+            'vitest/prefer-comparison-matcher': 'error',
+
+            /*
+             * Enterprise: Snapshot hints für bessere Test-Dokumentation
+             * ===== MATCHER PREFERENCES (Alle von warn zu error) =====
+             */
+            'vitest/prefer-each': 'error',
+
+            'vitest/prefer-equality-matcher': 'error',
+
+            // ===== EXPLIZIT DEAKTIVIERTE REGELN (Zu restriktiv) =====
+            'vitest/prefer-expect-assertions': 'off',
+
+            // War warn in all
+            'vitest/prefer-hooks-in-order': 'error',
+
+            // War warn in all
+            'vitest/prefer-hooks-on-top': 'error',
+
             'vitest/prefer-lowercase-title': [
                 'error',
                 {
@@ -352,124 +524,81 @@ const config = tseslint.config(
                 }
             ],
 
-            // ===== TEST QUALITY & ASSERTIONS =====
-            'vitest/expect-expect': [
+            // War warn in all
+            'vitest/prefer-mock-promise-shorthand': 'error',
+
+            'vitest/prefer-snapshot-hint': 'error',
+
+            // War warn in all
+            'vitest/prefer-spy-on': 'error',
+
+            'vitest/prefer-strict-equal': 'error',
+
+            'vitest/prefer-to-be': 'error',
+
+            'vitest/prefer-to-be-falsy': 'error',
+
+            'vitest/prefer-to-be-object': 'error',
+
+            'vitest/prefer-to-be-truthy': 'error',
+
+            'vitest/prefer-to-contain': 'error',
+
+            'vitest/prefer-to-have-length': 'error',
+
+            'vitest/prefer-todo': 'error',
+
+            // War warn in all
+            'vitest/require-hook': 'error',
+
+            // Recommended only
+            'vitest/require-to-throw-message': 'error',
+
+            'vitest/require-top-level-describe': 'error',
+
+            'vitest/valid-expect': [
                 'error',
                 {
-                    assertFunctionNames: [
-                        'expect',
-                        'assert',
-                        'expectTypeOf'
-                    ], // Type assertions
-                    additionalTestBlockFunctions: [
-                        'test.concurrent',
-                        'test.each',
-                        'test.failing'
-                    ]
+                    alwaysAwait: true,
+                    maxArgs: 2,
+                    minArgs: 1
                 }
             ],
-            'vitest/max-expects': [
-                'error',
-                {
-                    max: 5 // Strenger als default
-                }
-            ],
-            'vitest/no-identical-title': 'error', // Upgrade von warn
+
+            // Upgrade von warn
             'vitest/valid-title': [
                 'error',
                 {
-                    mustNotMatch: {
-                        test: [
-                            '/^should/',
-                            '/^must/',
-                            '/^can/'
-                        ], // Google style
-                        describe: [
-                            '/^should/',
-                            '/^must/',
-                            '/^can/'
-                        ]
-                    },
                     mustMatch: {
-                        test: ['/^(returns|throws|calls|handles|processes|validates|transforms|creates|updates|deletes)/'],
                         describe: [
                             String.raw`/^[A-Z]\w*/`,
                             '/^when /',
                             '/^with /',
                             '/^without /'
+                        ],
+                        test: ['/^(returns|throws|calls|handles|processes|validates|transforms|creates|updates|deletes)/']
+                    },
+                    mustNotMatch: {
+                        // Google style
+                        describe: [
+                            '/^should/',
+                            '/^must/',
+                            '/^can/'
+                        ],
+                        test: [
+                            '/^should/',
+                            '/^must/',
+                            '/^can/'
                         ]
                     }
                 }
-            ],
-            'vitest/valid-expect': [
-                'error',
-                {
-                    alwaysAwait: true,
-                    minArgs: 1,
-                    maxArgs: 2
-                }
-            ],
-
-            // ===== UPGRADES VON WARN ZU ERROR (Enterprise Critical) =====
-            'vitest/no-conditional-expect': 'error', // War warn in all
-            'vitest/no-conditional-in-test': 'error', // War warn in all
-            'vitest/no-conditional-tests': 'error', // War warn in all
-            'vitest/prefer-hooks-on-top': 'error', // War warn in all
-            'vitest/prefer-hooks-in-order': 'error', // War warn in all
-            'vitest/no-duplicate-hooks': 'error', // War warn in all
-            'vitest/require-hook': 'error', // War warn in all
-            'vitest/prefer-spy-on': 'error', // War warn in all
-            'vitest/prefer-mock-promise-shorthand': 'error', // War warn in all
-            'vitest/no-mocks-import': 'error', // War warn in all
-            'vitest/no-interpolation-in-snapshots': 'error', // War warn in all
-            'vitest/no-focused-tests': 'error', // War warn in all
-            'vitest/no-commented-out-tests': 'error', // Recommended only
-            'vitest/no-import-node-test': 'error', // Recommended only
-            'vitest/require-to-throw-message': 'error', // War warn in all
-            'vitest/no-test-return-statement': 'error', // War warn in all
-            'vitest/no-standalone-expect': 'error', // War warn in all
-
-            // ===== ENTERPRISE-SPEZIFISCHE KONFIGURATIONEN =====
-            'vitest/no-restricted-vi-methods': [
-                'error',
-                {
-                    'vi.unmock': 'Use explicit mock restoration in afterEach',
-                    'vi.resetModules': 'Use isolated test environments instead'
-                }
-            ],
-            'vitest/no-large-snapshots': [
-                'error',
-                { // Strenger als default warn
-                    maxSize: 50,
-                    inlineMaxSize: 10
-                }
-            ],
-            'vitest/prefer-snapshot-hint': 'error', // Enterprise: Snapshot hints für bessere Test-Dokumentation
-
-            // ===== MATCHER PREFERENCES (Alle von warn zu error) =====
-            'vitest/prefer-each': 'error',
-            'vitest/prefer-to-be': 'error',
-            'vitest/prefer-to-be-truthy': 'error',
-            'vitest/prefer-to-be-falsy': 'error',
-            'vitest/prefer-to-be-object': 'error',
-            'vitest/prefer-to-contain': 'error',
-            'vitest/prefer-to-have-length': 'error',
-            'vitest/prefer-equality-matcher': 'error',
-            'vitest/prefer-strict-equal': 'error',
-            'vitest/prefer-comparison-matcher': 'error',
-            'vitest/prefer-called-with': 'error',
-            'vitest/prefer-todo': 'error',
-            'vitest/no-alias-methods': 'error',
-
-            // ===== EXPLIZIT DEAKTIVIERTE REGELN (Zu restriktiv) =====
-            'vitest/prefer-expect-assertions': 'off', // Zu restriktiv
-            'vitest/no-hooks': 'off', // Hooks sind notwendig
-            'vitest/no-test-prefixes': 'off', // 'test' prefix ist okay
-            'vitest/no-restricted-matchers': 'off', // Team-spezifisch
-            'vitest/no-disabled-tests': 'warn', // Bleibt warn für Flexibilität
-
-            // ===== DEPRECATED REGEL EXPLIZIT AUS =====
-            'vitest/no-done-callback': 'off' // Deprecated laut Docs
+            ] // Deprecated laut Docs
+        },
+        settings: {
+            vitest: {
+                // Enable type-testing support for better type assertions
+                typecheck: true
+            }
         }
     },
 
@@ -481,57 +610,22 @@ const config = tseslint.config(
     configs['flat/all'],
     {
         rules: {
+
+            // Octal escapes manchmal nützlich
+            'regexp/confusing-quantifier': 'warn',
+
+            // Manche flags zur Klarheit ok
+            'regexp/control-character-escape': 'warn',
+
+            // /v flag zu neu
+            'regexp/grapheme-string-literal': 'off',
+
             /*
-             * ===== PERFORMANCE & SECURITY (CRITICAL) =====
-             * Diese Regeln verhindern ReDoS (Regular Expression Denial of Service)
+             * [a-zA-Z] → [a-z]/i
+             * ===== CONSISTENCY & STYLE (Google Style Guide) =====
              */
-            'regexp/no-super-linear-backtracking': 'error', // ReDoS-Schutz
-            'regexp/no-super-linear-move': 'error', // Quadratische Moves verhindern
-            'regexp/no-contradiction-with-assertion': 'error', // Logische Widersprüche
-            'regexp/no-control-character': 'error', // Keine Control Characters
-            'regexp/strict': 'error', // Strenge RegExp Validierung
+            'regexp/hexadecimal-escape': ['error', 'never'],
 
-            // ===== UNICODE & MODERN PATTERNS (Google/MS Standard) =====
-            'regexp/require-unicode-regexp': 'error', // /u flag ist Pflicht für Unicode
-            'regexp/require-unicode-sets-regexp': 'off', // /v flag noch zu neu (ES2024)
-            'regexp/unicode-escape': 'error', // \u{1F600} statt \uD83D\uDE00
-            'regexp/unicode-property': 'error', // Korrekte Unicode Property Nutzung
-
-            // ===== WARTBARKEIT & LESBARKEIT (Meta Standards) =====
-            'regexp/prefer-named-capture-group': 'error', // (?<name>...) für Klarheit
-            'regexp/prefer-named-backreference': 'error', // \k<name> statt \1
-            'regexp/prefer-named-replacement': 'error', // $<name> in replace()
-            'regexp/no-misleading-capturing-group': 'error', // Verwirrende Gruppen
-            'regexp/no-misleading-unicode-character': 'error', // Multi-codepoint chars
-            'regexp/no-obscure-range': 'error', // [A-z] ist verwirrend
-            'regexp/prefer-quantifier': 'error', // A{1,} → a+
-            'regexp/prefer-question-quantifier': 'error', // A{0,1} → a?
-            'regexp/sort-alternatives': 'error', // Sortiere Alternativen für Konsistenz
-
-            // ===== BEST PRACTICES (Enterprise Consensus) =====
-            'regexp/optimal-lookaround-quantifier': 'error', // Optimierte Lookarounds
-            'regexp/optimal-quantifier-concatenation': 'error', // A+a* → a+
-            'regexp/no-useless-lazy': 'error', // Unnötige non-greedy quantifiers
-            'regexp/no-useless-quantifier': 'error', // A{1} → a
-            'regexp/no-useless-range': 'error', // [a-a] → a
-            'regexp/prefer-character-class': 'error', // (a|b|c) → [abc]
-            'regexp/prefer-d': 'error', // [0-9] → \d
-            'regexp/prefer-w': 'error', // [a-zA-Z0-9_] → \w
-            'regexp/prefer-range': 'error', // [abcdef] → [a-f]
-            'regexp/prefer-set-operation': 'error', // Moderne Set Operations
-            'regexp/simplify-set-operations': 'error', // Vereinfache Set Ops
-            'regexp/use-ignore-case': 'error', // [a-zA-Z] → [a-z]/i
-
-            // ===== CONSISTENCY & STYLE (Google Style Guide) =====
-            'regexp/hexadecimal-escape': ['error', 'never'], // \x61 → a (lesbar)
-            'regexp/sort-character-class-elements': 'error', // Sortiere Zeichen in character classes
-            'regexp/sort-flags': 'error', // Alphabetische Flag-Sortierung
-            'regexp/match-any': [
-                'error',
-                {
-                    allows: ['dotAll'] // . mit /s flag für multiline matching
-                }
-            ],
             'regexp/letter-case': [
                 'error',
                 {
@@ -540,20 +634,72 @@ const config = tseslint.config(
                 }
             ],
 
-            // ===== ERROR PREVENTION =====
-            'regexp/no-empty-alternative': 'error', // (a|) ist verwirrend
-            'regexp/no-empty-capturing-group': 'error', // () ohne Inhalt
-            'regexp/no-empty-character-class': 'error', // [] matcht nichts
-            'regexp/no-empty-group': 'error', // (?:) ist nutzlos
-            'regexp/no-empty-lookarounds-assertion': 'error', // (?=) ist nutzlos
-            'regexp/no-invalid-regexp': 'error', // Ungültige RegExp
-            'regexp/no-lazy-ends': 'error', // A+?$ ist ineffizient
-            'regexp/no-optional-assertion': 'error', // ^? macht keinen Sinn
-            'regexp/no-useless-assertions': 'error', // ^\b ist redundant
-            'regexp/no-useless-backreference': 'error', // Referenz zu nicht-existenter Gruppe
-            'regexp/no-zero-quantifier': 'error', // A{0} ist nutzlos
+            // Alphabetische Flag-Sortierung
+            'regexp/match-any': [
+                'error',
+                {
+                    allows: ['dotAll'] // . mit /s flag für multiline matching
+                }
+            ],
 
-            // ===== SPEZIELLE ANPASSUNGEN =====
+            // Quadratische Moves verhindern
+            'regexp/no-contradiction-with-assertion': 'error',
+
+            // Logische Widersprüche
+            'regexp/no-control-character': 'error',
+
+            // ===== ERROR PREVENTION =====
+            'regexp/no-empty-alternative': 'error',
+
+            // (a|) ist verwirrend
+            'regexp/no-empty-capturing-group': 'error',
+
+            // () ohne Inhalt
+            'regexp/no-empty-character-class': 'error',
+
+            // [] matcht nichts
+            'regexp/no-empty-group': 'error',
+
+            // (?:) ist nutzlos
+            'regexp/no-empty-lookarounds-assertion': 'error',
+
+            // (?=) ist nutzlos
+            'regexp/no-invalid-regexp': 'error',
+
+            // Ungültige RegExp
+            'regexp/no-lazy-ends': 'error',
+
+            // $<name> in replace()
+            'regexp/no-misleading-capturing-group': 'error',
+
+            // Verwirrende Gruppen
+            'regexp/no-misleading-unicode-character': 'error',
+
+            // Multi-codepoint chars
+            'regexp/no-obscure-range': 'error',
+
+            // Match() für truthy check ist ok
+            'regexp/no-octal': 'off',
+
+            // A+?$ ist ineffizient
+            'regexp/no-optional-assertion': 'error',
+
+            // Lookarounds sind oft komplexer
+            'regexp/no-standalone-backslash': 'error',
+
+            /*
+             * ===== PERFORMANCE & SECURITY (CRITICAL) =====
+             * Diese Regeln verhindern ReDoS (Regular Expression Denial of Service)
+             */
+            'regexp/no-super-linear-backtracking': 'error',
+
+            // ReDoS-Schutz
+            'regexp/no-super-linear-move': 'error',
+
+            /*
+             * A{0} ist nutzlos
+             * ===== SPEZIELLE ANPASSUNGEN =====
+             */
             'regexp/no-unused-capturing-group': [
                 'error',
                 {
@@ -561,21 +707,125 @@ const config = tseslint.config(
                     allowNamed: false // Auch named groups müssen genutzt werden
                 }
             ],
-            'regexp/prefer-result-array-groups': 'off', // .groups ist optional
-            'regexp/prefer-lookaround': 'off', // Lookarounds sind oft komplexer
-            'regexp/no-standalone-backslash': 'error', // Einzelne \ sind Fehler
-            'regexp/prefer-escape-replacement-dollar-char': 'error', // $$ in replace
-            'regexp/prefer-predefined-assertion': 'error', // \b statt (?=\W|$)
 
-            // ===== EXPLIZIT DEAKTIVIERTE REGELN =====
-            'regexp/require-unicode-sets-regexp': 'off', // /v flag zu neu
-            'regexp/grapheme-string-literal': 'off', // Zu spezifisch
-            'regexp/prefer-regexp-exec': 'off', // Match() ist oft klarer
-            'regexp/prefer-regexp-test': 'off', // Match() für truthy check ist ok
-            'regexp/no-octal': 'off', // Octal escapes manchmal nützlich
-            'regexp/confusing-quantifier': 'warn', // Nur Warnung, nicht Error
-            'regexp/no-useless-flag': 'warn', // Manche flags zur Klarheit ok
-            'regexp/control-character-escape': 'warn' // \n ist klarer als \x0a
+            // ^? macht keinen Sinn
+            'regexp/no-useless-assertions': 'error',
+
+            // ^\b ist redundant
+            'regexp/no-useless-backreference': 'error',
+
+            // Nur Warnung, nicht Error
+            'regexp/no-useless-flag': 'warn',
+
+            // A+a* → a+
+            'regexp/no-useless-lazy': 'error',
+
+            // Unnötige non-greedy quantifiers
+            'regexp/no-useless-quantifier': 'error',
+
+            // A{1} → a
+            'regexp/no-useless-range': 'error',
+
+            // Referenz zu nicht-existenter Gruppe
+            'regexp/no-zero-quantifier': 'error',
+
+            /*
+             * Sortiere Alternativen für Konsistenz
+             * ===== BEST PRACTICES (Enterprise Consensus) =====
+             */
+            'regexp/optimal-lookaround-quantifier': 'error',
+
+            // Optimierte Lookarounds
+            'regexp/optimal-quantifier-concatenation': 'error',
+
+            // [a-a] → a
+            'regexp/prefer-character-class': 'error',
+
+            // (a|b|c) → [abc]
+            'regexp/prefer-d': 'error',
+
+            // Einzelne \ sind Fehler
+            'regexp/prefer-escape-replacement-dollar-char': 'error',
+
+            // .groups ist optional
+            'regexp/prefer-lookaround': 'off',
+
+            // (?<name>...) für Klarheit
+            'regexp/prefer-named-backreference': 'error',
+
+            /*
+             * Korrekte Unicode Property Nutzung
+             * ===== WARTBARKEIT & LESBARKEIT (Meta Standards) =====
+             */
+            'regexp/prefer-named-capture-group': 'error',
+
+            // \k<name> statt \1
+            'regexp/prefer-named-replacement': 'error',
+
+            // $$ in replace
+            'regexp/prefer-predefined-assertion': 'error',
+
+            // [A-z] ist verwirrend
+            'regexp/prefer-quantifier': 'error',
+
+            // A{1,} → a+
+            'regexp/prefer-question-quantifier': 'error',
+
+            // [a-zA-Z0-9_] → \w
+            'regexp/prefer-range': 'error',
+
+            // Zu spezifisch
+            'regexp/prefer-regexp-exec': 'off',
+
+            // Match() ist oft klarer
+            'regexp/prefer-regexp-test': 'off',
+
+            'regexp/prefer-result-array-groups': 'off',
+
+            // [abcdef] → [a-f]
+            'regexp/prefer-set-operation': 'error',
+
+            // [0-9] → \d
+            'regexp/prefer-w': 'error',
+
+            /*
+             * Strenge RegExp Validierung
+             * ===== UNICODE & MODERN PATTERNS (Google/MS Standard) =====
+             */
+            'regexp/require-unicode-regexp': 'error',
+
+            // /u flag ist Pflicht für Unicode
+            'regexp/require-unicode-sets-regexp': 'off',
+
+            /*
+             * \b statt (?=\W|$)
+             * ===== EXPLIZIT DEAKTIVIERTE REGELN =====
+             */
+            'regexp/require-unicode-sets-regexp': 'off',
+
+            // Moderne Set Operations
+            'regexp/simplify-set-operations': 'error',
+
+            // A{0,1} → a?
+            'regexp/sort-alternatives': 'error',
+
+            // \x61 → a (lesbar)
+            'regexp/sort-character-class-elements': 'error',
+
+            // Sortiere Zeichen in character classes
+            'regexp/sort-flags': 'error',
+
+            // Keine Control Characters
+            'regexp/strict': 'error',
+
+            // /v flag noch zu neu (ES2024)
+            'regexp/unicode-escape': 'error',
+
+            // \u{1F600} statt \uD83D\uDE00
+            'regexp/unicode-property': 'error',
+
+            // Vereinfache Set Ops
+            'regexp/use-ignore-case': 'error' // \n ist klarer als \x0a
         }
     },
 
@@ -583,86 +833,141 @@ const config = tseslint.config(
     eslintPluginJsonc.configs['flat/all'],
     {
         rules: {
-            // ===== ENTERPRISE-GRADE JSON/JSONC STANDARDS (Google/Microsoft/Meta) =====
 
-            // SECURITY & DATA INTEGRITY (CRITICAL)
-            'jsonc/no-comments': ['error'], // JSON files MUST NOT contain comments (breaks parsers)
-            'jsonc/no-bigint-literals': 'error', // BigInt not supported in JSON standard
-            'jsonc/no-undefined-value': 'error', // Undefined is not valid JSON
-            'jsonc/no-nan': 'error', // NaN breaks JSON parsers
-            'jsonc/no-infinity': 'error', // Infinity not valid in JSON
-
-            // STANDARDIZATION & CONSISTENCY (Google Style Guide)
-            'jsonc/comma-dangle': ['error', 'never'], // No trailing commas in JSON
-            'jsonc/quotes': ['error', 'double'], // JSON standard requires double quotes
-            'jsonc/quote-props': ['error', 'always'], // Property names must be quoted
-            'jsonc/indent': ['error', 2], // Google/Microsoft standard: 2 spaces for JSON
-
-            // SORTING & ORGANIZATION (Enterprise Maintainability)
-            'jsonc/sort-keys': [
-                'error',
-                'asc',
-                {
-                    caseSensitive: false,
-                    natural: true,
-                    minKeys: 2,
-                    allowLineSeparatedGroups: true // Allow logical grouping
-                }
-            ],
-            'jsonc/sort-array-values': 'off', // Arrays often have semantic ordering
-
-            // FORMATTING STANDARDS (Airbnb/Google Hybrid)
-            'jsonc/array-bracket-spacing': ['error', 'never'],
-            'jsonc/object-curly-spacing': ['error', 'always'],
-            'jsonc/key-spacing': [
-                'error',
-                {
-                    beforeColon: false,
-                    afterColon: true,
-                    mode: 'strict'
-                }
-            ],
-            'jsonc/comma-style': ['error', 'last'],
             'jsonc/array-bracket-newline': [
                 'error',
                 {
-                    multiline: true,
-                    minItems: 3
+                    minItems: 3,
+                    multiline: true
                 }
             ],
+
+            /*
+             * Arrays often have semantic ordering
+             * FORMATTING STANDARDS (Airbnb/Google Hybrid)
+             */
+            'jsonc/array-bracket-spacing': ['error', 'never'],
+
             'jsonc/array-element-newline': [
                 'error',
                 {
-                    multiline: true,
-                    minItems: 3
+                    minItems: 3,
+                    multiline: true
                 }
             ],
+
+            /*
+             * .5 should be 0.5
+             * SPECIAL CASES FOR CONFIGURATION FILES
+             */
+            'jsonc/auto': 'off',
+
+            /*
+             * Infinity not valid in JSON
+             * STANDARDIZATION & CONSISTENCY (Google Style Guide)
+             */
+            'jsonc/comma-dangle': ['error', 'never'],
+
+            'jsonc/comma-style': ['error', 'last'],
+
+            // Property names must be quoted
+            'jsonc/indent': ['error', 2],
+
+            'jsonc/key-spacing': [
+                'error',
+                {
+                    afterColon: true,
+                    beforeColon: false,
+                    mode: 'strict'
+                }
+            ],
+
+            // JSON files MUST NOT contain comments (breaks parsers)
+            'jsonc/no-bigint-literals': 'error',
+
+            // 0xFF not valid
+            'jsonc/no-binary-numeric-literals': 'error',
+
+            /*
+             * ===== ENTERPRISE-GRADE JSON/JSONC STANDARDS (Google/Microsoft/Meta) =====
+             * SECURITY & DATA INTEGRITY (CRITICAL)
+             */
+            'jsonc/no-comments': ['error'],
+
+            // ERROR PREVENTION (Microsoft Standards)
+            'jsonc/no-dupe-keys': 'error',
+
+            // +1 should be 1
+            'jsonc/no-floating-decimal': 'error',
+
+            // JSONC/JSON5 SPECIFIC (When using JSONC files)
+            'jsonc/no-hexadecimal-numeric-literals': 'error',
+
+            // NaN breaks JSON parsers
+            'jsonc/no-infinity': 'error',
+
+            // Remove unnecessary escapes
+            'jsonc/no-irregular-whitespace': [
+                'error',
+                {
+                    skipComments: false,
+                    skipRegExps: false,
+                    skipStrings: false,
+                    skipTemplates: false
+                }
+            ],
+
+            // Undefined is not valid JSON
+            'jsonc/no-nan': 'error',
+
+            // 0o755 not valid
+            'jsonc/no-numeric-separators': 'error',
+
+            // [1,,3] is invalid JSON
+            'jsonc/no-octal-escape': 'error',
+
+            // 0b1010 not valid
+            'jsonc/no-octal-numeric-literals': 'error',
+
+            // 1_000 not valid
+            'jsonc/no-plus-sign': 'error',
+
+            // Duplicate keys cause data loss
+            'jsonc/no-sparse-arrays': 'error',
+
+            // BigInt not supported in JSON standard
+            'jsonc/no-undefined-value': 'error',
+
+            // Octal escapes not supported
+            'jsonc/no-useless-escape': 'error',
 
             //
             'jsonc/object-curly-newline': [
                 'error',
                 {
-                    ObjectExpression: {
-                        multiline: true,
-                        minProperties: 2,
-                        consistent: true
-                    },
-                    ObjectPattern: {
-                        multiline: true,
+                    ExportDeclaration: {
+                        consistent: true,
                         minProperties: 3,
-                        consistent: false
+                        multiline: true
                     },
                     ImportDeclaration: {
-                        minProperties: 3,
-                        consistent: false
+                        consistent: false,
+                        minProperties: 3
                     },
-                    ExportDeclaration: {
-                        multiline: true,
+                    ObjectExpression: {
+                        consistent: true,
+                        minProperties: 2,
+                        multiline: true
+                    },
+                    ObjectPattern: {
+                        consistent: false,
                         minProperties: 3,
-                        consistent: true
+                        multiline: true
                     }
                 }
             ],
+
+            'jsonc/object-curly-spacing': ['error', 'always'],
 
             'jsonc/object-property-newline': [
                 'error',
@@ -671,31 +976,28 @@ const config = tseslint.config(
                 }
             ],
 
-            // ERROR PREVENTION (Microsoft Standards)
-            'jsonc/no-dupe-keys': 'error', // Duplicate keys cause data loss
-            'jsonc/no-sparse-arrays': 'error', // [1,,3] is invalid JSON
-            'jsonc/no-octal-escape': 'error', // Octal escapes not supported
-            'jsonc/no-useless-escape': 'error', // Remove unnecessary escapes
-            'jsonc/no-irregular-whitespace': [
+            // JSON standard requires double quotes
+            'jsonc/quote-props': ['error', 'always'],
+
+            // No trailing commas in JSON
+            'jsonc/quotes': ['error', 'double'],
+
+            'jsonc/sort-array-values': 'off',
+
+            /*
+             * Google/Microsoft standard: 2 spaces for JSON
+             * SORTING & ORGANIZATION (Enterprise Maintainability)
+             */
+            'jsonc/sort-keys': [
                 'error',
+                'asc',
                 {
-                    skipStrings: false,
-                    skipComments: false,
-                    skipRegExps: false,
-                    skipTemplates: false
+                    allowLineSeparatedGroups: true,
+                    caseSensitive: false,
+                    minKeys: 2,
+                    natural: true // Allow logical grouping
                 }
-            ],
-
-            // JSONC/JSON5 SPECIFIC (When using JSONC files)
-            'jsonc/no-hexadecimal-numeric-literals': 'error', // 0xFF not valid
-            'jsonc/no-binary-numeric-literals': 'error', // 0b1010 not valid
-            'jsonc/no-octal-numeric-literals': 'error', // 0o755 not valid
-            'jsonc/no-numeric-separators': 'error', // 1_000 not valid
-            'jsonc/no-plus-sign': 'error', // +1 should be 1
-            'jsonc/no-floating-decimal': 'error', // .5 should be 0.5
-
-            // SPECIAL CASES FOR CONFIGURATION FILES
-            'jsonc/auto': 'off' // Too aggressive for mixed JSON/JSONC environments
+            ] // Too aggressive for mixed JSON/JSONC environments
         }
     },
 
@@ -706,13 +1008,95 @@ const config = tseslint.config(
     {
         files: ['**/package.json'],
         rules: {
-            // ===== ENTERPRISE SECURITY & COMPLIANCE =====
-            'package-json/require-engines': 'error', // MANDATORY: Node.js version constraints for reproducible builds
-            'package-json/require-author': 'error', // MANDATORY: Clear ownership and accountability
-            'package-json/require-files': 'warn', // RECOMMENDED: Explicit file inclusion for security
-            'package-json/no-redundant-files': 'error', // SECURITY: Prevent accidental sensitive data exposure
 
-            // ===== DEPENDENCY MANAGEMENT EXCELLENCE =====
+            'jsonc/array-bracket-newline': 'off',
+
+            'jsonc/array-bracket-spacing': 'off',
+
+            'jsonc/array-element-newline': 'off',
+
+            'jsonc/auto': 'off',
+
+            'jsonc/comma-dangle': 'off',
+
+            'jsonc/comma-style': 'off',
+
+            // RECOMMENDED: Better discoverability
+            /*
+             * ===== DISABLE ALL JSONC RULES FOR PACKAGE.JSON =====
+             * Only eslint-plugin-package-json should handle package.json files
+             */
+            'jsonc/indent': 'off',
+
+            'jsonc/key-name-casing': 'off',
+
+            'jsonc/key-spacing': 'off',
+
+            'jsonc/no-bigint-literals': 'off',
+
+            'jsonc/no-binary-numeric-literals': 'off',
+
+            'jsonc/no-comments': 'off',
+
+            'jsonc/no-dupe-keys': 'off',
+
+            'jsonc/no-floating-decimal': 'off',
+
+            'jsonc/no-hexadecimal-numeric-literals': 'off',
+
+            'jsonc/no-infinity': 'off',
+
+            'jsonc/no-irregular-whitespace': 'off',
+
+            'jsonc/no-nan': 'off',
+
+            'jsonc/no-numeric-separators': 'off',
+
+            'jsonc/no-octal-escape': 'off',
+
+            'jsonc/no-octal-numeric-literals': 'off',
+
+            'jsonc/no-plus-sign': 'off',
+
+            'jsonc/no-sparse-arrays': 'off',
+
+            'jsonc/no-undefined-value': 'off',
+
+            'jsonc/no-useless-escape': 'off',
+
+            'jsonc/object-curly-newline': 'off',
+
+            'jsonc/object-curly-spacing': 'off',
+
+            'jsonc/object-property-newline': 'off',
+
+            'jsonc/quote-props': 'off',
+
+            'jsonc/quotes': 'off',
+
+            'jsonc/sort-array-values': 'off',
+
+            'jsonc/sort-keys': 'off',
+
+            // RECOMMENDED: Explicit file inclusion for security
+            'package-json/no-redundant-files': 'error',
+
+            // MANDATORY: Node.js version constraints for reproducible builds
+            'package-json/require-author': 'error',
+
+            // ===== ENTERPRISE SECURITY & COMPLIANCE =====
+            'package-json/require-engines': 'error',
+
+            // MANDATORY: Clear ownership and accountability
+            'package-json/require-files': 'warn',
+
+            // ===== METADATA COMPLETENESS =====
+            'package-json/require-keywords': 'warn',
+
+            /*
+             * SECURITY: Prevent accidental sensitive data exposure
+             * ===== DEPENDENCY MANAGEMENT EXCELLENCE =====
+             */
             'package-json/restrict-dependency-ranges': [
                 'error',
                 [
@@ -738,47 +1122,7 @@ const config = tseslint.config(
                         ] // All acceptable
                     }
                 ]
-            ],
-
-            // ===== METADATA COMPLETENESS =====
-            'package-json/require-keywords': 'warn', // RECOMMENDED: Better discoverability
-
-            /*
-             * ===== DISABLE ALL JSONC RULES FOR PACKAGE.JSON =====
-             * Only eslint-plugin-package-json should handle package.json files
-             */
-            'jsonc/indent': 'off',
-            'jsonc/sort-keys': 'off',
-            'jsonc/key-name-casing': 'off',
-            'jsonc/quotes': 'off',
-            'jsonc/comma-dangle': 'off',
-            'jsonc/no-comments': 'off',
-            'jsonc/object-curly-spacing': 'off',
-            'jsonc/key-spacing': 'off',
-            'jsonc/comma-style': 'off',
-            'jsonc/array-bracket-newline': 'off',
-            'jsonc/array-element-newline': 'off',
-            'jsonc/object-curly-newline': 'off',
-            'jsonc/object-property-newline': 'off',
-            'jsonc/no-dupe-keys': 'off',
-            'jsonc/no-sparse-arrays': 'off',
-            'jsonc/no-octal-escape': 'off',
-            'jsonc/no-useless-escape': 'off',
-            'jsonc/no-irregular-whitespace': 'off',
-            'jsonc/no-hexadecimal-numeric-literals': 'off',
-            'jsonc/no-binary-numeric-literals': 'off',
-            'jsonc/no-octal-numeric-literals': 'off',
-            'jsonc/no-numeric-separators': 'off',
-            'jsonc/no-plus-sign': 'off',
-            'jsonc/no-floating-decimal': 'off',
-            'jsonc/array-bracket-spacing': 'off',
-            'jsonc/quote-props': 'off',
-            'jsonc/sort-array-values': 'off',
-            'jsonc/no-bigint-literals': 'off',
-            'jsonc/no-undefined-value': 'off',
-            'jsonc/no-nan': 'off',
-            'jsonc/no-infinity': 'off',
-            'jsonc/auto': 'off'
+            ]
 
             // Note: Only package-json/* rules should apply to package.json files
         }
@@ -788,24 +1132,48 @@ const config = tseslint.config(
     pluginPromise.configs['flat/recommended'],
     {
         rules: {
-            // ===== ENTERPRISE PROMISE STANDARDS (Google/Microsoft/Meta) =====
 
-            // UPGRADE: Warnings zu Errors (Zero-Tolerance für Promise Anti-Patterns)
-            'promise/no-callback-in-promise': 'error', // War 'warn' - Mixing Callbacks/Promises ist Enterprise Anti-Pattern
-            'promise/no-promise-in-callback': 'error', // War 'warn' - Callback-Promise-Mixing verhindert Clean Architecture
-            'promise/no-nesting': 'error', // War 'warn' - Nested Promises = Code Smell (use async/await)
-            'promise/no-return-in-finally': 'error', // War 'warn' - Finally sollte NIEMALS returnen
-            'promise/valid-params': 'error', // War 'warn' - Falsche Promise-Parameter = Runtime Errors
+            /*
+             * Nur Standard Promise Methods (keine Bluebird etc.)
+             * PRAGMATISCHE AUSNAHMEN
+             */
+            'promise/avoid-new': 'off',
 
-            // NEUE REGELN: Modern JavaScript Best Practices
-            'promise/prefer-await-to-then': 'error', // Google/MS Standard: async/await > then/catch
-            'promise/prefer-await-to-callbacks': 'error', // Enterprise: Callbacks sind Legacy
-            'promise/no-multiple-resolved': 'error', // Verhindert Promise Race Conditions
-            'promise/spec-only': 'error', // Nur Standard Promise Methods (keine Bluebird etc.)
+            /*
+             * ===== ENTERPRISE PROMISE STANDARDS (Google/Microsoft/Meta) =====
+             * UPGRADE: Warnings zu Errors (Zero-Tolerance für Promise Anti-Patterns)
+             */
+            'promise/no-callback-in-promise': 'error',
 
-            // PRAGMATISCHE AUSNAHMEN
-            'promise/avoid-new': 'off', // Manchmal notwendig für Custom Promise Wrapping
-            'promise/no-native': 'off' // TypeScript Projekte nutzen immer native Promises
+            // Enterprise: Callbacks sind Legacy
+            'promise/no-multiple-resolved': 'error',
+
+            // Manchmal notwendig für Custom Promise Wrapping
+            'promise/no-native': 'off',
+
+            // War 'warn' - Callback-Promise-Mixing verhindert Clean Architecture
+            'promise/no-nesting': 'error',
+
+            // War 'warn' - Mixing Callbacks/Promises ist Enterprise Anti-Pattern
+            'promise/no-promise-in-callback': 'error',
+
+            // War 'warn' - Nested Promises = Code Smell (use async/await)
+            'promise/no-return-in-finally': 'error',
+
+            // Google/MS Standard: async/await > then/catch
+            'promise/prefer-await-to-callbacks': 'error',
+
+            /*
+             * War 'warn' - Falsche Promise-Parameter = Runtime Errors
+             * NEUE REGELN: Modern JavaScript Best Practices
+             */
+            'promise/prefer-await-to-then': 'error',
+
+            // Verhindert Promise Race Conditions
+            'promise/spec-only': 'error',
+
+            // War 'warn' - Finally sollte NIEMALS returnen
+            'promise/valid-params': 'error' // TypeScript Projekte nutzen immer native Promises
         }
     },
 
@@ -822,9 +1190,9 @@ const config = tseslint.config(
             'prefer-arrow-functions/prefer-arrow-functions': [
                 'error',
                 {
-                    allowedNames: [],
                     allowNamedFunctions: false,
                     allowObjectProperties: true,
+                    allowedNames: [],
                     classPropertiesAllowed: false,
                     disallowPrototype: false,
                     returnStyle: 'unchanged',
@@ -838,33 +1206,34 @@ const config = tseslint.config(
     sonarjs.configs.recommended,
     {
         rules: {
+
+            // Prüft implizite Dependencies
+            'sonarjs/arguments-usage': 'error',
+
+            // Erzwingt else-Block für Vollständigkeit
+            'sonarjs/bool-param-default': 'error',
+
+            /*
+             * Verhindert unsichere 'arguments' Nutzung
+             * ===== DEFENSIVE PROGRAMMING (Enterprise Best Practice) =====
+             */
+            'sonarjs/elseif-without-else': 'error',
+
             /*
              * ===== ENTERPRISE-CRITICAL COMPLEXITY RULES =====
              * 'sonarjs/cyclomatic-complexity': 'off', // REDUNDANT: Bereits durch ESLint Core 'complexity' abgedeckt
              * 'sonarjs/max-lines-per-function': 'off', // REDUNDANT: Bereits durch ESLint Core abgedeckt
              */
-
             /*
              * ===== CODE MAINTAINABILITY (Google/Microsoft Standards) =====
              * 'sonarjs/max-lines': ['error', { maximum: 400 }], // covered by eslint/max-lines
              */
-            'sonarjs/expression-complexity': 'error', // Verhindert überkomplexe Ausdrücke
-            'sonarjs/no-duplicate-string': ['error', { threshold: 3 }], // String darf max 2x vorkommen
+            'sonarjs/expression-complexity': 'error',
 
-            // ===== TYPE SAFETY & ARCHITECTURE =====
-            'sonarjs/no-implicit-dependencies': 'error', // Prüft implizite Dependencies
-            'sonarjs/arguments-usage': 'error', // Verhindert unsichere 'arguments' Nutzung
-
-            // ===== DEFENSIVE PROGRAMMING (Enterprise Best Practice) =====
-            'sonarjs/elseif-without-else': 'error', // Erzwingt else-Block für Vollständigkeit
-            'sonarjs/bool-param-default': 'error', // Boolean Parameter brauchen Defaults
-
-            // ===== CODE CLARITY & MODERN SYNTAX =====
-            'sonarjs/no-collapsible-if': 'error', // Vereinfacht verschachtelte if-Statements
-            'sonarjs/prefer-object-literal': 'error', // Moderne Object-Literal Syntax
-            'sonarjs/prefer-immediate-return': 'error', // Return direkt statt Variable
-
-            // ===== FUNCTION DESIGN (Clean Code) =====
+            /*
+             * Return direkt statt Variable
+             * ===== FUNCTION DESIGN (Clean Code) =====
+             */
             'sonarjs/function-name': [
                 'error',
                 {
@@ -872,36 +1241,78 @@ const config = tseslint.config(
                 }
             ],
 
+            // Funktionen sollten nicht immer dasselbe returnen
+            /*
+             * ===== REACT SPECIFIC (Falls React verwendet wird) =====
+             * Diese sind NICHT redundant mit react-plugin, da sie andere Aspekte prüfen
+             */
+            'sonarjs/jsx-no-leaked-render': 'error',
+
+            // Keine verschachtelten switch
+            'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }],
+
+            /*
+             * Boolean Parameter brauchen Defaults
+             * ===== CODE CLARITY & MODERN SYNTAX =====
+             */
+            'sonarjs/no-collapsible-if': 'error',
+
+            // Verhindert überkomplexe Ausdrücke
+            'sonarjs/no-duplicate-string': ['error', { threshold: 3 }],
+
+            /*
+             * Identische Funktionen verhindern
+             * ===== LOOP & CONTROL FLOW SAFETY =====
+             */
+            'sonarjs/no-for-in-iterable': 'error',
+
+            // Verhindert && mit non-boolean
+            'sonarjs/no-hook-setter-in-body': 'error',
+
             // ===== TESTING BEST PRACTICES =====
-            'sonarjs/no-identical-functions': 'error', // Identische Funktionen verhindern
+            'sonarjs/no-identical-functions': 'error',
 
-            // ===== LOOP & CONTROL FLOW SAFETY =====
-            'sonarjs/no-for-in-iterable': 'error', // For...in nicht für Iterables
-            'sonarjs/no-nested-switch': 'error', // Keine verschachtelten switch
-            'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }], // Max 3 Ebenen Verschachtelung
+            /*
+             * Variable naming conventions
+             * ===== ASYNC/PROMISE PATTERNS =====
+             */
+            'sonarjs/no-ignored-return': 'error',
 
+            /*
+             * String darf max 2x vorkommen
+             * ===== TYPE SAFETY & ARCHITECTURE =====
+             */
+            'sonarjs/no-implicit-dependencies': 'error',
+
+            // Return values müssen verwendet werden
+            'sonarjs/no-invariant-returns': 'error',
+
+            // For...in nicht für Iterables
+            'sonarjs/no-nested-switch': 'error',
+
+            /*
+             * ✅ UNIQUE: SonarJS-spezifische Regel
+             * 'sonarjs/no-control-regex': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-control-character
+             * ===== VARIABLE & PARAMETER HYGIENE =====
+             */
+            'sonarjs/no-parameter-reassignment': 'error',
+
+            // Moderne Object-Literal Syntax
+            'sonarjs/prefer-immediate-return': 'error',
+
+            // Vereinfacht verschachtelte if-Statements
+            'sonarjs/prefer-object-literal': 'error',
+
+            // Max 3 Ebenen Verschachtelung
             /*
              * ===== REGEX SAFETY (Performance & Security) =====
              * ENTERPRISE: regexp Plugin hat spezialisiertere Regex-Prüfungen
              * 'sonarjs/no-empty-character-class': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-empty-character-class
              */
-            'sonarjs/single-char-in-character-classes': 'error', // ✅ UNIQUE: SonarJS-spezifische Regel
-            // 'sonarjs/no-control-regex': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-control-character
+            'sonarjs/single-char-in-character-classes': 'error',
 
-            // ===== VARIABLE & PARAMETER HYGIENE =====
-            'sonarjs/no-parameter-reassignment': 'error', // Parameter Reassignment verhindern
-            'sonarjs/variable-name': 'error', // Variable naming conventions
-
-            // ===== ASYNC/PROMISE PATTERNS =====
-            'sonarjs/no-ignored-return': 'error', // Return values müssen verwendet werden
-            'sonarjs/no-invariant-returns': 'error', // Funktionen sollten nicht immer dasselbe returnen
-
-            /*
-             * ===== REACT SPECIFIC (Falls React verwendet wird) =====
-             * Diese sind NICHT redundant mit react-plugin, da sie andere Aspekte prüfen
-             */
-            'sonarjs/jsx-no-leaked-render': 'error', // Verhindert && mit non-boolean
-            'sonarjs/no-hook-setter-in-body': 'error' // UseState nicht direkt in render
+            // Parameter Reassignment verhindern
+            'sonarjs/variable-name': 'error' // UseState nicht direkt in render
         }
     },
 
@@ -914,7 +1325,6 @@ const config = tseslint.config(
                 'error',
                 {
                     case: 'kebabCase',
-                    multipleFileExtensions: true,
                     ignore: [
                         String.raw`^README\.md$`,
                         String.raw`^CHANGELOG\.md$`,
@@ -923,7 +1333,8 @@ const config = tseslint.config(
                         String.raw`^\[.+\]\.(ts|tsx)$`
 
                         // Keep index.* as-is (plugin already ignores index.*)
-                    ]
+                    ],
+                    multipleFileExtensions: true
                 }
             ]
         }
@@ -936,11 +1347,16 @@ const config = tseslint.config(
             n: nodePlugin
         },
         rules: {
+            // Enterprise: Force explicit imports
+            'n/file-extension-in-import': 'off',
+
             'n/no-missing-import': 'off',
+
             'n/no-unpublished-import': 'off',
-            'n/prefer-node-protocol': 'off', // Already handled by unicorn/prefer-node-protocol
-            'n/prefer-global/process': ['error', 'never'], // Enterprise: Force explicit imports
-            'n/file-extension-in-import': 'off' // Off because we use the .ts extension in the imports
+
+            // Already handled by unicorn/prefer-node-protocol
+            'n/prefer-global/process': ['error', 'never'],
+            'n/prefer-node-protocol': 'off' // Off because we use the .ts extension in the imports
         }
     },
 
@@ -954,39 +1370,138 @@ const config = tseslint.config(
     // ===== IMPORT PLUGIN =====
     importPlugin.flatConfigs.typescript,
     {
-        settings: {
-            'import/parsers': {
-                '@typescript-eslint/parser': ['.ts', '.tsx']
-            },
-            'import/resolver': {
-                typescript: {
-                    alwaysTryTypes: true,
-                    project: './tsconfig.json',
-                    extensions: [
-                        '.ts',
-                        '.tsx',
-                        '.js',
-                        '.jsx'
-                    ],
-                    paths: {
-                        '@main/*': ['./src/main/*'],
-                        '@/*': ['./src/*']
-                    }
-                },
-                node: {
-                    extensions: [
-                        '.ts',
-                        '.tsx',
-                        '.js',
-                        '.jsx'
-                    ],
-                    paths: ['src']
-                }
-            }
-        },
         rules: {
+
+            // ===== TYPE IMPORTS (TypeScript Specific) =====
+            /*
+             *✅ ==== VERIFIED ====
+             *Import type { Foo } - Enterprise Standard für TypeScript 5.0+
+             */
+            'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+
+            /*
+             * Kein dynamisches require()
+             * ===== EXPORT CONSISTENCY =====
+             */
+            'import/export': 'error',
+
+            /*
+             * Group value exports together
+             * ✅ ==== VERIFIED ====
+             */
+            'import/exports-last': 'off',
+
+            /*
+             * Import {} from 'foo' verhindert
+             * ===== FILE EXTENSIONS (Enterprise Barrel Pattern Standard) =====
+             */
+            /*
+             * ✅ ==== VERIFIED ====
+             * Optimal für Enterprise: Barrel Pattern + direkte .ts Imports
+             */
+            'import/extensions': [
+                'error',
+                'ignorePackages',
+                {
+                    // Daten: ./config.json (explizit)
+                    css: 'always',
+
+                    js: 'never',
+
+                    // React TS: ./Component (Barrel Pattern)
+                    json: 'always',
+
+                    // JavaScript: ./file (ohne .js für Node-Kompatibilität)
+                    jsx: 'never',
+
+                    // Styles: ./styles.css (explizit)
+                    scss: 'always',
+
+                    // React JS: ./Component (ohne .jsx)
+                    ts: 'never',
+
+                    // TypeScript: ./core (Barrel) - Enterprise Standard
+                    tsx: 'never' // Sass: ./styles.scss (explizit)
+                }
+            ],
+
             // ===== IMPORT ORDER & STYLE (Google/Airbnb Standards) =====
             'import/first': 'error',
+
+            /*
+             * ===== ENTERPRISE EXPORT STRATEGY =====
+             * Types/Interfaces: Export at definition site (Enterprise Standard)
+             * Values/Functions: Group exports at end when beneficial
+             * ✅ ==== VERIFIED ====
+             */
+            'import/group-exports': 'error',
+
+            // Google/Microsoft Standard: NEVER use default exports
+            'import/max-dependencies': [
+                'error',
+                {
+                    // Maximale Dependencies pro File
+                    ignoreTypeImports: true,
+                    max: 15
+                }
+            ],
+
+            // ===== CODE STYLE =====
+            'import/newline-after-import': [
+                'error',
+                {
+                    considerComments: true,
+                    count: 1
+                }
+            ],
+
+            'import/no-absolute-path': 'error',
+
+            // Pure ES Modules (für Tree-shaking)
+            'import/no-amd': 'error',
+
+            /*
+             * Named exports bevorzugt
+             * ✅ ==== VERIFIED ====
+             */
+            'import/no-anonymous-default-export': [
+                'error',
+                {
+                    allowAnonymousClass: false,
+
+                    allowAnonymousFunction: false,
+
+                    // Named Defaults
+                    allowArray: false,
+                    allowArrowFunction: false,
+                    allowCallExpression: false,
+                    allowLiteral: false,
+                    allowNew: false,
+                    allowObject: false
+                }
+            ],
+
+            // Immutable Exports
+            'import/no-commonjs': 'error',
+
+            // ===== PERFORMANCE & TREE-SHAKING =====
+            'import/no-cycle': [
+                'error',
+                {
+
+                    allowUnsafeDynamicCyclicDependency: false,
+
+                    // Tiefere Analyse für komplexe Projekte
+                    ignoreExternal: true,
+                    maxDepth: 5
+                }
+            ],
+
+            // ✅ ==== VERIFIED ====
+            'import/no-default-export': 'error',
+
+            // 'import/no-unused-modules': 'off', // Inkompatibel mit Flat Config - siehe https://github.com/import-js/eslint-plugin-import/issues/3079
+            'import/no-deprecated': 'error',
 
             /*
              * ✅ ==== VERIFIED ====
@@ -994,7 +1509,6 @@ const config = tseslint.config(
              *    prefer-inline: false  → verhindert erzwungenes Zusammenführen in ein Statement (erlaubt zwei Imports).
              *    considerQueryString: true → unterstützt Importe mit Query-Strings/Loadern korrekt.
              */
-
             /*
              * ===== ENTERPRISE STANDARD: Type- und Wert-Importe strikt trennen (Top-Level `import type`) =====
              * Warum (Rationale):
@@ -1011,110 +1525,54 @@ const config = tseslint.config(
              * - In `import/order` soll `type` als eigene Gruppe konfiguriert sein. Außerdem `pathGroupsExcludedImportTypes: ['type']`,
              *   Damit Typ-Imports separat gruppiert und alphabetisiert werden (bereits in deiner Config vorhanden).
              */
-
             'import/no-duplicates': [
                 'error',
                 {
-                    'prefer-inline': false,
-                    considerQueryString: true
+                    considerQueryString: true,
+                    'prefer-inline': false
                 }
             ],
 
-            /*
-             * ✅ ==== VERIFIED ====
-             * https://github.com/import-js/eslint-plugin-import/blob/HEAD/docs/rules/order.md
-             */
-            'import/order': [
+            // Kein AMD
+            'import/no-dynamic-require': 'error',
+
+            // Kein Mix von import/module.exports
+            'import/no-empty-named-blocks': 'error',
+
+            // ✅ ==== VERIFIED ====
+            'import/no-import-module-exports': 'error',
+
+            // Verhindert Nutzung veralteter APIs
+            'import/no-mutable-exports': 'error',
+
+            // Validiert alle Exports
+            'import/no-named-as-default': 'error',
+
+            // Verhindert Konfusion
+            'import/no-named-as-default-member': 'error',
+
+            // Keine relativen Package-Imports
+            //   'import/no-internal-modules': ['error', {
+            //       'allow': [
+            //           '**/src/**', // Erlaubt interne src imports
+            //           '**/*.types', // Erlaubt .types imports
+            //           '**/constants/*',
+            //           '**/utils/*'
+            //       ]
+            //   }],
+            // ===== NAMING CONVENTIONS =====
+            'import/no-named-export': 'off',
+
+            // Named exports sind erwünscht
+            'import/no-namespace': [
                 'error',
-                {
-                    /*
-                     * ✅ ==== VERIFIED ====
-                     * Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
-                     */
-                    // Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
-                    groups: [
-                        'builtin', // Node.js built-ins
-                        'external', // Npm packages
-                        'internal', // Aliases (z. B. @/**, ~/**)
-                        'parent', // ../
-                        'sibling', // ./
-                        'index', // ./index
-                        'object', // TS: import log = console.log
-                        'type' // TS/Flow: import type { Foo } from 'foo'
-                    ],
-
-                    // Aliase zuerst innerhalb der "internal"-Gruppe
-                    pathGroups: [
-                        {
-                            pattern: '@/**',
-                            group: 'internal',
-                            position: 'before'
-                        },
-                        {
-                            pattern: '~/**',
-                            group: 'internal',
-                            position: 'before'
-                        }
-                    ],
-
-                    /*
-                     * Wichtig: PathGroups nicht auf builtins/external/object/type anwenden
-                     * (verhindert Overreach, entspricht gängiger Praxis)
-                     */
-                    pathGroupsExcludedImportTypes: [
-                        'builtin',
-                        'external',
-                        'object',
-                        'type'
-                    ],
-
-                    /*
-                     * Verhindert "Sub-Group"-Leerzeilen bei pathGroups + newlines-between=always
-                     * (Default wird sich künftig ändern -> explizit setzen für Stabilität)
-                     */
-                    distinctGroup: false,
-
-                    /*
-                     * ✅ ==== VERIFIED ====
-                     * Eine Leerzeile zwischen den Hauptgruppen; keine Leerzeilen innerhalb
-                     */
-                    'newlines-between': 'always-and-inside-groups',
-
-                    /*
-                     * ✅ ==== VERIFIED ====
-                     * Alphabetische Sortierung; Import-Kinds (type/typeof) aufsteigend
-                     */
-                    alphabetize: {
-                        order: 'asc',
-                        orderImportKind: 'asc',
-                        caseInsensitive: true
-                    },
-
-                    // Unassigned (Side-Effect) Imports nicht bewegen, aber warnen
-                    warnOnUnassignedImports: true
+                { // Wildcard imports vermeiden
+                    ignore: ['*.d.ts'] // Außer für Type Definitions
                 }
             ],
 
-            // ===== RESOLUTION & SECURITY (Critical for Enterprise) =====
-            'import/no-unresolved': [
-                'error',
-                {
-                    commonjs: true,
-                    amd: true,
-                    caseSensitive: true, // Linux/Windows Kompatibilität
-                    caseSensitiveStrict: true
-                }
-            ],
-            'import/no-absolute-path': 'error', // Security: Keine absoluten Pfade
-            'import/no-webpack-loader-syntax': 'error', // Keine Webpack-spezifische Syntax
-            'import/no-self-import': 'error', // Verhindert Selbst-Imports
-            'import/no-useless-path-segments': [
-                'error',
-                {
-                    noUselessIndex: true, // Enterprise Standard: ./core statt ./core/index.ts
-                    commonjs: true
-                }
-            ],
+            // ===== MONOREPO & NAMESPACE SUPPORT =====
+            'import/no-relative-packages': 'error',
 
             // ===== DEPENDENCY MANAGEMENT (Enterprise Boundaries) =====
             // Ref: https://github.com/import-js/eslint-plugin-import/issues/496
@@ -1153,130 +1611,22 @@ const config = tseslint.config(
                     zones: [
                         // Domain Boundaries (Clean Architecture)
                         {
-                            target: './src/domain',
                             from: './src/infrastructure',
-                            message: 'Domain should not depend on Infrastructure'
+                            message: 'Domain should not depend on Infrastructure',
+                            target: './src/domain'
                         },
                         {
-                            target: './src/domain',
                             from: './src/application',
-                            message: 'Domain should not depend on Application'
+                            message: 'Domain should not depend on Application',
+                            target: './src/domain'
                         }
                     ]
                 }
             ],
 
-            // ===== PERFORMANCE & TREE-SHAKING =====
-            'import/no-cycle': [
-                'error',
-                {
-                    maxDepth: 5, // Tiefere Analyse für komplexe Projekte
-                    ignoreExternal: true,
-                    allowUnsafeDynamicCyclicDependency: false
-                }
-            ],
+            // Keine Webpack-spezifische Syntax
+            'import/no-self-import': 'error',
 
-            // 'import/no-unused-modules': 'off', // Inkompatibel mit Flat Config - siehe https://github.com/import-js/eslint-plugin-import/issues/3079
-            'import/no-deprecated': 'error', // Verhindert Nutzung veralteter APIs
-            'import/no-mutable-exports': 'error', // Immutable Exports
-            'import/no-commonjs': 'error', // Pure ES Modules (für Tree-shaking)
-            'import/no-amd': 'error', // Kein AMD
-            'import/no-dynamic-require': 'error', // Kein dynamisches require()
-
-            // ===== EXPORT CONSISTENCY =====
-            'import/export': 'error', // Validiert alle Exports
-            'import/no-named-as-default': 'error', // Verhindert Konfusion
-            'import/no-named-as-default-member': 'error',
-
-            // ===== TYPE IMPORTS (TypeScript Specific) =====
-
-            /*
-             *✅ ==== VERIFIED ====
-             *Import type { Foo } - Enterprise Standard für TypeScript 5.0+
-             */
-            'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
-
-            // ✅ ==== VERIFIED ====
-            'import/no-import-module-exports': 'error', // Kein Mix von import/module.exports
-            'import/no-empty-named-blocks': 'error', // Import {} from 'foo' verhindert
-
-            // ===== FILE EXTENSIONS (Enterprise Barrel Pattern Standard) =====
-
-            /*
-             * ✅ ==== VERIFIED ====
-             * Optimal für Enterprise: Barrel Pattern + direkte .ts Imports
-             */
-            'import/extensions': [
-                'error',
-                'ignorePackages',
-                {
-                    js: 'never', // JavaScript: ./file (ohne .js für Node-Kompatibilität)
-                    jsx: 'never', // React JS: ./Component (ohne .jsx)
-                    ts: 'never', // TypeScript: ./core (Barrel) - Enterprise Standard
-                    tsx: 'never', // React TS: ./Component (Barrel Pattern)
-                    json: 'always', // Daten: ./config.json (explizit)
-                    css: 'always', // Styles: ./styles.css (explizit)
-                    scss: 'always' // Sass: ./styles.scss (explizit)
-                }
-            ],
-
-            // ===== MONOREPO & NAMESPACE SUPPORT =====
-            'import/no-relative-packages': 'error', // Keine relativen Package-Imports
-            //   'import/no-internal-modules': ['error', {
-            //       'allow': [
-            //           '**/src/**', // Erlaubt interne src imports
-            //           '**/*.types', // Erlaubt .types imports
-            //           '**/constants/*',
-            //           '**/utils/*'
-            //       ]
-            //   }],
-
-            // ===== NAMING CONVENTIONS =====
-            'import/no-named-export': 'off', // Named exports sind erwünscht
-            'import/no-namespace': [
-                'error',
-                { // Wildcard imports vermeiden
-                    ignore: ['*.d.ts'] // Außer für Type Definitions
-                }
-            ],
-
-            // ✅ ==== VERIFIED ====
-            'import/prefer-default-export': 'off', // Named exports bevorzugt
-
-            // ✅ ==== VERIFIED ====
-            'import/no-anonymous-default-export': [
-                'error',
-                { // Named Defaults
-                    allowArray: false,
-                    allowArrowFunction: false,
-                    allowAnonymousClass: false,
-                    allowAnonymousFunction: false,
-                    allowCallExpression: false,
-                    allowNew: false,
-                    allowObject: false,
-                    allowLiteral: false
-                }
-            ],
-
-            // ✅ ==== VERIFIED ====
-            'import/no-default-export': 'error', // Google/Microsoft Standard: NEVER use default exports
-
-            'import/max-dependencies': [
-                'error',
-                {
-                    max: 15, // Maximale Dependencies pro File
-                    ignoreTypeImports: true
-                }
-            ],
-
-            // ===== CODE STYLE =====
-            'import/newline-after-import': [
-                'error',
-                {
-                    count: 1,
-                    considerComments: true
-                }
-            ],
             'import/no-unassigned-import': [
                 'error',
                 {
@@ -1291,16 +1641,140 @@ const config = tseslint.config(
                 }
             ],
 
+            // ===== RESOLUTION & SECURITY (Critical for Enterprise) =====
+            'import/no-unresolved': [
+                'error',
+                {
+                    amd: true,
+                    caseSensitive: true,
+
+                    // Linux/Windows Kompatibilität
+                    caseSensitiveStrict: true,
+                    commonjs: true
+                }
+            ],
+
+            // Verhindert Selbst-Imports
+            'import/no-useless-path-segments': [
+                'error',
+                {
+                    // Enterprise Standard: ./core statt ./core/index.ts
+                    commonjs: true,
+                    noUselessIndex: true
+                }
+            ],
+
+            // Security: Keine absoluten Pfade
+            'import/no-webpack-loader-syntax': 'error',
+
             /*
-             * ===== ENTERPRISE EXPORT STRATEGY =====
-             * Types/Interfaces: Export at definition site (Enterprise Standard)
-             * Values/Functions: Group exports at end when beneficial
              * ✅ ==== VERIFIED ====
+             * https://github.com/import-js/eslint-plugin-import/blob/HEAD/docs/rules/order.md
              */
-            'import/group-exports': 'error', // Group value exports together
+            'import/order': [
+                'error',
+                {
+
+                    /*
+                     * ✅ ==== VERIFIED ====
+                     * Alphabetische Sortierung; Import-Kinds (type/typeof) aufsteigend
+                     */
+                    alphabetize: {
+                        caseInsensitive: true,
+                        order: 'asc',
+                        orderImportKind: 'asc'
+                    },
+
+                    /*
+                     * Verhindert "Sub-Group"-Leerzeilen bei pathGroups + newlines-between=always
+                     * (Default wird sich künftig ändern -> explizit setzen für Stabilität)
+                     */
+                    distinctGroup: false,
+
+                    /*
+                     * ✅ ==== VERIFIED ====
+                     * Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
+                     */
+                    // Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
+                    groups: [
+                        'builtin', // Node.js built-ins
+                        'external', // Npm packages
+                        'internal', // Aliases (z. B. @/**, ~/**)
+                        'parent', // ../
+                        'sibling', // ./
+                        'index', // ./index
+                        'object', // TS: import log = console.log
+                        'type' // TS/Flow: import type { Foo } from 'foo'
+                    ],
+
+                    /*
+                     * ✅ ==== VERIFIED ====
+                     * Eine Leerzeile zwischen den Hauptgruppen; keine Leerzeilen innerhalb
+                     */
+                    'newlines-between': 'always-and-inside-groups',
+
+                    // Aliase zuerst innerhalb der "internal"-Gruppe
+                    pathGroups: [
+                        {
+                            group: 'internal',
+                            pattern: '@/**',
+                            position: 'before'
+                        },
+                        {
+                            group: 'internal',
+                            pattern: '~/**',
+                            position: 'before'
+                        }
+                    ],
+
+                    /*
+                     * Wichtig: PathGroups nicht auf builtins/external/object/type anwenden
+                     * (verhindert Overreach, entspricht gängiger Praxis)
+                     */
+                    pathGroupsExcludedImportTypes: [
+                        'builtin',
+                        'external',
+                        'object',
+                        'type'
+                    ],
+
+                    // Unassigned (Side-Effect) Imports nicht bewegen, aber warnen
+                    warnOnUnassignedImports: true
+                }
+            ],
 
             // ✅ ==== VERIFIED ====
-            'import/exports-last': 'off'
+            'import/prefer-default-export': 'off'
+        },
+        settings: {
+            'import/parsers': {
+                '@typescript-eslint/parser': ['.ts', '.tsx']
+            },
+            'import/resolver': {
+                node: {
+                    extensions: [
+                        '.ts',
+                        '.tsx',
+                        '.js',
+                        '.jsx'
+                    ],
+                    paths: ['src']
+                },
+                typescript: {
+                    alwaysTryTypes: true,
+                    extensions: [
+                        '.ts',
+                        '.tsx',
+                        '.js',
+                        '.jsx'
+                    ],
+                    paths: {
+                        '@/*': ['./src/*'],
+                        '@main/*': ['./src/main/*']
+                    },
+                    project: './tsconfig.json'
+                }
+            }
         }
     },
 
@@ -1317,237 +1791,26 @@ const config = tseslint.config(
             '@stylistic': stylistic
         },
         rules: {
-            // ===== SPACING & INDENTATION =====
-            '@stylistic/indent': [
-                'error',
-                4,
-                {
-                    SwitchCase: 1,
-                    VariableDeclarator: 1,
-                    outerIIFEBody: 1,
-                    MemberExpression: 1,
-                    FunctionDeclaration: {
-                        parameters: 1,
-                        body: 1
-                    },
-                    FunctionExpression: {
-                        parameters: 1,
-                        body: 1
-                    },
-                    CallExpression: {
-                        arguments: 1
-                    },
-                    ArrayExpression: 1,
-                    ObjectExpression: 1,
-                    ImportDeclaration: 1,
-                    flatTernaryExpressions: false,
-                    offsetTernaryExpressions: true,
-                    ignoreComments: false
-                }
-            ],
-            '@stylistic/indent-binary-ops': ['error', 4],
-            '@stylistic/key-spacing': [
-                'error',
-                {
-                    beforeColon: false,
-                    afterColon: true,
-                    mode: 'strict'
-                }
-            ],
-            '@stylistic/keyword-spacing': [
-                'error',
-                {
-                    before: true,
-                    after: true,
-                    overrides: {
-                        return: { after: true },
-                        throw: { after: true },
-                        case: { after: true }
-                    }
-                }
-            ],
-            '@stylistic/space-before-blocks': ['error', 'always'],
-            '@stylistic/space-before-function-paren': [
-                'error',
-                {
-                    anonymous: 'never',
-                    named: 'never',
-                    asyncArrow: 'always'
-                }
-            ],
-            '@stylistic/space-in-parens': ['error', 'never'],
-            '@stylistic/space-infix-ops': ['error', { int32Hint: false }],
-            '@stylistic/space-unary-ops': [
-                'error',
-                {
-                    words: true,
-                    nonwords: false,
-                    overrides: {}
-                }
-            ],
-            '@stylistic/spaced-comment': [
-                'error',
-                'always',
-                {
-                    line: {
-                        exceptions: ['-', '+'],
-                        markers: [
-                            '=',
-                            '!',
-                            '/'
-                        ]
-                    },
-                    block: {
-                        exceptions: ['-', '+'],
-                        markers: [
-                            '=',
-                            '!',
-                            ':',
-                            '::'
-                        ],
-                        balanced: true
-                    }
-                }
-            ],
-
-            // ===== LINE BREAKS & WRAPPING =====
-            '@stylistic/max-len': [
-                'error',
-                {
-                    code: 120, // Enterprise Standard: 100 ist der moderne Sweet Spot
-                    tabWidth: 4,
-                    ignoreUrls: true,
-                    ignoreStrings: false,
-                    ignoreTemplateLiterals: false,
-                    ignoreRegExpLiterals: true,
-                    ignoreComments: true,
-                    ignorePattern: String.raw`^import\s.+\sfrom\s.+;$` // Allow long import statements
-                }
-            ],
-            '@stylistic/max-statements-per-line': ['error', { max: 1 }],
-            '@stylistic/newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
-            '@stylistic/operator-linebreak': [
-                'error',
-                'before',
-                {
-                    overrides: {
-                        '=': 'none',
-                        '+=': 'none',
-                        '-=': 'none',
-                        '*=': 'none',
-                        '/=': 'none',
-                        '%=': 'none'
-                    }
-                }
-            ],
-            '@stylistic/linebreak-style': ['error', 'unix'],
-            '@stylistic/eol-last': ['error', 'always'],
-            '@stylistic/no-multiple-empty-lines': [
-                'error',
-                {
-                    max: 1,
-                    maxEOF: 0,
-                    maxBOF: 0
-                }
-            ],
-            '@stylistic/no-trailing-spaces': [
-                'error',
-                {
-                    skipBlankLines: false,
-                    ignoreComments: false
-                }
-            ],
-            '@stylistic/nonblock-statement-body-position': ['error', 'below'],
 
             // ===== ARRAYS =====
             '@stylistic/array-bracket-newline': [
                 'error',
                 {
-                    multiline: true,
-                    minItems: 3
+                    minItems: 3,
+                    multiline: true
                 }
             ],
+
             '@stylistic/array-bracket-spacing': ['error', 'never'],
+
             '@stylistic/array-element-newline': [
                 'error',
                 {
-                    multiline: true,
-                    minItems: 3
+                    minItems: 3,
+                    multiline: true
                 }
             ],
 
-            // ===== OBJECTS =====
-
-            // ✅ ==== VERIFIED ====
-            '@stylistic/object-curly-spacing': ['error', 'always'],
-
-            // ✅ ==== VERIFIED ====
-            '@stylistic/object-curly-newline': [
-                'error',
-                {
-                    ObjectExpression: {
-                        multiline: true,
-                        minProperties: 2,
-                        consistent: true
-                    },
-                    ObjectPattern: {
-                        multiline: true,
-                        minProperties: 3,
-                        consistent: false
-                    },
-                    ImportDeclaration: {
-                        minProperties: 3,
-                        consistent: false
-                    },
-                    ExportDeclaration: {
-                        multiline: true,
-                        minProperties: 3,
-                        consistent: true
-                    },
-
-                    // ===== ENTERPRISE TYPE SAFETY: TypeScript Return-Type Formatting =====
-                    TSTypeLiteral: {
-                        multiline: true,
-                        minProperties: 1, // STRICT: Schon ab 1 Property neue Zeilen erzwingen
-                        consistent: true
-                    },
-                    TSInterfaceBody: {
-                        multiline: true,
-                        minProperties: 1, // CONSISTENT: Gleiche Regeln für Interface Bodies
-                        consistent: true
-                    },
-                    TSEnumBody: {
-                        multiline: true,
-                        minProperties: 1, // CONSISTENT: Gleiche Regeln für Enum Bodies
-                        consistent: true
-                    }
-                }
-            ],
-
-            '@stylistic/object-property-newline': [
-                'error',
-                {
-                    allowAllPropertiesOnSameLine: false
-                }
-            ],
-            '@stylistic/quote-props': [
-                'error',
-                'as-needed',
-                {
-                    keywords: false,
-                    unnecessary: true,
-                    numbers: false
-                }
-            ],
-
-            /*
-             * ===== FUNCTIONS =====
-             * ✅ ==== VERIFIED ====
-             */
-            '@stylistic/function-paren-newline': ['error', 'consistent'], // We use custom rules for formatting function definitions
-
-            '@stylistic/function-call-argument-newline': ['error', 'consistent'],
-            '@stylistic/function-call-spacing': ['error', 'never'],
             '@stylistic/arrow-parens': [
                 'error',
                 'as-needed',
@@ -1559,24 +1822,14 @@ const config = tseslint.config(
             '@stylistic/arrow-spacing': [
                 'error',
                 {
-                    before: true,
-                    after: true
+                    after: true,
+                    before: true
                 }
             ],
 
-            // ✅ ==== VERIFIED ====
-            '@stylistic/implicit-arrow-linebreak': ['error', 'below'],
-
-            '@stylistic/wrap-iife': [
-                'error',
-                'inside',
-                {
-                    functionPrototypeMethods: true
-                }
-            ],
+            '@stylistic/block-spacing': ['error', 'always'],
 
             // ===== BLOCKS & BRACES =====
-
             /*
              * ✅ ==== VERIFIED ====
              * 1tbs: One True Brace Style (Enterprise Standard)
@@ -1589,110 +1842,343 @@ const config = tseslint.config(
                     allowSingleLine: false
                 }
             ],
-            '@stylistic/block-spacing': ['error', 'always'],
-            '@stylistic/padded-blocks': [
-                'error',
-                'never',
-                {
-                    allowSingleLineBlocks: false
-                }
-            ],
-            '@stylistic/curly-newline': ['error'],
 
             // ===== PUNCTUATION =====
             '@stylistic/comma-dangle': [
                 'error',
                 {
                     arrays: 'never',
-                    objects: 'never',
-                    imports: 'never',
                     exports: 'never',
-                    functions: 'never'
+                    functions: 'never',
+                    imports: 'never',
+                    objects: 'never'
                 }
             ],
+
             '@stylistic/comma-spacing': [
                 'error',
                 {
-                    before: false,
-                    after: true
+                    after: true,
+                    before: false
                 }
             ],
+
             '@stylistic/comma-style': ['error', 'last'],
-            '@stylistic/semi': [
-                'error',
-                'never',
-                {
-                    beforeStatementContinuationChars: 'never'
-                }
-            ],
-            '@stylistic/semi-spacing': [
-                'error',
-                {
-                    before: false,
-                    after: true
-                }
-            ],
-            '@stylistic/semi-style': ['error', 'last'],
-            '@stylistic/quotes': [
-                'error',
-                'single',
-                {
-                    avoidEscape: true,
-                    allowTemplateLiterals: 'never'
-                }
-            ],
-            '@stylistic/template-curly-spacing': ['error', 'never'],
-            '@stylistic/template-tag-spacing': ['error', 'never'],
 
             // ===== MISC FORMATTING =====
             '@stylistic/computed-property-spacing': ['error', 'never'],
+
+            '@stylistic/curly-newline': ['error'],
+
             '@stylistic/dot-location': ['error', 'property'],
+
+            '@stylistic/eol-last': ['error', 'always'],
+
+            // We use custom rules for formatting function definitions
+            '@stylistic/function-call-argument-newline': ['error', 'consistent'],
+
+            '@stylistic/function-call-spacing': ['error', 'never'],
+
+            /*
+             * ===== FUNCTIONS =====
+             * ✅ ==== VERIFIED ====
+             */
+            '@stylistic/function-paren-newline': ['error', 'consistent'],
+
             '@stylistic/generator-star-spacing': [
                 'error',
                 {
+                    after: false,
+                    before: true
+                }
+            ],
+
+            // ✅ ==== VERIFIED ====
+            '@stylistic/implicit-arrow-linebreak': ['error', 'below'],
+
+            // ===== SPACING & INDENTATION =====
+            '@stylistic/indent': [
+                'error',
+                4,
+                {
+                    ArrayExpression: 1,
+                    CallExpression: {
+                        arguments: 1
+                    },
+                    FunctionDeclaration: {
+                        body: 1,
+                        parameters: 1
+                    },
+                    FunctionExpression: {
+                        body: 1,
+                        parameters: 1
+                    },
+                    ImportDeclaration: 1,
+                    MemberExpression: 1,
+                    ObjectExpression: 1,
+                    SwitchCase: 1,
+                    VariableDeclarator: 1,
+                    flatTernaryExpressions: false,
+                    ignoreComments: false,
+                    offsetTernaryExpressions: true,
+                    outerIIFEBody: 1
+                }
+            ],
+
+            '@stylistic/indent-binary-ops': ['error', 4],
+
+            '@stylistic/jsx-child-element-spacing': ['error'],
+
+            '@stylistic/jsx-closing-bracket-location': ['error', 'line-aligned'],
+
+            '@stylistic/jsx-closing-tag-location': ['error'],
+
+            '@stylistic/jsx-curly-brace-presence': [
+                'error',
+                {
+                    children: 'never',
+                    props: 'never'
+                }
+            ],
+
+            '@stylistic/jsx-curly-newline': [
+                'error',
+                {
+                    multiline: 'consistent',
+                    singleline: 'forbid'
+                }
+            ],
+
+            '@stylistic/jsx-curly-spacing': [
+                'error',
+                {
+                    children: true,
+                    when: 'never'
+                }
+            ],
+
+            '@stylistic/jsx-equals-spacing': ['error', 'never'],
+
+            '@stylistic/jsx-first-prop-new-line': ['error', 'multiline'],
+
+            '@stylistic/jsx-function-call-newline': ['error', 'multiline'],
+
+            // '@stylistic/jsx-indent': deprecated - use '@stylistic/indent' instead
+            '@stylistic/jsx-indent-props': ['error', 4],
+
+            '@stylistic/jsx-max-props-per-line': [
+                'error',
+                {
+                    maximum: 1,
+                    when: 'multiline'
+                }
+            ],
+
+            '@stylistic/jsx-one-expression-per-line': [
+                'error',
+                {
+                    allow: 'single-child'
+                }
+            ],
+
+            '@stylistic/jsx-pascal-case': [
+                'error',
+                {
+                    allowAllCaps: false,
+                    allowNamespace: true
+                }
+            ],
+
+            '@stylistic/jsx-props-no-multi-spaces': ['error'],
+
+            // ===== JSX/REACT SPECIFIC (only essential for future React support) =====
+            '@stylistic/jsx-quotes': ['error', 'prefer-double'],
+
+            '@stylistic/jsx-self-closing-comp': [
+                'error',
+                {
+                    component: true,
+                    html: true
+                }
+            ],
+
+            '@stylistic/jsx-sort-props': [
+                'error',
+                {
+                    callbacksLast: true,
+                    ignoreCase: true,
+                    multiline: 'last',
+                    reservedFirst: true,
+                    shorthandFirst: true
+                }
+            ],
+
+            '@stylistic/jsx-tag-spacing': [
+                'error',
+                {
+                    afterOpening: 'never',
+                    beforeClosing: 'never',
+                    beforeSelfClosing: 'always',
+                    closingSlash: 'never'
+                }
+            ],
+
+            '@stylistic/jsx-wrap-multilines': [
+                'error',
+                {
+                    arrow: 'parens-new-line',
+                    assignment: 'parens-new-line',
+                    condition: 'parens-new-line',
+                    declaration: 'parens-new-line',
+                    logical: 'parens-new-line',
+                    prop: 'parens-new-line',
+                    return: 'parens-new-line'
+                }
+            ],
+
+            '@stylistic/key-spacing': [
+                'error',
+                {
+                    afterColon: true,
+                    beforeColon: false,
+                    mode: 'strict'
+                }
+            ],
+
+            '@stylistic/keyword-spacing': [
+                'error',
+                {
+                    after: true,
                     before: true,
-                    after: false
+                    overrides: {
+                        case: { after: true },
+                        return: { after: true },
+                        throw: { after: true }
+                    }
                 }
             ],
-            '@stylistic/yield-star-spacing': [
+
+            /*
+             * Note: jsx-newline rule removed due to compatibility issues
+             * ===== COMMENTS & DOCUMENTATION =====
+             */
+            '@stylistic/line-comment-position': [
                 'error',
                 {
-                    before: false,
-                    after: true
+                    applyDefaultIgnorePatterns: true,
+                    ignorePattern: 'eslint|jshint|global',
+                    position: 'above'
                 }
             ],
-            '@stylistic/switch-colon-spacing': [
+
+            '@stylistic/linebreak-style': ['error', 'unix'],
+
+            '@stylistic/lines-around-comment': [
                 'error',
                 {
-                    before: false,
-                    after: true
+                    afterBlockComment: false,
+                    afterLineComment: false,
+                    allowArrayEnd: true,
+                    allowArrayStart: true,
+                    allowBlockEnd: true,
+                    allowBlockStart: true,
+                    allowClassEnd: true,
+                    allowClassStart: true,
+                    allowObjectEnd: true,
+                    allowObjectStart: true,
+                    applyDefaultIgnorePatterns: true,
+                    beforeBlockComment: true,
+                    beforeLineComment: true
                 }
             ],
+
+            // ===== CLASS MEMBERS =====
+            '@stylistic/lines-between-class-members': [
+                'error',
+                'always',
+                {
+                    exceptAfterOverload: true,
+                    exceptAfterSingleLine: false
+                }
+            ],
+
+            // ===== LINE BREAKS & WRAPPING =====
+            '@stylistic/max-len': [
+                'error',
+                {
+                    code: 120,
+                    ignoreComments: true,
+
+                    ignorePattern: String.raw`^import\s.+\sfrom\s.+;$`,
+
+                    ignoreRegExpLiterals: true,
+
+                    ignoreStrings: false,
+
+                    ignoreTemplateLiterals: false,
+
+                    ignoreUrls: true,
+
+                    // Enterprise Standard: 100 ist der moderne Sweet Spot
+                    tabWidth: 4 // Allow long import statements
+                }
+            ],
+
+            '@stylistic/max-statements-per-line': ['error', { max: 1 }],
+
+            '@stylistic/member-delimiter-style': [
+                'error',
+                {
+                    multiline: {
+                        delimiter: 'none',
+                        requireLast: false
+                    },
+                    singleline: {
+                        delimiter: 'semi',
+                        requireLast: false
+                    }
+                }
+            ],
+
+            '@stylistic/multiline-comment-style': ['error', 'starred-block'],
+
+            // ===== TERNARY =====
+            '@stylistic/multiline-ternary': ['error', 'always-multiline'],
+
+            '@stylistic/new-parens': ['error', 'always'],
+
+            '@stylistic/newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
+
             '@stylistic/no-confusing-arrow': [
                 'error',
                 {
                     allowParens: true
                 }
             ],
+
             '@stylistic/no-extra-parens': [
                 'error',
                 'all',
                 {
                     conditionalAssign: false,
-                    returnAssign: false,
-                    nestedBinaryExpressions: false,
-                    ignoreJSX: 'all',
                     enforceForArrowConditionals: false,
-                    enforceForSequenceExpressions: false,
+                    enforceForFunctionPrototypeMethods: false,
                     enforceForNewInMemberExpressions: false,
-                    enforceForFunctionPrototypeMethods: false
+                    enforceForSequenceExpressions: false,
+                    ignoreJSX: 'all',
+                    nestedBinaryExpressions: false,
+                    returnAssign: false
                 }
             ],
+
             '@stylistic/no-extra-semi': ['error'],
+
             '@stylistic/no-floating-decimal': ['error'],
+
             '@stylistic/no-mixed-operators': [
                 'error',
                 {
+                    allowSamePrecedence: true,
                     groups: [
                         ['%', '**'],
                         ['%', '+'],
@@ -1714,255 +2200,332 @@ const config = tseslint.config(
                             '!=='
                         ],
                         ['&&', '||']
-                    ],
-                    allowSamePrecedence: true
+                    ]
                 }
             ],
+
             '@stylistic/no-mixed-spaces-and-tabs': ['error'],
+
             '@stylistic/no-multi-spaces': [
                 'error',
                 {
-                    ignoreEOLComments: false,
-                    exceptions: {}
+                    exceptions: {},
+                    ignoreEOLComments: false
                 }
             ],
+
+            '@stylistic/no-multiple-empty-lines': [
+                'error',
+                {
+                    max: 1,
+                    maxBOF: 0,
+                    maxEOF: 0
+                }
+            ],
+
             '@stylistic/no-tabs': ['error'],
+
+            '@stylistic/no-trailing-spaces': [
+                'error',
+                {
+                    ignoreComments: false,
+                    skipBlankLines: false
+                }
+            ],
+
             '@stylistic/no-whitespace-before-property': ['error'],
+
+            '@stylistic/nonblock-statement-body-position': ['error', 'below'],
+
+            // ✅ ==== VERIFIED ====
+            '@stylistic/object-curly-newline': [
+                'error',
+                {
+                    ExportDeclaration: {
+                        consistent: true,
+                        minProperties: 3,
+                        multiline: true
+                    },
+                    ImportDeclaration: {
+                        consistent: false,
+                        minProperties: 3
+                    },
+                    ObjectExpression: {
+                        consistent: true,
+                        minProperties: 2,
+                        multiline: true
+                    },
+                    ObjectPattern: {
+                        consistent: false,
+                        minProperties: 3,
+                        multiline: true
+                    },
+
+                    TSEnumBody: {
+                        // CONSISTENT: Gleiche Regeln für Enum Bodies
+                        consistent: true,
+
+                        minProperties: 1,
+                        multiline: true
+                    },
+
+                    TSInterfaceBody: {
+                        // CONSISTENT: Gleiche Regeln für Interface Bodies
+                        consistent: true,
+
+                        minProperties: 1,
+                        multiline: true
+                    },
+
+                    // ===== ENTERPRISE TYPE SAFETY: TypeScript Return-Type Formatting =====
+                    TSTypeLiteral: {
+                        // STRICT: Schon ab 1 Property neue Zeilen erzwingen
+                        consistent: true,
+
+                        minProperties: 1,
+                        multiline: true
+                    }
+                }
+            ],
+
+            /*
+             * ===== OBJECTS =====
+             * ✅ ==== VERIFIED ====
+             */
+            '@stylistic/object-curly-spacing': ['error', 'always'],
+
+            '@stylistic/object-property-newline': [
+                'error',
+                {
+                    allowAllPropertiesOnSameLine: false
+                }
+            ],
+
+            '@stylistic/one-var-declaration-per-line': ['error', 'always'],
+
+            '@stylistic/operator-linebreak': [
+                'error',
+                'before',
+                {
+                    overrides: {
+                        '%=': 'none',
+                        '*=': 'none',
+                        '+=': 'none',
+                        '-=': 'none',
+                        '/=': 'none',
+                        '=': 'none'
+                    }
+                }
+            ],
+
+            '@stylistic/padded-blocks': [
+                'error',
+                'never',
+                {
+                    allowSingleLineBlocks: false
+                }
+            ],
+
+            '@stylistic/padding-line-between-statements': [
+                'error',
+                {
+                    blankLine: 'always',
+                    next: '*',
+                    prev: 'directive'
+                },
+                {
+                    blankLine: 'any',
+                    next: 'directive',
+                    prev: 'directive'
+                },
+                {
+                    blankLine: 'always',
+                    next: '*',
+                    prev: [
+                        'const',
+                        'let',
+                        'var'
+                    ]
+                },
+                {
+                    blankLine: 'any',
+                    next: [
+                        'const',
+                        'let',
+                        'var'
+                    ],
+                    prev: [
+                        'const',
+                        'let',
+                        'var'
+                    ]
+                },
+                {
+                    blankLine: 'always',
+                    next: 'return',
+                    prev: '*'
+                },
+                {
+                    blankLine: 'always',
+                    next: [
+                        'if',
+                        'try',
+                        'class',
+                        'export'
+                    ],
+                    prev: '*'
+                },
+                {
+                    blankLine: 'always',
+                    next: '*',
+                    prev: [
+                        'if',
+                        'try',
+                        'class',
+                        'export'
+                    ]
+                },
+                {
+                    blankLine: 'any',
+                    next: ['export'],
+                    prev: ['export']
+                }
+            ],
+
+            '@stylistic/quote-props': [
+                'error',
+                'as-needed',
+                {
+                    keywords: false,
+                    numbers: false,
+                    unnecessary: true
+                }
+            ],
+
+            '@stylistic/quotes': [
+                'error',
+                'single',
+                {
+                    allowTemplateLiterals: 'never',
+                    avoidEscape: true
+                }
+            ],
+
             '@stylistic/rest-spread-spacing': ['error', 'never'],
-            '@stylistic/wrap-regex': ['error'],
+
+            '@stylistic/semi': [
+                'error',
+                'never',
+                {
+                    beforeStatementContinuationChars: 'never'
+                }
+            ],
+
+            '@stylistic/semi-spacing': [
+                'error',
+                {
+                    after: true,
+                    before: false
+                }
+            ],
+
+            '@stylistic/semi-style': ['error', 'last'],
+
+            '@stylistic/space-before-blocks': ['error', 'always'],
+
+            '@stylistic/space-before-function-paren': [
+                'error',
+                {
+                    anonymous: 'never',
+                    asyncArrow: 'always',
+                    named: 'never'
+                }
+            ],
+
+            '@stylistic/space-in-parens': ['error', 'never'],
+
+            '@stylistic/space-infix-ops': ['error', { int32Hint: false }],
+
+            '@stylistic/space-unary-ops': [
+                'error',
+                {
+                    nonwords: false,
+                    overrides: {},
+                    words: true
+                }
+            ],
+
+            '@stylistic/spaced-comment': [
+                'error',
+                'always',
+                {
+                    block: {
+                        balanced: true,
+                        exceptions: ['-', '+'],
+                        markers: [
+                            '=',
+                            '!',
+                            ':',
+                            '::'
+                        ]
+                    },
+                    line: {
+                        exceptions: ['-', '+'],
+                        markers: [
+                            '=',
+                            '!',
+                            '/'
+                        ]
+                    }
+                }
+            ],
+
+            '@stylistic/switch-colon-spacing': [
+                'error',
+                {
+                    after: true,
+                    before: false
+                }
+            ],
+
+            '@stylistic/template-curly-spacing': ['error', 'never'],
+
+            '@stylistic/template-tag-spacing': ['error', 'never'],
 
             // ===== TYPESCRIPT SPECIFIC =====
             '@stylistic/type-annotation-spacing': [
                 'error',
                 {
-                    before: false,
                     after: true,
+                    before: false,
                     overrides: {
                         arrow: {
-                            before: true,
-                            after: true
+                            after: true,
+                            before: true
                         }
                     }
                 }
             ],
+
             '@stylistic/type-generic-spacing': ['error'],
+
             '@stylistic/type-named-tuple-spacing': ['error'],
-            '@stylistic/member-delimiter-style': [
-                'error',
-                {
-                    multiline: {
-                        delimiter: 'none',
-                        requireLast: false
-                    },
-                    singleline: {
-                        delimiter: 'semi',
-                        requireLast: false
-                    }
-                }
-            ],
 
-            // ===== JSX/REACT SPECIFIC (only essential for future React support) =====
-            '@stylistic/jsx-quotes': ['error', 'prefer-double'],
-            '@stylistic/jsx-closing-bracket-location': ['error', 'line-aligned'],
-            '@stylistic/jsx-closing-tag-location': ['error'],
-            '@stylistic/jsx-curly-spacing': [
+            '@stylistic/wrap-iife': [
                 'error',
+                'inside',
                 {
-                    when: 'never',
-                    children: true
+                    functionPrototypeMethods: true
                 }
             ],
-            '@stylistic/jsx-curly-newline': [
+            '@stylistic/wrap-regex': ['error'],
+            '@stylistic/yield-star-spacing': [
                 'error',
                 {
-                    multiline: 'consistent',
-                    singleline: 'forbid'
+                    after: true,
+                    before: false
                 }
-            ],
-            '@stylistic/jsx-equals-spacing': ['error', 'never'],
-            '@stylistic/jsx-first-prop-new-line': ['error', 'multiline'],
-
-            // '@stylistic/jsx-indent': deprecated - use '@stylistic/indent' instead
-            '@stylistic/jsx-indent-props': ['error', 4],
-            '@stylistic/jsx-max-props-per-line': [
-                'error',
-                {
-                    maximum: 1,
-                    when: 'multiline'
-                }
-            ],
-            '@stylistic/jsx-one-expression-per-line': [
-                'error',
-                {
-                    allow: 'single-child'
-                }
-            ],
-            '@stylistic/jsx-props-no-multi-spaces': ['error'],
-            '@stylistic/jsx-tag-spacing': [
-                'error',
-                {
-                    closingSlash: 'never',
-                    beforeSelfClosing: 'always',
-                    afterOpening: 'never',
-                    beforeClosing: 'never'
-                }
-            ],
-            '@stylistic/jsx-wrap-multilines': [
-                'error',
-                {
-                    declaration: 'parens-new-line',
-                    assignment: 'parens-new-line',
-                    return: 'parens-new-line',
-                    arrow: 'parens-new-line',
-                    condition: 'parens-new-line',
-                    logical: 'parens-new-line',
-                    prop: 'parens-new-line'
-                }
-            ],
-            '@stylistic/jsx-self-closing-comp': [
-                'error',
-                {
-                    component: true,
-                    html: true
-                }
-            ],
-            '@stylistic/jsx-sort-props': [
-                'error',
-                {
-                    callbacksLast: true,
-                    shorthandFirst: true,
-                    multiline: 'last',
-                    ignoreCase: true,
-                    reservedFirst: true
-                }
-            ],
-            '@stylistic/jsx-pascal-case': [
-                'error',
-                {
-                    allowAllCaps: false,
-                    allowNamespace: true
-                }
-            ],
-            '@stylistic/jsx-child-element-spacing': ['error'],
-            '@stylistic/jsx-curly-brace-presence': [
-                'error',
-                {
-                    props: 'never',
-                    children: 'never'
-                }
-            ],
-            '@stylistic/jsx-function-call-newline': ['error', 'multiline'],
-
-            // Note: jsx-newline rule removed due to compatibility issues
-
-            // ===== COMMENTS & DOCUMENTATION =====
-            '@stylistic/line-comment-position': [
-                'error',
-                {
-                    position: 'above',
-                    ignorePattern: 'eslint|jshint|global',
-                    applyDefaultIgnorePatterns: true
-                }
-            ],
-            '@stylistic/lines-around-comment': [
-                'error',
-                {
-                    beforeBlockComment: true,
-                    afterBlockComment: false,
-                    beforeLineComment: true,
-                    afterLineComment: false,
-                    allowBlockStart: true,
-                    allowBlockEnd: true,
-                    allowObjectStart: true,
-                    allowObjectEnd: true,
-                    allowArrayStart: true,
-                    allowArrayEnd: true,
-                    allowClassStart: true,
-                    allowClassEnd: true,
-                    applyDefaultIgnorePatterns: true
-                }
-            ],
-            '@stylistic/multiline-comment-style': ['error', 'starred-block'],
-
-            // ===== CLASS MEMBERS =====
-            '@stylistic/lines-between-class-members': [
-                'error',
-                'always',
-                {
-                    exceptAfterSingleLine: false,
-                    exceptAfterOverload: true
-                }
-            ],
-            '@stylistic/padding-line-between-statements': [
-                'error',
-                {
-                    blankLine: 'always',
-                    prev: 'directive',
-                    next: '*'
-                },
-                {
-                    blankLine: 'any',
-                    prev: 'directive',
-                    next: 'directive'
-                },
-                {
-                    blankLine: 'always',
-                    prev: [
-                        'const',
-                        'let',
-                        'var'
-                    ],
-                    next: '*'
-                },
-                {
-                    blankLine: 'any',
-                    prev: [
-                        'const',
-                        'let',
-                        'var'
-                    ],
-                    next: [
-                        'const',
-                        'let',
-                        'var'
-                    ]
-                },
-                {
-                    blankLine: 'always',
-                    prev: '*',
-                    next: 'return'
-                },
-                {
-                    blankLine: 'always',
-                    prev: '*',
-                    next: [
-                        'if',
-                        'try',
-                        'class',
-                        'export'
-                    ]
-                },
-                {
-                    blankLine: 'always',
-                    prev: [
-                        'if',
-                        'try',
-                        'class',
-                        'export'
-                    ],
-                    next: '*'
-                },
-                {
-                    blankLine: 'any',
-                    prev: ['export'],
-                    next: ['export']
-                }
-            ],
-
-            // ===== TERNARY =====
-            '@stylistic/multiline-ternary': ['error', 'always-multiline'],
-            '@stylistic/new-parens': ['error', 'always'],
-            '@stylistic/one-var-declaration-per-line': ['error', 'always']
+            ]
         }
     },
 
@@ -1990,74 +2553,125 @@ const config = tseslint.config(
 
     // ReactPlugin.configs.flat['jsx-runtime'],
     {
-        settings: {
-            react: {
-                version: 'detect',
-
-                // Enterprise settings for better component detection
-                createClass: 'createReactClass',
-                pragma: 'React',
-                fragment: 'Fragment',
-
-                // Support for common HOCs and wrappers
-                componentWrapperFunctions: [
-                    'observer', // MobX
-                    'memo', // React.memo
-                    'forwardRef', // React.forwardRef
-                    { property: 'styled' }, // Styled-components
-                    { property: 'connect' } // Redux
-                ],
-
-                // Form component detection
-                formComponents: [
-                    'Form',
-                    {
-                        name: 'Formik',
-                        formAttribute: 'onSubmit'
-                    }
-                ],
-
-                // Link component detection
-                linkComponents: [
-                    'Link',
-                    {
-                        name: 'NavLink',
-                        linkAttribute: 'to'
-                    },
-                    {
-                        name: 'RouterLink',
-                        linkAttribute: 'to'
-                    }
-                ]
-            },
-
-            // PropTypes wrapper functions (for teams still using PropTypes)
-            propWrapperFunctions: [
-                'forbidExtraProps',
-                {
-                    property: 'freeze',
-                    object: 'Object'
-                },
-                { property: 'myFavoriteWrapper' }
-            ]
-        },
         rules: {
-            // ===== SECURITY & BUG PREVENTION (CRITICAL) =====
-            'react/jsx-no-target-blank': [
+
+            'react-hooks/exhaustive-deps': [
                 'error',
                 {
-                    enforceDynamicLinks: 'always',
-                    warnOnSpreadAttributes: true
+                    enableDangerousAutofixThisMayCauseInfiniteLoops: false
                 }
             ],
-            'react/no-danger-with-children': 'error',
-            'react/jsx-no-script-url': 'error',
-            'react/no-direct-mutation-state': 'error',
-            'react/no-find-dom-node': 'error',
-            'react/no-render-return-value': 'error',
-            'react/no-string-refs': 'error',
-            'react/no-is-mounted': 'error',
-            'react/no-deprecated': 'error',
+
+            // ===== HOOKS BEST PRACTICES (ENTERPRISE STANDARD) =====
+            'react-hooks/rules-of-hooks': 'error',
+
+            /*
+             * Abgedeckt durch @stylistic/jsx-equals-spacing
+             * ===== ZUSÄTZLICHE ENTERPRISE STANDARDS =====
+             */
+            'react/button-has-type': [
+                'error',
+                {
+                    button: true,
+                    reset: true,
+                    submit: true
+                }
+            ],
+
+            /*
+             * ===== DISABLED RULES (ENTERPRISE FLEXIBILITY) =====
+             * Diese Regeln sind aus flat.all übernommen, aber für Enterprise zu restriktiv
+             */
+            'react/destructuring-assignment': 'off',
+
+            // Zu arbiträr, moderne IDEs helfen
+            'react/forbid-prop-types': 'off',
+
+            'react/forward-ref-uses-ref': 'error',
+
+            
+            // TypeScript macht PropTypes obsolet
+'react/display-name': 'off',
+
+            
+// ===== MODERN REACT PATTERNS =====
+'react/function-component-definition': [
+                'error',
+                {
+                    namedComponents: 'arrow-function',
+                    unnamedComponents: 'arrow-function'
+                }
+            ],
+            
+            'react/hook-use-state': [
+                'error',
+                {
+                    allowDestructuredState: true
+                }
+            ],
+
+            // Abgedeckt durch @stylistic/jsx-self-closing-comp
+            'react/jsx-boolean-value': ['error', 'never'],
+
+            /*
+             * ===== JSX FORMATTING =====
+             * WICHTIG: Alle JSX-Formatting-Regeln werden durch @stylistic/* abgedeckt
+             * Diese React-spezifischen Formatting-Regeln sind deaktiviert, um Konflikte zu vermeiden
+             */
+            'react/jsx-closing-bracket-location': 'off',
+
+            // Abgedeckt durch @stylistic/jsx-closing-bracket-location
+            'react/jsx-closing-tag-location': 'off',
+
+            'react/jsx-curly-brace-presence': 'off',
+
+            // Abgedeckt durch @stylistic/jsx-wrap-multilines
+            'react/jsx-curly-spacing': 'off',
+
+            // Abgedeckt durch @stylistic/jsx-curly-spacing
+            'react/jsx-equals-spacing': 'off',
+
+            
+            // Zu restriktiv
+'react/forbid-component-props': 'off',
+
+            
+            
+// Abgedeckt durch @stylistic/jsx-closing-tag-location
+'react/jsx-first-prop-new-line': 'off',
+            
+            // Abgedeckt durch @stylistic/jsx-pascal-case
+            'react/jsx-fragments': ['error', 'syntax'],
+
+            // Zu restriktiv
+'react/forbid-dom-props': 'off',
+
+            
+            
+'react/jsx-handler-names': [
+                'error',
+                {
+                    // Zu restriktiv
+                    checkInlineFunction: false,
+
+                    checkLocalVariables: false,
+
+                    eventHandlerPrefix: 'handle',
+                    eventHandlerPropPrefix: 'on'
+                }
+            ],
+            
+            // Abgedeckt durch @stylistic/jsx-first-prop-new-line
+            'react/jsx-indent': 'off',
+
+            
+            // Zu restriktiv
+'react/forbid-elements': 'off',
+
+            
+// Abgedeckt durch @stylistic/indent (JSX wird mit abgedeckt)
+'react/jsx-indent-props': 'off',
+            
             'react/jsx-key': [
                 'error',
                 {
@@ -2067,127 +2681,219 @@ const config = tseslint.config(
                 }
             ],
 
-            // ===== HOOKS BEST PRACTICES (ENTERPRISE STANDARD) =====
-            'react-hooks/rules-of-hooks': 'error',
-            'react-hooks/exhaustive-deps': [
-                'error',
-                {
-                    enableDangerousAutofixThisMayCauseInfiniteLoops: false
-                }
-            ],
-            'react/hook-use-state': [
-                'error',
-                {
-                    allowDestructuredState: true
-                }
-            ],
+            
+            // Zu restriktiv
+'react/forbid-foreign-prop-types': 'off',
 
-            // ===== PERFORMANCE OPTIMIZATIONS =====
-            'react/no-array-index-key': 'warn', // Warn statt error für Flexibilität
-            'react/no-unstable-nested-components': [
-                'error',
-                {
-                    allowAsProps: false
-                }
-            ],
-            'react/jsx-no-constructed-context-values': 'error',
-            'react/no-unused-state': 'error',
-            'react/no-unused-class-component-methods': 'error',
-            'react/no-unused-prop-types': [
-                'error',
-                {
-                    skipShapeProps: true // Shape props oft nur teilweise genutzt
-                }
-            ],
+            
+            
+// Utility components oft in gleicher Datei
+'react/jsx-max-depth': 'off',
+            
+            // Abgedeckt durch @stylistic/jsx-indent-props
+            'react/jsx-max-props-per-line': 'off',
 
-            // ===== CODE QUALITY & CONSISTENCY =====
-            'react/jsx-pascal-case': 'off', // Abgedeckt durch @stylistic/jsx-pascal-case
-            'react/jsx-fragments': ['error', 'syntax'], // Prefer <> over React.Fragment
-            'react/self-closing-comp': 'off', // Abgedeckt durch @stylistic/jsx-self-closing-comp
-            'react/jsx-boolean-value': ['error', 'never'],
-            'react/jsx-curly-brace-presence': 'off', // Abgedeckt durch @stylistic/jsx-curly-brace-presence
-            'react/jsx-no-useless-fragment': [
-                'error',
-                {
-                    allowExpressions: true
-                }
-            ],
-            'react/jsx-handler-names': [
-                'error',
-                {
-                    eventHandlerPrefix: 'handle',
-                    eventHandlerPropPrefix: 'on',
-                    checkLocalVariables: false, // Zu restriktiv
-                    checkInlineFunction: false
-                }
-            ],
+            
+            // Zu restriktiv
+'react/jsx-child-element-spacing': 'off',
 
-            // ===== MODERN REACT PATTERNS =====
-            'react/function-component-definition': [
-                'error',
-                {
-                    namedComponents: 'arrow-function',
-                    unnamedComponents: 'arrow-function'
-                }
-            ],
-            'react/prefer-stateless-function': 'error',
-            'react/prefer-es6-class': ['error', 'always'],
-            'react/static-property-placement': ['error', 'static public field'],
-            'react/state-in-constructor': ['error', 'never'], // Modern class fields
-
-            // ===== LIFECYCLE & STATE MANAGEMENT =====
-            'react/no-access-state-in-setstate': 'error',
-            'react/no-did-mount-set-state': 'error',
-            'react/no-did-update-set-state': 'error',
-            'react/no-will-update-set-state': 'error',
-            'react/no-redundant-should-component-update': 'error',
-            'react/no-typos': 'error',
-            'react/no-this-in-sfc': 'error',
-            'react/void-dom-elements-no-children': 'error',
-            'react/style-prop-object': 'error',
-
-            /*
-             * ===== JSX FORMATTING =====
-             * WICHTIG: Alle JSX-Formatting-Regeln werden durch @stylistic/* abgedeckt
-             * Diese React-spezifischen Formatting-Regeln sind deaktiviert, um Konflikte zu vermeiden
-             */
-            'react/jsx-closing-bracket-location': 'off', // Abgedeckt durch @stylistic/jsx-closing-bracket-location
-            'react/jsx-closing-tag-location': 'off', // Abgedeckt durch @stylistic/jsx-closing-tag-location
-            'react/jsx-first-prop-new-line': 'off', // Abgedeckt durch @stylistic/jsx-first-prop-new-line
-            'react/jsx-indent': 'off', // Abgedeckt durch @stylistic/indent (JSX wird mit abgedeckt)
-            'react/jsx-indent-props': 'off', // Abgedeckt durch @stylistic/jsx-indent-props
-            'react/jsx-max-props-per-line': 'off', // Abgedeckt durch @stylistic/jsx-max-props-per-line
-            'react/jsx-tag-spacing': 'off', // Abgedeckt durch @stylistic/jsx-tag-spacing
-            'react/jsx-wrap-multilines': 'off', // Abgedeckt durch @stylistic/jsx-wrap-multilines
-            'react/jsx-curly-spacing': 'off', // Abgedeckt durch @stylistic/jsx-curly-spacing
-            'react/jsx-equals-spacing': 'off', // Abgedeckt durch @stylistic/jsx-equals-spacing
-
-            // ===== ZUSÄTZLICHE ENTERPRISE STANDARDS =====
-            'react/button-has-type': [
-                'error',
-                {
-                    button: true,
-                    submit: true,
-                    reset: true
-                }
-            ],
-            'react/forward-ref-uses-ref': 'error',
-            'react/no-children-prop': 'error',
+            
+// SetState manchmal notwendig
+'react/jsx-no-bind': 'off',
+            
             'react/jsx-no-comment-textnodes': 'error',
+
+            // Edge cases existieren
+'react/jsx-filename-extension': 'off',
+
+            
+'react/jsx-no-constructed-context-values': 'error',
+            
             'react/jsx-no-duplicate-props': [
                 'error',
                 {
                     ignoreCase: true
                 }
             ],
+
+            // .tsx ist Standard
+'react/jsx-newline': 'off',
+
+            
+            
+'react/jsx-no-leaked-render': [
+                'error',
+                {
+                    validStrategies: ['coerce', 'ternary']
+                }
+            ],
+            
+            // Zu arbiträr
+            'react/jsx-no-literals': 'off',
+
+            // Nicht relevant mit TypeScript
+'react/boolean-prop-naming': 'off',
+
+            
+            
+'react/jsx-no-script-url': 'error',
+            
+            // ===== SECURITY & BUG PREVENTION (CRITICAL) =====
+            'react/jsx-no-target-blank': [
+                'error',
+                {
+                    enforceDynamicLinks: 'always',
+                    warnOnSpreadAttributes: true
+                }
+            ],
+
+            // Zu opinion-based
+'react/default-props-match-prop-types': 'off',
+
+
+            
             'react/jsx-no-undef': [
                 'error',
                 {
                     allowGlobals: true
                 }
             ],
+
+            
+            // Warn für graduelle Adoption
+'react/checked-requires-onchange-or-readonly': 'warn',
+
+            
+            
+// Abgedeckt durch @stylistic/jsx-curly-brace-presence
+'react/jsx-no-useless-fragment': [
+                'error',
+                {
+                    allowExpressions: true
+                }
+            ],
+            
+            // Nicht nützlich mit TypeScript
+            'react/jsx-one-expression-per-line': 'off',
+
+            
+            // Warn statt error - manchmal notwendig
+'react/iframe-missing-sandbox': 'warn',
+
+            
+            
+// ===== CODE QUALITY & CONSISTENCY =====
+'react/jsx-pascal-case': 'off',
+            
+            // Zu restriktiv für JSX
+            'react/jsx-props-no-multi-spaces': 'off',
+
+            // Zu opinion-based
+            'react/jsx-props-no-spread-multi': 'off',
+
+            // Zu opinion-based
+            'react/jsx-props-no-spreading': 'off',
+
+            // React 17+ JSX Transform
+            'react/jsx-sort-default-props': 'off',
+
+            
+            // Mit TypeScript redundant
+'react/jsx-sort-props': 'off',
+
+            
+            
+/*
+ * Modern class fields
+ * ===== LIFECYCLE & STATE MANAGEMENT =====
+ */
+'react/no-access-state-in-setstate': 'error',
+            
+            
+// Prettier handled das
+'react/jsx-space-before-closing': 'off',
+
+            
+            // ===== PERFORMANCE OPTIMIZATIONS =====
+'react/no-array-index-key': 'warn',
+
+            // Abgedeckt durch @stylistic/jsx-max-props-per-line
+            'react/jsx-tag-spacing': 'off',
+            
+            'react/no-danger-with-children': 'error',
+
             'react/jsx-uses-react': 'error',
+
+            'react/no-deprecated': 'error',
+
             'react/jsx-uses-vars': 'error',
+
+            // Abgedeckt durch @stylistic/jsx-tag-spacing
+'react/jsx-wrap-multilines': 'off',
+
+            
+'react/no-did-mount-set-state': 'error',
+            
+            'react/no-did-update-set-state': 'error',
+
+            // Nicht immer notwendig
+'react/no-adjacent-inline-elements': 'off',
+
+            
+'react/no-direct-mutation-state': 'error',
+            
+            'react/no-find-dom-node': 'error',
+
+            // Prettier handled das
+'react/no-arrow-function-lifecycle': 'off',
+
+            
+'react/no-is-mounted': 'error',
+            
+            'react/no-children-prop': 'error',
+
+            'react/no-redundant-should-component-update': 'error',
+
+            // Zu restriktiv
+            'react/no-danger': 'warn',
+            
+            // Moderne Patterns erlauben das
+'react/no-invalid-html-attribute': 'off',
+
+            
+            'react/no-render-return-value': 'error',
+
+            // Zu restriktiv
+            'react/no-multi-comp': 'off',
+            
+            // Spread patterns sind oft valid
+'react/no-namespace': 'off',
+
+            
+            'react/no-string-refs': 'error',
+
+            // Zu viele false positives
+'react/no-object-type-as-default-prop': 'off',
+
+            
+            
+'react/no-this-in-sfc': 'error',
+            
+            
+// Zu restriktiv für i18n
+'react/no-set-state': 'off',
+
+            
+            // Warn statt error für Flexibilität
+'react/no-unstable-nested-components': [
+                'error',
+                {
+                    allowAsProps: false
+                }
+            ],
+
+            'react/no-typos': 'error',
+
             'react/no-unescaped-entities': [
                 'error',
                 {
@@ -2199,58 +2905,118 @@ const config = tseslint.config(
                     ]
                 }
             ],
-            'react/jsx-no-leaked-render': [
+
+            'react/no-unused-class-component-methods': 'error',
+
+            'react/no-unused-prop-types': [
                 'error',
                 {
-                    validStrategies: ['coerce', 'ternary']
+                    skipShapeProps: true // Shape props oft nur teilweise genutzt
                 }
             ],
 
-            /*
-             * ===== DISABLED RULES (ENTERPRISE FLEXIBILITY) =====
-             * Diese Regeln sind aus flat.all übernommen, aber für Enterprise zu restriktiv
-             */
-            'react/destructuring-assignment': 'off', // Zu opinion-based
-            'react/jsx-props-no-spreading': 'off', // Spreading oft nützlich
-            'react/require-default-props': 'off', // Mit TypeScript redundant
-            'react/jsx-sort-props': 'off', // Kein echter Mehrwert
-            'react/sort-comp': 'off', // Zu arbiträr, moderne IDEs helfen
-            'react/forbid-prop-types': 'off', // Zu restriktiv
-            'react/no-multi-comp': 'off', // Utility components oft in gleicher Datei
-            'react/jsx-max-depth': 'off', // Zu arbiträr
-            'react/jsx-no-literals': 'off', // Zu restriktiv für i18n
-            'react/no-set-state': 'off', // SetState manchmal notwendig
-            'react/jsx-no-bind': 'off', // Mit modernen Engines kein Performance-Problem
-            'react/prop-types': 'off', // TypeScript macht PropTypes obsolet
-            'react/display-name': 'off', // DevTools zeigen meist richtige Namen
-            'react/react-in-jsx-scope': 'off', // React 17+ JSX Transform
-            'react/jsx-sort-default-props': 'off', // Deprecated
-            'react/sort-default-props': 'off', // Nicht nützlich mit TypeScript
-            'react/jsx-one-expression-per-line': 'off', // Zu restriktiv für JSX
-            'react/jsx-props-no-multi-spaces': 'off', // Prettier handled das
-            'react/jsx-space-before-closing': 'off', // Deprecated
-            'react/require-optimization': 'off', // Nicht immer notwendig
-            'react/no-adjacent-inline-elements': 'off', // Zu restriktiv
-            'react/forbid-component-props': 'off', // Zu restriktiv
-            'react/forbid-dom-props': 'off', // Zu restriktiv
-            'react/forbid-elements': 'off', // Zu restriktiv
-            'react/forbid-foreign-prop-types': 'off', // Edge cases existieren
-            'react/jsx-filename-extension': 'off', // .tsx ist Standard
-            'react/jsx-newline': 'off', // Zu opinion-based
-            'react/jsx-props-no-spread-multi': 'off', // Spread patterns sind oft valid
-            'react/no-namespace': 'off', // Namespaces manchmal nötig
-            'react/prefer-read-only-props': 'off', // Zu restriktiv
-            'react/jsx-child-element-spacing': 'off', // Prettier handled das
-            'react/no-arrow-function-lifecycle': 'off', // Moderne Patterns erlauben das
-            'react/no-invalid-html-attribute': 'off', // Zu viele false positives
-            'react/no-object-type-as-default-prop': 'off', // TypeScript handled das
-            'react/sort-prop-types': 'off', // Nicht relevant mit TypeScript
-            'react/boolean-prop-naming': 'off', // Zu opinion-based
-            'react/default-props-match-prop-types': 'off', // TypeScript redundant
-            'react/prefer-exact-props': 'off', // Zu restriktiv
-            'react/no-danger': 'warn', // Warn statt error - manchmal notwendig
-            'react/iframe-missing-sandbox': 'warn', // Warn für graduelle Adoption
-            'react/checked-requires-onchange-or-readonly': 'warn' // Warn für Flexibilität
+            'react/no-unused-state': 'error',
+
+            'react/no-will-update-set-state': 'error',
+
+            'react/prefer-es6-class': ['error', 'always'],
+
+            // TypeScript redundant
+            'react/prefer-exact-props': 'off',
+
+            // Namespaces manchmal nötig
+            'react/prefer-read-only-props': 'off',
+
+
+            'react/prefer-stateless-function': 'error',
+
+            
+// Mit modernen Engines kein Performance-Problem
+'react/prop-types': 'off',
+
+            
+            // Prefer <> over React.Fragment
+'react/self-closing-comp': 'off',
+
+            // DevTools zeigen meist richtige Namen
+            'react/react-in-jsx-scope': 'off',
+
+            // Spreading oft nützlich
+            'react/require-default-props': 'off',
+
+            // Deprecated
+            'react/require-optimization': 'off',
+
+            // Kein echter Mehrwert
+            'react/sort-comp': 'off',
+
+            // Deprecated
+            'react/sort-default-props': 'off',
+
+            // TypeScript handled das
+            'react/sort-prop-types': 'off',
+
+            'react/state-in-constructor': ['error', 'never'],
+
+            'react/static-property-placement': ['error', 'static public field'],
+
+            'react/style-prop-object': 'error',
+
+            'react/void-dom-elements-no-children': 'error' // Warn für Flexibilität
+        },
+        settings: {
+            // PropTypes wrapper functions (for teams still using PropTypes)
+            propWrapperFunctions: [
+                'forbidExtraProps',
+                {
+                    object: 'Object',
+                    property: 'freeze'
+                },
+                { property: 'myFavoriteWrapper' }
+            ],
+
+            react: {
+
+                // Support for common HOCs and wrappers
+                componentWrapperFunctions: [
+                    'observer', // MobX
+                    'memo', // React.memo
+                    'forwardRef', // React.forwardRef
+                    { property: 'styled' }, // Styled-components
+                    { property: 'connect' } // Redux
+                ],
+
+                // Enterprise settings for better component detection
+                createClass: 'createReactClass',
+
+                // Form component detection
+                formComponents: [
+                    'Form',
+                    {
+                        formAttribute: 'onSubmit',
+                        name: 'Formik'
+                    }
+                ],
+
+                fragment: 'Fragment',
+
+                // Link component detection
+                linkComponents: [
+                    'Link',
+                    {
+                        linkAttribute: 'to',
+                        name: 'NavLink'
+                    },
+                    {
+                        linkAttribute: 'to',
+                        name: 'RouterLink'
+                    }
+                ],
+
+                pragma: 'React',
+
+                version: 'detect'
+            }
         }
     },
 
@@ -2261,83 +3027,12 @@ const config = tseslint.config(
      */
     a11yPlugin.flatConfigs.strict, // Basiert auf strict config
     {
-        settings: {
-            'jsx-a11y': {
-                // Polymorphe Komponenten-Unterstützung (Material-UI, Chakra UI, etc.)
-                polymorphicPropName: 'as',
-
-                // Custom Component Mapping für Enterprise UI Libraries
-                components: {
-                    // Form Controls
-                    Input: 'input',
-                    TextInput: 'input',
-                    NumberInput: 'input',
-                    Select: 'select',
-                    Dropdown: 'select',
-                    TextArea: 'textarea',
-                    TextField: 'input',
-                    FormField: 'input',
-                    Checkbox: 'input',
-                    Radio: 'input',
-                    Switch: 'input',
-                    Toggle: 'input',
-
-                    // Buttons
-                    Button: 'button',
-                    IconButton: 'button',
-                    PrimaryButton: 'button',
-                    SecondaryButton: 'button',
-                    SubmitButton: 'button',
-                    ActionButton: 'button',
-                    FloatingActionButton: 'button',
-                    Fab: 'button',
-
-                    // Links
-                    Link: 'a',
-                    NavLink: 'a',
-                    RouterLink: 'a',
-                    ExternalLink: 'a',
-
-                    // Structure
-                    Nav: 'nav',
-                    Navigation: 'nav',
-                    Header: 'header',
-                    Footer: 'footer',
-                    Main: 'main',
-                    Section: 'section',
-                    Article: 'article',
-                    Aside: 'aside',
-
-                    // Lists
-                    List: 'ul',
-                    OrderedList: 'ol',
-                    ListItem: 'li',
-
-                    // Media
-                    Image: 'img',
-                    Picture: 'img',
-                    Video: 'video',
-                    Audio: 'audio',
-
-                    // Tables
-                    Table: 'table',
-                    TableRow: 'tr',
-                    TableCell: 'td',
-                    TableHeader: 'th'
-                },
-
-                // Attribute Mapping für verschiedene Prop-Namen
-                attributes: {
-                    for: ['htmlFor', 'for'],
-                    id: ['id', 'htmlId']
-                }
-            }
-        },
         rules: {
             // ===== WCAG 2.1 LEVEL A (MANDATORY) =====
             'jsx-a11y/alt-text': [
                 'error',
                 {
+                    area: [],
                     elements: [
                         'img',
                         'object',
@@ -2345,11 +3040,36 @@ const config = tseslint.config(
                         'input[type="image"]'
                     ],
                     img: [],
-                    object: [],
-                    area: [],
-                    'input[type="image"]': []
+                    'input[type="image"]': [],
+                    object: []
                 }
             ],
+
+            /*
+             * ===== DEPRECATED BUT STILL IN DOCS =====
+             * 'jsx-a11y/accessible-emoji': 'off', // Deprecated - modern emoji sind accessible
+             * 'jsx-a11y/label-has-for': 'off', // Deprecated - use label-has-associated-control
+             * 'jsx-a11y/no-onchange': 'off', // Deprecated - onchange ist jetzt accessible
+             */
+            // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
+            'jsx-a11y/anchor-ambiguous-text': [
+                'warn',
+                {
+                    words: [
+                        'click here',
+                        'here',
+                        'link',
+                        'a link',
+                        'learn more',
+                        'more',
+                        'read more',
+                        'mehr',
+                        'hier',
+                        'klicken'
+                    ]
+                }
+            ],
+
             'jsx-a11y/anchor-has-content': [
                 'error',
                 {
@@ -2360,82 +3080,47 @@ const config = tseslint.config(
                     ]
                 }
             ],
+
             'jsx-a11y/anchor-is-valid': [
                 'error',
                 {
+                    aspects: [
+                        'noHref',
+                        'invalidHref',
+                        'preferButton'
+                    ],
                     components: [
                         'Link',
                         'NavLink',
                         'RouterLink'
                     ],
-                    specialLink: ['to', 'href'],
-                    aspects: [
-                        'noHref',
-                        'invalidHref',
-                        'preferButton'
-                    ]
+                    specialLink: ['to', 'href']
                 }
             ],
-            'jsx-a11y/aria-props': 'error', // ARIA attributes müssen korrekt sein
-            'jsx-a11y/aria-proptypes': 'error', // ARIA prop values müssen valid sein
+
+            // ===== ARIA BEST PRACTICES =====
+            'jsx-a11y/aria-activedescendant-has-tabindex': 'error',
+
+            'jsx-a11y/aria-props': 'error',
+
+            // ARIA attributes müssen korrekt sein
+            'jsx-a11y/aria-proptypes': 'error',
+
+            // ARIA prop values müssen valid sein
             'jsx-a11y/aria-role': [
                 'error',
                 {
-                    ignoreNonDOM: true,
-                    allowedInvalidRoles: [] // Keine invaliden Roles erlaubt
+                    allowedInvalidRoles: [],
+                    ignoreNonDOM: true // Keine invaliden Roles erlaubt
                 }
             ],
-            'jsx-a11y/aria-unsupported-elements': 'error', // Keine ARIA auf unsupported elements
-            'jsx-a11y/heading-has-content': [
-                'error',
-                {
-                    components: [
-                        'Heading',
-                        'H1',
-                        'H2',
-                        'H3',
-                        'H4',
-                        'H5',
-                        'H6'
-                    ]
-                }
-            ],
-            'jsx-a11y/html-has-lang': 'error', // Html element muss lang attribute haben
-            'jsx-a11y/iframe-has-title': 'error', // Iframes brauchen title
-            'jsx-a11y/img-redundant-alt': [
-                'error',
-                {
-                    components: ['Image', 'Picture'],
-                    words: [
-                        'image',
-                        'photo',
-                        'picture',
-                        'bild',
-                        'foto'
-                    ]
-                }
-            ],
-            'jsx-a11y/no-access-key': 'error', // AccessKey conflicts mit Screen Reader shortcuts
-            'jsx-a11y/no-distracting-elements': [
-                'error',
-                {
-                    elements: ['marquee', 'blink']
-                }
-            ],
-            'jsx-a11y/no-redundant-roles': [
-                'error',
-                {
-                    nav: ['navigation']
 
-                    // Weitere redundante roles werden automatisch erkannt
-                }
-            ],
-            'jsx-a11y/role-has-required-aria-props': 'error', // Roles brauchen required ARIA props
-            'jsx-a11y/role-supports-aria-props': 'error', // Nur supported ARIA props für roles
-            'jsx-a11y/scope': 'error', // Scope nur auf th elements
-            'jsx-a11y/tabindex-no-positive': 'error', // Kein tabindex > 0 (stört keyboard navigation)
+            'jsx-a11y/aria-unsupported-elements': 'error',
 
-            // ===== WCAG 2.1 LEVEL AA (ENTERPRISE STANDARD) =====
+            /*
+             * Kein tabindex > 0 (stört keyboard navigation)
+             * ===== WCAG 2.1 LEVEL AA (ENTERPRISE STANDARD) =====
+             */
             'jsx-a11y/autocomplete-valid': [
                 'error',
                 {
@@ -2446,106 +3131,19 @@ const config = tseslint.config(
                     ]
                 }
             ],
-            'jsx-a11y/label-has-associated-control': [
-                'error',
-                {
-                    controlComponents: [
-                        'Input',
-                        'Select',
-                        'TextArea',
-                        'TextField',
-                        'Checkbox',
-                        'Radio',
-                        'Switch'
-                    ],
-                    assert: 'either', // Either nesting or htmlFor
-                    depth: 3, // Wie tief nach control component suchen
-                    labelComponents: ['Label', 'FormLabel'],
-                    labelAttributes: ['label']
-                }
-            ],
-            'jsx-a11y/lang': 'error', // Lang attribute muss valid language code sein
-            'jsx-a11y/no-aria-hidden-on-focusable': 'error', // Focusable elements nicht mit aria-hidden verstecken
 
-            // ===== INTERACTION ACCESSIBILITY =====
-            'jsx-a11y/click-events-have-key-events': 'error', // Click handlers brauchen keyboard support
-            'jsx-a11y/interactive-supports-focus': [
-                'error',
-                {
-                    tabbable: [
-                        'button',
-                        'checkbox',
-                        'link',
-                        'searchbox',
-                        'spinbutton',
-                        'switch',
-                        'textbox'
-                    ]
-                }
-            ],
-            'jsx-a11y/mouse-events-have-key-events': [
-                'error',
-                {
-                    hoverInHandlers: [
-                        'onMouseOver',
-                        'onMouseEnter',
-                        'onPointerOver',
-                        'onPointerEnter'
-                    ],
-                    hoverOutHandlers: [
-                        'onMouseOut',
-                        'onMouseLeave',
-                        'onPointerOut',
-                        'onPointerLeave'
-                    ]
-                }
-            ],
-            'jsx-a11y/no-static-element-interactions': [
-                'error',
-                {
-                    handlers: [
-                        'onClick',
-                        'onMouseDown',
-                        'onMouseUp',
-                        'onKeyPress',
-                        'onKeyDown',
-                        'onKeyUp'
-                    ],
-                    allowExpressionValues: true
-                }
-            ],
-            'jsx-a11y/no-noninteractive-element-interactions': [
-                'error',
-                {
-                    handlers: [
-                        'onClick',
-                        'onMouseDown',
-                        'onMouseUp',
-                        'onKeyPress',
-                        'onKeyDown',
-                        'onKeyUp'
-                    ],
-                    alert: [
-                        'onKeyUp',
-                        'onKeyDown',
-                        'onKeyPress'
-                    ],
-                    body: ['onError', 'onLoad'],
-                    dialog: [
-                        'onKeyUp',
-                        'onKeyDown',
-                        'onKeyPress'
-                    ],
-                    iframe: ['onError', 'onLoad'],
-                    img: ['onError', 'onLoad']
-                }
-            ],
+            /*
+             * Focusable elements nicht mit aria-hidden verstecken
+             * ===== INTERACTION ACCESSIBILITY =====
+             */
+            'jsx-a11y/click-events-have-key-events': 'error',
 
             // ===== FORM ACCESSIBILITY =====
             'jsx-a11y/control-has-associated-label': [
                 'error',
                 {
                     controlComponents: ['Button', 'IconButton'],
+                    depth: 3,
                     ignoreElements: [
                         'audio',
                         'canvas',
@@ -2566,8 +3164,177 @@ const config = tseslint.config(
                         'toolbar',
                         'tree',
                         'treegrid'
+                    ]
+                }
+            ],
+
+            // Keine ARIA auf unsupported elements
+            'jsx-a11y/heading-has-content': [
+                'error',
+                {
+                    components: [
+                        'Heading',
+                        'H1',
+                        'H2',
+                        'H3',
+                        'H4',
+                        'H5',
+                        'H6'
+                    ]
+                }
+            ],
+
+            'jsx-a11y/html-has-lang': 'error',
+
+            // Html element muss lang attribute haben
+            'jsx-a11y/iframe-has-title': 'error',
+
+            // Iframes brauchen title
+            'jsx-a11y/img-redundant-alt': [
+                'error',
+                {
+                    components: ['Image', 'Picture'],
+                    words: [
+                        'image',
+                        'photo',
+                        'picture',
+                        'bild',
+                        'foto'
+                    ]
+                }
+            ],
+
+            // Click handlers brauchen keyboard support
+            'jsx-a11y/interactive-supports-focus': [
+                'error',
+                {
+                    tabbable: [
+                        'button',
+                        'checkbox',
+                        'link',
+                        'searchbox',
+                        'spinbutton',
+                        'switch',
+                        'textbox'
+                    ]
+                }
+            ],
+
+            'jsx-a11y/label-has-associated-control': [
+                'error',
+                {
+                    assert: 'either',
+                    controlComponents: [
+                        'Input',
+                        'Select',
+                        'TextArea',
+                        'TextField',
+                        'Checkbox',
+                        'Radio',
+                        'Switch'
+                    ], // Either nesting or htmlFor
+                    depth: 3,
+                    labelAttributes: ['label'],
+
+                    // Wie tief nach control component suchen
+                    labelComponents: ['Label', 'FormLabel']
+                }
+            ],
+
+            'jsx-a11y/lang': 'error',
+
+            /*
+             * Semantic HTML > ARIA roles
+             * ===== MEDIA ACCESSIBILITY =====
+             */
+            'jsx-a11y/media-has-caption': [
+                'error',
+                {
+                    audio: ['Audio'],
+                    track: ['Track'],
+                    video: ['Video']
+                }
+            ],
+
+            'jsx-a11y/mouse-events-have-key-events': [
+                'error',
+                {
+                    hoverInHandlers: [
+                        'onMouseOver',
+                        'onMouseEnter',
+                        'onPointerOver',
+                        'onPointerEnter'
                     ],
-                    depth: 3
+                    hoverOutHandlers: [
+                        'onMouseOut',
+                        'onMouseLeave',
+                        'onPointerOut',
+                        'onPointerLeave'
+                    ]
+                }
+            ],
+
+            'jsx-a11y/no-access-key': 'error',
+
+            // Lang attribute muss valid language code sein
+            'jsx-a11y/no-aria-hidden-on-focusable': 'error',
+
+            // ===== FOCUS MANAGEMENT =====
+            'jsx-a11y/no-autofocus': [
+                'warn',
+                {
+                    ignoreNonDOM: true
+                }
+            ],
+
+            // AccessKey conflicts mit Screen Reader shortcuts
+            'jsx-a11y/no-distracting-elements': [
+                'error',
+                {
+                    elements: ['marquee', 'blink']
+                }
+            ],
+
+            'jsx-a11y/no-interactive-element-to-noninteractive-role': [
+                'error',
+                {
+                    canvas: ['img'],
+                    tr: ['none', 'presentation'] // Canvas kann als img behandelt werden
+                }
+            ],
+
+            // Elements mit aria-activedescendant müssen tabbable sein
+            'jsx-a11y/no-interactive-element-to-noninteractive-role': [
+                'error',
+                {
+                    canvas: ['img', 'presentation'] // Canvas exceptions
+                }
+            ],
+
+            'jsx-a11y/no-noninteractive-element-interactions': [
+                'error',
+                {
+                    alert: [
+                        'onKeyUp',
+                        'onKeyDown',
+                        'onKeyPress'
+                    ],
+                    body: ['onError', 'onLoad'],
+                    dialog: [
+                        'onKeyUp',
+                        'onKeyDown',
+                        'onKeyPress'
+                    ],
+                    handlers: [
+                        'onClick',
+                        'onMouseDown',
+                        'onMouseUp',
+                        'onKeyPress',
+                        'onKeyDown',
+                        'onKeyUp'
+                    ],
+                    iframe: ['onError', 'onLoad'],
+                    img: ['onError', 'onLoad']
                 }
             ],
 
@@ -2575,14 +3342,13 @@ const config = tseslint.config(
             'jsx-a11y/no-noninteractive-element-to-interactive-role': [
                 'error',
                 {
-                    ul: [
-                        'listbox',
-                        'menu',
-                        'menubar',
-                        'radiogroup',
-                        'tablist',
-                        'tree',
-                        'treegrid'
+                    fieldset: ['radiogroup', 'presentation'],
+                    li: [
+                        'menuitem',
+                        'option',
+                        'row',
+                        'tab',
+                        'treeitem'
                     ],
                     ol: [
                         'listbox',
@@ -2593,87 +3359,173 @@ const config = tseslint.config(
                         'tree',
                         'treegrid'
                     ],
-                    li: [
-                        'menuitem',
-                        'option',
-                        'row',
-                        'tab',
-                        'treeitem'
-                    ],
                     table: ['grid'],
                     td: ['gridcell'],
-                    fieldset: ['radiogroup', 'presentation']
-                }
-            ],
-            'jsx-a11y/no-interactive-element-to-noninteractive-role': [
-                'error',
-                {
-                    tr: ['none', 'presentation'],
-                    canvas: ['img'] // Canvas kann als img behandelt werden
-                }
-            ],
-            'jsx-a11y/prefer-tag-over-role': 'error', // Semantic HTML > ARIA roles
-
-            // ===== MEDIA ACCESSIBILITY =====
-            'jsx-a11y/media-has-caption': [
-                'error',
-                {
-                    audio: ['Audio'],
-                    video: ['Video'],
-                    track: ['Track']
+                    ul: [
+                        'listbox',
+                        'menu',
+                        'menubar',
+                        'radiogroup',
+                        'tablist',
+                        'tree',
+                        'treegrid'
+                    ]
                 }
             ],
 
-            // ===== FOCUS MANAGEMENT =====
-            'jsx-a11y/no-autofocus': [
-                'warn',
-                {
-                    ignoreNonDOM: true
-                }
-            ], // Warn level - manchmal für UX notwendig
+            // Warn level - manchmal für UX notwendig
             'jsx-a11y/no-noninteractive-tabindex': [
                 'error',
                 {
-                    tags: [],
+                    allowExpressionValues: true,
                     roles: ['tabpanel', 'dialog'],
-                    allowExpressionValues: true
+                    tags: []
                 }
             ],
 
-            // ===== ARIA BEST PRACTICES =====
-            'jsx-a11y/aria-activedescendant-has-tabindex': 'error', // Elements mit aria-activedescendant müssen tabbable sein
-            'jsx-a11y/no-interactive-element-to-noninteractive-role': [
+            'jsx-a11y/no-redundant-roles': [
                 'error',
                 {
-                    canvas: ['img', 'presentation'] // Canvas exceptions
+                    nav: ['navigation']
+
+                    // Weitere redundante roles werden automatisch erkannt
                 }
             ],
 
-            /*
-             * ===== DEPRECATED BUT STILL IN DOCS =====
-             * 'jsx-a11y/accessible-emoji': 'off', // Deprecated - modern emoji sind accessible
-             * 'jsx-a11y/label-has-for': 'off', // Deprecated - use label-has-associated-control
-             * 'jsx-a11y/no-onchange': 'off', // Deprecated - onchange ist jetzt accessible
-             */
-
-            // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-            'jsx-a11y/anchor-ambiguous-text': [
-                'warn',
+            'jsx-a11y/no-static-element-interactions': [
+                'error',
                 {
-                    words: [
-                        'click here',
-                        'here',
-                        'link',
-                        'a link',
-                        'learn more',
-                        'more',
-                        'read more',
-                        'mehr',
-                        'hier',
-                        'klicken'
+                    allowExpressionValues: true,
+                    handlers: [
+                        'onClick',
+                        'onMouseDown',
+                        'onMouseUp',
+                        'onKeyPress',
+                        'onKeyDown',
+                        'onKeyUp'
                     ]
                 }
-            ] // Warn level - manchmal design requirements
+            ],
+
+            'jsx-a11y/prefer-tag-over-role': 'error',
+
+            'jsx-a11y/role-has-required-aria-props': 'error',
+
+            // Roles brauchen required ARIA props
+            'jsx-a11y/role-supports-aria-props': 'error',
+
+            // Nur supported ARIA props für roles
+            'jsx-a11y/scope': 'error',
+
+            // Scope nur auf th elements
+            'jsx-a11y/tabindex-no-positive': 'error' // Warn level - manchmal design requirements
+        },
+        settings: {
+            'jsx-a11y': {
+
+                // Attribute Mapping für verschiedene Prop-Namen
+                attributes: {
+                    for: ['htmlFor', 'for'],
+                    id: ['id', 'htmlId']
+                },
+
+                // Custom Component Mapping für Enterprise UI Libraries
+                components: {
+
+                    ActionButton: 'button',
+
+                    Article: 'article',
+
+                    Aside: 'aside',
+
+                    Audio: 'audio',
+
+                    // Buttons
+                    Button: 'button',
+
+                    Checkbox: 'input',
+
+                    Dropdown: 'select',
+
+                    ExternalLink: 'a',
+
+                    Fab: 'button',
+
+                    FloatingActionButton: 'button',
+
+                    Footer: 'footer',
+
+                    FormField: 'input',
+
+                    Header: 'header',
+
+                    IconButton: 'button',
+
+                    // Media
+                    Image: 'img',
+
+                    // Form Controls
+                    Input: 'input',
+
+                    // Links
+                    Link: 'a',
+
+                    // Lists
+                    List: 'ul',
+
+                    ListItem: 'li',
+
+                    Main: 'main',
+
+                    // Structure
+                    Nav: 'nav',
+
+                    NavLink: 'a',
+
+                    Navigation: 'nav',
+
+                    NumberInput: 'input',
+
+                    OrderedList: 'ol',
+
+                    Picture: 'img',
+
+                    PrimaryButton: 'button',
+
+                    Radio: 'input',
+
+                    RouterLink: 'a',
+
+                    SecondaryButton: 'button',
+
+                    Section: 'section',
+
+                    Select: 'select',
+
+                    SubmitButton: 'button',
+
+                    Switch: 'input',
+
+                    // Tables
+                    Table: 'table',
+
+                    TableCell: 'td',
+
+                    TableHeader: 'th',
+
+                    TableRow: 'tr',
+
+                    TextArea: 'textarea',
+
+                    TextField: 'input',
+                    TextInput: 'input',
+                    Toggle: 'input',
+                    Video: 'video'
+                },
+
+                // Polymorphe Komponenten-Unterstützung (Material-UI, Chakra UI, etc.)
+                polymorphicPropName: 'as'
+            }
         }
     },
 
@@ -3005,46 +3857,70 @@ const config = tseslint.config(
     perfectionist.configs['recommended-natural'], // Natural sorting (human-readable)
     {
         rules: {
+
+            // New Map([...]) entries
+            'perfectionist/sort-array-includes': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
+            /*
+             * ===== CLASS & INHERITANCE SORTING =====
+             * ✅ ==== VERIFIED ====
+             */
+            'perfectionist/sort-classes': 'off',
+
+            /*
+             * Module member sorting
+             * ===== DECORATOR SORTING (ENTERPRISE TYPESCRIPT) =====
+             */
+            'perfectionist/sort-decorators': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
+            // ✅ Abgedeckt durch ESLint Core sort-keys
+            'perfectionist/sort-enums': 'off',
+
+            /*
+             * Switch case statements (alphabetical für bessere Lesbarkeit)
+             * ===== EXPORT/IMPORT MODULE SORTING =====
+             */
+            'perfectionist/sort-exports': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
+            // We use @typescript-eslint/member-ordering
+            'perfectionist/sort-heritage-clauses': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
             /*
              * ===== DEAKTIVIERTE REGELN (BEREITS ABGEDECKT) =====
              * Diese Regeln sind bereits durch andere Plugins mit besserer Konfiguration abgedeckt
              */
-            'perfectionist/sort-imports': 'off', // ✅ Abgedeckt durch import/order (komplexere Enterprise-Konfiguration)
-            'perfectionist/sort-named-imports': 'off', // ✅ Abgedeckt durch import/order
-            'perfectionist/sort-interfaces': 'off', // ✅ Abgedeckt durch typescript-sort-keys/interface
-            'perfectionist/sort-jsx-props': 'off', // ✅ Abgedeckt durch @stylistic/jsx-sort-props (bessere JSX-Integration)
-            'perfectionist/sort-objects': 'off', // ✅ Abgedeckt durch ESLint Core sort-keys
-            'perfectionist/sort-enums': 'off', // ✅ Abgedeckt durch typescript-sort-keys/string-enum
+            'perfectionist/sort-imports': 'off',
 
-            // ===== ENTERPRISE-AKTIVIERTE REGELN (NOCH NICHT ABGEDECKT) =====
+            // ✅ Abgedeckt durch import/order
+            'perfectionist/sort-interfaces': 'off',
 
-            // ===== TYPESCRIPT TYPE SORTING =====
-            'perfectionist/sort-union-types': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc',
-                    groups: [
-                        'conditional', // A extends B ? C : D
-                        'function', // () => void
-                        'import', // Import('module')
-                        'intersection', // A & B
-                        'keyword', // String, number, boolean
-                        'literal', // 'literal', 123, true
-                        'named', // CustomType, Interface
-                        'object', // { key: value }
-                        'operator', // Keyof, typeof
-                        'tuple', // [string, number]
-                        'union', // A | B
-                        'nullish' // Null, undefined
-                    ]
-                }
-            ],
             'perfectionist/sort-intersection-types': [
                 'error',
                 {
-                    type: 'natural',
-                    order: 'asc',
                     groups: [
                         'conditional',
                         'function',
@@ -3058,105 +3934,121 @@ const config = tseslint.config(
                         'tuple',
                         'union',
                         'nullish'
-                    ]
+                    ],
+                    order: 'asc',
+                    type: 'natural'
                 }
             ],
+
+            // ✅ Abgedeckt durch typescript-sort-keys/interface
+            'perfectionist/sort-jsx-props': 'off',
+
+            // New Set([...]) values
+            'perfectionist/sort-maps': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
+            // Export { a, b, c }
+            'perfectionist/sort-modules': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
+            // Export statements sorting
+            'perfectionist/sort-named-exports': [
+                'error',
+                {
+                    order: 'asc',
+                    type: 'natural'
+                }
+            ],
+
+            // ✅ Abgedeckt durch import/order (komplexere Enterprise-Konfiguration)
+            'perfectionist/sort-named-imports': 'off',
+
             'perfectionist/sort-object-types': [
                 'error',
                 {
-                    type: 'natural',
-                    order: 'asc',
                     groups: [
                         'multiline', // Komplexe Properties zuerst
                         'method', // Methods nach Properties (Airbnb Standard)
                         'property' // Einfache Properties zuletzt
-                    ]
+                    ],
+                    order: 'asc',
+                    type: 'natural'
                 }
             ],
 
-            // ===== CLASS & INHERITANCE SORTING =====
+            // ✅ Abgedeckt durch @stylistic/jsx-sort-props (bessere JSX-Integration)
+            'perfectionist/sort-objects': 'off',
 
-            // ✅ ==== VERIFIED ====
-            'perfectionist/sort-classes': 'off', // We use @typescript-eslint/member-ordering
-
-            'perfectionist/sort-heritage-clauses': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc'
-                }
-            ], // Extends/implements clauses
-
-            // ===== MODERN JAVASCRIPT FEATURES =====
+            /*
+             * Extends/implements clauses
+             * ===== MODERN JAVASCRIPT FEATURES =====
+             */
             'perfectionist/sort-sets': [
                 'error',
                 {
-                    type: 'natural',
-                    order: 'asc'
+                    order: 'asc',
+                    type: 'natural'
                 }
-            ], // New Set([...]) values
-            'perfectionist/sort-maps': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc'
-                }
-            ], // New Map([...]) entries
-            'perfectionist/sort-array-includes': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc'
-                }
-            ], // Array.includes() arguments
+            ],
 
-            // ===== VARIABLE & DECLARATION SORTING =====
-            'perfectionist/sort-variable-declarations': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc'
-                }
-            ], // Const a, b, c = destructuring
-
-            // ===== CONTROL FLOW SORTING =====
+            /*
+             * Const a, b, c = destructuring
+             * ===== CONTROL FLOW SORTING =====
+             */
             'perfectionist/sort-switch-case': [
                 'error',
                 {
-                    type: 'natural',
-                    order: 'asc'
+                    order: 'asc',
+                    type: 'natural'
                 }
-            ], // Switch case statements (alphabetical für bessere Lesbarkeit)
+            ],
 
-            // ===== EXPORT/IMPORT MODULE SORTING =====
-            'perfectionist/sort-exports': [
+            /*
+             * ✅ Abgedeckt durch typescript-sort-keys/string-enum
+             * ===== ENTERPRISE-AKTIVIERTE REGELN (NOCH NICHT ABGEDECKT) =====
+             * ===== TYPESCRIPT TYPE SORTING =====
+             */
+            'perfectionist/sort-union-types': [
                 'error',
                 {
-                    type: 'natural',
-                    order: 'asc'
+                    groups: [
+                        'conditional', // A extends B ? C : D
+                        'function', // () => void
+                        'import', // Import('module')
+                        'intersection', // A & B
+                        'keyword', // String, number, boolean
+                        'literal', // 'literal', 123, true
+                        'named', // CustomType, Interface
+                        'object', // { key: value }
+                        'operator', // Keyof, typeof
+                        'tuple', // [string, number]
+                        'union', // A | B
+                        'nullish' // Null, undefined
+                    ],
+                    order: 'asc',
+                    type: 'natural'
                 }
-            ], // Export statements sorting
-            'perfectionist/sort-named-exports': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc'
-                }
-            ], // Export { a, b, c }
-            'perfectionist/sort-modules': [
-                'error',
-                {
-                    type: 'natural',
-                    order: 'asc'
-                }
-            ], // Module member sorting
+            ],
 
-            // ===== DECORATOR SORTING (ENTERPRISE TYPESCRIPT) =====
-            'perfectionist/sort-decorators': [
+            /*
+             * Array.includes() arguments
+             * ===== VARIABLE & DECLARATION SORTING =====
+             */
+            'perfectionist/sort-variable-declarations': [
                 'error',
                 {
-                    type: 'natural',
-                    order: 'asc'
+                    order: 'asc',
+                    type: 'natural'
                 }
             ] // @decorator sorting für Enterprise TypeScript Apps
         }
@@ -3187,8 +4079,59 @@ const config = tseslint.config(
             '**/*.cts'
         ], // Only apply to TypeScript files
         rules: {
+
+            /*
+             * Konsistente Method Signatures
+             * Class Design (Enterprise OOP Standards)
+             */
+            '@typescript-eslint/class-methods-use-this': [
+                'error',
+                {
+                    enforceForClassFields: true,
+
+                    // Statische Methoden wenn kein "this"
+                    exceptMethods: [
+                        'render',
+                        'componentDidMount',
+                        'componentDidUpdate',
+                        'componentWillUnmount'
+                    ]
+                }
+            ],
+
+            // Verhindert unnötige Type Conversions
+            /*
+             * ✅ ==== VERIFIED ====
+             * If possible, it is recommended to use tsconfig's noImplicitReturns option rather than this rule. noImplicitReturns is powered by TS's type information and control-flow analysis so it has better coverage than this rule.
+             */
+            '@typescript-eslint/consistent-return': 'off',
+
+            /*
+             * Performance: Verhindert Side Effects bei Type Imports
+             * ✅ ==== VERIFIED ====
+             */
+            '@typescript-eslint/consistent-type-exports': 'error',
+
+            // Konsistente Type Exports
+            /*
+             * ✅ ==== VERIFIED ====
+             * ✅ Erzwingt Konsistenz in TypeScript und steuert den Auto-Fixer.
+             *    prefer: 'type-imports'          → immer `import type` statt Wert-Import für Typen.
+             *    fixStyle: 'separate-type-imports' → separater Top-Level-Block für Typen (kein Inline-Mixing).
+             */
+            '@typescript-eslint/consistent-type-imports': [
+                'error',
+                {
+                    fixStyle: 'separate-type-imports',
+                    prefer: 'type-imports'
+                }
+            ],
+
+            '@typescript-eslint/dot-notation': 'off',
+
             // Additional typescript-eslint rules not included in strict
             '@typescript-eslint/explicit-function-return-type': 'error',
+
             '@typescript-eslint/explicit-member-accessibility': 'error',
 
             // ✅ ==== VERIFIED ====
@@ -3196,21 +4139,26 @@ const config = tseslint.config(
                 'error',
                 {
                     default: {
+
+                        // ADD: Optional members preference (Enterprise consistency)
+                        optionalityOrder: 'required-first',
+
                         /*
                          * Keep all default memberTypes (sie sind enterprise-optimal!)
                          * ADD: Alphabetical sorting within groups
                          */
-                        order: 'alphabetically-case-insensitive',
-
-                        // ADD: Optional members preference (Enterprise consistency)
-                        optionalityOrder: 'required-first'
+                        order: 'alphabetically-case-insensitive'
                     }
                 }
             ],
 
-            '@typescript-eslint/dot-notation': 'off', // Disabled to allow bracket notation for private method testing
+            // Method Signature Enforcement
+            '@typescript-eslint/method-signature-style': ['error', 'property'],
 
-            // ✅ ==== VERIFIED ====
+            /*
+             * Disabled to allow bracket notation for private method testing
+             * ✅ ==== VERIFIED ====
+             */
             '@typescript-eslint/naming-convention': [
                 'error',
 
@@ -3218,110 +4166,115 @@ const config = tseslint.config(
 
                 // 🚫 KRITISCH: Verbiete I-Prefix für Interfaces (veraltetes Anti-Pattern)
                 {
-                    selector: 'interface',
-                    format: ['PascalCase'],
                     custom: {
-                        regex: '^I[A-Z]',
-                        match: false
-                    }
+                        match: false,
+                        regex: '^I[A-Z]'
+                    },
+                    format: ['PascalCase'],
+                    selector: 'interface'
                 },
 
                 // 🚫 KRITISCH: Verbiete E-Prefix für Enums (veraltetes Anti-Pattern)
                 {
-                    selector: 'enum',
-                    format: ['PascalCase'],
                     custom: {
-                        regex: '^E[A-Z]',
-                        match: false
-                    }
+                        match: false,
+                        regex: '^E[A-Z]'
+                    },
+                    format: ['PascalCase'],
+                    selector: 'enum'
                 },
 
                 // ✅ Type-Like (Interfaces, Classes, Types, Enums) - PascalCase
                 {
-                    selector: 'typeLike',
-                    format: ['PascalCase']
+                    format: ['PascalCase'],
+                    selector: 'typeLike'
                 },
 
                 // ✅ Type Parameters (Generics) - T-Prefix (Google/MS Standard)
                 {
-                    selector: 'typeParameter',
                     format: ['PascalCase'],
-                    prefix: ['T']
+                    prefix: ['T'],
+                    selector: 'typeParameter'
                 },
 
                 // 🚀 MODERN ONLY: # Private Fields (ECMA Standard) - Enterprise Future
                 {
-                    selector: 'classProperty',
-                    modifiers: ['#private'],
                     format: ['camelCase'],
-                    leadingUnderscore: 'forbid'
+                    leadingUnderscore: 'forbid',
+                    modifiers: ['#private'],
+                    selector: 'classProperty'
                 },
 
                 // 🚀 MODERN ONLY: # Private Methods (ECMA Standard)
                 {
-                    selector: 'classMethod',
-                    modifiers: ['#private'],
                     format: ['camelCase'],
-                    leadingUnderscore: 'forbid'
+                    leadingUnderscore: 'forbid',
+                    modifiers: ['#private'],
+                    selector: 'classMethod'
                 },
 
                 // 🚫 VERBIETE Legacy underscore für private (erzwinge # private fields)
                 {
-                    selector: 'memberLike',
-                    modifiers: ['private'],
+                    custom: {
+                        match: false,
+                        regex: '^_'
+                    },
                     format: ['camelCase'],
                     leadingUnderscore: 'forbid',
-                    custom: {
-                        regex: '^_',
-                        match: false
-                    }
+                    modifiers: ['private'],
+                    selector: 'memberLike'
                 },
 
                 // ✅ Protected Members - underscore optional
                 {
-                    selector: 'memberLike',
-                    modifiers: ['protected'],
                     format: ['camelCase'],
-                    leadingUnderscore: 'allow'
+                    leadingUnderscore: 'allow',
+                    modifiers: ['protected'],
+                    selector: 'memberLike'
                 },
 
                 // ✅ Static Readonly Constants - UPPER_CASE (Google Standard)
                 {
-                    selector: 'classProperty',
+                    format: ['UPPER_CASE'],
                     modifiers: ['static', 'readonly'],
-                    format: ['UPPER_CASE']
+                    selector: 'classProperty'
                 },
 
                 // ✅ Global Primitive Constants - UPPER_CASE (Google/Meta Standard)
                 {
-                    selector: 'variable',
+                    format: ['UPPER_CASE'],
                     modifiers: ['const', 'global'],
+                    selector: 'variable',
                     types: [
                         'string',
                         'number',
                         'boolean'
-                    ],
-                    format: ['UPPER_CASE']
+                    ]
                 },
 
                 // ✅ Global Function Constants - camelCase (Enterprise Standard)
                 {
-                    selector: 'variable',
+                    format: ['camelCase'],
                     modifiers: ['const', 'global'],
-                    types: ['function'],
-                    format: ['camelCase']
+                    selector: 'variable',
+                    types: ['function']
                 },
 
                 // ✅ Enum Members - PascalCase (Meta/React Standard)
                 {
-                    selector: 'enumMember',
-                    format: ['PascalCase', 'UPPER_CASE']
+                    format: ['PascalCase', 'UPPER_CASE'],
+                    selector: 'enumMember'
                 },
 
                 // ✅ Boolean Variables - Verb Prefixes (Google Best Practice)
                 {
-                    selector: 'variable',
-                    types: ['boolean'],
+                    filter: {
+
+                        match: false,
+
+                        // Erlaube auch normale camelCase für destructured oder spezielle Fälle
+                        regex: '^(__|_)'
+                    },
                     format: ['PascalCase'],
                     prefix: [
                         'is',
@@ -3334,53 +4287,52 @@ const config = tseslint.config(
                         'was',
                         'were'
                     ],
-                    filter: {
-                        // Erlaube auch normale camelCase für destructured oder spezielle Fälle
-                        regex: '^(__|_)',
-                        match: false
-                    }
+                    selector: 'variable',
+                    types: ['boolean']
                 },
 
                 // ✅ Variables - camelCase oder UPPER_CASE
                 {
-                    selector: 'variable',
                     format: ['camelCase', 'UPPER_CASE'],
-                    leadingUnderscore: 'allow'
+                    leadingUnderscore: 'allow',
+                    selector: 'variable'
                 },
 
                 // ✅ Functions - camelCase oder PascalCase (für React Components)
                 {
-                    selector: 'function',
-                    format: ['camelCase', 'PascalCase']
+                    format: ['camelCase', 'PascalCase'],
+                    selector: 'function'
                 },
 
                 // ✅ Parameters - camelCase mit underscore erlaubt
                 {
-                    selector: 'parameter',
                     format: ['camelCase'],
-                    leadingUnderscore: 'allow'
+                    leadingUnderscore: 'allow',
+                    selector: 'parameter'
                 },
 
                 // ✅ Destructured Variables - flexible Naming (externe APIs)
                 {
-                    selector: 'variable',
+                    format: null,
                     modifiers: ['destructured'],
-                    format: null
+                    selector: 'variable'
                 },
 
                 // ✅ Object/Type Properties - verschiedene Formate für externe Libraries (Zod, etc.)
                 {
-                    selector: ['objectLiteralProperty', 'typeProperty'],
                     format: [
                         'camelCase',
                         'snake_case',
                         'PascalCase'
                     ],
-                    leadingUnderscore: 'allow'
+                    leadingUnderscore: 'allow',
+                    selector: ['objectLiteralProperty', 'typeProperty']
                 },
 
                 // ✅ Properties die Quotes brauchen - keine Format-Checks
                 {
+                    format: null,
+                    modifiers: ['requiresQuotes'],
                     selector: [
                         'classProperty',
                         'objectLiteralProperty',
@@ -3390,150 +4342,15 @@ const config = tseslint.config(
                         'typeMethod',
                         'accessor',
                         'enumMember'
-                    ],
-                    format: null,
-                    modifiers: ['requiresQuotes']
+                    ]
                 },
 
                 // ✅ Default Fallback - camelCase
                 {
-                    selector: 'default',
                     format: ['camelCase'],
                     leadingUnderscore: 'allow',
+                    selector: 'default',
                     trailingUnderscore: 'forbid'
-                }
-            ],
-            '@typescript-eslint/no-explicit-any': 'error',
-            '@typescript-eslint/no-non-null-assertion': 'error',
-            '@typescript-eslint/no-unnecessary-condition': [
-                'error',
-                {
-                    allowConstantLoopConditions: false,
-                    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false
-                }
-            ],
-            '@typescript-eslint/prefer-optional-chain': 'error',
-            '@typescript-eslint/prefer-nullish-coalescing': 'error',
-            '@typescript-eslint/prefer-readonly': 'error',
-            '@typescript-eslint/prefer-readonly-parameter-types': 'error',
-            '@typescript-eslint/require-array-sort-compare': 'error',
-            '@typescript-eslint/strict-boolean-expressions': 'error',
-            '@typescript-eslint/switch-exhaustiveness-check': 'error',
-            '@typescript-eslint/restrict-template-expressions': 'error',
-            '@typescript-eslint/unbound-method': 'error',
-            '@typescript-eslint/no-floating-promises': 'error',
-            '@typescript-eslint/promise-function-async': 'error',
-            '@typescript-eslint/prefer-enum-initializers': 'error',
-            '@typescript-eslint/prefer-literal-enum-member': 'error',
-
-            /*
-             * ===== ENTERPRISE-GRADE ZUSÄTZLICHE REGELN =====
-             * Type Safety Enhancement
-             */
-            '@typescript-eslint/no-unsafe-type-assertion': 'error', // Verhindert unsichere Type Assertions
-            '@typescript-eslint/no-unnecessary-type-conversion': 'error', // Verhindert unnötige Type Conversions
-
-            /*
-             * ✅ ==== VERIFIED ====
-             * If possible, it is recommended to use tsconfig's noImplicitReturns option rather than this rule. noImplicitReturns is powered by TS's type information and control-flow analysis so it has better coverage than this rule.
-             */
-            '@typescript-eslint/consistent-return': 'off',
-
-            '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error', // Verhindert redundante Zuweisungen
-
-            // Import/Export Hygiene (Google/Microsoft Standards)
-
-            // ✅ ==== VERIFIED ====
-            '@typescript-eslint/no-import-type-side-effects': 'error', // Performance: Verhindert Side Effects bei Type Imports
-
-            // ✅ ==== VERIFIED ====
-            '@typescript-eslint/consistent-type-exports': 'error', // Konsistente Type Exports
-
-            /*
-             * ✅ ==== VERIFIED ====
-             * ✅ Erzwingt Konsistenz in TypeScript und steuert den Auto-Fixer.
-             *    prefer: 'type-imports'          → immer `import type` statt Wert-Import für Typen.
-             *    fixStyle: 'separate-type-imports' → separater Top-Level-Block für Typen (kein Inline-Mixing).
-             */
-
-            '@typescript-eslint/consistent-type-imports': [
-                'error',
-                {
-                    prefer: 'type-imports',
-                    fixStyle: 'separate-type-imports'
-                }
-            ],
-
-            '@typescript-eslint/no-useless-empty-export': 'error', // Verhindert leere Exports
-
-            // Code Quality & Maintainability
-            '@typescript-eslint/no-unnecessary-qualifier': 'error', // Entfernt unnötige Namespace Qualifier
-            '@typescript-eslint/prefer-destructuring': [
-                'error',
-                { // Erzwingt Destructuring (moderne Syntax)
-                    array: true,
-                    object: true
-                }
-            ],
-            '@typescript-eslint/parameter-properties': [
-                'error',
-                { // Explizite Parameter Properties
-                    prefer: 'parameter-property'
-                }
-            ],
-
-            // Restricted Types (Security & Type Safety)
-            '@typescript-eslint/no-restricted-types': [
-                'error',
-                {
-                    types: {
-                        Object: {
-                            message: 'Use Record<string, unknown> or a specific interface instead',
-                            fixWith: 'Record<string, unknown>'
-                        },
-                        Function: {
-                            message: 'Use a specific function type instead',
-                            suggest: ['() => void', '(...args: unknown[]) => unknown']
-                        },
-                        '{}': {
-                            message: 'Use Record<string, never> for empty object, unknown for any value, or a specific interface',
-                            fixWith: 'Record<string, never>'
-                        }
-                    }
-                }
-            ],
-
-            // Method Signature Enforcement
-            '@typescript-eslint/method-signature-style': ['error', 'property'], // Konsistente Method Signatures
-
-            // Class Design (Enterprise OOP Standards)
-            '@typescript-eslint/class-methods-use-this': [
-                'error',
-                { // Statische Methoden wenn kein "this"
-                    exceptMethods: [
-                        'render',
-                        'componentDidMount',
-                        'componentDidUpdate',
-                        'componentWillUnmount'
-                    ],
-                    enforceForClassFields: true
-                }
-            ],
-
-            // Async/Promise Best Practices
-            '@typescript-eslint/return-await': ['error', 'always'], // Explizites await für besseres Stack Tracing
-            '@typescript-eslint/no-misused-promises': [
-                'error',
-                {
-                    checksVoidReturn: {
-                        arguments: true,
-                        attributes: true,
-                        properties: true,
-                        returns: true,
-                        variables: true
-                    },
-                    checksConditionals: true,
-                    checksSpreads: true
                 }
             ],
 
@@ -3545,6 +4362,151 @@ const config = tseslint.config(
                     ignoreVoidOperator: false
                 }
             ],
+
+            // Verhindert redundante Union/Intersection Types
+            '@typescript-eslint/no-duplicate-type-constituents': 'error',
+
+            '@typescript-eslint/no-explicit-any': 'error',
+
+            '@typescript-eslint/no-floating-promises': 'error',
+
+            /*
+             * Verhindert redundante Zuweisungen
+             * Import/Export Hygiene (Google/Microsoft Standards)
+             * ✅ ==== VERIFIED ====
+             */
+            '@typescript-eslint/no-import-type-side-effects': 'error',
+
+            // Explizites await für besseres Stack Tracing
+            '@typescript-eslint/no-misused-promises': [
+                'error',
+                {
+                    checksConditionals: true,
+                    checksSpreads: true,
+                    checksVoidReturn: {
+                        arguments: true,
+                        attributes: true,
+                        properties: true,
+                        returns: true,
+                        variables: true
+                    }
+                }
+            ],
+
+            '@typescript-eslint/no-non-null-assertion': 'error',
+
+            /*
+             * ===== ENTERPRISE-GRADE NEUE REGELN (VERIFIZIERT) =====
+             * Type Safety Enhancement
+             */
+            '@typescript-eslint/no-redundant-type-constituents': 'error',
+
+            // Restricted Types (Security & Type Safety)
+            '@typescript-eslint/no-restricted-types': [
+                'error',
+                {
+                    types: {
+                        Function: {
+                            message: 'Use a specific function type instead',
+                            suggest: ['() => void', '(...args: unknown[]) => unknown']
+                        },
+                        Object: {
+                            fixWith: 'Record<string, unknown>',
+                            message: 'Use Record<string, unknown> or a specific interface instead'
+                        },
+                        '{}': {
+                            fixWith: 'Record<string, never>',
+                            message: 'Use Record<string, never> for empty object, unknown for any value, or a specific interface'
+                        }
+                    }
+                }
+            ],
+
+            '@typescript-eslint/no-unnecessary-condition': [
+                'error',
+                {
+                    allowConstantLoopConditions: false,
+                    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false
+                }
+            ],
+
+            '@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error',
+
+            /*
+             * Verhindert leere Exports
+             * Code Quality & Maintainability
+             */
+            '@typescript-eslint/no-unnecessary-qualifier': 'error',
+
+            // Keine doppelten Type Constituents
+            '@typescript-eslint/no-unnecessary-template-expression': 'error',
+
+            // Verhindert unsichere Type Assertions
+            '@typescript-eslint/no-unnecessary-type-conversion': 'error',
+
+            /*
+             * Includes() > indexOf() !== -1
+             * TypeScript 5.x Features
+             */
+            '@typescript-eslint/no-unsafe-declaration-merging': 'error',
+
+            // TypeScript 5.x Declaration Merging Safety
+            '@typescript-eslint/no-unsafe-enum-comparison': 'error',
+
+            /*
+             * ===== ENTERPRISE-GRADE ZUSÄTZLICHE REGELN =====
+             * Type Safety Enhancement
+             */
+            '@typescript-eslint/no-unsafe-type-assertion': 'error',
+
+            '@typescript-eslint/no-useless-empty-export': 'error',
+
+            '@typescript-eslint/parameter-properties': [
+                'error',
+                { // Explizite Parameter Properties
+                    prefer: 'parameter-property'
+                }
+            ],
+
+            // Entfernt unnötige Namespace Qualifier
+            '@typescript-eslint/prefer-destructuring': [
+                'error',
+                { // Erzwingt Destructuring (moderne Syntax)
+                    array: true,
+                    object: true
+                }
+            ],
+
+            '@typescript-eslint/prefer-enum-initializers': 'error',
+
+            // Korrekter Name (nicht no-useless-template-literals)
+            '@typescript-eslint/prefer-find': 'error',
+
+            // Array.find() > filter()[0]
+            '@typescript-eslint/prefer-includes': 'error',
+
+            '@typescript-eslint/prefer-literal-enum-member': 'error',
+
+            '@typescript-eslint/prefer-nullish-coalescing': 'error',
+
+            '@typescript-eslint/prefer-optional-chain': 'error',
+
+            '@typescript-eslint/prefer-readonly': 'error',
+
+            '@typescript-eslint/prefer-readonly-parameter-types': 'error',
+
+            '@typescript-eslint/promise-function-async': 'error',
+
+            '@typescript-eslint/require-array-sort-compare': 'error',
+
+            '@typescript-eslint/restrict-template-expressions': 'error',
+
+            // Async/Promise Best Practices
+            '@typescript-eslint/return-await': ['error', 'always'],
+
+            '@typescript-eslint/strict-boolean-expressions': 'error',
+
+            '@typescript-eslint/switch-exhaustiveness-check': 'error',
 
             // Type Annotation Requirements (für kritische Bereiche)
             '@typescript-eslint/typedef': [
@@ -3561,19 +4523,7 @@ const config = tseslint.config(
                 }
             ],
 
-            /*
-             * ===== ENTERPRISE-GRADE NEUE REGELN (VERIFIZIERT) =====
-             * Type Safety Enhancement
-             */
-            '@typescript-eslint/no-redundant-type-constituents': 'error', // Verhindert redundante Union/Intersection Types
-            '@typescript-eslint/no-duplicate-type-constituents': 'error', // Keine doppelten Type Constituents
-            '@typescript-eslint/no-unnecessary-template-expression': 'error', // Korrekter Name (nicht no-useless-template-literals)
-            '@typescript-eslint/prefer-find': 'error', // Array.find() > filter()[0]
-            '@typescript-eslint/prefer-includes': 'error', // Includes() > indexOf() !== -1
-
-            // TypeScript 5.x Features
-            '@typescript-eslint/no-unsafe-declaration-merging': 'error', // TypeScript 5.x Declaration Merging Safety
-            '@typescript-eslint/no-unsafe-enum-comparison': 'error' // TypeScript 5.x Enum Comparison Safety
+            '@typescript-eslint/unbound-method': 'error' // TypeScript 5.x Enum Comparison Safety
         }
     },
 
@@ -3624,20 +4574,20 @@ const config = tseslint.config(
             'no-restricted-syntax': [
                 'error',
                 {
-                    selector: 'ForInStatement',
-                    message: 'Use for...of or Object.keys/entries/values instead'
+                    message: 'Use for...of or Object.keys/entries/values instead',
+                    selector: 'ForInStatement'
                 },
                 {
-                    selector: 'WithStatement',
-                    message: 'With statements are not allowed'
+                    message: 'With statements are not allowed',
+                    selector: 'WithStatement'
                 },
                 {
-                    selector: 'CallExpression[callee.name=\"eval\"]',
-                    message: 'eval() is not allowed for security reasons'
+                    message: 'eval() is not allowed for security reasons',
+                    selector: 'CallExpression[callee.name=\"eval\"]'
                 },
                 {
-                    selector: 'CallExpression[callee.property.name=\"assign\"][callee.object.name=\"Object\"][arguments.0.type=\"ObjectExpression\"]',
-                    message: 'Use object spread instead of Object.assign with object literal'
+                    message: 'Use object spread instead of Object.assign with object literal',
+                    selector: 'CallExpression[callee.property.name=\"assign\"][callee.object.name=\"Object\"][arguments.0.type=\"ObjectExpression\"]'
                 }
             ]
         }

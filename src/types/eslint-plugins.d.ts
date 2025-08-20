@@ -10,6 +10,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
+type RuleModule = import('eslint').Rule.RuleModule
 type Rules = Readonly<import('eslint').Linter.RulesRecord>
 
 declare module 'eslint-plugin-promise' {
@@ -35,6 +36,7 @@ declare module 'eslint-plugin-react-perf' {
             }
         }
     }
+
     const plugin: EslintPluginReactPerf
     export = plugin
 }
@@ -47,22 +49,39 @@ declare module 'eslint-plugin-security' {
             }
         }
     }
+
     const plugin: EslintPluginSecurity
     export = plugin
 }
 
 declare module 'eslint-plugin-typescript-sort-keys' {
     interface EslintPluginTypescriptSortKeys {
-        readonly rules?: Readonly<Record<string, unknown>>
+        readonly rules?: Record<string, RuleModule>
     }
+
     const plugin: EslintPluginTypescriptSortKeys
     export = plugin
 }
 
 declare module 'eslint-plugin-jsx-a11y' {
     interface EslintPluginJsxA11y {
-        readonly rules: Rules
+        readonly flatConfigs: {
+            readonly strict: {
+                readonly rules: Rules
+            }
+        }
+        readonly rules: Record<string, RuleModule>
     }
+
     const plugin: EslintPluginJsxA11y
+    export = plugin
+}
+
+declare module 'eslint-plugin-sort-keys-fix' {
+    interface EslintPluginSortKeysFix {
+        readonly rules: Record<string, RuleModule>
+    }
+
+    const plugin: EslintPluginSortKeysFix
     export = plugin
 }
