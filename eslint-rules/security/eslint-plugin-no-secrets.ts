@@ -1,3 +1,5 @@
+/* eslint-disable no-secrets/no-pattern-match */
+/* eslint-disable no-secrets/no-secrets */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -32,7 +34,7 @@ const noSecretsRules: {
             {
                 patterns: {
                     'Connection String': /(?:mongodb|mysql|postgres|redis):\/\/[^:]+:[^@]+@[^/]+/u,
-                    'Hardcoded API Key': /api[_-]?key\s*[:=]\s*["'][^"']+["']/iu,
+                    'Hardcoded API Key': /api[-_]?key\s*[:=]\s*["'][^"']+["']/iu,
 
                     /*
                      * Enterprise patterns for configuration files
@@ -40,7 +42,7 @@ const noSecretsRules: {
                     'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/iu,
                     'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/iu,
                     'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/iu,
-                    'Private Key Content': /-{5}BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-{5}/u
+                    'Private Key Content': /-{5}BEGIN\s+(?:RSA\s+PRIVATE|PRIVATE)\s+KEY-{5}/u
                 }
             }
         ],
@@ -155,23 +157,19 @@ const noSecretsRules: {
  * Creates the no-secrets plugin configuration.
  * @returns The no-secrets plugin configuration.
  */
-const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => {
-    return {
-        name: 'enterprise/security/no-secrets',
-        plugins: {
-            'no-secrets': noSecrets
-        },
-        rules: noSecretsRules.rules
-    }
-}
+const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => ({
+    name: 'enterprise/security/no-secrets',
+    plugins: {
+        'no-secrets': noSecrets
+    },
+    rules: noSecretsRules.rules
+})
 
 /**
  * Creates the all security ESLint rules.
  * @returns The all security ESLint rules.
  */
-const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [
-    createNoSecretsConfig()
-]
+const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [createNoSecretsConfig()]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {

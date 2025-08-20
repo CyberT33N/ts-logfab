@@ -643,8 +643,25 @@ const config = tseslint.config(
             // A{0,1} → a?
             'regexp/sort-alternatives': 'error',
 
-            // \x61 → a (lesbar)
-            'regexp/sort-character-class-elements': 'error',
+            // ==== ✅ VERIFIED ====
+            'regexp/sort-character-class-elements': [
+                'error',
+                {
+                    /*
+                     * ✅ ENTERPRISE STANDARD: Default order optimiert für Readability & Security
+                     * Folgt Google/Meta/Microsoft Standards für Character Class Organization
+                     */
+                    order: [
+                        String.raw`\s`, // Whitespace (\s, \S) - grundlegendste Kategorie
+                        String.raw`\w`, // Word chars (\w, \W) - häufigste Verwendung
+                        String.raw`\d`, // Digits (\d, \D) - spezifischer als \w
+                        String.raw`\p`, // Unicode properties (\p{...}, \P{...}) - moderne Features
+                        '*', // Normale Chars/Ranges (a-z, A-Z, 0-9) - explizite Definitionen
+                        String.raw`\q`, // Quoted sequences (\q{...}) - ES2024 Features
+                        '[]' // Nested character classes - komplexeste Strukturen
+                    ]
+                }
+            ],
 
             // Sortiere Zeichen in character classes
             'regexp/sort-flags': 'error',
@@ -2411,6 +2428,9 @@ const config = tseslint.config(
             // ===== HOOKS BEST PRACTICES (ENTERPRISE STANDARD) =====
             'react-hooks/rules-of-hooks': 'error',
 
+            // Nicht relevant mit TypeScript
+            'react/boolean-prop-naming': 'off',
+
             /*
              * Abgedeckt durch @stylistic/jsx-equals-spacing
              * ===== ZUSÄTZLICHE ENTERPRISE STANDARDS =====
@@ -2424,6 +2444,12 @@ const config = tseslint.config(
                 }
             ],
 
+            // Warn für graduelle Adoption
+            'react/checked-requires-onchange-or-readonly': 'warn',
+
+            // Zu opinion-based
+            'react/default-props-match-prop-types': 'off',
+
             /*
              * ===== DISABLED RULES (ENTERPRISE FLEXIBILITY) =====
              * Diese Regeln sind aus flat.all übernommen, aber für Enterprise zu restriktiv
@@ -2436,37 +2462,20 @@ const config = tseslint.config(
             // Zu restriktiv
             'react/forbid-component-props': 'off',
 
-            
-            // Nicht relevant mit TypeScript
-'react/boolean-prop-naming': 'off',
+            // Zu restriktiv
+            'react/forbid-dom-props': 'off',
 
-            
-            
-// Zu restriktiv
-'react/forbid-dom-props': 'off',
-            
             // Zu restriktiv
             'react/forbid-elements': 'off',
 
-            
-            // Zu opinion-based
-'react/default-props-match-prop-types': 'off',
+            // Zu restriktiv
+            'react/forbid-foreign-prop-types': 'off',
 
-            
-            
-// Zu restriktiv
-'react/forbid-foreign-prop-types': 'off',
-            
             // Zu arbiträr, moderne IDEs helfen
             'react/forbid-prop-types': 'off',
 
-            // Warn für graduelle Adoption
-'react/checked-requires-onchange-or-readonly': 'warn',
+            'react/forward-ref-uses-ref': 'error',
 
-            
-            
-'react/forward-ref-uses-ref': 'error',
-            
             // ===== MODERN REACT PATTERNS =====
             'react/function-component-definition': [
                 'error',
@@ -2482,10 +2491,10 @@ const config = tseslint.config(
                     allowDestructuredState: true
                 }
             ],
-            
+
             // Warn statt error - manchmal notwendig
             'react/iframe-missing-sandbox': 'warn',
-            
+
             // Abgedeckt durch @stylistic/jsx-self-closing-comp
             'react/jsx-boolean-value': ['error', 'never'],
 
