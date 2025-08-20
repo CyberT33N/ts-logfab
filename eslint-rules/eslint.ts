@@ -16,12 +16,19 @@
  */
 
 // ==== IMPORTS ====
-import eslint from '@eslint/js'
+import { configs as eslintConfigs } from '@eslint/js'
+import { z } from 'zod'
 
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-// ==== RULES ====
+// Needed for type safety
+const rulesRecordSchema = z.custom<TSESLint.Linter.RulesRecord>(
+    (data): data is TSESLint.Linter.RulesRecord => typeof data === 'object' && data !== null,
+    { message: 'Invalid ESLint rules configuration' }
+)
+
+// Custom rules
 const eslintRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
@@ -47,6 +54,7 @@ const eslintRules: {
          */
 
         // Enterprise standard: Google/Microsoft use 10-15
+        // ✅ ==== VERIFIED ====
         complexity: ['error', 15],
 
         /*
@@ -597,36 +605,51 @@ const eslintRules: {
     }
 }
 
-// ==== FACTORY FUNCTIONS (TypeScript-ESLint Pattern) ====
-const createEnterpriseBase = (): TSESLint.FlatConfig.Config =>
-    ({
+/**
+ * Creates the base enterprise ESLint rules.
+ * @returns The base enterprise ESLint rules.
+ */
+const createEnterpriseBase = (): TSESLint.FlatConfig.Config => {
+    // We validate here because of missing types in eslint/js
+    const validatedRules = rulesRecordSchema.parse(eslintConfigs.all.rules)
+
+    const rules: TSESLint.Linter.RulesRecord = {
+        ...validatedRules,
+        ...eslintRules.rules
+    }
+
+    return {
         name: 'enterprise/base',
-        rules: {
-            ...eslint.configs.all.rules,
-            ...eslintRules.rules
-        }
-    })
+        rules
+    }
+}
 
-const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config =>
-    ({
-        files: [
-            'src/**/index.ts',
-            'test/**/*.{ts,tsx,js,mjs,cjs}',
-            '**/*.test.{ts,tsx,js}',
-            '**/*.spec.{ts,tsx,js}'
-        ],
-        name: 'enterprise/overrides:tests-and-index',
-        rules: { 'no-restricted-imports': 'off' }
-    })
+/**
+ * Creates the overrides for the enterprise ESLint rules.
+ * @returns The overrides for the enterprise ESLint rules.
+ */
+const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config => ({
+    files: [
+        'src/**/index.ts',
+        'test/**/*.{ts,tsx,js,mjs,cjs}',
+        '**/*.test.{ts,tsx,js}',
+        '**/*.spec.{ts,tsx,js}'
+    ],
+    name: 'enterprise/overrides:tests-and-index',
+    rules: { 'no-restricted-imports': 'off' }
+})
 
-const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray =>
-    [createEnterpriseBase(), createEnterpriseOverrides()]
+/**
+ * Creates the all enterprise ESLint rules.
+ * @returns The all enterprise ESLint rules.
+ */
+const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray => [createEnterpriseBase(), createEnterpriseOverrides()]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {
     /**
      * Enterprise-grade ESLint rules based on Google/Microsoft/Meta standards.
-     * Combines @eslint/js all rules with additional enterprise-specific rules.
+     * Combines {@link https://github.com/eslint/eslint/tree/main/packages/eslint/eslint.js} all rules with additional enterprise-specific rules.
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-eslint-config}
      */
     all: createEnterpriseAll(),
@@ -646,7 +669,3 @@ export const configs = {
      */
     overrides: createEnterpriseOverrides()
 } satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
-
-// ==== LEGACY EXPORTS (Backwards Compatibility) ====
-export const eslintEnterpriseRules = createEnterpriseBase()
-export const eslintEnterpriseOverrides = createEnterpriseOverrides()

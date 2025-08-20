@@ -1419,9 +1419,10 @@ const config = tseslint.config(
              * ===== ENTERPRISE EXPORT STRATEGY =====
              * Types/Interfaces: Export at definition site (Enterprise Standard)
              * Values/Functions: Group exports at end when beneficial
+             * Bessere Co-Location/Lesbarkeit, weniger Churn/Merge-Konflikte, einfachere Refactors. Praktiken großer OSS‑Codebasen (React/Next.js/Node-Core) nutzen überwiegend mehrere Export-Statements statt Zwangs-Gruppierung. Tree‑Shaking bleibt in beiden Varianten gleich gut.
              * ✅ ==== VERIFIED ====
              */
-            'import/group-exports': 'error',
+            'import/group-exports': 'off',
 
             // Google/Microsoft Standard: NEVER use default exports
             'import/max-dependencies': [
@@ -1780,6 +1781,7 @@ const config = tseslint.config(
         rules: {
 
             // ===== ARRAYS =====
+            // ✅ ==== VERIFIED ====
             '@stylistic/array-bracket-newline': [
                 'error',
                 {
@@ -1859,6 +1861,7 @@ const config = tseslint.config(
 
             '@stylistic/dot-location': ['error', 'property'],
 
+            // ✅ ==== VERIFIED ====
             '@stylistic/eol-last': ['error', 'always'],
 
             // We use custom rules for formatting function definitions
@@ -1881,7 +1884,7 @@ const config = tseslint.config(
             ],
 
             // ✅ ==== VERIFIED ====
-            '@stylistic/implicit-arrow-linebreak': ['error', 'below'],
+            '@stylistic/implicit-arrow-linebreak': ['error', 'beside'],
 
             // ===== SPACING & INDENTATION =====
             '@stylistic/indent': [
@@ -2058,6 +2061,7 @@ const config = tseslint.config(
                 }
             ],
 
+            // ✅ ==== VERIFIED ====
             '@stylistic/linebreak-style': ['error', 'unix'],
 
             '@stylistic/lines-around-comment': [
@@ -2127,6 +2131,7 @@ const config = tseslint.config(
                 }
             ],
 
+            // ✅ ==== VERIFIED ====
             '@stylistic/multiline-comment-style': ['error', 'starred-block'],
 
             // ===== TERNARY =====
@@ -2201,6 +2206,11 @@ const config = tseslint.config(
                 }
             ],
 
+            /*
+             * ✅ ==== VERIFIED ====
+             * Begründung: Minimales, konsistentes Whitespace; verhindert visuelles Rauschen
+             * und harmoniert mit @stylistic/eol-last: "always" (genau eine Abschluss‑Newline, aber keine „zusätzlichen“ Leerzeilen)
+             */
             '@stylistic/no-multiple-empty-lines': [
                 'error',
                 {

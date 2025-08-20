@@ -25,8 +25,7 @@ const LAST_INDEX_OFFSET = 1
 
 // Create typed rule factory with docs URL
 const createRule = ESLintUtils.RuleCreator(
-    name =>
-        `https://docs.t33n.software/eslint-rules/${name}`
+    name => `https://docs.t33n.software/eslint-rules/${name}`
 )
 
 interface EnforceParameters {
@@ -258,8 +257,7 @@ const reportMissingNewlines = (
 
     if (isOpenAndNextSameLine) {
         context.report({
-            fix: (fixer: Readonly<TSESLint.RuleFixer>) =>
-                fixer.insertTextAfter(openingParen, '\n'),
+            fix: (fixer: Readonly<TSESLint.RuleFixer>) => fixer.insertTextAfter(openingParen, '\n'),
             loc: openingParen.loc,
             messageId: 'expectedAfter',
             node: functionNode
@@ -268,8 +266,7 @@ const reportMissingNewlines = (
 
     if (isPreviousAndCloseSameLine) {
         context.report({
-            fix: (fixer: Readonly<TSESLint.RuleFixer>) =>
-                fixer.insertTextBefore(closingParen, '\n'),
+            fix: (fixer: Readonly<TSESLint.RuleFixer>) => fixer.insertTextBefore(closingParen, '\n'),
             loc: closingParen.loc,
             messageId: 'expectedBefore',
             node: functionNode
