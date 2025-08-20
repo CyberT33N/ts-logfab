@@ -53,8 +53,10 @@ const eslintRules: {
          * 'camelcase': ['error', { properties: 'never' }],
          */
 
-        // Enterprise standard: Google/Microsoft use 10-15
-        // ✅ ==== VERIFIED ====
+        /*
+         * ✅ ==== VERIFIED ====
+         * Enterprise standard: Google/Microsoft use 10-15
+         */
         complexity: ['error', 15],
 
         /*
@@ -488,6 +490,7 @@ const eslintRules: {
          *      enforceForJSX: true
          * }],
          */
+
         'no-useless-call': 'error',
 
         // Prevents shadowing restricted names

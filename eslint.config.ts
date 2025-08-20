@@ -74,6 +74,7 @@ import importPlugin from 'eslint-plugin-import'
  * https://www.npmjs.com/package/eslint-plugin-jsonc
  */
 import eslintPluginJsonc from 'eslint-plugin-jsonc'
+
 // https://www.npmjs.com/package/eslint-plugin-jsx-a11y
 import a11yPlugin from 'eslint-plugin-jsx-a11y'
 import nodePlugin from 'eslint-plugin-n'
@@ -1780,8 +1781,10 @@ const config = tseslint.config(
         },
         rules: {
 
-            // ===== ARRAYS =====
-            // ✅ ==== VERIFIED ====
+            /*
+             * ===== ARRAYS =====
+             * ✅ ==== VERIFIED ====
+             */
             '@stylistic/array-bracket-newline': [
                 'error',
                 {
@@ -2581,34 +2584,67 @@ const config = tseslint.config(
              */
             'react/destructuring-assignment': 'off',
 
+            // TypeScript macht PropTypes obsolet
+            'react/display-name': 'off',
+
+            // Zu restriktiv
+            'react/forbid-component-props': 'off',
+
+            
+            // Nicht relevant mit TypeScript
+'react/boolean-prop-naming': 'off',
+
+            
+            
+// Zu restriktiv
+'react/forbid-dom-props': 'off',
+            
+            // Zu restriktiv
+            'react/forbid-elements': 'off',
+
+            
+            // Zu opinion-based
+'react/default-props-match-prop-types': 'off',
+
+            
+            
+// Zu restriktiv
+'react/forbid-foreign-prop-types': 'off',
+            
             // Zu arbiträr, moderne IDEs helfen
             'react/forbid-prop-types': 'off',
 
-            'react/forward-ref-uses-ref': 'error',
+            // Warn für graduelle Adoption
+'react/checked-requires-onchange-or-readonly': 'warn',
 
             
-            // TypeScript macht PropTypes obsolet
-'react/display-name': 'off',
-
             
-// ===== MODERN REACT PATTERNS =====
-'react/function-component-definition': [
+'react/forward-ref-uses-ref': 'error',
+            
+            // ===== MODERN REACT PATTERNS =====
+            'react/function-component-definition': [
                 'error',
                 {
                     namedComponents: 'arrow-function',
                     unnamedComponents: 'arrow-function'
                 }
             ],
-            
+
             'react/hook-use-state': [
                 'error',
                 {
                     allowDestructuredState: true
                 }
             ],
-
+            
+            // Warn statt error - manchmal notwendig
+            'react/iframe-missing-sandbox': 'warn',
+            
             // Abgedeckt durch @stylistic/jsx-self-closing-comp
             'react/jsx-boolean-value': ['error', 'never'],
+
+            // Zu restriktiv
+            'react/jsx-child-element-spacing': 'off',
 
             /*
              * ===== JSX FORMATTING =====
@@ -2628,24 +2664,16 @@ const config = tseslint.config(
             // Abgedeckt durch @stylistic/jsx-curly-spacing
             'react/jsx-equals-spacing': 'off',
 
-            
-            // Zu restriktiv
-'react/forbid-component-props': 'off',
+            // Edge cases existieren
+            'react/jsx-filename-extension': 'off',
 
-            
-            
-// Abgedeckt durch @stylistic/jsx-closing-tag-location
-'react/jsx-first-prop-new-line': 'off',
-            
+            // Abgedeckt durch @stylistic/jsx-closing-tag-location
+            'react/jsx-first-prop-new-line': 'off',
+
             // Abgedeckt durch @stylistic/jsx-pascal-case
             'react/jsx-fragments': ['error', 'syntax'],
 
-            // Zu restriktiv
-'react/forbid-dom-props': 'off',
-
-            
-            
-'react/jsx-handler-names': [
+            'react/jsx-handler-names': [
                 'error',
                 {
                     // Zu restriktiv
@@ -2657,18 +2685,13 @@ const config = tseslint.config(
                     eventHandlerPropPrefix: 'on'
                 }
             ],
-            
+
             // Abgedeckt durch @stylistic/jsx-first-prop-new-line
             'react/jsx-indent': 'off',
 
-            
-            // Zu restriktiv
-'react/forbid-elements': 'off',
+            // Abgedeckt durch @stylistic/indent (JSX wird mit abgedeckt)
+            'react/jsx-indent-props': 'off',
 
-            
-// Abgedeckt durch @stylistic/indent (JSX wird mit abgedeckt)
-'react/jsx-indent-props': 'off',
-            
             'react/jsx-key': [
                 'error',
                 {
@@ -2678,34 +2701,22 @@ const config = tseslint.config(
                 }
             ],
 
-            
-            // Zu restriktiv
-'react/forbid-foreign-prop-types': 'off',
+            // Utility components oft in gleicher Datei
+            'react/jsx-max-depth': 'off',
 
-            
-            
-// Utility components oft in gleicher Datei
-'react/jsx-max-depth': 'off',
-            
             // Abgedeckt durch @stylistic/jsx-indent-props
             'react/jsx-max-props-per-line': 'off',
 
-            
-            // Zu restriktiv
-'react/jsx-child-element-spacing': 'off',
+            // .tsx ist Standard
+            'react/jsx-newline': 'off',
 
-            
-// SetState manchmal notwendig
-'react/jsx-no-bind': 'off',
-            
+            // SetState manchmal notwendig
+            'react/jsx-no-bind': 'off',
+
             'react/jsx-no-comment-textnodes': 'error',
 
-            // Edge cases existieren
-'react/jsx-filename-extension': 'off',
+            'react/jsx-no-constructed-context-values': 'error',
 
-            
-'react/jsx-no-constructed-context-values': 'error',
-            
             'react/jsx-no-duplicate-props': [
                 'error',
                 {
@@ -2713,28 +2724,18 @@ const config = tseslint.config(
                 }
             ],
 
-            // .tsx ist Standard
-'react/jsx-newline': 'off',
-
-            
-            
-'react/jsx-no-leaked-render': [
+            'react/jsx-no-leaked-render': [
                 'error',
                 {
                     validStrategies: ['coerce', 'ternary']
                 }
             ],
-            
+
             // Zu arbiträr
             'react/jsx-no-literals': 'off',
 
-            // Nicht relevant mit TypeScript
-'react/boolean-prop-naming': 'off',
+            'react/jsx-no-script-url': 'error',
 
-            
-            
-'react/jsx-no-script-url': 'error',
-            
             // ===== SECURITY & BUG PREVENTION (CRITICAL) =====
             'react/jsx-no-target-blank': [
                 'error',
@@ -2744,11 +2745,6 @@ const config = tseslint.config(
                 }
             ],
 
-            // Zu opinion-based
-'react/default-props-match-prop-types': 'off',
-
-
-            
             'react/jsx-no-undef': [
                 'error',
                 {
@@ -2756,32 +2752,20 @@ const config = tseslint.config(
                 }
             ],
 
-            
-            // Warn für graduelle Adoption
-'react/checked-requires-onchange-or-readonly': 'warn',
-
-            
-            
-// Abgedeckt durch @stylistic/jsx-curly-brace-presence
-'react/jsx-no-useless-fragment': [
+            // Abgedeckt durch @stylistic/jsx-curly-brace-presence
+            'react/jsx-no-useless-fragment': [
                 'error',
                 {
                     allowExpressions: true
                 }
             ],
-            
+
             // Nicht nützlich mit TypeScript
             'react/jsx-one-expression-per-line': 'off',
 
-            
-            // Warn statt error - manchmal notwendig
-'react/iframe-missing-sandbox': 'warn',
+            // ===== CODE QUALITY & CONSISTENCY =====
+            'react/jsx-pascal-case': 'off',
 
-            
-            
-// ===== CODE QUALITY & CONSISTENCY =====
-'react/jsx-pascal-case': 'off',
-            
             // Zu restriktiv für JSX
             'react/jsx-props-no-multi-spaces': 'off',
 
@@ -2794,100 +2778,78 @@ const config = tseslint.config(
             // React 17+ JSX Transform
             'react/jsx-sort-default-props': 'off',
 
-            
             // Mit TypeScript redundant
-'react/jsx-sort-props': 'off',
+            'react/jsx-sort-props': 'off',
 
-            
-            
-/*
- * Modern class fields
- * ===== LIFECYCLE & STATE MANAGEMENT =====
- */
-'react/no-access-state-in-setstate': 'error',
-            
-            
-// Prettier handled das
-'react/jsx-space-before-closing': 'off',
-
-            
-            // ===== PERFORMANCE OPTIMIZATIONS =====
-'react/no-array-index-key': 'warn',
+            // Prettier handled das
+            'react/jsx-space-before-closing': 'off',
 
             // Abgedeckt durch @stylistic/jsx-max-props-per-line
             'react/jsx-tag-spacing': 'off',
-            
-            'react/no-danger-with-children': 'error',
 
             'react/jsx-uses-react': 'error',
-
-            'react/no-deprecated': 'error',
 
             'react/jsx-uses-vars': 'error',
 
             // Abgedeckt durch @stylistic/jsx-tag-spacing
-'react/jsx-wrap-multilines': 'off',
+            'react/jsx-wrap-multilines': 'off',
 
-            
-'react/no-did-mount-set-state': 'error',
-            
-            'react/no-did-update-set-state': 'error',
+            /*
+             * Modern class fields
+             * ===== LIFECYCLE & STATE MANAGEMENT =====
+             */
+            'react/no-access-state-in-setstate': 'error',
 
             // Nicht immer notwendig
-'react/no-adjacent-inline-elements': 'off',
+            'react/no-adjacent-inline-elements': 'off',
 
-            
-'react/no-direct-mutation-state': 'error',
-            
-            'react/no-find-dom-node': 'error',
+            // ===== PERFORMANCE OPTIMIZATIONS =====
+            'react/no-array-index-key': 'warn',
 
             // Prettier handled das
-'react/no-arrow-function-lifecycle': 'off',
+            'react/no-arrow-function-lifecycle': 'off',
 
-            
-'react/no-is-mounted': 'error',
-            
             'react/no-children-prop': 'error',
-
-            'react/no-redundant-should-component-update': 'error',
 
             // Zu restriktiv
             'react/no-danger': 'warn',
-            
-            // Moderne Patterns erlauben das
-'react/no-invalid-html-attribute': 'off',
 
-            
-            'react/no-render-return-value': 'error',
+            'react/no-danger-with-children': 'error',
+
+            'react/no-deprecated': 'error',
+
+            'react/no-did-mount-set-state': 'error',
+
+            'react/no-did-update-set-state': 'error',
+
+            'react/no-direct-mutation-state': 'error',
+
+            'react/no-find-dom-node': 'error',
+
+            // Moderne Patterns erlauben das
+            'react/no-invalid-html-attribute': 'off',
+
+            'react/no-is-mounted': 'error',
 
             // Zu restriktiv
             'react/no-multi-comp': 'off',
-            
-            // Spread patterns sind oft valid
-'react/no-namespace': 'off',
 
-            
-            'react/no-string-refs': 'error',
+            // Spread patterns sind oft valid
+            'react/no-namespace': 'off',
 
             // Zu viele false positives
-'react/no-object-type-as-default-prop': 'off',
+            'react/no-object-type-as-default-prop': 'off',
 
-            
-            
-'react/no-this-in-sfc': 'error',
-            
-            
-// Zu restriktiv für i18n
-'react/no-set-state': 'off',
+            'react/no-redundant-should-component-update': 'error',
 
-            
-            // Warn statt error für Flexibilität
-'react/no-unstable-nested-components': [
-                'error',
-                {
-                    allowAsProps: false
-                }
-            ],
+            'react/no-render-return-value': 'error',
+
+            // Zu restriktiv für i18n
+            'react/no-set-state': 'off',
+
+            'react/no-string-refs': 'error',
+
+            'react/no-this-in-sfc': 'error',
 
             'react/no-typos': 'error',
 
@@ -2900,6 +2862,14 @@ const config = tseslint.config(
                         '\'',
                         '}'
                     ]
+                }
+            ],
+
+            // Warn statt error für Flexibilität
+            'react/no-unstable-nested-components': [
+                'error',
+                {
+                    allowAsProps: false
                 }
             ],
 
@@ -2924,16 +2894,10 @@ const config = tseslint.config(
             // Namespaces manchmal nötig
             'react/prefer-read-only-props': 'off',
 
-
             'react/prefer-stateless-function': 'error',
 
-            
-// Mit modernen Engines kein Performance-Problem
-'react/prop-types': 'off',
-
-            
-            // Prefer <> over React.Fragment
-'react/self-closing-comp': 'off',
+            // Mit modernen Engines kein Performance-Problem
+            'react/prop-types': 'off',
 
             // DevTools zeigen meist richtige Namen
             'react/react-in-jsx-scope': 'off',
@@ -2943,6 +2907,9 @@ const config = tseslint.config(
 
             // Deprecated
             'react/require-optimization': 'off',
+
+            // Prefer <> over React.Fragment
+            'react/self-closing-comp': 'off',
 
             // Kein echter Mehrwert
             'react/sort-comp': 'off',
@@ -3530,26 +3497,24 @@ const config = tseslint.config(
      * ===== TYPESCRIPT-ESLINT CONFIGURATIONS =====
      * Include ALL strict TypeScript rules (includes recommended)
      */
-    ...tseslint.configs.strictTypeChecked.map(config =>
-        ({
-            ...config,
-            files: [
-                '**/*.ts',
-                '**/*.tsx',
-                '**/*.mts',
-                '**/*.cts'
-            ] // Only apply to TypeScript files
-        })),
-    ...tseslint.configs.stylisticTypeChecked.map(config =>
-        ({
-            ...config,
-            files: [
-                '**/*.ts',
-                '**/*.tsx',
-                '**/*.mts',
-                '**/*.cts'
-            ] // Only apply to TypeScript files
-        })),
+    ...tseslint.configs.strictTypeChecked.map(config => ({
+        ...config,
+        files: [
+            '**/*.ts',
+            '**/*.tsx',
+            '**/*.mts',
+            '**/*.cts'
+        ] // Only apply to TypeScript files
+    })),
+    ...tseslint.configs.stylisticTypeChecked.map(config => ({
+        ...config,
+        files: [
+            '**/*.ts',
+            '**/*.tsx',
+            '**/*.mts',
+            '**/*.cts'
+        ] // Only apply to TypeScript files
+    })),
 
     // ===== TYPESCRIPT PARSER CONFIG =====
     {
@@ -4455,6 +4420,17 @@ const config = tseslint.config(
              * Type Safety Enhancement
              */
             '@typescript-eslint/no-unsafe-type-assertion': 'error',
+
+            // ✅ ==== VERIFIED ====
+            '@typescript-eslint/no-unused-expressions': [
+                'error',
+                {
+                    allowShortCircuit: false,
+                    allowTaggedTemplates: false,
+                    allowTernary: false,
+                    enforceForJSX: true
+                }
+            ],
 
             '@typescript-eslint/no-useless-empty-export': 'error',
 
