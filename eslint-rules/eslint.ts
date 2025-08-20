@@ -15,12 +15,15 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
+// ==== IMPORTS ====
+import eslint from '@eslint/js'
+
 // ==== TYPES ====
-import type { Linter } from 'eslint'
+import type { TSESLint } from '@typescript-eslint/utils'
 
 // ==== RULES ====
-export const eslintRules: {
-    rules: Linter.RulesRecord
+const eslintRules: {
+    rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
         'accessor-pairs': 'error',
@@ -593,3 +596,57 @@ export const eslintRules: {
         'symbol-description': 'error'
     }
 }
+
+// ==== FACTORY FUNCTIONS (TypeScript-ESLint Pattern) ====
+const createEnterpriseBase = (): TSESLint.FlatConfig.Config =>
+    ({
+        name: 'enterprise/base',
+        rules: {
+            ...eslint.configs.all.rules,
+            ...eslintRules.rules
+        }
+    })
+
+const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config =>
+    ({
+        files: [
+            'src/**/index.ts',
+            'test/**/*.{ts,tsx,js,mjs,cjs}',
+            '**/*.test.{ts,tsx,js}',
+            '**/*.spec.{ts,tsx,js}'
+        ],
+        name: 'enterprise/overrides:tests-and-index',
+        rules: { 'no-restricted-imports': 'off' }
+    })
+
+const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray =>
+    [createEnterpriseBase(), createEnterpriseOverrides()]
+
+// ==== SHARED CONFIGS (Plugin Pattern) ====
+export const configs = {
+    /**
+     * Enterprise-grade ESLint rules based on Google/Microsoft/Meta standards.
+     * Combines @eslint/js all rules with additional enterprise-specific rules.
+     * @see {@link https://github.com/t33n/ts-logfab#enterprise-eslint-config}
+     */
+    all: createEnterpriseAll(),
+
+    /**
+     * Base enterprise ESLint rules without file-specific overrides.
+     */
+    base: createEnterpriseBase(),
+
+    /**
+     * Alias for compatibility with flat config naming conventions.
+     */
+    'flat/all': createEnterpriseAll(),
+
+    /**
+     * File-specific rule overrides for test files and index files.
+     */
+    overrides: createEnterpriseOverrides()
+} satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
+
+// ==== LEGACY EXPORTS (Backwards Compatibility) ====
+export const eslintEnterpriseRules = createEnterpriseBase()
+export const eslintEnterpriseOverrides = createEnterpriseOverrides()

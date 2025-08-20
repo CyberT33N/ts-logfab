@@ -14,9 +14,6 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
-// ===== [CORE ESLINT & TYPESCRIPT] =====
-import eslint from '@eslint/js'
-
 // https://github.com/eslint-stylistic/eslint-stylistic
 import stylistic from '@stylistic/eslint-plugin'
 
@@ -148,7 +145,7 @@ import tseslint from 'typescript-eslint'
  */
 
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
-import { eslintRules } from './eslint-rules/eslint'
+import { configs as enterpriseConfigs } from './eslint-rules/eslint'
 
 const config = tseslint.config(
     {
@@ -157,17 +154,7 @@ const config = tseslint.config(
     },
 
     // ===== ESLINT CORE =====
-    eslint.configs.all,
-    eslintRules,
-    {
-        files: [
-            'src/**/index.ts',
-            'test/**/*.{ts,tsx,js,mjs,cjs}',
-            '**/*.test.{ts,tsx,js}',
-            '**/*.spec.{ts,tsx,js}'
-        ],
-        rules: { 'no-restricted-imports': 'off' }
-    },
+    enterpriseConfigs.all,
 
     {
         plugins: {
@@ -197,7 +184,7 @@ const config = tseslint.config(
              * Since eslint-plugin-xss is incompatible with ESLint 9,
              * We use security plugin rules for XSS prevention
              */
-            'security/detect-unsafe-regex': 'error' // Timing attack prevention
+            'security/detect-unsafe-regex': 'error'
         }
     },
 
