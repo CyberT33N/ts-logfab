@@ -157,6 +157,7 @@ const config = tseslint.config(
     // ===== ESLINT CORE =====
     enterpriseConfigs.all,
 
+    // ===== SORTING & ORDERING =====
     {
         plugins: {
             'sort-keys-fix': sortKeysFix
