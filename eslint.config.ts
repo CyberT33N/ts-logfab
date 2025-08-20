@@ -78,7 +78,6 @@ import eslintPluginJsonc from 'eslint-plugin-jsonc'
 // https://www.npmjs.com/package/eslint-plugin-jsx-a11y
 import a11yPlugin from 'eslint-plugin-jsx-a11y'
 import nodePlugin from 'eslint-plugin-n'
-import noSecrets from 'eslint-plugin-no-secrets'
 
 // https://www.npmjs.com/package/eslint-plugin-package-json
 import packageJson from 'eslint-plugin-package-json'
@@ -96,7 +95,6 @@ import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
 import { configs } from 'eslint-plugin-regexp'
-import pluginSecurity from 'eslint-plugin-security'
 import sonarjs from 'eslint-plugin-sonarjs'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
 import pluginTsDoc from 'eslint-plugin-tsdoc'
@@ -145,8 +143,15 @@ import tseslint from 'typescript-eslint'
  * import boundaries from "eslint-plugin-boundaries";
  */
 
+// ==== CUSTOM ====
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
+
+// ==== ENTERPRISE ====
 import { configs as enterpriseConfigs } from './eslint-rules/eslint'
+
+// ==== SECURITY ====
+import { configs as noSecretsConfigs } from './eslint-rules/security/eslint-plugin-no-secrets'
+import { configs as securityConfigs } from './eslint-rules/security/eslint-plugin-security'
 
 const config = tseslint.config(
     {
@@ -168,170 +173,10 @@ const config = tseslint.config(
     },
 
     // ===== SECURITY PLUGIN =====
-    pluginSecurity.configs.recommended,
-    {
-        rules: {
-
-            // Prevents ReDoS attacks
-            'security/detect-eval-with-expression': 'error',
-
-            // Prevents code injection
-            'security/detect-no-csrf-before-method-override': 'error',
-
-            // CSRF protection
-            'security/detect-possible-timing-attacks': 'error',
-
-            /*
-             * ===== ENHANCED XSS PREVENTION (OWASP Top 10 Compliance) =====
-             * Since eslint-plugin-xss is incompatible with ESLint 9,
-             * We use security plugin rules for XSS prevention
-             */
-            'security/detect-unsafe-regex': 'error'
-        }
-    },
+    securityConfigs.all,
 
     // ===== NO SECRETS PLUGIN (ENTERPRISE SECURITY COMPLIANCE) =====
-    {
-        plugins: {
-            'no-secrets': noSecrets
-        },
-        rules: {
-
-            // ===== PATTERN MATCHING FOR STRUCTURED SECRETS =====
-            'no-secrets/no-pattern-match': [
-                'error',
-                {
-                    patterns: {
-
-                        'Connection String': /(?:mongodb|mysql|postgres|redis):\/\/[^:]+:[^@]+@[^/]+/,
-
-                        'Hardcoded API Key': /api[_-]?key\s*[:=]\s*["'][^"']+["']/i,
-
-                        // Enterprise patterns for configuration files
-                        'Hardcoded Password': /password\s*[:=]\s*["'][^"']+["']/i,
-                        'Hardcoded Secret': /secret\s*[:=]\s*["'][^"']+["']/i,
-                        'Hardcoded Token': /token\s*[:=]\s*["'][^"']+["']/i,
-                        'Private Key Content': /-{5}BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-{5}/u
-                    }
-                }
-            ],
-
-            // ===== ENTERPRISE SECRET DETECTION (Google/Microsoft/Meta Standards) =====
-            'no-secrets/no-secrets': [
-                'error',
-                {
-
-                    additionalDelimiters: [
-                        '.', // Split by dots (e.g., api.key.value)
-                        '-', // Split by dashes (e.g., api-key-value)
-                        '_', // Split by underscores (e.g., api_key_value)
-                        '(?=[A-Z][a-z])' // Split camelCase
-                    ],
-
-                    // Enterprise: Case-sensitive entropy calculation
-                    additionalRegexes: {
-                        // ===== CLOUD PROVIDER SECRETS =====
-                        'AWS Access Key': 'AKIA[0-9A-Z]{16}',
-
-                        'AWS AppSync': 'da2-[a-z0-9]{26}',
-
-                        // 'AWS Secret Key': '[0-9a-zA-Z/+=]{40}',
-                        'AWS MWS Key': String.raw`amzn\.mws\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`,
-
-                        'Ansible Vault': String.raw`\$ANSIBLE_VAULT;[0-9.]+;AES256`,
-
-                        /*
-                         * 'OAuth Token': '[a-zA-Z0-9\\-._~+/]+=*',
-                         * ===== ENTERPRISE SPECIFIC =====
-                         */
-                        'Artifactory Token': 'AKC[a-zA-Z0-9]{10,}',
-
-                        'Azure Storage Key': '[a-zA-Z0-9+/]{86}==',
-
-                        // 'Basic Auth': 'Basic [A-Za-z0-9+/]{4,}={0,2}',
-                        'Bearer Token': String.raw`Bearer [A-Za-z0-9\-_]+`,
-
-                        'Discord Token': String.raw`[MN][a-zA-Z\d]{23}\.[a-zA-Z\d-_]{6}\.[a-zA-Z\d-_]{27}`,
-
-                        'Discord Webhook': String.raw`https://discord\.com/api/webhooks/[0-9]+/[a-zA-Z0-9\-_]+`,
-
-                        'Docker Hub Token': String.raw`dckr_pat_[a-zA-Z0-9\-_]+`,
-
-                        'GCP API Key': String.raw`AIza[0-9A-Za-z\-_]{35}`,
-
-                        'GCP OAuth': String.raw`[0-9]+-[0-9A-Za-z_]{32}\.apps\.googleusercontent\.com`,
-
-                        'GitHub App Token': 'ghs_[0-9a-zA-Z]{36}',
-
-                        'GitHub Personal Token': 'ghp_[0-9a-zA-Z]{36}',
-
-                        // ===== VERSION CONTROL TOKENS =====
-                        'GitHub Token': '(gh[oprs]_[0-9a-zA-Z]{36})',
-
-                        'GitLab Token': String.raw`glpat-[0-9a-zA-Z\-_]{20}`,
-
-                        // ===== AUTHENTICATION PATTERNS =====
-                        'JWT Token': String.raw`ey[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*`,
-
-                        'Kubernetes Secret': String.raw`kubectl create secret [^\n]+`,
-
-                        'MailChimp API Key': '[0-9a-f]{32}-us[0-9]{1,2}',
-
-                        // ===== DATABASE CREDENTIALS =====
-                        'MongoDB Connection': String.raw`mongodb(\+srv)?://[^\s]+`,
-
-                        'MySQL Connection': String.raw`mysql://[^\s]+`,
-
-                        // ===== API KEYS & SECRETS =====
-                        'NPM Token': 'npm_[a-zA-Z0-9]{36}',
-
-                        'PayPal/Braintree Token': String.raw`access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32}`,
-
-                        'PostgreSQL Connection': String.raw`postgres(ql)?://[^\s]+`,
-
-                        'Private Key': '-----BEGIN (RSA |EC |DSA |OPENSSH |)?(PRIVATE|ENCRYPTED) KEY-----',
-
-                        'PyPI Token': String.raw`pypi-[a-zA-Z0-9\-_]+`,
-
-                        'Redis Connection': String.raw`redis://[^\s]+`,
-
-                        'SendGrid API Key': String.raw`SG\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+`,
-
-                        /*
-                         * 'Bitbucket Token': '[a-zA-Z0-9]{20,}',
-                         * ===== COMMUNICATION PLATFORMS =====
-                         */
-                        'Slack Token': '(xox[baprs]-[0-9a-zA-Z-]+)',
-
-                        'Slack Webhook': String.raw`https://hooks\.slack\.com/services/T[a-zA-Z0-9_]+/B[a-zA-Z0-9_]+/[a-zA-Z0-9_]+`,
-
-                        'Square Token': String.raw`(sq0atp|sq0csp)-[0-9A-Za-z\-_]+`,
-
-                        'Stripe API Key': '(sk|pk)_(test|live)_[0-9a-zA-Z]{24}',
-                        'Teams Webhook': String.raw`https://[a-z0-9]+\.webhook\.office\.com/webhookb2/[a-z0-9\-]+@[a-z0-9\-]+/IncomingWebhook/[a-z0-9]+/[a-z0-9\-]+`,
-                        'Terraform Variable': String.raw`TF_VAR_[a-zA-Z_]+=[^\s]+`,
-                        'Twilio API Key': 'SK[0-9a-fA-F]{32}',
-                        'Vault Token': String.raw`s\.[a-zA-Z0-9]{24}`
-                    },
-
-                    // Enterprise: Check ALL strings including imports
-                    ignoreCase: false,
-
-                    ignoreContent: [
-                        // Common false positives in enterprise codebases
-                        '^[A-Z][A-Z0-9_]*$', // Environment variable names
-                        '^[a-f0-9]{32}$', // MD5 hashes (often used for cache keys)
-                        '^[a-f0-9]{40}$', // SHA1 hashes
-                        '^[a-f0-9]{64}$' // SHA256 hashes
-                    ],
-
-                    // Enterprise: Stricter entropy threshold (Google standard)
-                    ignoreModules: false,
-                    tolerance: 3
-                }
-            ]
-        }
-    },
+    noSecretsConfigs.all,
 
     /*
      * ===== VITEST TESTING STANDARDS =====

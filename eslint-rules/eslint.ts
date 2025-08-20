@@ -17,16 +17,13 @@
 
 // ==== IMPORTS ====
 import { configs as eslintConfigs } from '@eslint/js'
-import { z } from 'zod'
+
+// ==== UTILS ====
+import { rulesRecordSchema } from './utilities'
 
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-// Needed for type safety
-const rulesRecordSchema = z.custom<TSESLint.Linter.RulesRecord>(
-    (data): data is TSESLint.Linter.RulesRecord => typeof data === 'object' && data !== null,
-    { message: 'Invalid ESLint rules configuration' }
-)
 
 // Custom rules
 const eslintRules: {
