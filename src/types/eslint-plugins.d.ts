@@ -9,6 +9,7 @@
  */
 
 type LooseRuleDefinition = import('@typescript-eslint/utils').TSESLint.LooseRuleDefinition
+type RuleEntry = import('@typescript-eslint/utils').TSESLint.Linter.RuleEntry
 type RulesRecord = import('@typescript-eslint/utils').TSESLint.Linter.RulesRecord
 
 declare module '@eslint/js' {
@@ -72,20 +73,6 @@ declare module 'eslint-plugin-typescript-sort-keys' {
     export = plugin
 }
 
-declare module 'eslint-plugin-jsx-a11y' {
-    interface EslintPluginJsxA11y {
-        readonly flatConfigs: {
-            readonly strict: {
-                readonly rules: Record<string, LooseRuleDefinition>
-            }
-        }
-        readonly rules: RulesRecord
-    }
-
-    const plugin: EslintPluginJsxA11y
-    export = plugin
-}
-
 declare module 'eslint-plugin-sort-keys-fix' {
     interface EslintPluginSortKeysFix {
         readonly rules: Record<string, LooseRuleDefinition>
@@ -97,7 +84,7 @@ declare module 'eslint-plugin-sort-keys-fix' {
 
 declare module 'eslint-plugin-no-secrets' {
     interface EslintPluginNoSecrets {
-        readonly rules: RulesRecord
+        readonly rules: Record<string, LooseRuleDefinition>
     }
 
     const plugin: EslintPluginNoSecrets
