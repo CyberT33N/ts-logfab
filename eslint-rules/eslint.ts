@@ -1,5 +1,5 @@
-/* eslint-disable max-lines */
 /* eslint-disable no-magic-numbers */
+/* eslint-disable max-lines */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -18,12 +18,8 @@
 // ==== IMPORTS ====
 import { configs as eslintConfigs } from '@eslint/js'
 
-// ==== UTILS ====
-import { rulesRecordSchema } from './utilities'
-
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
-
 
 // Custom rules
 const eslintRules: {
@@ -610,11 +606,8 @@ const eslintRules: {
  * @returns The base enterprise ESLint rules.
  */
 const createEnterpriseBase = (): TSESLint.FlatConfig.Config => {
-    // We validate here because of missing types in eslint/js
-    const validatedRules = rulesRecordSchema.parse(eslintConfigs.all.rules)
-
     const rules: TSESLint.Linter.RulesRecord = {
-        ...validatedRules,
+        ...eslintConfigs.all.rules,
         ...eslintRules.rules
     }
 

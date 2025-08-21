@@ -1,5 +1,3 @@
-/* eslint-disable max-lines */
-/* eslint-disable no-magic-numbers */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -17,9 +15,6 @@
 
 // ==== IMPORTS ====
 import pluginSecurity from 'eslint-plugin-security'
-
-// ==== UTILS ====
-import { rulesRecordSchema } from '../utilities'
 
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
@@ -54,11 +49,8 @@ const securityRules: {
  * @returns The base security ESLint rules.
  */
 const createSecurityBase = (): TSESLint.FlatConfig.Config => {
-    // We validate here because of missing types in security plugins
-    const validatedSecurityRules = rulesRecordSchema.parse(pluginSecurity.configs.recommended.rules)
-
     const rules: TSESLint.Linter.RulesRecord = {
-        ...validatedSecurityRules,
+        ...pluginSecurity.configs.recommended.rules,
         ...securityRules.rules
     }
 
@@ -73,10 +65,7 @@ const createSecurityBase = (): TSESLint.FlatConfig.Config => {
  * Creates the all security ESLint rules.
  * @returns The all security ESLint rules.
  */
-const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [
-    createSecurityBase()
-
-]
+const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [createSecurityBase()]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {
@@ -95,7 +84,6 @@ export const configs = {
     /**
      * Alias for compatibility with flat config naming conventions.
      */
-    'flat/all': createSecurityAll(),
-
+    'flat/all': createSecurityAll()
 
 } satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
