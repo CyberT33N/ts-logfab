@@ -78,7 +78,7 @@ import a11yPlugin from 'eslint-plugin-jsx-a11y'
 import nodePlugin from 'eslint-plugin-n'
 
 // https://www.npmjs.com/package/eslint-plugin-package-json
-import packageJson from 'eslint-plugin-package-json'
+import { configs as packageJsonConfigs } from 'eslint-plugin-package-json'
 
 /*
  * ===== [SORTING & ORDERING] =====
@@ -201,7 +201,7 @@ const config = tseslint.config(
     jsoncConfigs.all,
 
     // ===== PACKAGE JSON PLUGIN =====
-    packageJson.configs.recommended,
+    packageJsonConfigs.recommended,
 
     // ===== ENTERPRISE-GRADE PACKAGE.JSON CONFIGURATION =====
     {
