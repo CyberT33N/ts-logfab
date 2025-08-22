@@ -3949,7 +3949,17 @@ const config = tseslint.config(
             // Additional typescript-eslint rules not included in strict
             '@typescript-eslint/explicit-function-return-type': 'error',
 
-            '@typescript-eslint/explicit-member-accessibility': 'error',
+             // ✅ ==== VERIFIED ====
+            '@typescript-eslint/explicit-member-accessibility': ['error', {
+               accessibility: 'explicit',
+               overrides: {
+                   'accessors': 'explicit',
+                   'methods': 'explicit',
+                   'properties': 'explicit',
+                   'parameterProperties': 'explicit',
+                   'constructors': 'no-public'
+               }
+             }],
 
             // ✅ ==== VERIFIED ====
             '@typescript-eslint/member-ordering': [
