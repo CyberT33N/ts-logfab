@@ -157,15 +157,13 @@ const noSecretsRules: {
  * Creates the no-secrets plugin configuration.
  * @returns The no-secrets plugin configuration.
  */
-const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => {
-    return {
-        name: 'enterprise/security/no-secrets',
-        plugins: {
-            'no-secrets': noSecrets
-        },
-        rules: noSecretsRules.rules
-    }
-}
+const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => ({
+    name: 'enterprise/security/no-secrets',
+    plugins: {
+        'no-secrets': noSecrets
+    },
+    rules: noSecretsRules.rules
+})
 
 /**
  * Creates the all security ESLint rules.
