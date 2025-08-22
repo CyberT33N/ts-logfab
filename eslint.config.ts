@@ -87,7 +87,6 @@ import nodePlugin from 'eslint-plugin-n'
 // https://perfectionist.dev
 import perfectionist from 'eslint-plugin-perfectionist'
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
-import pluginPromise from 'eslint-plugin-promise'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
@@ -150,6 +149,9 @@ import { configs as jsoncConfigs } from './eslint-rules/file-formats/jsonc'
 // ==== PACKAGE.JSON ====
 import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json'
 
+// ==== PROMISE ====
+import { configs as promiseConfigs } from './eslint-rules/promise'
+
 // ==== REGEXP ====
 import { configs as regexpConfigs } from './eslint-rules/regexp'
 
@@ -206,53 +208,7 @@ const config = tseslint.config(
     packageJsonSharedConfigs.all,
 
     // ===== PROMISE PLUGIN =====
-    pluginPromise.configs['flat/recommended'],
-    {
-        rules: {
-
-            /*
-             * Nur Standard Promise Methods (keine Bluebird etc.)
-             * PRAGMATISCHE AUSNAHMEN
-             */
-            'promise/avoid-new': 'off',
-
-            /*
-             * ===== ENTERPRISE PROMISE STANDARDS (Google/Microsoft/Meta) =====
-             * UPGRADE: Warnings zu Errors (Zero-Tolerance für Promise Anti-Patterns)
-             */
-            'promise/no-callback-in-promise': 'error',
-
-            // Enterprise: Callbacks sind Legacy
-            'promise/no-multiple-resolved': 'error',
-
-            // Manchmal notwendig für Custom Promise Wrapping
-            'promise/no-native': 'off',
-
-            // War 'warn' - Callback-Promise-Mixing verhindert Clean Architecture
-            'promise/no-nesting': 'error',
-
-            // War 'warn' - Mixing Callbacks/Promises ist Enterprise Anti-Pattern
-            'promise/no-promise-in-callback': 'error',
-
-            // War 'warn' - Nested Promises = Code Smell (use async/await)
-            'promise/no-return-in-finally': 'error',
-
-            // Google/MS Standard: async/await > then/catch
-            'promise/prefer-await-to-callbacks': 'error',
-
-            /*
-             * War 'warn' - Falsche Promise-Parameter = Runtime Errors
-             * NEUE REGELN: Modern JavaScript Best Practices
-             */
-            'promise/prefer-await-to-then': 'error',
-
-            // Verhindert Promise Race Conditions
-            'promise/spec-only': 'error',
-
-            // War 'warn' - Finally sollte NIEMALS returnen
-            'promise/valid-params': 'error' // TypeScript Projekte nutzen immer native Promises
-        }
-    },
+    ...promiseConfigs.all,
 
     // ===== PREFER ARROW PLUGIN (MODERN JAVASCRIPT STANDARDS) =====
     {
