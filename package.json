@@ -84,7 +84,7 @@
     "eslint-plugin-regexp": "~2.9.1",
     "eslint-plugin-security": "~3.0.1",
     "eslint-plugin-sonarjs": "~3.0.4",
-    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "eslint-plugin-sort-keys-fix": "~1.1.2",
     "eslint-plugin-tsdoc": "~0.4.0",
     "eslint-plugin-typescript-sort-keys": "~3.3.0",
     "eslint-plugin-unicorn": "~60.0.0",

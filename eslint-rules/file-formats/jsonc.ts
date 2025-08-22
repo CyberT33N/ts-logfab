@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -162,7 +163,8 @@ const jsoncRules: {
         'jsonc/object-property-newline': [
             'error',
             {
-                allowAllPropertiesOnSameLine: false // Each property on new line
+                // Each property on new line
+                allowAllPropertiesOnSameLine: false
             }
         ],
 
@@ -185,9 +187,11 @@ const jsoncRules: {
                 allowLineSeparatedGroups: true,
                 caseSensitive: false,
                 minKeys: 2,
-                natural: true // Allow logical grouping
+
+                // Allow logical grouping
+                natural: true
             }
-        ] // Too aggressive for mixed JSON/JSONC environments
+        ]
     }
 }
 

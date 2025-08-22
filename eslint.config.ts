@@ -78,7 +78,6 @@ import a11yPlugin from 'eslint-plugin-jsx-a11y'
 import nodePlugin from 'eslint-plugin-n'
 
 // https://www.npmjs.com/package/eslint-plugin-package-json
-import { configs as packageJsonConfigs } from 'eslint-plugin-package-json'
 
 /*
  * ===== [SORTING & ORDERING] =====
@@ -148,6 +147,9 @@ import { configs as enterpriseConfigs } from './eslint-rules/eslint'
 // ==== FILE FORMATS ====
 import { configs as jsoncConfigs } from './eslint-rules/file-formats/jsonc'
 
+// ==== PACKAGE.JSON ====
+import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json'
+
 // ==== REGEXP ====
 import { configs as regexpConfigs } from './eslint-rules/regexp'
 
@@ -201,131 +203,7 @@ const config = tseslint.config(
     jsoncConfigs.all,
 
     // ===== PACKAGE JSON PLUGIN =====
-    packageJsonConfigs.recommended,
-
-    // ===== ENTERPRISE-GRADE PACKAGE.JSON CONFIGURATION =====
-    {
-        files: ['**/package.json'],
-        rules: {
-
-            'jsonc/array-bracket-newline': 'off',
-
-            'jsonc/array-bracket-spacing': 'off',
-
-            'jsonc/array-element-newline': 'off',
-
-            'jsonc/auto': 'off',
-
-            'jsonc/comma-dangle': 'off',
-
-            'jsonc/comma-style': 'off',
-
-            // RECOMMENDED: Better discoverability
-            /*
-             * ===== DISABLE ALL JSONC RULES FOR PACKAGE.JSON =====
-             * Only eslint-plugin-package-json should handle package.json files
-             */
-            'jsonc/indent': 'off',
-
-            'jsonc/key-name-casing': 'off',
-
-            'jsonc/key-spacing': 'off',
-
-            'jsonc/no-bigint-literals': 'off',
-
-            'jsonc/no-binary-numeric-literals': 'off',
-
-            'jsonc/no-comments': 'off',
-
-            'jsonc/no-dupe-keys': 'off',
-
-            'jsonc/no-floating-decimal': 'off',
-
-            'jsonc/no-hexadecimal-numeric-literals': 'off',
-
-            'jsonc/no-infinity': 'off',
-
-            'jsonc/no-irregular-whitespace': 'off',
-
-            'jsonc/no-nan': 'off',
-
-            'jsonc/no-numeric-separators': 'off',
-
-            'jsonc/no-octal-escape': 'off',
-
-            'jsonc/no-octal-numeric-literals': 'off',
-
-            'jsonc/no-plus-sign': 'off',
-
-            'jsonc/no-sparse-arrays': 'off',
-
-            'jsonc/no-undefined-value': 'off',
-
-            'jsonc/no-useless-escape': 'off',
-
-            'jsonc/object-curly-newline': 'off',
-
-            'jsonc/object-curly-spacing': 'off',
-
-            'jsonc/object-property-newline': 'off',
-
-            'jsonc/quote-props': 'off',
-
-            'jsonc/quotes': 'off',
-
-            'jsonc/sort-array-values': 'off',
-
-            'jsonc/sort-keys': 'off',
-
-            // RECOMMENDED: Explicit file inclusion for security
-            'package-json/no-redundant-files': 'error',
-
-            // MANDATORY: Node.js version constraints for reproducible builds
-            'package-json/require-author': 'error',
-
-            // ===== ENTERPRISE SECURITY & COMPLIANCE =====
-            'package-json/require-engines': 'error',
-
-            // MANDATORY: Clear ownership and accountability
-            'package-json/require-files': 'warn',
-
-            // ===== METADATA COMPLETENESS =====
-            'package-json/require-keywords': 'warn',
-
-            /*
-             * SECURITY: Prevent accidental sensitive data exposure
-             * ===== DEPENDENCY MANAGEMENT EXCELLENCE =====
-             */
-            'package-json/restrict-dependency-ranges': [
-                'error',
-                [
-                    // BASE RULE: All dependencies should use tilde (~) for Enterprise-controlled updates
-                    {
-                        rangeType: 'tilde'
-                    },
-
-                    // SECURITY: Pin unstable versions (0.x.x) for production dependencies
-                    {
-                        forDependencyTypes: ['dependencies'],
-                        forVersions: '<1',
-                        rangeType: 'pin'
-                    },
-
-                    // FLEXIBILITY: Allow any valid range for peer dependencies
-                    {
-                        forDependencyTypes: ['peerDependencies'],
-                        rangeType: [
-                            'caret',
-                            'tilde',
-                            'pin'
-                        ] // All acceptable
-                    }
-                ]
-            ]
-
-            // Note: Only package-json/* rules should apply to package.json files
-        }
-    },
+    packageJsonSharedConfigs.all,
 
     // ===== PROMISE PLUGIN =====
     pluginPromise.configs['flat/recommended'],
