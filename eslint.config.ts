@@ -90,7 +90,6 @@ import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
-import sonarjs from 'eslint-plugin-sonarjs'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
 import pluginTsDoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
@@ -138,6 +137,7 @@ import tseslint from 'typescript-eslint'
  */
 
 // ==== CUSTOM ====
+import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 
 // ==== ENTERPRISE ====
@@ -151,6 +151,8 @@ import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json
 
 // ==== PROMISE ====
 import { configs as promiseConfigs } from './eslint-rules/promise'
+
+// ==== CLEAN CODE ====
 
 // ==== REGEXP ====
 import { configs as regexpConfigs } from './eslint-rules/regexp'
@@ -208,7 +210,7 @@ const config = tseslint.config(
     packageJsonSharedConfigs.all,
 
     // ===== PROMISE PLUGIN =====
-    ...promiseConfigs.all,
+    promiseConfigs.all,
 
     // ===== PREFER ARROW PLUGIN (MODERN JAVASCRIPT STANDARDS) =====
     {
@@ -236,118 +238,7 @@ const config = tseslint.config(
     },
 
     // ===== SONARJS PLUGIN =====
-    sonarjs.configs.recommended,
-    {
-        rules: {
-
-            // Prüft implizite Dependencies
-            'sonarjs/arguments-usage': 'error',
-
-            // Erzwingt else-Block für Vollständigkeit
-            'sonarjs/bool-param-default': 'error',
-
-            /*
-             * Verhindert unsichere 'arguments' Nutzung
-             * ===== DEFENSIVE PROGRAMMING (Enterprise Best Practice) =====
-             */
-            'sonarjs/elseif-without-else': 'error',
-
-            /*
-             * ===== ENTERPRISE-CRITICAL COMPLEXITY RULES =====
-             * 'sonarjs/cyclomatic-complexity': 'off', // REDUNDANT: Bereits durch ESLint Core 'complexity' abgedeckt
-             * 'sonarjs/max-lines-per-function': 'off', // REDUNDANT: Bereits durch ESLint Core abgedeckt
-             */
-            /*
-             * ===== CODE MAINTAINABILITY (Google/Microsoft Standards) =====
-             * 'sonarjs/max-lines': ['error', { maximum: 400 }], // covered by eslint/max-lines
-             */
-            'sonarjs/expression-complexity': 'error',
-
-            /*
-             * Return direkt statt Variable
-             * ===== FUNCTION DESIGN (Clean Code) =====
-             */
-            'sonarjs/function-name': [
-                'error',
-                {
-                    format: '^[a-z][a-zA-Z0-9]*$' // CamelCase enforcement
-                }
-            ],
-
-            // Funktionen sollten nicht immer dasselbe returnen
-            /*
-             * ===== REACT SPECIFIC (Falls React verwendet wird) =====
-             * Diese sind NICHT redundant mit react-plugin, da sie andere Aspekte prüfen
-             */
-            'sonarjs/jsx-no-leaked-render': 'error',
-
-            // Keine verschachtelten switch
-            'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }],
-
-            /*
-             * Boolean Parameter brauchen Defaults
-             * ===== CODE CLARITY & MODERN SYNTAX =====
-             */
-            'sonarjs/no-collapsible-if': 'error',
-
-            // Verhindert überkomplexe Ausdrücke
-            'sonarjs/no-duplicate-string': ['error', { threshold: 3 }],
-
-            /*
-             * Identische Funktionen verhindern
-             * ===== LOOP & CONTROL FLOW SAFETY =====
-             */
-            'sonarjs/no-for-in-iterable': 'error',
-
-            // Verhindert && mit non-boolean
-            'sonarjs/no-hook-setter-in-body': 'error',
-
-            // ===== TESTING BEST PRACTICES =====
-            'sonarjs/no-identical-functions': 'error',
-
-            /*
-             * Variable naming conventions
-             * ===== ASYNC/PROMISE PATTERNS =====
-             */
-            'sonarjs/no-ignored-return': 'error',
-
-            /*
-             * String darf max 2x vorkommen
-             * ===== TYPE SAFETY & ARCHITECTURE =====
-             */
-            'sonarjs/no-implicit-dependencies': 'error',
-
-            // Return values müssen verwendet werden
-            'sonarjs/no-invariant-returns': 'error',
-
-            // For...in nicht für Iterables
-            'sonarjs/no-nested-switch': 'error',
-
-            /*
-             * ✅ UNIQUE: SonarJS-spezifische Regel
-             * 'sonarjs/no-control-regex': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-control-character
-             * ===== VARIABLE & PARAMETER HYGIENE =====
-             */
-            'sonarjs/no-parameter-reassignment': 'error',
-
-            // Moderne Object-Literal Syntax
-            'sonarjs/prefer-immediate-return': 'error',
-
-            // Vereinfacht verschachtelte if-Statements
-            'sonarjs/prefer-object-literal': 'error',
-
-            // Max 3 Ebenen Verschachtelung
-            /*
-             * ===== REGEX SAFETY (Performance & Security) =====
-             * ENTERPRISE: regexp Plugin hat spezialisiertere Regex-Prüfungen
-             * 'sonarjs/no-empty-character-class': 'error', // ❌ REDUNDANT: Übernommen von regexp/no-empty-character-class
-             */
-            'sonarjs/single-char-in-character-classes': 'error',
-
-            // Parameter Reassignment verhindern
-            'sonarjs/variable-name': 'error' // UseState nicht direkt in render
-        }
-    },
+    sonarjsConfigs.all,
 
     // ===== UNICORN PLUGIN =====
     eslintPluginUnicorn.configs.all,
@@ -2843,7 +2734,12 @@ const config = tseslint.config(
             'typescript-sort-keys': eslintPluginTypescriptSortKeys
         },
         rules: {
+            /*
+             * ✅ ==== VERIFIED ====
+             * Autorität für Interfaces/Type-Literals: alphabetisch
+             */
             'typescript-sort-keys/interface': 'error',
+
             'typescript-sort-keys/string-enum': 'error'
         }
     },
@@ -2972,18 +2868,8 @@ const config = tseslint.config(
             // ✅ Abgedeckt durch import/order (komplexere Enterprise-Konfiguration)
             'perfectionist/sort-named-imports': 'off',
 
-            'perfectionist/sort-object-types': [
-                'error',
-                {
-                    groups: [
-                        'multiline', // Komplexe Properties zuerst
-                        'method', // Methods nach Properties (Airbnb Standard)
-                        'property' // Einfache Properties zuletzt
-                    ],
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
+            // ✅ ==== VERIFIED ====
+            'perfectionist/sort-object-types': 'off',
 
             // ✅ Abgedeckt durch @stylistic/jsx-sort-props (bessere JSX-Integration)
             'perfectionist/sort-objects': 'off',
@@ -3143,19 +3029,24 @@ const config = tseslint.config(
                }
              }],
 
-            // ✅ ==== VERIFIED ====
+            /*
+             * ✅ ==== VERIFIED ====
+             * Klassen: gruppen + alphabetisch; Interfaces/Type-Literals: nur alphabetisch, KEIN optionalityOrder
+             */
             '@typescript-eslint/member-ordering': [
                 'error',
                 {
-                    default: {
-
-                        // ADD: Optional members preference (Enterprise consistency)
+                    classes: {
+                    // Z.B. sinnvoll für Klassen
                         optionalityOrder: 'required-first',
-
-                        /*
-                         * Keep all default memberTypes (sie sind enterprise-optimal!)
-                         * ADD: Alphabetical sorting within groups
-                         */
+                        order: 'alphabetically-case-insensitive'
+                    },
+                    interfaces: {
+                        memberTypes: 'never',
+                        order: 'alphabetically-case-insensitive'
+                    },
+                    typeLiterals: {
+                        memberTypes: 'never',
                         order: 'alphabetically-case-insensitive'
                     }
                 }
@@ -3615,7 +3506,28 @@ const config = tseslint.config(
     {
         files: ['**/*.d.ts'],
         rules: {
-            '@typescript-eslint/consistent-type-imports': 'off'
+            '@typescript-eslint/consistent-type-imports': 'off',
+
+            // ✅ ==== VERIFIED ====
+            '@typescript-eslint/member-ordering': [
+                'error',
+                {
+                    interfaces: {
+                        memberTypes: 'never',
+                        order: 'alphabetically-case-insensitive'
+                    },
+                    typeLiterals: {
+                        memberTypes: 'never',
+                        order: 'alphabetically-case-insensitive'
+                    }
+                }
+            ],
+
+            // ✅ ==== VERIFIED ====
+            'perfectionist/sort-object-types': 'off',
+
+            // ✅ ==== VERIFIED ====
+            'typescript-sort-keys/interface': 'error'
         }
     }
 )

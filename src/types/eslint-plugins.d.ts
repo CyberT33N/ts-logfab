@@ -90,3 +90,24 @@ declare module 'eslint-plugin-no-secrets' {
     const plugin: EslintPluginNoSecrets
     export = plugin
 }
+
+declare module 'eslint-plugin-sonarjs' {
+    import type { TSESLint } from '@typescript-eslint/utils'
+
+    interface EslintPluginSonarjs {
+        readonly configs: {
+            readonly recommended: TSESLint.FlatConfig.Config
+            readonly 'recommended-legacy': {
+                readonly rules: RulesRecord
+            }
+        }
+        readonly meta?: {
+            readonly name: string
+            readonly version: string
+        }
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginSonarjs
+    export = plugin
+}
