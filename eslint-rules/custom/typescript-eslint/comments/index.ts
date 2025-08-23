@@ -14,7 +14,7 @@
  */
 
 // ==== Types ====
-import { noRestrictedTypescriptEslintDisableRule } from './no-restricted-typescript-eslint-disable'
+import { noRestrictedTypescriptEslintDisableRule } from './rules/no-restricted-typescript-eslint-disable'
 
 import type { TSESLint } from '@typescript-eslint/utils'
 
