@@ -61,14 +61,9 @@ type Options = [
  * Enforce newlines just inside parentheses for function/method definitions only (not calls),
  * when the number of parameters is greater than or equal to minParams
  *
- * @param functionNode - The function node to check
- * @param sourceCode - The source code to check
- * @param minParameters - The minimum number of parameters
- * @param context - The context of the rule
- *
+ * @param parametersBag - The parameters bag to check
  * @returns void
  */
-
 const enforceNewlinesForFunctionLike = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     parametersBag: Readonly<EnforceParameters>
@@ -138,13 +133,9 @@ type ParensResult = Readonly<{
 /**
  * Find the wrapping parentheses for the function parameters
  *
- * @param firstParameter - The first parameter of the function
- * @param lastParameter - The last parameter of the function
- * @param sourceCode - The source code to check
- *
+ * @param findParameters - The parameters to find the wrapping parentheses for
  * @returns The wrapping parentheses for the function parameters
  */
-
 const findWrappingParens = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     findParameters: Readonly<FindParensParameters>
@@ -188,13 +179,9 @@ interface GetBoundaryTokensParameters {
 /**
  * Get the boundary tokens for the function parameters
  *
- * @param openingParen - The opening parenthesis of the function parameters
- * @param closingParen - The closing parenthesis of the function parameters
- * @param sourceCode - The source code to check
- *
+ * @param boundaryParameters - The parameters to get the boundary tokens for
  * @returns The boundary tokens for the function parameters
  */
-
 const getBoundaryTokens = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     boundaryParameters: Readonly<GetBoundaryTokensParameters>
@@ -233,13 +220,8 @@ interface ReportParameters {
 /**
  * Report missing newlines for the function parameters
  *
- * @param functionNode - The function node to check
- * @param openingParen - The opening parenthesis of the function parameters
- * @param closingParen - The closing parenthesis of the function parameters
- *
- * @returns void
+ * @param reportParameters - The parameters to report missing newlines for
  */
-
 const reportMissingNewlines = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     reportParameters: Readonly<ReportParameters>

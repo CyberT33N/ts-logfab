@@ -215,14 +215,20 @@ const config = tseslint.config(
      * **Not working for typescript-eslint specific rules**
      */
     {
-        files: ['*.js', '*.jsx'],
+        files: [
+            '*.js',
+            '*.jsx'
+        ],
         plugins: {
             '@eslint-community/eslint-comments': eslintPluginEslintComments
         },
         rules: {
 
             // ✅ ==== VERIFIED ====
-            '@eslint-community/eslint-comments/no-restricted-disable': ['error', '*'],
+            '@eslint-community/eslint-comments/no-restricted-disable': [
+                'error',
+                '*'
+            ],
 
             // ✅ ==== VERIFIED ====
             '@eslint-community/eslint-comments/no-use': [
@@ -303,7 +309,10 @@ const config = tseslint.config(
             'n/no-unpublished-import': 'off',
 
             // Already handled by unicorn/prefer-node-protocol
-            'n/prefer-global/process': ['error', 'never'],
+            'n/prefer-global/process': [
+                'error',
+                'never'
+            ],
 
             // Off because we use the .ts extension in the imports
             'n/prefer-node-protocol': 'off'
@@ -332,7 +341,10 @@ const config = tseslint.config(
             'local-rules': functionDefinitionParenNewlinePlugin
         },
         rules: {
-            'local-rules/function-definition-paren-newline': ['error', { minParams: 2 }]
+            'local-rules/function-definition-paren-newline': [
+                'error',
+                { minParams: 2 }
+            ]
         }
     },
 
@@ -352,7 +364,10 @@ const config = tseslint.config(
                 'error',
                 {
                     // Sometime you can not control external types
-                    allow: ['@typescript-eslint/prefer-readonly-parameter-types']
+                    allow: [
+                        '@typescript-eslint/prefer-readonly-parameter-types',
+                        '@typescript-eslint/naming-convention'
+                    ]
                 }
             ]
         }
@@ -1009,7 +1024,10 @@ const config = tseslint.config(
             ],
 
             // Method Signature Enforcement
-            '@typescript-eslint/method-signature-style': ['error', 'property'],
+            '@typescript-eslint/method-signature-style': [
+                'error',
+                'property'
+            ],
 
             /*
              * Disabled to allow bracket notation for private method testing
@@ -1092,14 +1110,20 @@ const config = tseslint.config(
                 // ✅ Static Readonly Constants - UPPER_CASE (Google Standard)
                 {
                     format: ['UPPER_CASE'],
-                    modifiers: ['static', 'readonly'],
+                    modifiers: [
+                        'static',
+                        'readonly'
+                    ],
                     selector: 'classProperty'
                 },
 
                 // ✅ Global Primitive Constants - UPPER_CASE (Google/Meta Standard)
                 {
                     format: ['UPPER_CASE'],
-                    modifiers: ['const', 'global'],
+                    modifiers: [
+                        'const',
+                        'global'
+                    ],
                     selector: 'variable',
                     types: [
                         'string',
@@ -1111,14 +1135,20 @@ const config = tseslint.config(
                 // ✅ Global Function Constants - camelCase (Enterprise Standard)
                 {
                     format: ['camelCase'],
-                    modifiers: ['const', 'global'],
+                    modifiers: [
+                        'const',
+                        'global'
+                    ],
                     selector: 'variable',
                     types: ['function']
                 },
 
                 // ✅ Enum Members - PascalCase (Meta/React Standard)
                 {
-                    format: ['PascalCase', 'UPPER_CASE'],
+                    format: [
+                        'PascalCase',
+                        'UPPER_CASE'
+                    ],
                     selector: 'enumMember'
                 },
 
@@ -1149,14 +1179,20 @@ const config = tseslint.config(
 
                 // ✅ Variables - camelCase oder UPPER_CASE
                 {
-                    format: ['camelCase', 'UPPER_CASE'],
+                    format: [
+                        'camelCase',
+                        'UPPER_CASE'
+                    ],
                     leadingUnderscore: 'allow',
                     selector: 'variable'
                 },
 
                 // ✅ Functions - camelCase oder PascalCase (für React Components)
                 {
-                    format: ['camelCase', 'PascalCase'],
+                    format: [
+                        'camelCase',
+                        'PascalCase'
+                    ],
                     selector: 'function'
                 },
 
@@ -1182,7 +1218,10 @@ const config = tseslint.config(
                         'PascalCase'
                     ],
                     leadingUnderscore: 'allow',
-                    selector: ['objectLiteralProperty', 'typeProperty']
+                    selector: [
+                        'objectLiteralProperty',
+                        'typeProperty'
+                    ]
                 },
 
                 // ✅ Properties die Quotes brauchen - keine Format-Checks
@@ -1264,7 +1303,10 @@ const config = tseslint.config(
                     types: {
                         Function: {
                             message: 'Use a specific function type instead',
-                            suggest: ['() => void', '(...args: unknown[]) => unknown']
+                            suggest: [
+                                '() => void',
+                                '(...args: unknown[]) => unknown'
+                            ]
                         },
                         Object: {
                             fixWith: 'Record<string, unknown>',
@@ -1369,7 +1411,10 @@ const config = tseslint.config(
             '@typescript-eslint/restrict-template-expressions': 'error',
 
             // Async/Promise Best Practices
-            '@typescript-eslint/return-await': ['error', 'always'],
+            '@typescript-eslint/return-await': [
+                'error',
+                'always'
+            ],
 
             // ✅ ==== VERIFIED ====
             '@typescript-eslint/strict-boolean-expressions': 'error',
@@ -1405,7 +1450,10 @@ const config = tseslint.config(
         ],
         rules: {
             // ✅ ==== VERIFIED ====
-            'consistent-return': ['error', { treatUndefinedAsUnspecified: true }]
+            'consistent-return': [
+                'error',
+                { treatUndefinedAsUnspecified: true }
+            ]
         }
     },
 
