@@ -84,7 +84,7 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
 
     // Remove trailing comment markers or annotations that sometimes appear
     const cleaned = remainder
-        .replace(/[*\-/]+$/u, '')
+        .replace(/[*\-/]{1,64}$/u, '')
         .trim()
 
     // Split by comma and whitespace, keep non-empty
@@ -95,6 +95,12 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
         .filter(Boolean)
 }
 
+/**
+ * Check if a comment is a disable comment
+ *
+ * @param parameters - The parameters to check
+ * @returns void
+ */
 const checkDisableComment = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     parameters: Readonly<CheckDisableParameters>
@@ -122,7 +128,12 @@ const checkDisableComment = (
     }
 }
 
-// ===== Rule =====
+/**
+ * The rule to check for restricted TypeScript ESLint disable comments
+ *
+ * @param context - The context of the rule
+ * @returns The rule listener
+ */
 const rule = createRule<Options, MessageIds>({
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {

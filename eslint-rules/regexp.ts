@@ -37,7 +37,10 @@ const regexpRules: {
          * [a-zA-Z] → [a-z]/i
          * ===== CONSISTENCY & STYLE (Google Style Guide) =====
          */
-        'regexp/hexadecimal-escape': ['error', 'never'],
+        'regexp/hexadecimal-escape': [
+            'error',
+            'never'
+        ],
 
         'regexp/letter-case': [
             'error',
@@ -108,10 +111,27 @@ const regexpRules: {
          * ===== PERFORMANCE & SECURITY (CRITICAL) =====
          * Diese Regeln verhindern ReDoS (Regular Expression Denial of Service)
          */
-        'regexp/no-super-linear-backtracking': 'error',
 
-        // ReDoS-Schutz
-        'regexp/no-super-linear-move': 'error',
+        /*
+         * ✅ ==== VERIFIED ====
+         */
+        'regexp/no-super-linear-backtracking': [
+            'error',
+            { report: 'certain' }
+        ],
+
+        /*
+         * ✅ ==== VERIFIED ====
+         * Use it together with sonarjs/slow-regex
+         */
+        'regexp/no-super-linear-move': [
+            'error',
+            {
+                ignorePartial: false,
+                ignoreSticky: false,
+                report: 'certain'
+            }
+        ],
 
         /*
          * A{0} ist nutzlos

@@ -137,6 +137,12 @@ const sonarjsRules: {
         'sonarjs/single-char-in-character-classes': 'error',
 
         /*
+         * ✅ ==== VERIFIED ====
+         * Use it together with regexp/no-super-linear-move
+         */
+        'sonarjs/slow-regex': 'error',
+
+        /*
          * Parameter Reassignment verhindern
          * UseState nicht direkt in render
          */
