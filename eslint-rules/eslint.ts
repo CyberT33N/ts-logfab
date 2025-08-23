@@ -26,11 +26,6 @@ const eslintRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
-        /*
-         * ✅ ==== VERIFIED ====
-         * Prevents undefined usage
-         */
-        'no-undefined': 'error',
 
         'accessor-pairs': 'error',
 
@@ -51,7 +46,6 @@ const eslintRules: {
          * ❌ REDUNDANT: Übernommen von @typescript-eslint/naming-convention
          * 'camelcase': ['error', { properties: 'never' }],
          */
-
         /*
          * ✅ ==== VERIFIED ====
          * Enterprise standard: Google/Microsoft use 10-15
@@ -74,6 +68,7 @@ const eslintRules: {
         // Disabled to allow bracket notation for private method testing
         'dot-notation': 'off',
 
+        // ✅ ==== VERIFIED ====
         eqeqeq: ['error', 'always'],
 
         'func-names': ['error', 'never'],
@@ -464,6 +459,12 @@ const eslintRules: {
 
         // ✅ ==== VERIFIED ====
         'no-ternary': 'off',
+
+        /*
+         * ✅ ==== VERIFIED ====
+         * Prevents undefined usage
+         */
+        'no-undefined': 'error',
 
         // ✅ ==== VERIFIED ====
         'no-underscore-dangle': [
