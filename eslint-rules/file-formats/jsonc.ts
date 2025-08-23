@@ -37,7 +37,10 @@ const jsoncRules: {
          * Arrays often have semantic ordering
          * FORMATTING STANDARDS (Airbnb/Google Hybrid)
          */
-        'jsonc/array-bracket-spacing': ['error', 'never'],
+        'jsonc/array-bracket-spacing': [
+            'error',
+            'never'
+        ],
 
         'jsonc/array-element-newline': [
             'error',
@@ -57,12 +60,21 @@ const jsoncRules: {
          * Infinity not valid in JSON
          * STANDARDIZATION & CONSISTENCY (Google Style Guide)
          */
-        'jsonc/comma-dangle': ['error', 'never'],
+        'jsonc/comma-dangle': [
+            'error',
+            'never'
+        ],
 
-        'jsonc/comma-style': ['error', 'last'],
+        'jsonc/comma-style': [
+            'error',
+            'last'
+        ],
 
         // Property names must be quoted
-        'jsonc/indent': ['error', 2],
+        'jsonc/indent': [
+            'error',
+            2
+        ],
 
         'jsonc/key-spacing': [
             'error',
@@ -158,7 +170,10 @@ const jsoncRules: {
             }
         ],
 
-        'jsonc/object-curly-spacing': ['error', 'always'],
+        'jsonc/object-curly-spacing': [
+            'error',
+            'always'
+        ],
 
         'jsonc/object-property-newline': [
             'error',
@@ -169,10 +184,16 @@ const jsoncRules: {
         ],
 
         // JSON standard requires double quotes
-        'jsonc/quote-props': ['error', 'always'],
+        'jsonc/quote-props': [
+            'error',
+            'always'
+        ],
 
         // No trailing commas in JSON
-        'jsonc/quotes': ['error', 'double'],
+        'jsonc/quotes': [
+            'error',
+            'double'
+        ],
 
         'jsonc/sort-array-values': 'off',
 

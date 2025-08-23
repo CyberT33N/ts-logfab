@@ -53,7 +53,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/array-bracket-spacing': ['error', 'never'],
+        '@stylistic/array-bracket-spacing': [
+            'error',
+            'never'
+        ],
 
         // ✅ ==== VERIFIED ====
         '@stylistic/array-element-newline': [
@@ -80,7 +83,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/block-spacing': ['error', 'always'],
+        '@stylistic/block-spacing': [
+            'error',
+            'always'
+        ],
 
         // ===== BLOCKS & BRACES =====
         '@stylistic/brace-style': [
@@ -113,24 +119,45 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/comma-style': ['error', 'last'],
+        '@stylistic/comma-style': [
+            'error',
+            'last'
+        ],
 
         // ===== MISC FORMATTING =====
-        '@stylistic/computed-property-spacing': ['error', 'never'],
+        '@stylistic/computed-property-spacing': [
+            'error',
+            'never'
+        ],
 
         '@stylistic/curly-newline': ['error'],
 
-        '@stylistic/dot-location': ['error', 'property'],
+        '@stylistic/dot-location': [
+            'error',
+            'property'
+        ],
 
-        '@stylistic/eol-last': ['error', 'always'],
+        '@stylistic/eol-last': [
+            'error',
+            'always'
+        ],
 
         // We use custom rules for formatting function definitions
-        '@stylistic/function-call-argument-newline': ['error', 'consistent'],
+        '@stylistic/function-call-argument-newline': [
+            'error',
+            'consistent'
+        ],
 
-        '@stylistic/function-call-spacing': ['error', 'never'],
+        '@stylistic/function-call-spacing': [
+            'error',
+            'never'
+        ],
 
         // ===== FUNCTIONS =====
-        '@stylistic/function-paren-newline': ['error', 'consistent'],
+        '@stylistic/function-paren-newline': [
+            'error',
+            'consistent'
+        ],
 
         '@stylistic/generator-star-spacing': [
             'error',
@@ -140,7 +167,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/implicit-arrow-linebreak': ['error', 'beside'],
+        '@stylistic/implicit-arrow-linebreak': [
+            'error',
+            'beside'
+        ],
 
         // ===== SPACING & INDENTATION =====
         '@stylistic/indent': [
@@ -171,11 +201,17 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/indent-binary-ops': ['error', ENTERPRISE_INDENT_SIZE],
+        '@stylistic/indent-binary-ops': [
+            'error',
+            ENTERPRISE_INDENT_SIZE
+        ],
 
         '@stylistic/jsx-child-element-spacing': ['error'],
 
-        '@stylistic/jsx-closing-bracket-location': ['error', 'line-aligned'],
+        '@stylistic/jsx-closing-bracket-location': [
+            'error',
+            'line-aligned'
+        ],
 
         '@stylistic/jsx-closing-tag-location': ['error'],
 
@@ -203,13 +239,25 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/jsx-equals-spacing': ['error', 'never'],
+        '@stylistic/jsx-equals-spacing': [
+            'error',
+            'never'
+        ],
 
-        '@stylistic/jsx-first-prop-new-line': ['error', 'multiline'],
+        '@stylistic/jsx-first-prop-new-line': [
+            'error',
+            'multiline'
+        ],
 
-        '@stylistic/jsx-function-call-newline': ['error', 'multiline'],
+        '@stylistic/jsx-function-call-newline': [
+            'error',
+            'multiline'
+        ],
 
-        '@stylistic/jsx-indent-props': ['error', ENTERPRISE_INDENT_SIZE],
+        '@stylistic/jsx-indent-props': [
+            'error',
+            ENTERPRISE_INDENT_SIZE
+        ],
 
         '@stylistic/jsx-max-props-per-line': [
             'error',
@@ -237,7 +285,10 @@ const stylisticRules: {
         '@stylistic/jsx-props-no-multi-spaces': ['error'],
 
         // ===== JSX/REACT SPECIFIC (only essential for future React support) =====
-        '@stylistic/jsx-quotes': ['error', 'prefer-double'],
+        '@stylistic/jsx-quotes': [
+            'error',
+            'prefer-double'
+        ],
 
         '@stylistic/jsx-self-closing-comp': [
             'error',
@@ -268,15 +319,20 @@ const stylisticRules: {
             }
         ],
 
+        /*
+         * ✅ ==== VERIFIED ====
+         */
         '@stylistic/jsx-wrap-multilines': [
             'error',
             {
+                // eslint-disable-next-line sonarjs/no-duplicate-string
                 arrow: 'parens-new-line',
                 assignment: 'parens-new-line',
                 condition: 'parens-new-line',
                 declaration: 'parens-new-line',
                 logical: 'parens-new-line',
-                prop: 'parens-new-line',
+                prop: 'ignore',
+                propertyValue: 'parens-new-line',
                 return: 'parens-new-line'
             }
         ],
@@ -313,7 +369,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/linebreak-style': ['error', 'unix'],
+        '@stylistic/linebreak-style': [
+            'error',
+            'unix'
+        ],
 
         // ✅ ==== VERIFIED ====
         '@stylistic/lines-around-comment': [
@@ -378,7 +437,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/max-statements-per-line': ['error', { max: ENTERPRISE_MAX_STATEMENTS_PER_LINE }],
+        '@stylistic/max-statements-per-line': [
+            'error',
+            { max: ENTERPRISE_MAX_STATEMENTS_PER_LINE }
+        ],
 
         '@stylistic/member-delimiter-style': [
             'error',
@@ -394,14 +456,26 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/multiline-comment-style': ['error', 'starred-block'],
+        '@stylistic/multiline-comment-style': [
+            'error',
+            'starred-block'
+        ],
 
         // ===== TERNARY =====
-        '@stylistic/multiline-ternary': ['error', 'always-multiline'],
+        '@stylistic/multiline-ternary': [
+            'error',
+            'always-multiline'
+        ],
 
-        '@stylistic/new-parens': ['error', 'always'],
+        '@stylistic/new-parens': [
+            'error',
+            'always'
+        ],
 
-        '@stylistic/newline-per-chained-call': ['error', { ignoreChainWithDepth: CHAIN_DEPTH_LIMIT }],
+        '@stylistic/newline-per-chained-call': [
+            'error',
+            { ignoreChainWithDepth: CHAIN_DEPTH_LIMIT }
+        ],
 
         '@stylistic/no-confusing-arrow': [
             'error',
@@ -434,12 +508,30 @@ const stylisticRules: {
             {
                 allowSamePrecedence: true,
                 groups: [
-                    ['%', '**'],
-                    ['%', '+'],
-                    ['%', '-'],
-                    ['%', '*'],
-                    ['%', '/'],
-                    ['/', '*'],
+                    [
+                        '%',
+                        '**'
+                    ],
+                    [
+                        '%',
+                        '+'
+                    ],
+                    [
+                        '%',
+                        '-'
+                    ],
+                    [
+                        '%',
+                        '*'
+                    ],
+                    [
+                        '%',
+                        '/'
+                    ],
+                    [
+                        '/',
+                        '*'
+                    ],
                     [
                         '&',
                         '|',
@@ -453,7 +545,10 @@ const stylisticRules: {
                         '===',
                         '!=='
                     ],
-                    ['&&', '||']
+                    [
+                        '&&',
+                        '||'
+                    ]
                 ]
             }
         ],
@@ -489,7 +584,10 @@ const stylisticRules: {
 
         '@stylistic/no-whitespace-before-property': ['error'],
 
-        '@stylistic/nonblock-statement-body-position': ['error', 'below'],
+        '@stylistic/nonblock-statement-body-position': [
+            'error',
+            'below'
+        ],
 
         // ===== OBJECTS =====
         '@stylistic/object-curly-newline': [
@@ -532,7 +630,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/object-curly-spacing': ['error', 'always'],
+        '@stylistic/object-curly-spacing': [
+            'error',
+            'always'
+        ],
 
         '@stylistic/object-property-newline': [
             'error',
@@ -541,7 +642,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/one-var-declaration-per-line': ['error', 'always'],
+        '@stylistic/one-var-declaration-per-line': [
+            'error',
+            'always'
+        ],
 
         '@stylistic/operator-linebreak': [
             'error',
@@ -651,7 +755,10 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/rest-spread-spacing': ['error', 'never'],
+        '@stylistic/rest-spread-spacing': [
+            'error',
+            'never'
+        ],
 
         '@stylistic/semi': [
             'error',
@@ -669,9 +776,15 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/semi-style': ['error', 'last'],
+        '@stylistic/semi-style': [
+            'error',
+            'last'
+        ],
 
-        '@stylistic/space-before-blocks': ['error', 'always'],
+        '@stylistic/space-before-blocks': [
+            'error',
+            'always'
+        ],
 
         '@stylistic/space-before-function-paren': [
             'error',
@@ -682,9 +795,15 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/space-in-parens': ['error', 'never'],
+        '@stylistic/space-in-parens': [
+            'error',
+            'never'
+        ],
 
-        '@stylistic/space-infix-ops': ['error', { int32Hint: false }],
+        '@stylistic/space-infix-ops': [
+            'error',
+            { int32Hint: false }
+        ],
 
         '@stylistic/space-unary-ops': [
             'error',
@@ -701,7 +820,10 @@ const stylisticRules: {
             {
                 block: {
                     balanced: true,
-                    exceptions: ['-', '+'],
+                    exceptions: [
+                        '-',
+                        '+'
+                    ],
                     markers: [
                         '=',
                         '!',
@@ -710,7 +832,10 @@ const stylisticRules: {
                     ]
                 },
                 line: {
-                    exceptions: ['-', '+'],
+                    exceptions: [
+                        '-',
+                        '+'
+                    ],
                     markers: [
                         '=',
                         '!',
@@ -728,9 +853,15 @@ const stylisticRules: {
             }
         ],
 
-        '@stylistic/template-curly-spacing': ['error', 'never'],
+        '@stylistic/template-curly-spacing': [
+            'error',
+            'never'
+        ],
 
-        '@stylistic/template-tag-spacing': ['error', 'never'],
+        '@stylistic/template-tag-spacing': [
+            'error',
+            'never'
+        ],
 
         // ===== TYPESCRIPT SPECIFIC =====
         '@stylistic/type-annotation-spacing': [
