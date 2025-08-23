@@ -256,6 +256,13 @@ const reportMissingNewlines = (
     }
 }
 
+/**
+ * The rule to enforce newlines just inside parentheses for function/method definitions only (not calls),
+ * when the number of parameters is greater than or equal to minParams
+ *
+ * @param context - The context of the rule
+ * @returns The rule listener
+ */
 const rule = createRule<Options, MessageIds>({
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
