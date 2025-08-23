@@ -136,7 +136,6 @@ import { configs as enterpriseConfigs } from './eslint-rules/eslint'
 import { configs as jsoncConfigs } from './eslint-rules/file-formats/jsonc'
 
 // Import Module Management Configuration
-import { configs as importConfigs } from './eslint-rules/modules/imports'
 
 // ==== FORMATTING ====
 import { configs as stylisticConfigs } from './eslint-rules/formatting/stylistic'
@@ -144,6 +143,7 @@ import { configs as stylisticConfigs } from './eslint-rules/formatting/stylistic
 // ==== FRAMEWORKS ====
 import { configs as reactConfigs } from './eslint-rules/frameworks/react/react'
 import { configs as reactHooksConfigs } from './eslint-rules/frameworks/react/react-hooks'
+import { configs as importConfigs } from './eslint-rules/modules/imports'
 
 // ==== PACKAGE.JSON ====
 import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json'
@@ -299,7 +299,7 @@ const config = tseslint.config(
 
     // ===== @STYLISTIC CONFIGURATION =====
     stylisticConfigs.all,
-    
+
     /*
      * ===== FUNCTION DEFINITION =====
      * FunctionDefinitionPlugin.configs.flat.all,
@@ -321,7 +321,6 @@ const config = tseslint.config(
 
     // ===== REACT RULES =====
     reactConfigs.all,
-    
 
     /*
      * ===== JSX ACCESSIBILITY (A11Y) RULES =====
@@ -1422,17 +1421,20 @@ const config = tseslint.config(
             // Additional typescript-eslint rules not included in strict
             '@typescript-eslint/explicit-function-return-type': 'error',
 
-             // ✅ ==== VERIFIED ====
-            '@typescript-eslint/explicit-member-accessibility': ['error', {
-               accessibility: 'explicit',
-               overrides: {
-                   'accessors': 'explicit',
-                   'methods': 'explicit',
-                   'properties': 'explicit',
-                   'parameterProperties': 'explicit',
-                   'constructors': 'no-public'
-               }
-             }],
+            // ✅ ==== VERIFIED ====
+            '@typescript-eslint/explicit-member-accessibility': [
+                'error',
+                {
+                    accessibility: 'explicit',
+                    overrides: {
+                        accessors: 'explicit',
+                        constructors: 'no-public',
+                        methods: 'explicit',
+                        parameterProperties: 'explicit',
+                        properties: 'explicit'
+                    }
+                }
+            ],
 
             /*
              * ✅ ==== VERIFIED ====
