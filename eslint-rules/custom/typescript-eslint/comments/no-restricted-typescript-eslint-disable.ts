@@ -14,6 +14,7 @@
  */
 
 // ==== Imports ====
+import { isUndefined } from '@sindresorhus/is'
 import { ESLintUtils } from '@typescript-eslint/utils'
 
 // ==== Types ====
@@ -35,7 +36,6 @@ type MessageIds = 'restrictedDisable'
 
 type Options = [
     {
-
         // List of fully qualified @typescript-eslint/* rule names that are allowed to be disabled
         allow?: readonly string[]
     }?
@@ -44,8 +44,17 @@ type Options = [
 // ===== Helpers =====
 const TYPESCRIPT_ESLINT_PREFIX = '@typescript-eslint/' as const
 
+/**
+ * @param ruleName - The name of the rule to check
+ * @returns True if the rule is a TypeScript ESLint rule, false otherwise
+ */
 const isTypescriptEslintRule = (ruleName: string): boolean => ruleName.startsWith(TYPESCRIPT_ESLINT_PREFIX)
 
+/**
+ * Extracts the names of disabled rules from a comment
+ * @param rawComment - The raw comment to extract the disabled rule names from
+ * @returns An array of disabled rule names
+ */
 const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
     // Normalize to simplify parsing across line/block comments
     const comment = rawComment.trim()
@@ -57,10 +66,10 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
 
     let remainder = comment.slice(directiveIndex + 'eslint-disable'.length)
 
-    if (remainder.startsWith('-next-line')) {
-        remainder = remainder.slice('-next-line'.length)
-    } else if (remainder.startsWith('-line')) {
-        remainder = remainder.slice('-line'.length)
+    const suffix = ['-next-line', '-line'].find(element => remainder.startsWith(element))
+
+    if (!isUndefined(suffix)) {
+        remainder = remainder.slice(suffix.length)
     }
 
     remainder = remainder.trim()
@@ -79,7 +88,7 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
     return cleaned
         .split(',')
         .flatMap(part => part.split(/\s+/u))
-        .map(x => x.trim())
+        .map(segment => segment.trim())
         .filter(Boolean)
 }
 
@@ -98,18 +107,15 @@ const checkDisableComment = (
     }
 
     for (const ruleName of disabledRules) {
-        if (!isTypescriptEslintRule(ruleName)) {
-            continue
-        }
+        const isTsRule = isTypescriptEslintRule(ruleName)
+        const isAllowed = allowList.has(ruleName)
 
-        if (allowList.has(ruleName)) {
-            continue
+        if (isTsRule && !isAllowed) {
+            context.report({
+                loc: comment.loc,
+                messageId: 'restrictedDisable'
+            })
         }
-
-        context.report({
-            loc: comment.loc,
-            messageId: 'restrictedDisable'
-        })
     }
 }
 
@@ -123,7 +129,7 @@ const rule = createRule<Options, MessageIds>({
         return {
             // Run once per file at the end to ensure all comments are available
             'Program:exit'(): void {
-                const sourceCode = context.getSourceCode()
+                const { sourceCode } = context
                 const allComments = sourceCode.getAllComments()
 
                 for (const comment of allComments) {
@@ -143,9 +149,7 @@ const rule = createRule<Options, MessageIds>({
     ],
     meta: {
         docs: {
-            description:
-
-                'Restrict eslint-disable(-line|-next-line) for @typescript-eslint/* rules with an allowlist'
+            description: 'Restrict eslint-disable(-line|-next-line) for @typescript-eslint/* rules with an allowlist'
         },
         messages: {
             restrictedDisable: 'Disabling @typescript-eslint/* rules via eslint-disable is restricted.'
@@ -167,8 +171,4 @@ const rule = createRule<Options, MessageIds>({
     name: 'no-restricted-typescript-eslint-disable'
 })
 
-export const eslintCommentsTypescriptPlugin: TSESLint.FlatConfig.Plugin = {
-    rules: {
-        'no-restricted-typescript-eslint-disable': rule
-    }
-}
+export const noRestrictedTypescriptEslintDisableRule: TSESLint.RuleModule<MessageIds, Options> = rule

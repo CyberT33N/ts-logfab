@@ -31,6 +31,7 @@ const sonarjsRules: {
         'sonarjs/bool-param-default': 'error',
 
         /*
+         * ✅ ==== VERIFIED ====
          * Verhindert unsichere 'arguments' Nutzung
          * ===== DEFENSIVE PROGRAMMING (Enterprise Best Practice) =====
          */

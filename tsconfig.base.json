@@ -62,6 +62,8 @@
      *
      * VERFÜGBARE OPTIONEN:
      *
+     * 'bundler'   for use with bundlers. Like node16 and nodenext, this mode supports package.json "imports" and "exports", but unlike the Node.js resolution modes, bundler never requires file extensions on relative paths in imports.
+     *
      * • "classic"     → TypeScript Original (DEPRECATED, nicht verwenden)
      *                   Sucht relativ zu importierender Datei
      *                   Für Legacy-Projekte vor TS 2.0
@@ -84,13 +86,15 @@
      *                   ./core/index.ts MUSS explizit sein
      *                   ⚠️ Bricht Barrel Pattern Eleganz
      *
-     * ENTERPRISE WAHL: "node"
-     * ✅ Perfekte Balance zwischen modern und praktisch
-     * ✅ Barrel Pattern: ./core → ./core/index.ts (automatisch)
-     * ✅ Maximale IDE-Integration und IntelliSense
-     * ✅ Kompatibel mit allen Tools (Bundler, Linter, etc.)
+     * ENTERPRISE WAHL: "bundler"
+     * ✅ Kompatibel mit modernen npm-Packages (package.json "exports"/"imports")
+     * ✅ Keine Dateiendungen bei relativen Imports nötig (Node-ähnliche Ergonomie)
+     * ✅ Barrel Pattern bleibt erhalten (./core → ./core/index.ts)
+     * ✅ Maximale IDE-Integration und Tooling
+     * ℹ️ Hintergrund: Einige populäre Packages funktionieren mit "node" nicht zuverlässig;
+     *    "bundler" löst Exports/Imports korrekt und behält unsere extensionlosen TS-Imports bei.
      */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
 
     /*
      *✅ Überspringt Typprüfung für Bibliotheken.

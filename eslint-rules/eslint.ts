@@ -26,6 +26,12 @@ const eslintRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
+        /*
+         * ✅ ==== VERIFIED ====
+         * Prevents undefined usage
+         */
+        'no-undefined': 'error',
+
         'accessor-pairs': 'error',
 
         'array-callback-return': 'error',
@@ -258,7 +264,16 @@ const eslintRules: {
          * 'arrow-parens': ['error', 'as-needed'],
          */
         // ✅ ==== VERIFIED ====
-        'no-magic-numbers': ['error', { ignore: [0, 1] }],
+        'no-magic-numbers': [
+            'error',
+            {
+                ignore: [
+                    0,
+                    1,
+                    -1
+                ]
+            }
+        ],
 
         // No assignments that aren't used
         'no-multi-assign': 'error',

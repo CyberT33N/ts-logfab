@@ -124,8 +124,8 @@ import tseslint from 'typescript-eslint'
 
 // ==== CUSTOM ====
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
-import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/eslint/comments'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
+import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/typescript-eslint/comments'
 
 // ==== ENTERPRISE ====
 import { configs as enterpriseConfigs } from './eslint-rules/eslint'
@@ -351,6 +351,7 @@ const config = tseslint.config(
             'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
                 'error',
                 {
+                    // Sometime you can not control external types
                     allow: ['@typescript-eslint/prefer-readonly-parameter-types']
                 }
             ]
@@ -1370,6 +1371,7 @@ const config = tseslint.config(
             // Async/Promise Best Practices
             '@typescript-eslint/return-await': ['error', 'always'],
 
+            // ✅ ==== VERIFIED ====
             '@typescript-eslint/strict-boolean-expressions': 'error',
 
             '@typescript-eslint/switch-exhaustiveness-check': 'error',
