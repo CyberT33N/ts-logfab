@@ -21,6 +21,9 @@ import type { TSESLint } from '@typescript-eslint/utils'
 
 // Enhanced security rules configuration
 const securityRules: {
+    /**
+     *
+     */
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
@@ -73,17 +76,18 @@ export const configs = {
      * Enterprise-grade Security ESLint rules based on OWASP Top 10 and industry standards.
      * Provides eslint-plugin-security configuration for XSS, ReDoS, and code injection prevention.
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-security-config}
+     *
      */
     all: createSecurityAll(),
 
     /**
      * Base security ESLint rules from eslint-plugin-security.
      */
-    base: createSecurityBase(),
+    base: [createSecurityBase()],
 
     /**
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createSecurityAll()
 
-} satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
+} satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

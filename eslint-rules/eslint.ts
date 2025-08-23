@@ -1,5 +1,3 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable max-lines */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -23,6 +21,9 @@ import type { TSESLint } from '@typescript-eslint/utils'
 
 // Custom rules
 const eslintRules: {
+    /**
+     *
+     */
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
@@ -50,7 +51,10 @@ const eslintRules: {
          * ✅ ==== VERIFIED ====
          * Enterprise standard: Google/Microsoft use 10-15
          */
-        complexity: ['error', 15],
+        complexity: [
+            'error',
+            15
+        ],
 
         /*
          * ✅ ==== VERIFIED ====
@@ -58,7 +62,10 @@ const eslintRules: {
          */
         'consistent-return': 'off',
 
-        curly: ['error', 'all'],
+        curly: [
+            'error',
+            'all'
+        ],
 
         'default-case': 'error',
 
@@ -69,9 +76,15 @@ const eslintRules: {
         'dot-notation': 'off',
 
         // ✅ ==== VERIFIED ====
-        eqeqeq: ['error', 'always'],
+        eqeqeq: [
+            'error',
+            'always'
+        ],
 
-        'func-names': ['error', 'never'],
+        'func-names': [
+            'error',
+            'never'
+        ],
 
         // ✅ ==== VERIFIED ====
         'func-style': [
@@ -83,15 +96,24 @@ const eslintRules: {
         ],
 
         // One class per file
-        'grouped-accessor-pairs': ['error', 'setBeforeGet'],
+        'grouped-accessor-pairs': [
+            'error',
+            'setBeforeGet'
+        ],
 
         'guard-for-in': 'error',
 
         // Class & OOP Standards
-        'max-classes-per-file': ['error', 1],
+        'max-classes-per-file': [
+            'error',
+            1
+        ],
 
         // Limit function parameters
-        'max-depth': ['error', { max: 4 }],
+        'max-depth': [
+            'error',
+            { max: 4 }
+        ],
 
         /*
          *   ✅ ==== VERIFIED ====
@@ -137,16 +159,25 @@ const eslintRules: {
         ],
 
         // Limit nesting depth
-        'max-nested-callbacks': ['error', { max: 3 }],
+        'max-nested-callbacks': [
+            'error',
+            { max: 3 }
+        ],
 
         /*
          * Function Design
          * ✅ ==== VERIFIED ====
          */
-        'max-params': ['error', { max: 3 }],
+        'max-params': [
+            'error',
+            { max: 3 }
+        ],
 
         // Limit callback nesting
-        'max-statements': ['error', 15],
+        'max-statements': [
+            'error',
+            15
+        ],
 
         // ✅ ==== VERIFIED ====
         /*
@@ -158,7 +189,6 @@ const eslintRules: {
             'error',
             {
                 capIsNew: false,
-                // eslint-disable-next-line unicorn/no-keyword-prefix
                 newIsCap: true
             }
         ],
@@ -205,7 +235,10 @@ const eslintRules: {
         'no-duplicate-imports': 'off',
 
         // Additional critical rules for enterprise compliance
-        'no-empty': ['error', { allowEmptyCatch: false }],
+        'no-empty': [
+            'error',
+            { allowEmptyCatch: false }
+        ],
 
         'no-eval': 'error',
 
@@ -215,7 +248,10 @@ const eslintRules: {
          */
         'no-extend-native': 'error',
 
-        'no-fallthrough': ['error', { commentPattern: String.raw`falls?\s?through` }],
+        'no-fallthrough': [
+            'error',
+            { commentPattern: String.raw`falls?\s?through` }
+        ],
 
         // No empty constructors
         'no-implicit-globals': [
@@ -366,7 +402,10 @@ const eslintRules: {
                 ],
                 patterns: [
                     {
-                        group: ['*/dist/*', '*/build/*'],
+                        group: [
+                            '*/dist/*',
+                            '*/build/*'
+                        ],
                         message: 'Do not import from dist/build directories'
                     },
                     {
@@ -470,7 +509,10 @@ const eslintRules: {
         'no-underscore-dangle': [
             'error',
             {
-                allow: ['__dirname', '__filename'],
+                allow: [
+                    '__dirname',
+                    '__filename'
+                ],
                 allowFunctionParams: true
             }
         ],
@@ -545,7 +587,10 @@ const eslintRules: {
          */
         'object-curly-newline': 'off',
 
-        'one-var': ['error', 'never'],
+        'one-var': [
+            'error',
+            'never'
+        ],
 
         /*
          * 'space-before-function-paren': ['error', 'never'], // Migrated to @stylistic
@@ -598,7 +643,10 @@ const eslintRules: {
         'prefer-spread': 'error',
 
         // Symbols must have descriptions
-        radix: ['error', 'always'],
+        radix: [
+            'error',
+            'always'
+        ],
 
         'require-atomic-updates': 'error',
 
@@ -652,7 +700,10 @@ const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config => ({
  * Creates the all enterprise ESLint rules.
  * @returns The all enterprise ESLint rules.
  */
-const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray => [createEnterpriseBase(), createEnterpriseOverrides()]
+const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray => [
+    createEnterpriseBase(),
+    createEnterpriseOverrides()
+]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {
@@ -660,13 +711,14 @@ export const configs = {
      * Enterprise-grade ESLint rules based on Google/Microsoft/Meta standards.
      * Combines {@link https://github.com/eslint/eslint/tree/main/packages/eslint/eslint.js} all rules with additional enterprise-specific rules.
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-eslint-config}
+     *
      */
     all: createEnterpriseAll(),
 
     /**
      * Base enterprise ESLint rules without file-specific overrides.
      */
-    base: createEnterpriseBase(),
+    base: [createEnterpriseBase()],
 
     /**
      * Alias for compatibility with flat config naming conventions.
@@ -676,5 +728,5 @@ export const configs = {
     /**
      * File-specific rule overrides for test files and index files.
      */
-    overrides: createEnterpriseOverrides()
-} satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
+    overrides: [createEnterpriseOverrides()]
+} satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

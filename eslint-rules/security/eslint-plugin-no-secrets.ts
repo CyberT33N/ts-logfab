@@ -1,5 +1,3 @@
-/* eslint-disable no-secrets/no-pattern-match */
-/* eslint-disable no-secrets/no-secrets */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -23,6 +21,9 @@ import type { TSESLint } from '@typescript-eslint/utils'
 
 // No-secrets plugin rules configuration
 const noSecretsRules: {
+    /**
+     *
+     */
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
@@ -177,6 +178,7 @@ export const configs = {
      * Enterprise-grade Security ESLint rules based on OWASP Top 10 and industry standards.
      * Combines eslint-plugin-security with no-secrets for comprehensive security coverage.
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-security-config}
+     *
      */
     all: createSecurityAll(),
 
@@ -188,5 +190,5 @@ export const configs = {
     /**
      * No-secrets plugin configuration for enterprise secret detection.
      */
-    'no-secrets': createNoSecretsConfig()
-} satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
+    'no-secrets': [createNoSecretsConfig()]
+} satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

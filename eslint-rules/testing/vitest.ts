@@ -314,11 +314,11 @@ export const configs = {
     /**
      * Base Vitest testing configuration without additional overrides.
      */
-    base: createVitestBase(),
+    base: [createVitestBase()],
 
     /**
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createVitestAll()
 
-} satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
+} satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

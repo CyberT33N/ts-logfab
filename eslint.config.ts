@@ -13,8 +13,6 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
-// https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/
-
 /*
  * ===== [REACT & JSX ECOSYSTEM] =====
  * https://www.npmjs.com/package/eslint-plugin-react
@@ -79,7 +77,6 @@ import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
 import tsdoc from 'eslint-plugin-tsdoc'
-import pluginTsDoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
@@ -185,8 +182,14 @@ const config = tseslint.config(
 
     // ===== TSDOC PLUGIN =====
     {
+        files: [
+            '**/*.ts',
+            '**/*.tsx',
+            '**/*.mts',
+            '**/*.cts'
+        ],
         plugins: {
-            'eslint-plugin-tsdoc': tsdoc
+            tsdoc
         },
         rules: {
             'tsdoc/syntax': 'error'
@@ -1089,22 +1092,6 @@ const config = tseslint.config(
                     type: 'natural'
                 }
             ] // @decorator sorting für Enterprise TypeScript Apps
-        }
-    },
-
-    // ===== TSDOC PLUGIN =====
-    {
-        files: [
-            '**/*.ts',
-            '**/*.tsx',
-            '**/*.mts',
-            '**/*.cts'
-        ], // Only apply to TypeScript files
-        plugins: {
-            tsdoc: pluginTsDoc
-        },
-        rules: {
-            'tsdoc/syntax': 'error' // Enterprise: TSDoc compliance ist Pflicht
         }
     },
 

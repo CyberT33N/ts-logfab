@@ -21,6 +21,9 @@ import type { TSESLint } from '@typescript-eslint/utils'
 
 // Enhanced RegExp rules configuration
 const regexpRules: {
+    /**
+     *
+     */
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
@@ -322,18 +325,17 @@ export const configs = {
      * Enterprise-grade Regular Expression Standards based on Google RE2,
      * Microsoft .NET Regex Guidelines, and Meta Pattern Standards.
      * Combines performance optimization, security (ReDoS prevention), and readability.
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-regexp-config}
      */
     all: createRegExpAll(),
 
     /**
      * Base RegExp configuration without additional overrides.
      */
-    base: createRegExpBase(),
+    base: [createRegExpBase()],
 
     /**
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createRegExpAll()
 
-} satisfies Record<string, TSESLint.FlatConfig.Config | TSESLint.FlatConfig.ConfigArray>
+} satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
