@@ -26,14 +26,23 @@ const createRule = ESLintUtils.RuleCreator(
 )
 
 // ===== Types =====
+
+/** The parameters for checking a disable comment. */
 interface CheckDisableParameters {
+    /** The list of allowed rule names. */
     readonly allowList: ReadonlySet<string>
+
+    /** The comment to check. */
     readonly comment: TSESTree.Comment
+
+    /** The context of the rule. */
     readonly context: TSESLint.RuleContext<MessageIds, Options>
 }
 
+/** The message ids for the rule. */
 type MessageIds = 'restrictedDisable'
 
+/** The options for the rule. */
 type Options = [
     {
         // List of fully qualified rule names that are allowed to be disabled (e.g., "max-lines", "react/jsx-no-bind", "@typescript-eslint/no-explicit-any")
@@ -44,6 +53,7 @@ type Options = [
 // ===== Helpers =====
 /**
  * Extracts the names of disabled rules from a comment.
+ *
  * @param rawComment - The raw comment to extract the disabled rule names from.
  * @returns An array of disabled rule names.
  */
@@ -96,10 +106,9 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
 }
 
 /**
- * Check if a comment is a disable comment
+ * Check if a comment is a disable comment.
  *
- * @param parameters - The parameters to check
- * @returns void
+ * @param parameters - The parameters to check.
  */
 const checkDisableComment = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -128,12 +137,18 @@ const checkDisableComment = (
 }
 
 /**
- * The rule to check for restricted disable comments
+ * The rule to check for restricted disable comments.
  *
- * @param context - The context of the rule
- * @returns The rule listener
+ * @param context - The context of the rule.
+ * @returns The rule listener.
  */
 const rule = createRule<Options, MessageIds>({
+    /**
+     * The rule listener.
+     *
+     * @param context - The context of the rule.
+     * @returns The rule listener.
+     */
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
         const [option] = context.options

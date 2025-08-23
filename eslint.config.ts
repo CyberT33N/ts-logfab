@@ -229,10 +229,16 @@ const config = tseslint.config(
             // Style & structure
             'jsdoc/empty-tags': 'error',
             'jsdoc/implements-on-classes': 'error',
+
+            // ✅ ==== VERIFIED ====
             'jsdoc/multiline-blocks': [
                 'error',
-                { noSingleLineBlocks: true }
+                {
+                    noMultilineBlocks: false,
+                    noSingleLineBlocks: false
+                }
             ],
+
             'jsdoc/no-defaults': 'error',
             'jsdoc/no-multi-asterisks': 'error',
             'jsdoc/no-types': 'error', // Redundant types in TS code
@@ -253,6 +259,8 @@ const config = tseslint.config(
                     ]
                 }
             ],
+
+            // ✅ ==== VERIFIED ====
             'jsdoc/require-description-complete-sentence': [
                 'error',
                 {
@@ -270,7 +278,10 @@ const config = tseslint.config(
                 'always'
             ],
 
-            // Documentation surface (public API only)
+            /**
+             * ✅ ==== VERIFIED ====
+             * Documentation surface (public API only).
+             */
             'jsdoc/require-jsdoc': [
                 'error',
                 {
@@ -280,9 +291,12 @@ const config = tseslint.config(
                         'TSEnumDeclaration',
                         'TSInterfaceDeclaration',
                         'TSMethodSignature',
-                        'TSPropertySignature',
                         'TSTypeAliasDeclaration',
-                        'PropertyDefinition'
+                        'PropertyDefinition',
+
+                        // Nur Properties in echten Typdefinitionen (nicht inline)
+                        'TSInterfaceDeclaration > TSInterfaceBody > TSPropertySignature',
+                        'TSTypeAliasDeclaration > TSTypeLiteral > TSPropertySignature'
                     ],
                     exemptEmptyConstructors: true,
                     exemptEmptyFunctions: true,
@@ -320,6 +334,7 @@ const config = tseslint.config(
                 { exemptedBy: ['constructor'] }
             ],
 
+            // ✅ ==== VERIFIED ====
             'jsdoc/require-returns-check': 'error',
 
             'jsdoc/require-returns-description': 'error',
@@ -333,17 +348,14 @@ const config = tseslint.config(
             'jsdoc/require-yields': 'error',
 
             'jsdoc/require-yields-check': 'error',
-            'jsdoc/tag-lines': [
-                'error',
-                'always',
-                {
-                    tags: {
-                        default: { lines: 'never' },
-                        param: { lines: 'never' },
-                        returns: { lines: 'never' }
-                    }
-                }
-            ],
+
+            // ✅ ==== VERIFIED ====
+            "jsdoc/tag-lines": ["error", "never", {
+               "startLines": 1,
+               "endLines": 0,
+               "count": 1,
+               "applyToEndTag": true
+          }],
 
             // Type/namepath validity
             'jsdoc/valid-types': 'error'

@@ -19,7 +19,9 @@ import sonarjs from 'eslint-plugin-sonarjs'
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-// Enhanced SonarJS rules configuration
+/**
+ * Enhanced SonarJS rules configuration.
+ */
 const sonarjsRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
@@ -152,6 +154,7 @@ const sonarjsRules: {
 
 /**
  * Creates the base SonarJS configuration.
+ *
  * @returns The base SonarJS configuration.
  */
 const createSonarjsBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -162,6 +165,11 @@ const createSonarjsBase = (): TSESLint.FlatConfig.ConfigArray => [
     }
 ]
 
+/**
+ * Creates the complete SonarJS configuration.
+ *
+ * @returns The complete SonarJS configuration.
+ */
 const createSonarjsAll = (): TSESLint.FlatConfig.ConfigArray => createSonarjsBase()
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====

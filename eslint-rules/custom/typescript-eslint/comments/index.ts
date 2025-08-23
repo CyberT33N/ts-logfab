@@ -18,8 +18,9 @@ import { noRestrictedTypescriptEslintDisableRule } from './rules/no-restricted-t
 
 import type { TSESLint } from '@typescript-eslint/utils'
 
-// ==== Local Rules ====
-
+/**
+ * The eslint comments typescript plugin.
+ */
 export const eslintCommentsTypescriptPlugin: TSESLint.FlatConfig.Plugin = {
     rules: {
         'no-restricted-typescript-eslint-disable': noRestrictedTypescriptEslintDisableRule
