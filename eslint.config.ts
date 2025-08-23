@@ -1,4 +1,3 @@
-/* eslint-disable import/max-dependencies */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -60,11 +59,13 @@
  * https://github.com/ota-meshi/eslint-plugin-regexp
  */
 
+import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
+import jsdoc from 'eslint-plugin-jsdoc'
+
 /*
  * ===== [FILE FORMAT SPECIFIC] =====
  * https://www.npmjs.com/package/eslint-plugin-jsonc
  */
-import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
 import nodePlugin from 'eslint-plugin-n'
 
 /*
@@ -77,6 +78,7 @@ import perfectionist from 'eslint-plugin-perfectionist'
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
+import tsdoc from 'eslint-plugin-tsdoc'
 import pluginTsDoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
@@ -178,6 +180,191 @@ const config = tseslint.config(
         },
         rules: {
             'sort-keys-fix/sort-keys-fix': 'warn'
+        }
+    },
+
+    // ===== TSDOC PLUGIN =====
+    {
+        plugins: {
+            'eslint-plugin-tsdoc': tsdoc
+        },
+        rules: {
+            'tsdoc/syntax': 'error'
+        }
+    },
+
+    // ===== JSDOC PLUGIN =====
+    jsdoc.configs['flat/recommended-typescript-error'],
+    {
+        files: [
+            '**/*.ts',
+            '**/*.tsx',
+            '**/*.mts',
+            '**/*.cts'
+        ],
+        plugins: {
+            jsdoc
+        },
+        rules: {
+            // Core correctness
+            'jsdoc/check-access': 'error',
+            'jsdoc/check-alignment': 'error',
+            'jsdoc/check-line-alignment': 'error',
+            'jsdoc/check-param-names': [
+                'error',
+                { enableFixer: true }
+            ],
+            'jsdoc/check-property-names': [
+                'error',
+                { enableFixer: true }
+            ],
+            'jsdoc/check-tag-names': 'error',
+            'jsdoc/check-template-names': 'error',
+            'jsdoc/check-types': 'error',
+            'jsdoc/check-values': 'error',
+
+            // Style & structure
+            'jsdoc/empty-tags': 'error',
+            'jsdoc/implements-on-classes': 'error',
+            'jsdoc/multiline-blocks': [
+                'error',
+                { noSingleLineBlocks: true }
+            ],
+            'jsdoc/no-defaults': 'error',
+            'jsdoc/no-multi-asterisks': 'error',
+            'jsdoc/no-types': 'error', // Redundant types in TS code
+            'jsdoc/no-undefined-types': 'off', // Off in TS flavor
+            'jsdoc/require-asterisk-prefix': [
+                'error',
+                'always'
+            ],
+
+            // Content quality
+            'jsdoc/require-description': [
+                'warn',
+                {
+                    contexts: [
+                        'FunctionDeclaration',
+                        'ClassDeclaration',
+                        'MethodDefinition'
+                    ]
+                }
+            ],
+            'jsdoc/require-description-complete-sentence': [
+                'error',
+                {
+                    tags: [
+                        'param',
+                        'returns',
+                        'property'
+                    ]
+                }
+            ],
+
+            // Consistent spacing between tags
+            'jsdoc/require-hyphen-before-param-description': [
+                'error',
+                'always'
+            ],
+
+            // Documentation surface (public API only)
+            'jsdoc/require-jsdoc': [
+                'error',
+                {
+                    checkConstructors: true,
+                    contexts: [
+                        'TSDeclareFunction',
+                        'TSEnumDeclaration',
+                        'TSInterfaceDeclaration',
+                        'TSMethodSignature',
+                        'TSPropertySignature',
+                        'TSTypeAliasDeclaration',
+                        'PropertyDefinition'
+                    ],
+                    exemptEmptyConstructors: true,
+                    exemptEmptyFunctions: true,
+                    publicOnly: false,
+                    require: {
+                        ArrowFunctionExpression: true,
+                        ClassDeclaration: true,
+                        ClassExpression: true,
+                        FunctionDeclaration: true,
+                        FunctionExpression: true,
+                        MethodDefinition: true
+                    }
+                }
+            ],
+
+            // Params & returns (TS disables type requirements)
+            'jsdoc/require-param': 'error',
+
+            'jsdoc/require-param-description': 'error',
+
+            'jsdoc/require-param-name': 'error',
+
+            'jsdoc/require-param-type': 'off',
+
+            'jsdoc/require-property': 'error',
+
+            'jsdoc/require-property-description': 'error',
+
+            'jsdoc/require-property-name': 'error',
+
+            'jsdoc/require-property-type': 'off',
+
+            'jsdoc/require-returns': [
+                'error',
+                { exemptedBy: ['constructor'] }
+            ],
+
+            'jsdoc/require-returns-check': 'error',
+
+            'jsdoc/require-returns-description': 'error',
+
+            'jsdoc/require-returns-type': 'off',
+
+            'jsdoc/require-template': 'error',
+
+            'jsdoc/require-throws': ['warn'],
+
+            'jsdoc/require-yields': 'error',
+
+            'jsdoc/require-yields-check': 'error',
+            'jsdoc/tag-lines': [
+                'error',
+                'always',
+                {
+                    tags: {
+                        default: { lines: 'never' },
+                        param: { lines: 'never' },
+                        returns: { lines: 'never' }
+                    }
+                }
+            ],
+
+            // Type/namepath validity
+            'jsdoc/valid-types': 'error'
+        },
+        settings: {
+            jsdoc: {
+                mode: 'typescript',
+                preferredTypes: {
+                    Boolean: 'boolean',
+                    Function: '(...args: unknown[]) => unknown',
+                    Number: 'number',
+                    Object: 'Record<string, unknown>',
+                    String: 'string',
+                    Symbol: 'symbol',
+                    object: 'Record<string, unknown>'
+                },
+                tagNamePreference: {
+                    augments: {
+                        message: 'Use @extends for inheritance (TSDoc-aligned).',
+                        replacement: 'extends'
+                    },
+                    returns: 'returns'
+                }
+            }
         }
     },
 

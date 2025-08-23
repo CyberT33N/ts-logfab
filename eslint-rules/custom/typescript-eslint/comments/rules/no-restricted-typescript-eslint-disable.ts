@@ -36,24 +36,16 @@ type MessageIds = 'restrictedDisable'
 
 type Options = [
     {
-        // List of fully qualified @typescript-eslint/* rule names that are allowed to be disabled
+        // List of fully qualified rule names that are allowed to be disabled (e.g., "max-lines", "react/jsx-no-bind", "@typescript-eslint/no-explicit-any")
         allow?: readonly string[]
     }?
 ]
 
 // ===== Helpers =====
-const TYPESCRIPT_ESLINT_PREFIX = '@typescript-eslint/' as const
-
 /**
- * @param ruleName - The name of the rule to check
- * @returns True if the rule is a TypeScript ESLint rule, false otherwise
- */
-const isTypescriptEslintRule = (ruleName: string): boolean => ruleName.startsWith(TYPESCRIPT_ESLINT_PREFIX)
-
-/**
- * Extracts the names of disabled rules from a comment
- * @param rawComment - The raw comment to extract the disabled rule names from
- * @returns An array of disabled rule names
+ * Extracts the names of disabled rules from a comment.
+ * @param rawComment - The raw comment to extract the disabled rule names from.
+ * @returns An array of disabled rule names.
  */
 const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
     // Normalize to simplify parsing across line/block comments
@@ -82,17 +74,25 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
         return []
     }
 
-    // Remove trailing comment markers or annotations that sometimes appear
+    /*
+     * Remove trailing comment markers or annotations that sometimes appear
+     * and strip inline explanations after " -- " (ESLint convention for explanations)
+     */
     const cleaned = remainder
+        .replace(/\s--\s.*$/su, '')
         .replace(/[*\-/]{1,64}$/u, '')
         .trim()
 
-    // Split by comma and whitespace, keep non-empty
+    if (cleaned.length === 0) {
+        return []
+    }
+
+    // Split by comma and whitespace, keep non-empty, and drop stray tokens like "--"
     return cleaned
         .split(',')
         .flatMap(part => part.split(/\s+/u))
         .map(segment => segment.trim())
-        .filter(Boolean)
+        .filter(token => token.length > 0 && token !== '--')
 }
 
 /**
@@ -116,10 +116,9 @@ const checkDisableComment = (
     }
 
     for (const ruleName of disabledRules) {
-        const isTsRule = isTypescriptEslintRule(ruleName)
         const isAllowed = allowList.has(ruleName)
 
-        if (isTsRule && !isAllowed) {
+        if (!isAllowed) {
             context.report({
                 loc: comment.loc,
                 messageId: 'restrictedDisable'
@@ -129,7 +128,7 @@ const checkDisableComment = (
 }
 
 /**
- * The rule to check for restricted TypeScript ESLint disable comments
+ * The rule to check for restricted disable comments
  *
  * @param context - The context of the rule
  * @returns The rule listener
@@ -163,10 +162,10 @@ const rule = createRule<Options, MessageIds>({
     ],
     meta: {
         docs: {
-            description: 'Restrict eslint-disable(-line|-next-line) for @typescript-eslint/* rules with an allowlist'
+            description: 'Restrict eslint-disable(-line|-next-line) for any rules with an allowlist'
         },
         messages: {
-            restrictedDisable: 'Disabling @typescript-eslint/* rules via eslint-disable is restricted.'
+            restrictedDisable: 'Disabling rules via eslint-disable is restricted.'
         },
         schema: [
             {

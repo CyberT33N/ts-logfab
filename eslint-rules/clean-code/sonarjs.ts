@@ -162,10 +162,6 @@ const createSonarjsBase = (): TSESLint.FlatConfig.ConfigArray => [
     }
 ]
 
-/**
- * Creates the complete SonarJS configuration.
- * @returns The complete SonarJS configuration.
- */
 const createSonarjsAll = (): TSESLint.FlatConfig.ConfigArray => createSonarjsBase()
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
@@ -173,7 +169,7 @@ export const configs = {
     /**
      * Enterprise-grade SonarJS Configuration based on Google/Microsoft/Meta standards.
      * Combines clean code principles with code quality and maintainability standards.
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-sonarjs-config}
+     *
      */
     all: createSonarjsAll(),
 

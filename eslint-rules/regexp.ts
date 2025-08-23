@@ -53,7 +53,9 @@ const regexpRules: {
             }
         ],
 
-        // Alphabetische Flag-Sortierung
+        /*
+         * ✅ ==== VERIFIED ====
+         */
         'regexp/match-any': [
             'error',
             {

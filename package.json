@@ -38,7 +38,6 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "~4.5.0",
     "@sindresorhus/is": "~7.0.2",
     "@types/cli-progress": "~3.11.6",
     "@typescript-eslint/utils": "~8.39.0",
@@ -61,6 +60,7 @@
     "zod-package-json": "~1.2.0"
   },
   "devDependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "~4.5.0",
     "@eslint/js": "~9.26.0",
     "@stylistic/eslint-plugin": "~5.2.2",
     "@types/lodash": "~4.17.17",
@@ -70,6 +70,7 @@
     "eslint-import-resolver-node": "~0.3.9",
     "eslint-import-resolver-typescript": "~4.3.4",
     "eslint-plugin-import": "~2.32.0",
+    "eslint-plugin-jsdoc": "~54.1.1",
     "eslint-plugin-jsonc": "~2.20.1",
     "eslint-plugin-jsx-a11y": "~6.10.2",
     "eslint-plugin-n": "~17.21.3",

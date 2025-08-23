@@ -193,3 +193,17 @@ declare module '@eslint-community/eslint-plugin-eslint-comments' {
     const plugin: EslintPluginEslintComments
     export = plugin
 }
+
+declare module 'eslint-plugin-jsdoc' {
+    import type { TSESLint } from '@typescript-eslint/utils'
+
+    interface EslintPluginJsdoc {
+        readonly configs: {
+            readonly 'flat/recommended-typescript-error': TSESLint.FlatConfig.Config
+        }
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginJsdoc
+    export = plugin
+}
