@@ -66,7 +66,10 @@ const extractDisabledRuleNames = (rawComment: string): readonly string[] => {
 
     let remainder = comment.slice(directiveIndex + 'eslint-disable'.length)
 
-    const suffix = ['-next-line', '-line'].find(element => remainder.startsWith(element))
+    const suffix = [
+        '-next-line',
+        '-line'
+    ].find(element => remainder.startsWith(element))
 
     if (!isUndefined(suffix)) {
         remainder = remainder.slice(suffix.length)

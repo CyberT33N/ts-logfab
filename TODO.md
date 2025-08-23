@@ -2,6 +2,7 @@
 Wir **MÜSSEN** auf jeden Fall noch einbauen, dass **JAS-Docs** und **TS-Docs** Kommentare immer erzwungen werden.
 
 Nochmal schauen wegen den Zeilenumbrüchen, weil ich glaube, es ist wirklich nicht leserlich, dass manchmal alles so lang ist, auch wenn wir denken, dass es so ist.
+  - Also in Arrays haben wir jetzt schon **Windows Item** auf 2 gesetzt, und das passt dadurch.
 
 Wenn wir das **Package** später releasen, **MÜSSEN** wir daran denken, dass die **TS-Config** äquivalent sein **MUSS** mit **Modul Resolution**, sodass alles funktioniert.
 

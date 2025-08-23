@@ -68,7 +68,10 @@ const sonarjsRules: {
         'sonarjs/jsx-no-leaked-render': 'error',
 
         // Keine verschachtelten switch
-        'sonarjs/nested-control-flow': ['error', { maximumNestingLevel: 3 }],
+        'sonarjs/nested-control-flow': [
+            'error',
+            { maximumNestingLevel: 3 }
+        ],
 
         /*
          * Boolean Parameter brauchen Defaults
@@ -77,7 +80,10 @@ const sonarjsRules: {
         'sonarjs/no-collapsible-if': 'error',
 
         // Verhindert überkomplexe Ausdrücke
-        'sonarjs/no-duplicate-string': ['error', { threshold: 3 }],
+        'sonarjs/no-duplicate-string': [
+            'error',
+            { threshold: 3 }
+        ],
 
         /*
          * Identische Funktionen verhindern
