@@ -111,3 +111,59 @@ declare module 'eslint-plugin-sonarjs' {
     const plugin: EslintPluginSonarjs
     export = plugin
 }
+
+declare module 'eslint-plugin-unicorn' {
+    interface EslintPluginUnicorn {
+        readonly configs: {
+            readonly all: {
+                readonly rules: RulesRecord
+            }
+        }
+    }
+
+    const plugin: EslintPluginUnicorn
+    export = plugin
+}
+
+declare module 'eslint-plugin-n' {
+    interface EslintPluginN {
+        readonly configs: {
+            readonly 'flat/all': {
+                readonly rules: RulesRecord
+            }
+        }
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginN
+    export = plugin
+
+}
+
+declare module 'eslint-plugin-unused-imports' {
+    interface EslintPluginUnusedImports {
+        readonly configs: {
+            readonly recommended: {
+                readonly rules: RulesRecord
+            }
+        }
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginUnusedImports
+    export = plugin
+}
+
+declare module '@stylistic/eslint-plugin' {
+    import type { TSESLint } from '@typescript-eslint/utils'
+
+    interface EslintPluginStylistic {
+        readonly configs: {
+            readonly all: TSESLint.FlatConfig.Config
+        }
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginStylistic
+    export = plugin
+}
