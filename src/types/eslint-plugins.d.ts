@@ -180,8 +180,9 @@ declare module 'eslint-plugin-jsx-a11y' {
     export = plugin
 }
 
-declare module 'eslint-plugin-eslint-comments' {
+declare module '@eslint-community/eslint-plugin-eslint-comments' {
     import type { TSESLint } from '@typescript-eslint/utils'
+
     interface EslintPluginEslintComments {
         readonly configs: {
             readonly recommended: TSESLint.FlatConfig.Config

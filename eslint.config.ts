@@ -64,9 +64,8 @@
  * ===== [FILE FORMAT SPECIFIC] =====
  * https://www.npmjs.com/package/eslint-plugin-jsonc
  */
+import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
 import nodePlugin from 'eslint-plugin-n'
-
-import eslintPluginEslintComments from 'eslint-plugin-eslint-comments'
 
 /*
  * ===== [SORTING & ORDERING] =====
@@ -125,6 +124,7 @@ import tseslint from 'typescript-eslint'
 
 // ==== CUSTOM ====
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
+import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/eslint/comments'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 
 // ==== ENTERPRISE ====
@@ -210,14 +210,28 @@ const config = tseslint.config(
     // ===== PROMISE PLUGIN =====
     promiseConfigs.all,
 
-    // ===== ESLINT COMMENTS PLUGIN =====
+    /*
+     * ===== ESLINT COMMENTS PLUGIN =====
+     * **Not working for typescript-eslint specific rules**
+     */
     {
+        files: ['*.js', '*.jsx'],
         plugins: {
-            'eslint-comments': eslintPluginEslintComments
+            '@eslint-community/eslint-comments': eslintPluginEslintComments
         },
         rules: {
-          "eslint-comments/no-use": ["error", {"allow": []}]
-        },
+
+            // ✅ ==== VERIFIED ====
+            '@eslint-community/eslint-comments/no-restricted-disable': ['error', '*'],
+
+            // ✅ ==== VERIFIED ====
+            '@eslint-community/eslint-comments/no-use': [
+                'error',
+                {
+                    allow: []
+                }
+            ]
+        }
     },
 
     // ===== PREFER ARROW PLUGIN (MODERN JAVASCRIPT STANDARDS) =====
@@ -322,6 +336,27 @@ const config = tseslint.config(
         }
     },
 
+    // Apply custom restriction for @typescript-eslint/* disables in TS files
+    {
+        files: [
+            '**/*.ts',
+            '**/*.tsx',
+            '**/*.mts',
+            '**/*.cts'
+        ],
+        plugins: {
+            'local-ts-eslint-comments': eslintCommentsTypescriptPlugin
+        },
+        rules: {
+            'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
+                'error',
+                {
+                    allow: ['@typescript-eslint/prefer-readonly-parameter-types']
+                }
+            ]
+        }
+    },
+
     // ===== REACT PERFORMANCE =====
     reactPerfPlugin.configs.flat.all,
 
@@ -335,7 +370,7 @@ const config = tseslint.config(
      * ===== JSX ACCESSIBILITY (A11Y) RULES =====
      */
     jsxA11yConfigs.all,
-    
+
     /*
      * ===== TYPESCRIPT-ESLINT CONFIGURATIONS =====
      * Include ALL strict TypeScript rules (includes recommended)
@@ -879,6 +914,8 @@ const config = tseslint.config(
             '**/*.cts'
         ], // Only apply to TypeScript files
         rules: {
+
+            '@typescript-eslint/ban-ts-comment': 'error',
 
             /*
              * Konsistente Method Signatures

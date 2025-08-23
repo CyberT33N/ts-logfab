@@ -38,6 +38,7 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
     "@sindresorhus/is": "~7.0.2",
     "@types/cli-progress": "~3.11.6",
     "@typescript-eslint/utils": "~8.39.0",
@@ -48,7 +49,6 @@
     "color-convert": "~3.1.0",
     "colorette": "~2.0.20",
     "dotenv": "~16.5.0",
-    "eslint-plugin-eslint-comments": "^3.2.0",
     "gradient-string": "~3.0.0",
     "lodash": "~4.17.21",
     "pino": "~9.7.0",
