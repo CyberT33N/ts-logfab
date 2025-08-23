@@ -19,7 +19,7 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks'
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-// Enhanced React Hooks rules configuration  
+// Enhanced React Hooks rules configuration
 const reactHooksRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
@@ -60,7 +60,7 @@ const createReactHooksBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete React Hooks configuration.
- * @returns The complete React Hooks configuration.  
+ * @returns The complete React Hooks configuration.
  */
 const createReactHooksAll = (): TSESLint.FlatConfig.ConfigArray => createReactHooksBase()
 

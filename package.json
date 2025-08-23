@@ -48,6 +48,7 @@
     "color-convert": "~3.1.0",
     "colorette": "~2.0.20",
     "dotenv": "~16.5.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
     "gradient-string": "~3.0.0",
     "lodash": "~4.17.21",
     "pino": "~9.7.0",

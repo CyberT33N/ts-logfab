@@ -101,10 +101,6 @@ declare module 'eslint-plugin-sonarjs' {
                 readonly rules: RulesRecord
             }
         }
-        readonly meta?: {
-            readonly name: string
-            readonly version: string
-        }
         readonly rules: Record<string, LooseRuleDefinition>
     }
 
@@ -165,5 +161,34 @@ declare module '@stylistic/eslint-plugin' {
     }
 
     const plugin: EslintPluginStylistic
+    export = plugin
+}
+
+declare module 'eslint-plugin-jsx-a11y' {
+    import type { TSESLint } from '@typescript-eslint/utils'
+
+    interface EslintPluginJsxA11y {
+        readonly flatConfigs: {
+            readonly recommended: TSESLint.FlatConfig.Config
+            readonly strict: TSESLint.FlatConfig.Config
+        }
+
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginJsxA11y
+    export = plugin
+}
+
+declare module 'eslint-plugin-eslint-comments' {
+    import type { TSESLint } from '@typescript-eslint/utils'
+    interface EslintPluginEslintComments {
+        readonly configs: {
+            readonly recommended: TSESLint.FlatConfig.Config
+        }
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginEslintComments
     export = plugin
 }
