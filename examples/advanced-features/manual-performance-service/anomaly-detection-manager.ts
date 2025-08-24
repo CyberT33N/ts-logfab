@@ -21,6 +21,8 @@
 import { memoryUsage } from 'node:process'
 import { setTimeout } from 'node:timers/promises'
 
+import cryptoRandomString from 'crypto-random-string'
+
 import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance'
 import { toWritable } from '@/utils/data-utils'
 
@@ -170,6 +172,7 @@ export class AnomalyDetectionManager {
         const ANOMALY_CHECK_INTERVAL = 5000
         const ANOMALY_PROBABILITY = 0.7
         const ANOMALY_DELAY = 10
+        const RANDOM_SCALE = 1_000_000
 
         let result = 0
 
@@ -179,7 +182,12 @@ export class AnomalyDetectionManager {
             // Variable delay to potentially trigger anomalies
             if (index % ANOMALY_CHECK_INTERVAL === 0) {
                 // Performance/Load Testing:
-                const delay = Math.random() > ANOMALY_PROBABILITY ? ANOMALY_DELAY : 1
+                const delay = Number(cryptoRandomString({
+                    length: 6,
+                    type: 'numeric'
+                })) / RANDOM_SCALE > ANOMALY_PROBABILITY
+                    ? ANOMALY_DELAY
+                    : 1
 
                 // Timing Control:
                 await setTimeout(delay)
