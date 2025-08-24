@@ -241,8 +241,8 @@ const config = tseslint.config(
 
             'jsdoc/no-defaults': 'error',
             'jsdoc/no-multi-asterisks': 'error',
-            'jsdoc/no-types': 'error', // Redundant types in TS code
-            'jsdoc/no-undefined-types': 'off', // Off in TS flavor
+            'jsdoc/no-types': 'error',
+            'jsdoc/no-undefined-types': 'off',
             'jsdoc/require-asterisk-prefix': [
                 'error',
                 'always'
