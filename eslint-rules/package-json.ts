@@ -115,6 +115,7 @@ const packageJsonRules: {
 
 /**
  * Creates the base Package.json configuration.
+ *
  * @returns The base Package.json configuration.
  */
 const createPackageJsonBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -128,6 +129,7 @@ const createPackageJsonBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete Package.json configuration.
+ *
  * @returns The complete Package.json configuration.
  */
 const createPackageJsonAll = (): TSESLint.FlatConfig.ConfigArray => createPackageJsonBase()
@@ -137,6 +139,7 @@ export const configs = {
     /**
      * Enterprise-grade Package.json Configuration based on Node.js best practices.
      * Combines package.json validation with JSONC rule overrides for package.json files.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-package-json-config}
      */
     all: createPackageJsonAll(),
@@ -150,5 +153,4 @@ export const configs = {
      * Alias for compatibility with flat config naming conventions.
      */
     recommended: createPackageJsonAll()
-
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

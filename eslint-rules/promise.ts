@@ -73,6 +73,7 @@ const promiseRules: {
 
 /**
  * Creates the base Promise configuration.
+ *
  * @returns The base Promise configuration.
  */
 const createPromiseBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -85,6 +86,7 @@ const createPromiseBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete Promise configuration.
+ *
  * @returns The complete Promise configuration.
  */
 const createPromiseAll = (): TSESLint.FlatConfig.ConfigArray => createPromiseBase()
@@ -94,7 +96,6 @@ export const configs = {
     /**
      * Enterprise-grade Promise Configuration based on Google/Microsoft/Meta standards.
      * Combines promise best practices with zero-tolerance for anti-patterns.
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-promise-config}
      */
     all: createPromiseAll(),
 
@@ -107,5 +108,4 @@ export const configs = {
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createPromiseAll()
-
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

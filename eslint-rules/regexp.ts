@@ -22,7 +22,9 @@ import type { TSESLint } from '@typescript-eslint/utils'
 // Enhanced RegExp rules configuration
 const regexpRules: {
     /**
-     *
+     * Enterprise-grade Regular Expression Standards based on Google RE2,
+     * Microsoft .NET Regex Guidelines, and Meta Pattern Standards.
+     * Combines performance optimization, security (ReDoS prevention), and readability.
      */
     rules: TSESLint.Linter.RulesRecord
 } = {
@@ -298,6 +300,7 @@ const regexpRules: {
 
 /**
  * Creates the base RegExp configuration.
+ *
  * @returns The base RegExp configuration.
  */
 const createRegExpBase = (): TSESLint.FlatConfig.Config => {
@@ -315,6 +318,7 @@ const createRegExpBase = (): TSESLint.FlatConfig.Config => {
 
 /**
  * Creates the complete RegExp configuration.
+ *
  * @returns The complete RegExp configuration.
  */
 const createRegExpAll = (): TSESLint.FlatConfig.ConfigArray => [createRegExpBase()]
@@ -337,5 +341,4 @@ export const configs = {
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createRegExpAll()
-
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
