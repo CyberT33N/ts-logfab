@@ -79,7 +79,8 @@ import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
-import tseslint, { configs as tseslintConfigs } from 'typescript-eslint'
+import tseslint, { configs as tseslintConfigs,
+    parser as tseslintParser } from 'typescript-eslint'
 
 // ------------------------------------------------
 
@@ -482,7 +483,7 @@ const config = tseslint.config(
             '**/*.cts'
         ],
         languageOptions: {
-            parser: tseslint.parser,
+            parser: tseslintParser,
             parserOptions: {
                 /*
                  *===== PERFORMANCE & CACHING OPTIONS =====
@@ -519,6 +520,15 @@ const config = tseslint.config(
                  *Additional options for raw syntax parsing
                  */
                 // EcmaFeatures: {
+
+                /*
+                 *- https://typescript-eslint.io/packages/parser/#ecmaversion
+                 *Default: 2018
+                 *ECMAScript version: number (es3, es5, es6, es7...) or year (es2015, es2016...) or 'latest'
+                 *Used for scope analysis, affects default behavior
+                 */
+                ecmaVersion: 'latest',
+
                 /*
                  *- https://typescript-eslint.io/packages/parser/#jsx
                  *Default: false
@@ -537,14 +547,6 @@ const config = tseslint.config(
                  * GlobalReturn: false
                  * },
                  */
-
-                /*
-                 *- https://typescript-eslint.io/packages/parser/#ecmaversion
-                 *Default: 2018
-                 *ECMAScript version: number (es3, es5, es6, es7...) or year (es2015, es2016...) or 'latest'
-                 *Used for scope analysis, affects default behavior
-                 */
-                // EcmaVersion: 'latest',
 
                 /*
                  *===== TYPESCRIPT COMPILER OPTIONS =====
@@ -778,7 +780,7 @@ const config = tseslint.config(
      * Enterprise-Grade Sorting Standards
      * Based on Google/Microsoft/Meta Natural Sorting Preferences
      */
-    perfectionist.configs['recommended-natural'], // Natural sorting (human-readable)
+    perfectionist.configs['recommended-natural'],
     {
         rules: {
 

@@ -3,9 +3,24 @@
 
     /*
      *✅ Eingebundene Standardbibliotheken.
-     *- ES2023: Aktuellste JavaScript-Funktionen.
-     *- DOM: Zugriff auf `document`, `window` usw. (wichtig für Renderer-Prozess).
-     *- DOM.Iterable: Erlaubt `for...of` auf NodeLists.
+     * VERFÜGBARE OPTIONEN:
+     * - ES5: Core-Definitions für ES5
+     * - ES2015 (Alias: ES6): Promise, Map, Set, Symbol, Reflect, Proxy, etc.
+     * - ES2016 (Alias: ES7): Array.prototype.includes
+     * - ES2017: Object.values, Object.entries, Atomics, SharedArrayBuffer, etc.
+     * - ES2018: Async Iterables, Promise.prototype.finally, RegExp.groups, Intl.PluralRules, etc.
+     * - ES2019: Array.prototype.flat/flatMap, Object.fromEntries, trimStart/trimEnd, etc.
+     * - ES2020: String.prototype.matchAll, Dynamic Import, BigInt, globalThis, etc.
+     * - ES2021: Promise.any, String.prototype.replaceAll, WeakRef/FinalizationRegistry, etc.
+     * - ES2022: Array.prototype.at, RegExp.hasIndices (/d), Top-level await, etc.
+     * - ES2023: Array.prototype.with, findLast/findLastIndex, toSorted/toReversed, etc.
+     * - ESNext: Neueste, sich ändernde JS-APIs (Moving Target; kann sich zwischen TS-Releases ändern)
+     * - DOM: window, document, usw.
+     * - DOM.Iterable: Iteration über DOM-Collections (NodeList, etc.)
+     * - WebWorker: APIs für Worker-Kontexte
+     * - ScriptHost: Windows Script Host APIs
+     *
+     * AKTUELL VERWENDET: ES2023, DOM, DOM.Iterable
      */
     "lib": [
       "ES2023",
