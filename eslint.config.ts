@@ -72,6 +72,7 @@ import nodePlugin from 'eslint-plugin-n'
 
 // https://perfectionist.dev
 import perfectionist from 'eslint-plugin-perfectionist'
+
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
@@ -132,6 +133,7 @@ import { configs as enterpriseConfigs } from './eslint-rules/eslint'
 
 // ==== FILE FORMATS ====
 import { configs as jsoncConfigs } from './eslint-rules/file-formats/jsonc'
+import { configs as perfectionistConfigs } from './eslint-rules/formatting/perfectionist'
 
 // Import Module Management Configuration
 
@@ -780,195 +782,7 @@ const config = tseslint.config(
      * Enterprise-Grade Sorting Standards
      * Based on Google/Microsoft/Meta Natural Sorting Preferences
      */
-    perfectionist.configs['recommended-natural'],
-    {
-        rules: {
-
-            // New Map([...]) entries
-            'perfectionist/sort-array-includes': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            /*
-             * ===== CLASS & INHERITANCE SORTING =====
-             * ✅ ==== VERIFIED ====
-             */
-            'perfectionist/sort-classes': 'off',
-
-            /*
-             * Module member sorting
-             * ===== DECORATOR SORTING (ENTERPRISE TYPESCRIPT) =====
-             */
-            'perfectionist/sort-decorators': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            // ✅ Abgedeckt durch ESLint Core sort-keys
-            'perfectionist/sort-enums': 'off',
-
-            /*
-             * Switch case statements (alphabetical für bessere Lesbarkeit)
-             * ===== EXPORT/IMPORT MODULE SORTING =====
-             */
-            'perfectionist/sort-exports': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            // We use @typescript-eslint/member-ordering
-            'perfectionist/sort-heritage-clauses': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            /*
-             * ===== DEAKTIVIERTE REGELN (BEREITS ABGEDECKT) =====
-             * Diese Regeln sind bereits durch andere Plugins mit besserer Konfiguration abgedeckt
-             */
-            'perfectionist/sort-imports': 'off',
-
-            // ✅ Abgedeckt durch import/order
-            'perfectionist/sort-interfaces': 'off',
-
-            'perfectionist/sort-intersection-types': [
-                'error',
-                {
-                    groups: [
-                        'conditional',
-                        'function',
-                        'import',
-                        'intersection',
-                        'keyword',
-                        'literal',
-                        'named',
-                        'object',
-                        'operator',
-                        'tuple',
-                        'union',
-                        'nullish'
-                    ],
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            // ✅ Abgedeckt durch typescript-sort-keys/interface
-            'perfectionist/sort-jsx-props': 'off',
-
-            // New Set([...]) values
-            'perfectionist/sort-maps': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            // Export { a, b, c }
-            'perfectionist/sort-modules': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            // Export statements sorting
-            'perfectionist/sort-named-exports': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            // ✅ Abgedeckt durch import/order (komplexere Enterprise-Konfiguration)
-            'perfectionist/sort-named-imports': 'off',
-
-            // ✅ ==== VERIFIED ====
-            'perfectionist/sort-object-types': 'off',
-
-            // ✅ Abgedeckt durch @stylistic/jsx-sort-props (bessere JSX-Integration)
-            'perfectionist/sort-objects': 'off',
-
-            /*
-             * Extends/implements clauses
-             * ===== MODERN JAVASCRIPT FEATURES =====
-             */
-            'perfectionist/sort-sets': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            /*
-             * Const a, b, c = destructuring
-             * ===== CONTROL FLOW SORTING =====
-             */
-            'perfectionist/sort-switch-case': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            /*
-             * ✅ Abgedeckt durch typescript-sort-keys/string-enum
-             * ===== ENTERPRISE-AKTIVIERTE REGELN (NOCH NICHT ABGEDECKT) =====
-             * ===== TYPESCRIPT TYPE SORTING =====
-             */
-            'perfectionist/sort-union-types': [
-                'error',
-                {
-                    groups: [
-                        'conditional', // A extends B ? C : D
-                        'function', // () => void
-                        'import', // Import('module')
-                        'intersection', // A & B
-                        'keyword', // String, number, boolean
-                        'literal', // 'literal', 123, true
-                        'named', // CustomType, Interface
-                        'object', // { key: value }
-                        'operator', // Keyof, typeof
-                        'tuple', // [string, number]
-                        'union', // A | B
-                        'nullish' // Null, undefined
-                    ],
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ],
-
-            /*
-             * Array.includes() arguments
-             * ===== VARIABLE & DECLARATION SORTING =====
-             */
-            'perfectionist/sort-variable-declarations': [
-                'error',
-                {
-                    order: 'asc',
-                    type: 'natural'
-                }
-            ] // @decorator sorting für Enterprise TypeScript Apps
-        }
-    },
+    perfectionistConfigs.all,
 
     // ===== ADDITIONAL TYPESCRIPT RULES =====
     {
