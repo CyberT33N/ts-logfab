@@ -75,7 +75,6 @@ import reactPerfPlugin from 'eslint-plugin-react-perf'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
 import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
-import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint, { parser as tseslintParser } from 'typescript-eslint'
 
@@ -120,6 +119,7 @@ import tseslint, { parser as tseslintParser } from 'typescript-eslint'
 
 // ==== CUSTOM ====
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
+import { configs as unicornConfigs } from './eslint-rules/clean-code/unicorn'
 import { configs as jsdocConfigs } from './eslint-rules/comments/jsdoc'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/typescript-eslint/comments'
@@ -147,9 +147,6 @@ import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json
 
 // ==== PROMISE ====
 import { configs as promiseConfigs } from './eslint-rules/promise'
-
-// ==== CLEAN CODE ====
-import { configs as unicornConfigs } from './eslint-rules/clean-code/unicorn'
 
 // ==== REGEXP ====
 import { configs as regexpConfigs } from './eslint-rules/regexp'

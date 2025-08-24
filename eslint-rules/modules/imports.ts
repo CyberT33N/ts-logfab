@@ -472,15 +472,22 @@ const createImportsBase = (): TSESLint.FlatConfig.ConfigArray => [
  *
  * @returns The overrides config for barrel-like files.
  */
-const createImportsOverrides = (): TSESLint.FlatConfig.Config => ({
-    files: [
-        '**/index.*',
-        '**/barrel.*',
-        '**/exports.*'
-    ],
-    name: 'enterprise/modules/imports-overrides:barrel-files',
-    rules: { 'import/max-dependencies': 'off' }
-})
+const createImportsOverrides = (): TSESLint.FlatConfig.ConfigArray => [
+    {
+        files: [
+            '**/index.*',
+            '**/barrel.*',
+            '**/exports.*'
+        ],
+        name: 'enterprise/modules/imports-overrides:barrel-files',
+        rules: { 'import/max-dependencies': 'off' }
+    },
+    {
+        files: ['eslint.config.*'],
+        name: 'enterprise/modules/imports-overrides:eslint-config-max-dependencies',
+        rules: { 'import/max-dependencies': 'off' }
+    }
+]
 
 /**
  * Creates the complete Import/Export configuration.
@@ -489,7 +496,7 @@ const createImportsOverrides = (): TSESLint.FlatConfig.Config => ({
  */
 const createImportsAll = (): TSESLint.FlatConfig.ConfigArray => [
     ...createImportsBase(),
-    createImportsOverrides()
+    ...createImportsOverrides()
 ]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
@@ -513,6 +520,6 @@ export const configs = {
     /**
      * File-specific overrides for barrel-like files to relax dependency limits.
      */
-    overrides: [createImportsOverrides()]
+    overrides: createImportsOverrides()
 
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
