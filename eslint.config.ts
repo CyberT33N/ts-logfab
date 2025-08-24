@@ -14,7 +14,6 @@
  */
 
 import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
-
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
@@ -22,63 +21,47 @@ import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint, { parser as tseslintParser } from 'typescript-eslint'
-
-// ==== CUSTOM ====
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
 import { configs as unicornConfigs } from './eslint-rules/clean-code/unicorn'
 import { configs as jsdocConfigs } from './eslint-rules/comments/jsdoc'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/typescript-eslint/comments'
-
-// ==== ENTERPRISE ====
 import { configs as enterpriseConfigs } from './eslint-rules/eslint'
-
-// ==== FILE FORMATS ====
 import { configs as jsoncConfigs } from './eslint-rules/file-formats/jsonc'
 import { configs as perfectionistConfigs } from './eslint-rules/formatting/perfectionist'
-
-// Import Module Management Configuration
-
-// ==== FORMATTING ====
 import { configs as stylisticConfigs } from './eslint-rules/formatting/stylistic'
-
-// ==== FRAMEWORKS ====
 import { configs as jsxA11yConfigs } from './eslint-rules/frameworks/react/jsx-a11y'
 import { configs as reactConfigs } from './eslint-rules/frameworks/react/react'
 import { configs as reactHooksConfigs } from './eslint-rules/frameworks/react/react-hooks'
 import { configs as importConfigs } from './eslint-rules/modules/imports'
-
-// ==== PACKAGE.JSON ====
 import { configs as nodeConfigs } from './eslint-rules/node/eslint-plugin-n'
 import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json'
-
-// ==== PROMISE ====
 import { configs as promiseConfigs } from './eslint-rules/promise'
-
-// ==== NODE ====
-
-// ==== REGEXP ====
 import { configs as regexpConfigs } from './eslint-rules/regexp'
-
-// ==== SECURITY ====
 import { configs as noSecretsConfigs } from './eslint-rules/security/eslint-plugin-no-secrets'
 import { configs as securityConfigs } from './eslint-rules/security/eslint-plugin-security'
-
 import { configs as vitestConfigs } from './eslint-rules/testing/vitest'
 import { configs as typescriptEslintConfigs } from './eslint-rules/typescript-eslint/typescript-eslint'
-
-// ==== OVERRIDES ====
 import { configs as overridesConfigs } from './eslint-rules/configs/overrides'
 import { configs as tsDeclarationOverrides } from './eslint-rules/typescript/declaration-files/overrides'
 
+/**
+ * Enterprise-Grade ESLint Configuration
+ * Based on Google/Microsoft/Meta Best Practices
+ * https://github.com/typescript-eslint/typescript-eslint
+ */
 const config = tseslint.config(
-    // ════════════════════════════╡ 🌍 GLOBAL ╞════════════════════════════
+    /*╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     🌍 GLOBAL   ►  Universal ignores, root-level rules & shared directives  
+     ╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───*/
     {
         // Global ignores for other directories, but not for eslint.config.mjs itself regarding naming conventions
         ignores: ['coverage/**']
     },
 
-    // ════════════════════════════╡ 🔍 PARSER ╞════════════════════════════
+    /*╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     🔍 PARSER   ►  ECMAScript awareness, TS nodes & syntax scanner    
+     ╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───*/
     {
         files: [
             '**/*.ts',
@@ -359,7 +342,7 @@ const config = tseslint.config(
         }
     },
 
-    // ===== ESLINT CORE =====
+    // ═══╡ 🧹 ESLINT CORE ╞═══
     enterpriseConfigs.all,
 
     // ===== SORTING & ORDERING =====
