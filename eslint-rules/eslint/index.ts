@@ -71,16 +71,23 @@ const createEnterpriseBase = (): TSESLint.FlatConfig.Config => {
  *
  * @returns The overrides for the enterprise ESLint rules.
  */
-const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config => ({
-    files: [
-        'src/**/index.ts',
-        'test/**/*.{ts,tsx,js,mjs,cjs}',
-        '**/*.test.{ts,tsx,js}',
-        '**/*.spec.{ts,tsx,js}'
-    ],
-    name: 'enterprise/overrides:tests-and-index',
-    rules: { 'no-restricted-imports': 'off' }
-})
+const createEnterpriseOverrides = (): TSESLint.FlatConfig.ConfigArray => [
+    {
+        files: [
+            'src/**/index.ts',
+            'test/**/*.{ts,tsx,js,mjs,cjs}',
+            '**/*.test.{ts,tsx,js}',
+            '**/*.spec.{ts,tsx,js}'
+        ],
+        name: 'enterprise/overrides:tests-and-index',
+        rules: { 'no-restricted-imports': 'off' }
+    },
+    {
+        files: ['eslint.config.*'],
+        name: 'enterprise/overrides:eslint-config-id-length',
+        rules: { 'id-length': 'off' }
+    }
+]
 
 /**
  * Creates the all enterprise ESLint rules.
@@ -89,7 +96,7 @@ const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config => ({
  */
 const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray => [
     createEnterpriseBase(),
-    createEnterpriseOverrides()
+    ...createEnterpriseOverrides()
 ]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
@@ -115,5 +122,5 @@ export const configs = {
     /**
      * File-specific rule overrides for test files and index files.
      */
-    overrides: [createEnterpriseOverrides()]
+    overrides: createEnterpriseOverrides()
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
