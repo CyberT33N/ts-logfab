@@ -13,62 +13,9 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
-/*
- * ===== [REACT & JSX ECOSYSTEM] =====
- * https://www.npmjs.com/package/eslint-plugin-react
- */
-
-// https://www.npmjs.com/package/eslint-plugin-react-hooks
-
-// https://www.npmjs.com/package/eslint-plugin-react-perf
-
-/*
- * ===== TESTING FRAMEWORKS =====
- * https://www.npmjs.com/package/eslint-plugin-vitest
- */
-
-/*
- * ===== [CODE QUALITY & BEST PRACTICES] =====
- * https://github.com/sindresorhus/eslint-plugin-unicorn
- */
-
-// https://www.npmjs.com/package/eslint-plugin-sonarjs
-
-// https://www.npmjs.com/package/eslint-plugin-promise
-
-// https://www.npmjs.com/package/eslint-plugin-prefer-arrow-functions
-
-// https://www.npmjs.com/package/eslint-plugin-unused-imports
-
-/*
- * ===== [NODE.JS SPECIFIC] =====
- * https://github.com/eslint-community/eslint-plugin-n
- */
-
-/*
- * ===== [SECURITY] =====
- * https://www.npmjs.com/package/eslint-plugin-security
- */
-
-// https://www.npmjs.com/package/eslint-plugin-no-secrets
-
-/*
- * ===== [REGULAR EXPRESSIONS] =====
- * https://github.com/ota-meshi/eslint-plugin-regexp
- */
-
 import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
 
-/*
- * ===== [FILE FORMAT SPECIFIC] =====
- * https://www.npmjs.com/package/eslint-plugin-jsonc
- */
 import nodePlugin from 'eslint-plugin-n'
-
-/*
- * ===== [SORTING & ORDERING] =====
- * https://github.com/infctr/eslint-plugin-typescript-sort-keys
- */
 
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
@@ -77,45 +24,6 @@ import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint, { parser as tseslintParser } from 'typescript-eslint'
-
-// ------------------------------------------------
-
-// ⚠️ INCOMPATIBLE WITH ESLINT 9 - DO NOT USE
-// eslint-plugin-xss uses deprecated APIs (getComments) removed in ESLint 9
-/*
- * Last updated: 2019 - NOT MAINTAINED
- * Alternative: Use eslint-plugin-security for XSS prevention
- * https://www.npmjs.com/package/eslint-plugin-xss
- * import eslintPluginXss from 'eslint-plugin-xss'
- */
-
-// ------------------------------------------------
-
-/*
- * ===== ENTERPRISE DECISION: BOUNDARIES PLUGIN DEAKTIVIERT =====
- * BEGRÜNDUNG: Nach Analyse der Big Tech Standards (Google, Meta, Microsoft, Amazon)
- * wird eslint-plugin-boundaries in KEINEM der großen Open Source Projekte verwendet.
- *
- * ENTERPRISE ANTI-PATTERN EVIDENZ:
- * ❌ Hoher Maintenance Overhead: Jede neue Datei = ESLint Config Update
- * ❌ Developer Friction: Team-Blockierung bei undefinierten Strukturen
- * ❌ Over-Engineering: Zu granulare Kontrolle für Library-Entwicklung
- * ❌ Performance Impact: Zusätzliche Linter-Rules verlangsamen Build
- *
- * BIG TECH PROVEN ALTERNATIVES IMPLEMENTIERT:
- * ✅ import/no-restricted-paths: Für kritische Architectural Boundaries
- * ✅ TypeScript-native Boundaries: Compiler-enforced statt Linter-enforced
- * ✅ Konventionsbasierte Architektur: Self-documenting Code Structure
- * ✅ Code Review Governance: Human-in-the-loop für Architecture Decisions
- */
-
-/*
- * ENTERPRISE STANDARD: Focus auf Developer Experience + Produktivität
- * Ref: Google Angular (konventionsbasiert), Meta React (feature-based),
- *      Microsoft TypeScript (type-driven), Amazon AWS SDK (service-oriented)
- * https://github.com/mxschmitt/eslint-plugin-boundaries
- * import boundaries from "eslint-plugin-boundaries";
- */
 
 // ==== CUSTOM ====
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
@@ -547,7 +455,7 @@ const config = tseslint.config(
         rules: {
             /*
              * ✅ ==== VERIFIED ====
-             * ===== ENTERPRISE ARROW FUNCTION STANDARDS (Google/Airbnb/Meta) =====
+             * ENTERPRISE ARROW FUNCTION STANDARDS (Google/Airbnb/Meta)
              */
             'prefer-arrow-functions/prefer-arrow-functions': [
                 'error',
