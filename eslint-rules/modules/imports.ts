@@ -462,9 +462,6 @@ const createImportsBase = (): TSESLint.FlatConfig.ConfigArray => [
     importPlugin.flatConfigs.typescript,
     {
         name: 'enterprise/modules/imports-overrides',
-        plugins: {
-            import: importPlugin
-        },
         rules: importRules.rules,
         settings: importRules.settings
     }
