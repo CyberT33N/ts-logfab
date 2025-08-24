@@ -79,7 +79,7 @@ import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
-import tseslint from 'typescript-eslint'
+import tseslint, { configs as tseslintConfigs } from 'typescript-eslint'
 
 // ------------------------------------------------
 
@@ -157,6 +157,8 @@ import { configs as regexpConfigs } from './eslint-rules/regexp'
 // ==== SECURITY ====
 import { configs as noSecretsConfigs } from './eslint-rules/security/eslint-plugin-no-secrets'
 import { configs as securityConfigs } from './eslint-rules/security/eslint-plugin-security'
+
+// ==== TYPESCRIPT-ESLINT ====
 
 // ==== TESTING ====
 import { configs as vitestConfigs } from './eslint-rules/testing/vitest'
@@ -448,24 +450,28 @@ const config = tseslint.config(
      * ===== TYPESCRIPT-ESLINT CONFIGURATIONS =====
      * Include ALL strict TypeScript rules (includes recommended)
      */
-    ...tseslint.configs.strictTypeChecked.map(config => ({
-        ...config,
-        files: [
-            '**/*.ts',
-            '**/*.tsx',
-            '**/*.mts',
-            '**/*.cts'
-        ] // Only apply to TypeScript files
-    })),
-    ...tseslint.configs.stylisticTypeChecked.map(config => ({
-        ...config,
-        files: [
-            '**/*.ts',
-            '**/*.tsx',
-            '**/*.mts',
-            '**/*.cts'
-        ] // Only apply to TypeScript files
-    })),
+    //     ...tseslintConfigs.strictTypeChecked.map((config: TSESLint.FlatConfig.Config) => ({
+    //         ...config,
+    //         Files: [
+    //             '**/*.ts',
+    //             '**/*.tsx',
+    //             '**/*.mts',
+    //             '**/*.cts'
+    //         ]
+    //     })),
+
+    //     ...tseslintConfigs.stylisticTypeChecked.map((config: TSESLint.FlatConfig.Config) => ({
+    //         ...config,
+    //         Files: [
+    //             '**/*.ts',
+    //             '**/*.tsx',
+    //             '**/*.mts',
+    //             '**/*.cts'
+    //         ]
+    //     })),
+
+    tseslintConfigs.strictTypeChecked,
+    tseslintConfigs.stylisticTypeChecked,
 
     // ===== TYPESCRIPT PARSER CONFIG =====
     {
@@ -474,7 +480,7 @@ const config = tseslint.config(
             '**/*.tsx',
             '**/*.mts',
             '**/*.cts'
-        ], // Only apply to TypeScript files
+        ],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
