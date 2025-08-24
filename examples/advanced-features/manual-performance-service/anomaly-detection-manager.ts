@@ -190,6 +190,7 @@ export class AnomalyDetectionManager {
                     : 1
 
                 // Timing Control:
+                // eslint-disable-next-line no-await-in-loop
                 await setTimeout(delay)
             }
         }

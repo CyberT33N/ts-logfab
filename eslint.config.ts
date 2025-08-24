@@ -627,10 +627,21 @@ const config = tseslint.config(
             'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
                 'error',
                 {
-                    // Sometime you can not control external types
                     allow: [
+                        /* ✅ ==== VERIFIED ====
+                         * Sometime you can not control external types
+                         */
                         '@typescript-eslint/prefer-readonly-parameter-types',
-                        '@typescript-eslint/naming-convention'
+
+                        /* ✅ ==== VERIFIED ====
+                         * Sometime you can not control external naming conventions
+                         */
+                        '@typescript-eslint/naming-convention',
+
+                        /* ✅ ==== VERIFIED ====
+                         * Sometime it is allowed to use await in a loop
+                         */
+                        'no-await-in-loop'
                     ]
                 }
             ]
