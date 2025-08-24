@@ -16,23 +16,30 @@
 // ==== IMPORTS ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const blocksAndBracesRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/block-spacing': [
+        'error',
+        'always'
+    ],
+
+    '@stylistic/brace-style': [
+        'error',
+        '1tbs',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
-            ]
+            allowSingleLine: false
         }
+    ],
+
+    '@stylistic/padded-blocks': [
+        'error',
+        'never',
+        {
+            allowSingleLineBlocks: false
+        }
+    ],
+
+    '@stylistic/space-before-blocks': [
+        'error',
+        'always'
     ]
 } satisfies TSESLint.Linter.RulesRecord

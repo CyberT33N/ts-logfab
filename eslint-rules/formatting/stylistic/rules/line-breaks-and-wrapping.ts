@@ -14,47 +14,92 @@
  */
 
 // ==== IMPORTS ====
+import {
+    CHAIN_DEPTH_LIMIT, ENTERPRISE_INDENT_SIZE, ENTERPRISE_MAX_LINE_LENGTH, ENTERPRISE_MAX_STATEMENTS_PER_LINE
+} from '../constants'
+
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const structureRules = {
-    // Keine ARIA auf unsupported elements
-    'jsx-a11y/heading-has-content': [
+export const lineBreaksAndWrappingRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/max-len': [
         'error',
         {
-            components: [
-                'Heading',
-                'H1',
-                'H2',
-                'H3',
-                'H4',
-                'H5',
-                'H6'
-            ]
+            code: ENTERPRISE_MAX_LINE_LENGTH,
+            ignoreComments: true,
+            ignorePattern: String.raw`^import\s.+\sfrom\s.+;$`,
+            ignoreRegExpLiterals: true,
+            ignoreStrings: true,
+            ignoreTemplateLiterals: false,
+            ignoreUrls: true,
+            tabWidth: ENTERPRISE_INDENT_SIZE
         }
     ],
 
-    'jsx-a11y/html-has-lang': 'error',
+    '@stylistic/max-statements-per-line': [
+        'error',
+        { max: ENTERPRISE_MAX_STATEMENTS_PER_LINE }
+    ],
 
-    // Html element muss lang attribute haben
-    'jsx-a11y/iframe-has-title': 'error',
-
-    // Iframes brauchen title
-    'jsx-a11y/img-redundant-alt': [
+    '@stylistic/member-delimiter-style': [
         'error',
         {
-            components: [
-                'Image',
-                'Picture'
-            ],
-            words: [
-                'image',
-                'photo',
-                'picture',
-                'bild',
-                'foto'
-            ]
+            multiline: {
+                delimiter: 'none',
+                requireLast: false
+            },
+            singleline: {
+                delimiter: 'semi',
+                requireLast: false
+            }
         }
     ],
 
-    'jsx-a11y/lang': 'error'
+    '@stylistic/multiline-ternary': [
+        'error',
+        'always-multiline'
+    ],
+
+    '@stylistic/new-parens': [
+        'error',
+        'always'
+    ],
+
+    '@stylistic/newline-per-chained-call': [
+        'error',
+        { ignoreChainWithDepth: CHAIN_DEPTH_LIMIT }
+    ],
+
+    '@stylistic/no-extra-parens': [
+        'error',
+        'all',
+        {
+            conditionalAssign: false,
+            enforceForArrowConditionals: false,
+            enforceForFunctionPrototypeMethods: false,
+            enforceForNewInMemberExpressions: false,
+            enforceForSequenceExpressions: false,
+            ignoreJSX: 'all',
+            nestedBinaryExpressions: false,
+            returnAssign: false
+        }
+    ],
+
+    '@stylistic/no-extra-semi': ['error'],
+
+    '@stylistic/wrap-iife': [
+        'error',
+        'inside',
+        {
+            functionPrototypeMethods: true
+        }
+    ],
+    '@stylistic/wrap-regex': ['error'],
+
+    '@stylistic/yield-star-spacing': [
+        'error',
+        {
+            after: true,
+            before: false
+        }
+    ]
 } satisfies TSESLint.Linter.RulesRecord

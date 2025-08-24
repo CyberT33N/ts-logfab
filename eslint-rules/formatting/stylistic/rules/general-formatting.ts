@@ -16,23 +16,66 @@
 // ==== IMPORTS ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const generalFormattingRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/comma-dangle': [
+        'error',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
-            ]
+            arrays: 'never',
+            exports: 'never',
+            functions: 'never',
+            imports: 'never',
+            objects: 'never'
         }
+    ],
+
+    '@stylistic/comma-spacing': [
+        'error',
+        {
+            after: true,
+            before: false
+        }
+    ],
+
+    '@stylistic/comma-style': [
+        'error',
+        'last'
+    ],
+
+    '@stylistic/computed-property-spacing': [
+        'error',
+        'never'
+    ],
+
+    '@stylistic/curly-newline': ['error'],
+
+    '@stylistic/dot-location': [
+        'error',
+        'property'
+    ],
+
+    '@stylistic/eol-last': [
+        'error',
+        'always'
+    ],
+
+    '@stylistic/semi': [
+        'error',
+        'never',
+        {
+            beforeStatementContinuationChars: 'never'
+        }
+    ],
+
+    '@stylistic/semi-spacing': [
+        'error',
+        {
+            after: true,
+            before: false
+        }
+    ],
+
+    '@stylistic/semi-style': [
+        'error',
+        'last'
     ]
 } satisfies TSESLint.Linter.RulesRecord

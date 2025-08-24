@@ -16,23 +16,71 @@
 // ==== IMPORTS ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const numbersAndOperatorsRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/no-floating-decimal': ['error'],
+
+    '@stylistic/no-mixed-operators': [
+        'error',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
+            allowSamePrecedence: true,
+            groups: [
+                [
+                    '%',
+                    '**'
+                ],
+                [
+                    '%',
+                    '+'
+                ],
+                [
+                    '%',
+                    '-'
+                ],
+                [
+                    '%',
+                    '*'
+                ],
+                [
+                    '%',
+                    '/'
+                ],
+                [
+                    '/',
+                    '*'
+                ],
+                [
+                    '&',
+                    '|',
+                    '<<',
+                    '>>',
+                    '>>>'
+                ],
+                [
+                    '==',
+                    '!=',
+                    '===',
+                    '!=='
+                ],
+                [
+                    '&&',
+                    '||'
+                ]
             ]
+        }
+    ],
+
+    '@stylistic/operator-linebreak': [
+        'error',
+        'before',
+        {
+            overrides: {
+                '%=': 'none',
+                '*=': 'none',
+                '+=': 'none',
+                '-=': 'none',
+                '/=': 'none',
+                '=': 'none'
+            }
         }
     ]
 } satisfies TSESLint.Linter.RulesRecord

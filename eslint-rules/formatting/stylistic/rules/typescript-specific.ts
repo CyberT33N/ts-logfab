@@ -16,23 +16,22 @@
 // ==== IMPORTS ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const typescriptSpecificRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/type-annotation-spacing': [
+        'error',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
-            ]
+            after: true,
+            before: false,
+            overrides: {
+                arrow: {
+                    after: true,
+                    before: true
+                }
+            }
         }
-    ]
+    ],
+
+    '@stylistic/type-generic-spacing': ['error'],
+
+    '@stylistic/type-named-tuple-spacing': ['error']
 } satisfies TSESLint.Linter.RulesRecord

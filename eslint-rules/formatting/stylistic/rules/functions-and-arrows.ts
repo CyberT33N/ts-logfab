@@ -16,23 +16,59 @@
 // ==== IMPORTS ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const functionAndArrowRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/arrow-parens': [
+        'error',
+        'as-needed',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
-            ]
+            requireForBlockBody: true
+        }
+    ],
+
+    '@stylistic/arrow-spacing': [
+        'error',
+        {
+            after: true,
+            before: true
+        }
+    ],
+
+    // We use custom rules for formatting function definitions
+    '@stylistic/function-call-argument-newline': [
+        'error',
+        'consistent'
+    ],
+
+    '@stylistic/function-call-spacing': [
+        'error',
+        'never'
+    ],
+
+    // ===== FUNCTIONS =====
+    '@stylistic/function-paren-newline': [
+        'error',
+        'consistent'
+    ],
+
+    '@stylistic/generator-star-spacing': [
+        'error',
+        {
+            after: false,
+            before: true
+        }
+    ],
+
+    '@stylistic/implicit-arrow-linebreak': [
+        'error',
+        'beside'
+    ],
+
+    '@stylistic/space-before-function-paren': [
+        'error',
+        {
+            anonymous: 'never',
+            asyncArrow: 'always',
+            named: 'never'
         }
     ]
 } satisfies TSESLint.Linter.RulesRecord

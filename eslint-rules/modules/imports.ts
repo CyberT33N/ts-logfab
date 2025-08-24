@@ -30,7 +30,10 @@ const importRules: {
          *✅ ==== VERIFIED ====
          *Import type { Foo } - Enterprise Standard für TypeScript 5.0+
          */
-        'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+        'import/consistent-type-specifier-style': [
+            'error',
+            'prefer-top-level'
+        ],
 
         /*
          * Kein dynamisches require()
@@ -90,13 +93,13 @@ const importRules: {
          */
         'import/group-exports': 'off',
 
-        // Google/Microsoft Standard: NEVER use default exports
+        // ✅ ==== VERIFIED ====
         'import/max-dependencies': [
             'error',
             {
                 // Maximale Dependencies pro File
                 ignoreTypeImports: true,
-                max: 15
+                max: 10
             }
         ],
 
@@ -402,7 +405,10 @@ const importRules: {
     },
     settings: {
         'import/parsers': {
-            '@typescript-eslint/parser': ['.ts', '.tsx']
+            '@typescript-eslint/parser': [
+                '.ts',
+                '.tsx'
+            ]
         },
         'import/resolver': {
             node: {
@@ -434,31 +440,52 @@ const importRules: {
 
 /**
  * Creates the base Import/Export configuration.
+ *
  * @returns The base Import/Export configuration.
  */
 const createImportsBase = (): TSESLint.FlatConfig.ConfigArray => [
     importPlugin.configs.typescript,
     {
         name: 'enterprise/modules/imports-overrides',
-        rules: importRules.rules,
         plugins: {
             import: importPlugin
         },
+        rules: importRules.rules,
         settings: importRules.settings
     }
 ]
 
 /**
+ * Creates the overrides for Import/Export configuration.
+ *
+ * @returns The overrides config for barrel-like files.
+ */
+const createImportsOverrides = (): TSESLint.FlatConfig.Config => ({
+    files: [
+        '**/index.*',
+        '**/barrel.*',
+        '**/exports.*'
+    ],
+    name: 'enterprise/modules/imports-overrides:barrel-files',
+    rules: { 'import/max-dependencies': 'off' }
+})
+
+/**
  * Creates the complete Import/Export configuration.
+ *
  * @returns The complete Import/Export configuration.
  */
-const createImportsAll = (): TSESLint.FlatConfig.ConfigArray => createImportsBase()
+const createImportsAll = (): TSESLint.FlatConfig.ConfigArray => [
+    ...createImportsBase(),
+    createImportsOverrides()
+]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {
     /**
      * Enterprise-grade Import/Export Configuration based on Google/Microsoft/Meta standards.
      * Combines import resolution, module boundaries, dependency management, and TypeScript integration.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-imports-config}
      */
     all: createImportsAll(),
@@ -471,6 +498,11 @@ export const configs = {
     /**
      * Alias for compatibility with flat config naming conventions.
      */
-    'flat/all': createImportsAll()
+    'flat/all': createImportsAll(),
+
+    /**
+     * File-specific overrides for barrel-like files to relax dependency limits.
+     */
+    overrides: [createImportsOverrides()]
 
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

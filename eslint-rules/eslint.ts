@@ -465,7 +465,7 @@ const eslintRules: {
             {
 
                 message: 'Use object spread instead of Object.assign with object literal',
-                // eslint-disable-next-line @stylistic/max-len
+
                 selector: 'CallExpression[callee.property.name="assign"][callee.object.name="Object"][arguments.0.type="ObjectExpression"]'
             },
             {
@@ -667,6 +667,7 @@ const eslintRules: {
 
 /**
  * Creates the base enterprise ESLint rules.
+ *
  * @returns The base enterprise ESLint rules.
  */
 const createEnterpriseBase = (): TSESLint.FlatConfig.Config => {
@@ -683,6 +684,7 @@ const createEnterpriseBase = (): TSESLint.FlatConfig.Config => {
 
 /**
  * Creates the overrides for the enterprise ESLint rules.
+ *
  * @returns The overrides for the enterprise ESLint rules.
  */
 const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config => ({
@@ -698,6 +700,7 @@ const createEnterpriseOverrides = (): TSESLint.FlatConfig.Config => ({
 
 /**
  * Creates the all enterprise ESLint rules.
+ *
  * @returns The all enterprise ESLint rules.
  */
 const createEnterpriseAll = (): TSESLint.FlatConfig.ConfigArray => [
@@ -710,8 +713,8 @@ export const configs = {
     /**
      * Enterprise-grade ESLint rules based on Google/Microsoft/Meta standards.
      * Combines {@link https://github.com/eslint/eslint/tree/main/packages/eslint/eslint.js} all rules with additional enterprise-specific rules.
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-eslint-config}
      *
+     * @see {@link https://github.com/t33n/ts-logfab#enterprise-eslint-config}
      */
     all: createEnterpriseAll(),
 

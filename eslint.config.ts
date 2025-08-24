@@ -459,7 +459,6 @@ const config = tseslint.config(
                     allowNamedFunctions: false,
                     allowObjectProperties: true,
                     allowedNames: [],
-                    // eslint-disable-next-line unicorn/no-keyword-prefix
                     classPropertiesAllowed: false,
                     disallowPrototype: false,
                     returnStyle: 'unchanged',
@@ -476,6 +475,39 @@ const config = tseslint.config(
     eslintPluginUnicorn.configs.all,
     {
         rules: {
+               // ✅ ==== VERIFIED ====
+               "unicorn/prevent-abbreviations": ["warn", {
+                    "extendDefaultReplacements": false,
+                    "replacements": {
+                    "e":   { "event": true },
+                    "err": { "error": true },
+                    "cb":  { "callback": true },
+                    "cmd": { "command": true }
+                    },
+                    "allowList": {
+                    "req": true,
+                    "res": true,
+                    "next": true,
+                    "ctx": true,
+                    "props": true,
+                    "id": true,
+                    "db": true,
+                    "URL": true,
+                    "API": true,
+                    "JWT": true,
+                    "i18n": true
+                    },
+                    "checkProperties": false,
+                    "checkFilenames": false,
+                    "checkDefaultAndNamespaceImports": "internal",
+                    "checkShorthandImports": "internal",
+                    "checkShorthandProperties": false,
+                    "ignore": ["\\.e2e$", "\\.spec$", "\\.d\\.ts$"]
+               }],
+
+            // ✅ ==== VERIFIED ====
+            'unicorn/no-keyword-prefix': 'off',
+
             // ✅ ==== VERIFIED ====
             'unicorn/filename-case': [
                 'error',

@@ -14,25 +14,31 @@
  */
 
 // ==== IMPORTS ====
+import { MIN_ARRAY_ITEMS_FOR_NEWLINE } from '../constants'
+
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const arrayRules: TSESLint.Linter.RulesRecord = {
+    // ✅ ==== VERIFIED ====
+    '@stylistic/array-bracket-newline': [
+        'error',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
-            ]
+            minItems: MIN_ARRAY_ITEMS_FOR_NEWLINE,
+            multiline: true
+        }
+    ],
+
+    '@stylistic/array-bracket-spacing': [
+        'error',
+        'never'
+    ],
+
+    // ✅ ==== VERIFIED ====
+    '@stylistic/array-element-newline': [
+        'error',
+        {
+            minItems: MIN_ARRAY_ITEMS_FOR_NEWLINE,
+            multiline: true
         }
     ]
 } satisfies TSESLint.Linter.RulesRecord

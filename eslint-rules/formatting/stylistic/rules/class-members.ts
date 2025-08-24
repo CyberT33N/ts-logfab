@@ -16,23 +16,13 @@
 // ==== IMPORTS ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-export const optionalStrict = {
-    // ===== OPTIONAL STRICT RULES (Consider for AAA compliance) =====
-    'jsx-a11y/anchor-ambiguous-text': [
-        'warn',
+export const classMembersRules: TSESLint.Linter.RulesRecord = {
+    '@stylistic/lines-between-class-members': [
+        'error',
+        'always',
         {
-            words: [
-                'click here',
-                'here',
-                'link',
-                'a link',
-                'learn more',
-                'more',
-                'read more',
-                'mehr',
-                'hier',
-                'klicken'
-            ]
+            exceptAfterOverload: true,
+            exceptAfterSingleLine: false
         }
     ]
 } satisfies TSESLint.Linter.RulesRecord
