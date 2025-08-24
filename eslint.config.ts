@@ -13,6 +13,7 @@
  *███████████████████████████████████████████████████████████████████████████████
  */
 
+// ═══╡ 🧩 IMPORTS ╞═══
 import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
@@ -21,12 +22,14 @@ import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint, { parser as tseslintParser } from 'typescript-eslint'
+
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
 import { configs as unicornConfigs } from './eslint-rules/clean-code/unicorn'
 import { configs as jsdocConfigs } from './eslint-rules/comments/jsdoc'
+import { configs as configOverrides } from './eslint-rules/configs/overrides'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/typescript-eslint/comments'
-import { configs as enterpriseConfigs } from './eslint-rules/eslint'
+import { configs as eslintConfigs } from './eslint-rules/eslint'
 import { configs as jsoncConfigs } from './eslint-rules/file-formats/jsonc'
 import { configs as perfectionistConfigs } from './eslint-rules/formatting/perfectionist'
 import { configs as stylisticConfigs } from './eslint-rules/formatting/stylistic'
@@ -41,27 +44,31 @@ import { configs as regexpConfigs } from './eslint-rules/regexp'
 import { configs as noSecretsConfigs } from './eslint-rules/security/eslint-plugin-no-secrets'
 import { configs as securityConfigs } from './eslint-rules/security/eslint-plugin-security'
 import { configs as vitestConfigs } from './eslint-rules/testing/vitest'
-import { configs as typescriptEslintConfigs } from './eslint-rules/typescript-eslint/typescript-eslint'
-import { configs as overridesConfigs } from './eslint-rules/configs/overrides'
 import { configs as tsDeclarationOverrides } from './eslint-rules/typescript/declaration-files/overrides'
+import { configs as typescriptEslintConfigs } from './eslint-rules/typescript-eslint/typescript-eslint'
 
 /**
  * Enterprise-Grade ESLint Configuration
  * Based on Google/Microsoft/Meta Best Practices
- * https://github.com/typescript-eslint/typescript-eslint
+ * https://github.com/typescript-eslint/typescript-eslint.
  */
 const config = tseslint.config(
-    /*╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
-     🌍 GLOBAL   ►  Universal ignores, root-level rules & shared directives  
-     ╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───*/
+
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🌍 GLOBAL   ►  Universal ignores, root-level rules & shared directives
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
     {
         // Global ignores for other directories, but not for eslint.config.mjs itself regarding naming conventions
         ignores: ['coverage/**']
     },
 
-    /*╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
-     🔍 PARSER   ►  ECMAScript awareness, TS nodes & syntax scanner    
-     ╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───*/
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🔍 PARSER   ►  ECMAScript awareness, TS nodes & syntax scanner
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
     {
         files: [
             '**/*.ts',
@@ -342,10 +349,51 @@ const config = tseslint.config(
         }
     },
 
-    // ═══╡ 🧹 ESLINT CORE ╞═══
-    enterpriseConfigs.all,
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧹 ESLINT   ►  ESLint rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
 
-    // ===== SORTING & ORDERING =====
+    // ═══╡ 🧹 ESLINT CORE ╞═══
+    eslintConfigs.all,
+
+    /* ═══╡ 💬 ESLINT COMMENTS PLUGIN ╞═══
+     * Not working for typescript-eslint specific rules
+     */
+    {
+          files: [
+          '*.js',
+          '*.jsx'
+          ],
+          plugins: {
+          '@eslint-community/eslint-comments': eslintPluginEslintComments
+          },
+          rules: {
+
+          /* ✅ ==== VERIFIED ==== */
+          '@eslint-community/eslint-comments/no-restricted-disable': [
+               'error',
+               '*'
+          ],
+
+          /* ✅ ==== VERIFIED ==== */
+          '@eslint-community/eslint-comments/no-use': [
+               'error',
+               {
+                    allow: []
+               }
+          ]
+          }
+     },
+
+     /*
+      *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+      *🧹 SORTING   ►  Sorting rules and configuration
+      *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+      */
+
+    // ═══╡ 🔡 SORTING & ORDERING ╞═══
     {
         plugins: {
             'sort-keys-fix': sortKeysFix
@@ -355,7 +403,32 @@ const config = tseslint.config(
         }
     },
 
-    // ===== TSDOC PLUGIN =====
+    /* ═══╡ 🔡 TYPESCRIPT SORT KEYS ╞═══ */
+    {
+          plugins: {
+          'typescript-sort-keys': eslintPluginTypescriptSortKeys
+          },
+          rules: {
+          /*
+               * ✅ ==== VERIFIED ====
+               * Autorität für Interfaces/Type-Literals: alphabetisch
+               */
+          'typescript-sort-keys/interface': 'error',
+
+          'typescript-sort-keys/string-enum': 'error'
+          }
+     },
+
+     /* ═══╡ 🎯 PERFECTIONIST PLUGIN ╞═══ */
+     perfectionistConfigs.all,
+
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *📚 Documentations   ►  TSDoc and JSDoc rules
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    // ═══╡ 📚 TSDOC PLUGIN ╞═══
     {
         files: [
             '**/*.ts',
@@ -371,69 +444,67 @@ const config = tseslint.config(
         }
     },
 
-    // ===== JSDOC PLUGIN =====
+    /* ═══╡ 📚 JSDOC PLUGIN ╞═══ */
     jsdocConfigs.all,
 
-    // ===== SECURITY PLUGIN =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🔒 SECURITY   ►  Security rules and secret scanning
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🔒 SECURITY PLUGIN ╞═══ */
     securityConfigs.all,
 
-    // ===== NO SECRETS PLUGIN (ENTERPRISE SECURITY COMPLIANCE) =====
+    /* ═══╡ 🔒 NO SECRETS (COMPLIANCE) ╞═══ */
     noSecretsConfigs.all,
 
     /*
-     * ===== VITEST TESTING STANDARDS =====
-     * Enterprise-Grade Testing Configuration
-     * Based on Google Testing Blog, Microsoft Testing Guidelines, Meta Jest Best Practices
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧪 TESTING   ►  Testing rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
      */
+
+    /* ═══╡ 🧪 VITEST TESTING STANDARDS ╞═══ */
     vitestConfigs.all,
 
     /*
-     * ===== REGEXP PLUGIN =====
-     * Enterprise-Grade Regular Expression Standards
-     * Based on Google RE2, Microsoft .NET Regex Guidelines, Meta Pattern Standards
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧪 REGEXP   ►  Regular expression rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
      */
+
+    /* ═══╡ 🔤 REGEXP PLUGIN ╞═══ */
     regexpConfigs.all,
 
-    // ===== JSONC PLUGIN =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧪 JSON   ►  JSON rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🧩 JSONC PLUGIN ╞═══ */
     jsoncConfigs.all,
 
-    // ===== PACKAGE JSON PLUGIN =====
+    /* ═══╡ 🧩 PACKAGE JSON PLUGIN ╞═══ */
     packageJsonSharedConfigs.all,
 
-    // ===== PROMISE PLUGIN =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧪 PROMISE   ►  Promise rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🧩 PROMISE PLUGIN ╞═══ */
     promiseConfigs.all,
 
     /*
-     * ===== ESLINT COMMENTS PLUGIN =====
-     * **Not working for typescript-eslint specific rules**
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧹 CLEAN CODE   ►  Clean code rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
      */
-    {
-        files: [
-            '*.js',
-            '*.jsx'
-        ],
-        plugins: {
-            '@eslint-community/eslint-comments': eslintPluginEslintComments
-        },
-        rules: {
 
-            // ✅ ==== VERIFIED ====
-            '@eslint-community/eslint-comments/no-restricted-disable': [
-                'error',
-                '*'
-            ],
-
-            // ✅ ==== VERIFIED ====
-            '@eslint-community/eslint-comments/no-use': [
-                'error',
-                {
-                    allow: []
-                }
-            ]
-        }
-    },
-
-    // ===== PREFER ARROW PLUGIN (MODERN JAVASCRIPT STANDARDS) =====
+    /* ═══╡ ➡️ PREFER ARROW FUNCTIONS ╞═══ */
     {
         plugins: {
             'prefer-arrow-functions': eslintPluginPreferArrow
@@ -458,31 +529,47 @@ const config = tseslint.config(
         }
     },
 
-    // ===== SONARJS PLUGIN =====
+    /* ═══╡ 🧠 SONARJS PLUGIN ╞═══ */
     sonarjsConfigs.all,
 
-    // ===== UNICORN PLUGIN =====
+    /* ═══╡ 🦄 UNICORN PLUGIN ╞═══ */
     unicornConfigs.all,
 
-    // ===== NODE PLUGIN =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧹 NODE   ►  Node.js rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🟩 NODE PLUGIN ╞═══ */
     nodeConfigs.all,
 
-    // ===== UNUSED IMPORTS PLUGIN =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧹 MODULES   ►  Module rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🧹 UNUSED IMPORTS ╞═══ */
     {
         plugins: {
             'unused-imports': unusedImports
         }
     },
 
-    // ===== IMPORT/EXPORT MODULE MANAGEMENT =====
+    /* ═══╡ 📦 MODULE IMPORTS ╞═══ */
     importConfigs.all,
 
-    // ===== @STYLISTIC CONFIGURATION =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧹 STYLISTIC   ►  Stylistic rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🎨 @STYLISTIC CONFIGURATION ╞═══ */
     stylisticConfigs.all,
 
-    /*
-     * ===== FUNCTION DEFINITION =====
-     */
+    /* ═══╡ 🧩 LOCAL RULES: FUNCTION DEFINITION ╞═══ */
     {
         plugins: {
             'local-rules': functionDefinitionParenNewlinePlugin
@@ -495,81 +582,73 @@ const config = tseslint.config(
         }
     },
 
-    // Apply custom restriction for @typescript-eslint/* disables in TS files
-    {
-        files: [
-            '**/*.ts',
-            '**/*.tsx',
-            '**/*.mts',
-            '**/*.cts'
-        ],
-        plugins: {
-            'local-ts-eslint-comments': eslintCommentsTypescriptPlugin
-        },
-        rules: {
-            'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
-                'error',
-                {
-                    // Sometime you can not control external types
-                    allow: [
-                        '@typescript-eslint/prefer-readonly-parameter-types',
-                        '@typescript-eslint/naming-convention'
-                    ]
-                }
-            ]
-        }
-    },
-
-    // ===== REACT PERFORMANCE =====
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🔧 REACT   ►  React ecosystem rules: performance, hooks, core, a11y
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+    /* ═══╡ ⚛️ REACT PERFORMANCE ╞═══ */
     reactPerfPlugin.configs.flat.all,
 
-    // ===== REACT HOOKS =====
+    /* ═══╡ ⚛️ REACT HOOKS ╞═══ */
     reactHooksConfigs.all,
 
-    // ===== REACT RULES =====
+    /* ═══╡ ⚛️ REACT CORE RULES ╞═══ */
     reactConfigs.all,
 
-    /*
-     * ===== JSX ACCESSIBILITY (A11Y) RULES =====
-     */
+    /* ═══╡ ♿ JSX ACCESSIBILITY (A11y) ╞═══ */
     jsxA11yConfigs.all,
 
-    // ===== TYPESCRIPT SORT KEYS =====
-    {
-        plugins: {
-            'typescript-sort-keys': eslintPluginTypescriptSortKeys
-        },
-        rules: {
-            /*
-             * ✅ ==== VERIFIED ====
-             * Autorität für Interfaces/Type-Literals: alphabetisch
-             */
-            'typescript-sort-keys/interface': 'error',
-
-            'typescript-sort-keys/string-enum': 'error'
-        }
-    },
-
     /*
-     * ===== PERFECTIONIST PLUGIN =====
-     * Enterprise-Grade Sorting Standards
-     * Based on Google/Microsoft/Meta Natural Sorting Preferences
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🔧 TYPESCRIPT ESLINT   ►  Typescript rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
      */
-    perfectionistConfigs.all,
 
-    // ===== ADDITIONAL TYPESCRIPT RULES =====
+    /* ═══╡ 📘 ADDITIONAL TYPESCRIPT RULES ╞═══ */
     typescriptEslintConfigs.all,
 
-    // ===== JS-ONLY FALLBACK =====
+    /* ═══╡ 🛡️ TYPESCRIPT-ESLINT DISABLE RESTRICTIONS ╞═══ */
     {
-        // Optional: JS-only fallback if you lint JS files
+          files: [
+          '**/*.ts',
+          '**/*.tsx',
+          '**/*.mts',
+          '**/*.cts'
+          ],
+          plugins: {
+          'local-ts-eslint-comments': eslintCommentsTypescriptPlugin
+          },
+          rules: {
+          'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
+               'error',
+               {
+                    // Sometime you can not control external types
+                    allow: [
+                         '@typescript-eslint/prefer-readonly-parameter-types',
+                         '@typescript-eslint/naming-convention'
+                    ]
+               }
+          ]
+          }
+     },
+
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🔧 OVERRIDE CONFIGS   ►  Override configs
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+
+    /* ═══╡ 🟨 JS-ONLY FALLBACK ╞═══ */
+    {
+        /* Optional: JS-only fallback if you lint JS files */
         files: [
             '**/*.js',
             '**/*.cjs',
             '**/*.mjs'
         ],
         rules: {
-            // ✅ ==== VERIFIED ====
+            /* ✅ ==== VERIFIED ==== */
             'consistent-return': [
                 'error',
                 { treatUndefinedAsUnspecified: true }
@@ -577,8 +656,10 @@ const config = tseslint.config(
         }
     },
 
-    // ===== OVERRIDE CONFIGS =====
-    overridesConfigs.all,
+    /* ═══╡ ⚙️ CONFIGS OVERRIDES ╞═══ */
+    configOverrides.all,
+
+    /* ═══╡ 📘 TYPESCRIPT DECLARATION OVERRIDES ╞═══ */
     tsDeclarationOverrides.all
 )
 
