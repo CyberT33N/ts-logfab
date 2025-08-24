@@ -300,6 +300,7 @@ const config = tseslint.config(
                     ],
                     exemptEmptyConstructors: true,
                     exemptEmptyFunctions: true,
+                    enableFixer: false,
                     publicOnly: false,
                     require: {
                         ArrowFunctionExpression: true,

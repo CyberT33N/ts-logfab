@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -325,7 +324,6 @@ const stylisticRules: {
         '@stylistic/jsx-wrap-multilines': [
             'error',
             {
-                // eslint-disable-next-line sonarjs/no-duplicate-string
                 arrow: 'parens-new-line',
                 assignment: 'parens-new-line',
                 condition: 'parens-new-line',
@@ -423,6 +421,8 @@ const stylisticRules: {
         ],
 
         // ===== LINE BREAKS & WRAPPING =====
+
+        // ✅ ==== VERIFIED ====
         '@stylistic/max-len': [
             'error',
             {
@@ -430,7 +430,7 @@ const stylisticRules: {
                 ignoreComments: true,
                 ignorePattern: String.raw`^import\s.+\sfrom\s.+;$`,
                 ignoreRegExpLiterals: true,
-                ignoreStrings: false,
+                ignoreStrings: true,
                 ignoreTemplateLiterals: false,
                 ignoreUrls: true,
                 tabWidth: ENTERPRISE_INDENT_SIZE
