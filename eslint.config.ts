@@ -748,11 +748,11 @@ const config = tseslint.config(
                 },
                 {
                     message: 'eval() is not allowed for security reasons',
-                    selector: 'CallExpression[callee.name=\"eval\"]'
+                    selector: "CallExpression[callee.name='eval']"
                 },
                 {
                     message: 'Use object spread instead of Object.assign with object literal',
-                    selector: 'CallExpression[callee.property.name=\"assign\"][callee.object.name=\"Object\"][arguments.0.type=\"ObjectExpression\"]'
+                    selector: "CallExpression[callee.property.name='assign'][callee.object.name='Object'][arguments.0.type='ObjectExpression']"
                 }
             ]
         }
