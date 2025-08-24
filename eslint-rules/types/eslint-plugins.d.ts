@@ -148,9 +148,7 @@ declare module 'eslint-plugin-unused-imports' {
 
     const plugin: EslintPluginUnusedImports
     export = plugin
-}
-
-declare module '@stylistic/eslint-plugin' {
+}declare module '@stylistic/eslint-plugin' {
     import type { TSESLint } from '@typescript-eslint/utils'
 
     interface EslintPluginStylistic {
@@ -207,3 +205,19 @@ declare module 'eslint-plugin-jsdoc' {
     const plugin: EslintPluginJsdoc
     export = plugin
 }
+
+declare module 'eslint-plugin-import' {
+    import type { TSESLint } from '@typescript-eslint/utils'
+
+    interface EslintPluginImport {
+        readonly flatConfigs: {
+            readonly typescript: TSESLint.FlatConfig.Config
+        }
+
+        readonly rules: Record<string, LooseRuleDefinition>
+    }
+
+    const plugin: EslintPluginImport
+    export = plugin
+}
+

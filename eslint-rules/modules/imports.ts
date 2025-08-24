@@ -77,7 +77,7 @@ const importRules: {
                 ts: 'never',
 
                 // TypeScript: ./core (Barrel) - Enterprise Standard
-                tsx: 'never' // Sass: ./styles.scss (explizit)
+                tsx: 'never'
             }
         ],
 
@@ -223,8 +223,8 @@ const importRules: {
         // Named exports sind erwünscht
         'import/no-namespace': [
             'error',
-            { // Wildcard imports vermeiden
-                ignore: ['*.d.ts'] // Außer für Type Definitions
+            {
+                ignore: ['*.d.ts']
             }
         ],
 
@@ -291,7 +291,7 @@ const importRules: {
                     '**/*.css',
                     '**/*.scss',
                     '**/*.less',
-                    'reflect-metadata', // Decorators
+                    'reflect-metadata',
                     'core-js/**',
                     '@babel/polyfill'
                 ]
@@ -354,14 +354,29 @@ const importRules: {
                  */
                 // Reihenfolge der Gruppen (Type-Imports als eigener Block am Ende)
                 groups: [
-                    'builtin', // Node.js built-ins
-                    'external', // Npm packages
-                    'internal', // Aliases (z. B. @/**, ~/**)
-                    'parent', // ../
-                    'sibling', // ./
-                    'index', // ./index
-                    'object', // TS: import log = console.log
-                    'type' // TS/Flow: import type { Foo } from 'foo'
+                    // Node.js built-ins
+                    'builtin',
+
+                    // Npm packages
+                    'external',
+
+                    // Aliases (z. B. @/**, ~/**)
+                    'internal',
+
+                    // ../
+                    'parent',
+
+                    // ./
+                    'sibling',
+
+                    // ./index
+                    'index',
+
+                    // T S: import log = console.log
+                    'object',
+
+                    // TS/Flow: import type { Foo } from 'foo'
+                    'type'
                 ],
 
                 /*
@@ -444,7 +459,7 @@ const importRules: {
  * @returns The base Import/Export configuration.
  */
 const createImportsBase = (): TSESLint.FlatConfig.ConfigArray => [
-    importPlugin.configs.typescript,
+    importPlugin.flatConfigs.typescript,
     {
         name: 'enterprise/modules/imports-overrides',
         plugins: {
@@ -485,8 +500,6 @@ export const configs = {
     /**
      * Enterprise-grade Import/Export Configuration based on Google/Microsoft/Meta standards.
      * Combines import resolution, module boundaries, dependency management, and TypeScript integration.
-     *
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-imports-config}
      */
     all: createImportsAll(),
 
