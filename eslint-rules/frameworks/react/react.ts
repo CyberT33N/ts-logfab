@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -20,7 +19,7 @@ import reactPlugin from 'eslint-plugin-react'
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
-// Enhanced React rules configuration  
+// Enhanced React rules configuration
 const reactRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
@@ -93,7 +92,10 @@ const reactRules: {
         'react/iframe-missing-sandbox': 'warn',
 
         // Abgedeckt durch @stylistic/jsx-self-closing-comp
-        'react/jsx-boolean-value': ['error', 'never'],
+        'react/jsx-boolean-value': [
+            'error',
+            'never'
+        ],
 
         // Zu restriktiv
         'react/jsx-child-element-spacing': 'off',
@@ -123,7 +125,10 @@ const reactRules: {
         'react/jsx-first-prop-new-line': 'off',
 
         // Abgedeckt durch @stylistic/jsx-pascal-case
-        'react/jsx-fragments': ['error', 'syntax'],
+        'react/jsx-fragments': [
+            'error',
+            'syntax'
+        ],
 
         'react/jsx-handler-names': [
             'error',
@@ -179,7 +184,10 @@ const reactRules: {
         'react/jsx-no-leaked-render': [
             'error',
             {
-                validStrategies: ['coerce', 'ternary']
+                validStrategies: [
+                    'coerce',
+                    'ternary'
+                ]
             }
         ],
 
@@ -330,7 +338,8 @@ const reactRules: {
         'react/no-unused-prop-types': [
             'error',
             {
-                skipShapeProps: true // Shape props oft nur teilweise genutzt
+                // Shape props oft nur teilweise genutzt
+                skipShapeProps: true
             }
         ],
 
@@ -338,7 +347,10 @@ const reactRules: {
 
         'react/no-will-update-set-state': 'error',
 
-        'react/prefer-es6-class': ['error', 'always'],
+        'react/prefer-es6-class': [
+            'error',
+            'always'
+        ],
 
         // TypeScript redundant
         'react/prefer-exact-props': 'off',
@@ -372,13 +384,20 @@ const reactRules: {
         // TypeScript handled das
         'react/sort-prop-types': 'off',
 
-        'react/state-in-constructor': ['error', 'never'],
+        'react/state-in-constructor': [
+            'error',
+            'never'
+        ],
 
-        'react/static-property-placement': ['error', 'static public field'],
+        'react/static-property-placement': [
+            'error',
+            'static public field'
+        ],
 
         'react/style-prop-object': 'error',
 
-        'react/void-dom-elements-no-children': 'error' // Warn für Flexibilität
+        // Warn für Flexibilität
+        'react/void-dom-elements-no-children': 'error'
     }
 }
 
@@ -398,11 +417,11 @@ const reactSettings = {
 
         // Support for common HOCs and wrappers
         componentWrapperFunctions: [
-            'observer', // MobX
-            'memo', // React.memo
-            'forwardRef', // React.forwardRef
-            { property: 'styled' }, // Styled-components
-            { property: 'connect' } // Redux
+            'observer',
+            'memo',
+            'forwardRef',
+            { property: 'styled' },
+            { property: 'connect' }
         ],
 
         // Enterprise settings for better component detection
@@ -440,6 +459,7 @@ const reactSettings = {
 
 /**
  * Creates the base React configuration.
+ *
  * @returns The base React configuration.
  */
 const createReactBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -453,7 +473,8 @@ const createReactBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete React configuration.
- * @returns The complete React configuration.  
+ *
+ * @returns The complete React configuration.
  */
 const createReactAll = (): TSESLint.FlatConfig.ConfigArray => createReactBase()
 
@@ -462,6 +483,7 @@ export const configs = {
     /**
      * Enterprise-grade React Configuration based on Google/Microsoft/Meta standards.
      * Combines modern React patterns with enterprise flexibility and TypeScript integration.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-react-config}
      */
     all: createReactAll(),

@@ -198,6 +198,7 @@ const jsxA11ySettings = {
 
 /**
  * Creates the base JSX A11Y configuration.
+ *
  * @returns The base JSX A11Y configuration.
  */
 const createJsxA11yBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -211,6 +212,7 @@ const createJsxA11yBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete JSX A11Y configuration.
+ *
  * @returns The complete JSX A11Y configuration.
  */
 const createJsxA11yAll = (): TSESLint.FlatConfig.ConfigArray => createJsxA11yBase()
@@ -220,6 +222,7 @@ export const configs = {
     /**
      * Enterprise-grade JSX Accessibility Configuration based on WCAG 2.1 AA standards.
      * Based on Google/Microsoft/Meta Accessibility Guidelines for enterprise-grade web applications.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-jsx-a11y-config}
      */
     all: createJsxA11yAll(),

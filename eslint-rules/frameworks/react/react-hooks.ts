@@ -46,6 +46,7 @@ const reactHooksRules: {
 
 /**
  * Creates the base React Hooks configuration.
+ *
  * @returns The base React Hooks configuration.
  */
 const createReactHooksBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -60,6 +61,7 @@ const createReactHooksBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete React Hooks configuration.
+ *
  * @returns The complete React Hooks configuration.
  */
 const createReactHooksAll = (): TSESLint.FlatConfig.ConfigArray => createReactHooksBase()
@@ -69,6 +71,7 @@ export const configs = {
     /**
      * Enterprise-grade React Hooks Configuration based on Google/Microsoft/Meta standards.
      * Enforces proper hooks usage patterns and dependency array management.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-react-hooks-config}
      */
     all: createReactHooksAll(),
