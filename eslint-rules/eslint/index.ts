@@ -86,6 +86,11 @@ const createEnterpriseOverrides = (): TSESLint.FlatConfig.ConfigArray => [
         files: ['eslint.config.*'],
         name: 'enterprise/overrides:eslint-config-id-length',
         rules: { 'id-length': 'off' }
+    },
+    {
+        files: ['eslint-rules/**/*.ts'],
+        name: 'enterprise/overrides:eslint-rules',
+        rules: { 'id-length': 'off' }
     }
 ]
 
