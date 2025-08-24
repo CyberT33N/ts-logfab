@@ -358,40 +358,41 @@ const config = tseslint.config(
     // ═══╡ 🧹 ESLINT CORE ╞═══
     eslintConfigs.all,
 
-    /* ═══╡ 💬 ESLINT COMMENTS PLUGIN ╞═══
+    /*
+     * ═══╡ 💬 ESLINT COMMENTS PLUGIN ╞═══
      * Not working for typescript-eslint specific rules
      */
     {
-          files: [
-          '*.js',
-          '*.jsx'
-          ],
-          plugins: {
-          '@eslint-community/eslint-comments': eslintPluginEslintComments
-          },
-          rules: {
+        files: [
+            '*.js',
+            '*.jsx'
+        ],
+        plugins: {
+            '@eslint-community/eslint-comments': eslintPluginEslintComments
+        },
+        rules: {
 
-          /* ✅ ==== VERIFIED ==== */
-          '@eslint-community/eslint-comments/no-restricted-disable': [
-               'error',
-               '*'
-          ],
+            /* ✅ ==== VERIFIED ==== */
+            '@eslint-community/eslint-comments/no-restricted-disable': [
+                'error',
+                '*'
+            ],
 
-          /* ✅ ==== VERIFIED ==== */
-          '@eslint-community/eslint-comments/no-use': [
-               'error',
-               {
+            /* ✅ ==== VERIFIED ==== */
+            '@eslint-community/eslint-comments/no-use': [
+                'error',
+                {
                     allow: []
-               }
-          ]
-          }
-     },
+                }
+            ]
+        }
+    },
 
-     /*
-      *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
-      *🧹 SORTING   ►  Sorting rules and configuration
-      *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
-      */
+    /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🧹 SORTING   ►  Sorting rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
 
     // ═══╡ 🔡 SORTING & ORDERING ╞═══
     {
@@ -405,22 +406,22 @@ const config = tseslint.config(
 
     /* ═══╡ 🔡 TYPESCRIPT SORT KEYS ╞═══ */
     {
-          plugins: {
-          'typescript-sort-keys': eslintPluginTypescriptSortKeys
-          },
-          rules: {
-          /*
-               * ✅ ==== VERIFIED ====
-               * Autorität für Interfaces/Type-Literals: alphabetisch
-               */
-          'typescript-sort-keys/interface': 'error',
+        plugins: {
+            'typescript-sort-keys': eslintPluginTypescriptSortKeys
+        },
+        rules: {
+            /*
+             * ✅ ==== VERIFIED ====
+             * Autorität für Interfaces/Type-Literals: alphabetisch
+             */
+            'typescript-sort-keys/interface': 'error',
 
-          'typescript-sort-keys/string-enum': 'error'
-          }
-     },
+            'typescript-sort-keys/string-enum': 'error'
+        }
+    },
 
-     /* ═══╡ 🎯 PERFECTIONIST PLUGIN ╞═══ */
-     perfectionistConfigs.all,
+    /* ═══╡ 🎯 PERFECTIONIST PLUGIN ╞═══ */
+    perfectionistConfigs.all,
 
     /*
      *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
@@ -441,6 +442,9 @@ const config = tseslint.config(
         },
         rules: {
             'tsdoc/syntax': 'error'
+        },
+        settings: {
+            jsdoc: { mode: 'typescript' }
         }
     },
 
@@ -610,28 +614,28 @@ const config = tseslint.config(
 
     /* ═══╡ 🛡️ TYPESCRIPT-ESLINT DISABLE RESTRICTIONS ╞═══ */
     {
-          files: [
-          '**/*.ts',
-          '**/*.tsx',
-          '**/*.mts',
-          '**/*.cts'
-          ],
-          plugins: {
-          'local-ts-eslint-comments': eslintCommentsTypescriptPlugin
-          },
-          rules: {
-          'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
-               'error',
-               {
+        files: [
+            '**/*.ts',
+            '**/*.tsx',
+            '**/*.mts',
+            '**/*.cts'
+        ],
+        plugins: {
+            'local-ts-eslint-comments': eslintCommentsTypescriptPlugin
+        },
+        rules: {
+            'local-ts-eslint-comments/no-restricted-typescript-eslint-disable': [
+                'error',
+                {
                     // Sometime you can not control external types
                     allow: [
-                         '@typescript-eslint/prefer-readonly-parameter-types',
-                         '@typescript-eslint/naming-convention'
+                        '@typescript-eslint/prefer-readonly-parameter-types',
+                        '@typescript-eslint/naming-convention'
                     ]
-               }
-          ]
-          }
-     },
+                }
+            ]
+        }
+    },
 
     /*
      *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───

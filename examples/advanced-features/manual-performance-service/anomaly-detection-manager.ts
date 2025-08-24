@@ -13,29 +13,48 @@
  *█████████████████████████████████████████████████████████████████████████████
  */
 
-// ==== Imports ====
+/*
+ *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+ *🧩 IMPORTS
+ *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+ */
 import { memoryUsage } from 'node:process'
 import { setTimeout } from 'node:timers/promises'
 
 import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance'
 import { toWritable } from '@/utils/data-utils'
 
+/*
+ *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+ *🔡 Types
+ *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+ */
 import type { ReadonlyDeep } from 'type-fest'
+
+/*
+ *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+ *📚 Interfaces
+ *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+ */
 
 /**
  * 📊 Represents the comprehensive result of performance anomaly detection analysis.
- *2
+ *
  * @remarks
  * This interface encapsulates all relevant data from a performance monitoring session,
  * including the raw execution result, detailed tracking metrics, and baseline comparisons
  * for anomaly detection purposes.
- *
  * @see {@link trackMethodPerformance} for tracking implementation details
  * @see {@link getPerformanceBaseline} for baseline comparison functionality
  */
 export interface AnomalyDetectionResult {
+    /** The raw execution result of the performance anomaly detection operation. */
     executionResult: number
+
+    /** The performance baseline for the operation. */
     performanceBaseline: ReturnType<typeof getPerformanceBaseline>
+
+    /** The tracking result of the performance anomaly detection operation. */
     trackingResult: ReturnType<typeof trackMethodPerformance>
 }
 
@@ -47,11 +66,19 @@ export interface AnomalyDetectionResult {
  * including execution metrics, anomaly detection results, and baseline comparison status.
  */
 interface LogPerformanceMetricsProperties {
+    /** The execution duration in milliseconds. */
     readonly duration: number
+
+    /** The number of computational iterations performed. */
     readonly iterations: number
+
+    /** The memory consumption change in bytes. */
     readonly memoryDelta: number
-    readonly methodName: string
+
+    /** The unique identifier for the operation being monitored. */
     readonly performanceBaseline: ReturnType<typeof getPerformanceBaseline>
+
+    /** The tracking result of the performance anomaly detection operation. */
     readonly trackingResult: ReturnType<typeof trackMethodPerformance>
 }
 
@@ -67,7 +94,6 @@ interface LogPerformanceMetricsProperties {
  *
  * 📊 **Metrics Collection:** Captures detailed execution metrics including duration, memory
  * usage, and threshold violations for comprehensive performance analysis.
- *
  * @example
  * Basic usage for performance monitoring with anomaly detection:
  * ```typescript
@@ -78,11 +104,11 @@ interface LogPerformanceMetricsProperties {
  * console.log(`Execution result: ${result.executionResult}`);
  * console.log(`Anomalies detected: ${result.trackingResult.anomalies.length}`);
  * ```
- *
  * @see {@link AnomalyDetectionResult} for return value structure
  * @see {@link trackMethodPerformance} for underlying tracking mechanism
  */
 export class AnomalyDetectionManager {
+    /** The performance log for storing performance metrics. */
     readonly #performanceLog: {
         metrics: Record<string, unknown>
         operation: string
@@ -95,7 +121,7 @@ export class AnomalyDetectionManager {
      * @param performanceLog - Historical performance data used for baseline calculations
      * and anomaly detection. This log provides context for identifying performance deviations.
      */
-    public constructor(performanceLog: ReadonlyDeep<{
+    constructor(performanceLog: ReadonlyDeep<{
         readonly metrics: Record<string, unknown>
         readonly operation: string
         readonly timestamp: Readonly<Date>
@@ -109,11 +135,9 @@ export class AnomalyDetectionManager {
      * @remarks
      * This method computes the execution duration and memory consumption delta
      * by taking measurements at operation completion and comparing against start values.
-     *
-     * @param startTime - Initial time measurement when operation began
-     * @param startMemory - Initial memory usage when operation began
-     *
-     * @returns bject containing calculated duration and memory delta metrics
+     * @param startTime - Initial time measurement when operation began.
+     * @param startMemory - Initial memory usage when operation began.
+     * @returns Bject containing calculated duration and memory delta metrics.
      */
     static readonly #calculatePerformanceMetrics = (
         startTime: number, startMemory: number
@@ -139,10 +163,8 @@ export class AnomalyDetectionManager {
      * @remarks
      * This method performs mathematical calculations while introducing random delays
      * to potentially trigger performance anomalies for testing detection capabilities.
-     *
-     * @param iterations - Number of computational iterations to perform
-     *
-     * @returns Promise resolving to the computational result value
+     * @param iterations - Number of computational iterations to perform.
+     * @returns Promise resolving to the computational result value.
      */
     static readonly #executeComputationalOperation = async (iterations: number): Promise<number> => {
         const ANOMALY_CHECK_INTERVAL = 5000
@@ -157,11 +179,9 @@ export class AnomalyDetectionManager {
             // Variable delay to potentially trigger anomalies
             if (index % ANOMALY_CHECK_INTERVAL === 0) {
                 // Performance/Load Testing:
-                // eslint-disable-next-line sonarjs/pseudo-random -- Performance simulation only, not security-sensitive
                 const delay = Math.random() > ANOMALY_PROBABILITY ? ANOMALY_DELAY : 1
 
                 // Timing Control:
-                // eslint-disable-next-line no-await-in-loop -- Intentional sequential timing for [specific purpose]
                 await setTimeout(delay)
             }
         }
@@ -175,8 +195,7 @@ export class AnomalyDetectionManager {
      * @remarks
      * This method establishes the baseline metrics needed for performance monitoring
      * by recording precise timestamps and memory consumption at the start of operations.
-     *
-     * @returns Object containing start time and memory measurements for performance tracking
+     * @returns Object containing start time and memory measurements for performance tracking.
      */
     static readonly #initializePerformanceMeasurement = (): {
         startMemory: number
@@ -197,12 +216,10 @@ export class AnomalyDetectionManager {
      * @remarks
      * This method integrates with the performance monitoring system to track method
      * execution metrics and retrieve historical baseline data for anomaly comparison.
-     *
-     * @param methodName - Unique identifier for the operation being monitored
-     * @param duration - Execution duration in milliseconds
-     * @param memoryDelta - Memory consumption change in bytes
-     *
-     * @returns Object containing tracking results and performance baseline data
+     * @param methodName - Unique identifier for the operation being monitored.
+     * @param duration - Execution duration in milliseconds.
+     * @param memoryDelta - Memory consumption change in bytes.
+     * @returns Object containing tracking results and performance baseline data.
      */
     static readonly #retrievePerformanceData = (
         methodName: string,
@@ -243,13 +260,10 @@ export class AnomalyDetectionManager {
      * - Execution duration and memory consumption
      * - Anomaly detection results and threshold violations
      * - Baseline comparison data for historical context
-     *
-     * @param methodName - Unique identifier for the operation being monitored
-     * @param iterations - Number of computational iterations to perform (affects execution time)
-     *
+     * @param methodName - Unique identifier for the operation being monitored.
+     * @param iterations - Number of computational iterations to perform (affects execution time).
      * @returns Promise resolving to comprehensive anomaly detection results including execution
-     * result, tracking metrics, and baseline comparison data
-     *
+     * result, tracking metrics, and baseline comparison data.
      * @example
      * Monitoring a specific operation with anomaly detection:
      * ```typescript
@@ -263,7 +277,6 @@ export class AnomalyDetectionManager {
      *   console.log('Performance vs baseline:', result.performanceBaseline);
      * }
      * ```
-     *
      * @see {@link AnomalyDetectionResult} for detailed return value structure
      * @see {@link trackMethodPerformance} for anomaly detection implementation
      */
@@ -306,13 +319,18 @@ export class AnomalyDetectionManager {
      * @remarks
      * This method records detailed performance data including execution metrics,
      * anomaly detection results, and baseline comparison status for historical tracking.
-     *
-     * @param methodName - Unique identifier for the operation being monitored
-     * @param iterations - Number of computational iterations performed
-     * @param duration - Execution duration in milliseconds
-     * @param memoryDelta - Memory consumption change in bytes
-     * @param trackingResult - Anomaly detection tracking results
-     * @param performanceBaseline - Historical baseline data for comparison
+     * @param methodName.methodName
+     * @param methodName - Unique identifier for the operation being monitored.
+     * @param iterations - Number of computational iterations performed.
+     * @param methodName.iterations
+     * @param methodName.duration
+     * @param methodName.memoryDelta
+     * @param methodName.trackingResult
+     * @param methodName.performanceBaseline
+     * @param duration - Execution duration in milliseconds.
+     * @param memoryDelta - Memory consumption change in bytes.
+     * @param trackingResult - Anomaly detection tracking results.
+     * @param performanceBaseline - Historical baseline data for comparison.
      */
     readonly #logPerformanceMetrics = ({
         methodName,

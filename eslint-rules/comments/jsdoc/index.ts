@@ -37,7 +37,44 @@ const jsdocRules: {
             'error',
             { enableFixer: true }
         ],
-        'jsdoc/check-tag-names': 'error',
+
+        // ✅ ==== VERIFIED ====
+        'jsdoc/check-tag-names': [
+            'error',
+            {
+                definedTags: [
+                    'alpha',
+                    'beta',
+                    'decorator',
+                    'deprecated',
+                    'defaultValue',
+                    'eventProperty',
+                    'example',
+                    'experimental',
+                    'inheritDoc',
+                    'internal',
+                    'label',
+                    'link',
+                    'linkcode',
+                    'linkplain',
+                    'override',
+                    'packageDocumentation',
+                    'param',
+                    'privateRemarks',
+                    'public',
+                    'readonly',
+                    'remarks',
+                    'returns',
+                    'sealed',
+                    'see',
+                    'throws',
+                    'typeParam',
+                    'virtual'
+                ],
+                typed: true
+            }
+        ],
+
         'jsdoc/check-template-names': 'error',
         'jsdoc/check-types': 'error',
         'jsdoc/check-values': 'error',
