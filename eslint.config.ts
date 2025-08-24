@@ -67,12 +67,18 @@ import { configs as securityConfigs } from './eslint-rules/security/eslint-plugi
 import { configs as vitestConfigs } from './eslint-rules/testing/vitest'
 import { configs as typescriptEslintConfigs } from './eslint-rules/typescript-eslint/typescript-eslint'
 
+// ==== OVERRIDES ====
+import { configs as overridesConfigs } from './eslint-rules/configs/overrides'
+import { configs as tsDeclarationOverrides } from './eslint-rules/typescript/declaration-files/overrides'
+
 const config = tseslint.config(
+    // ════════════════════════════╡ 🌍 GLOBAL ╞════════════════════════════
     {
         // Global ignores for other directories, but not for eslint.config.mjs itself regarding naming conventions
         ignores: ['coverage/**']
     },
 
+    // ════════════════════════════╡ 🔍 PARSER ╞════════════════════════════
     {
         files: [
             '**/*.ts',
@@ -83,10 +89,6 @@ const config = tseslint.config(
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
-                /*
-                 *===== PERFORMANCE & CACHING OPTIONS =====
-                 */
-
                 /*
                  *- https://typescript-eslint.io/packages/parser/#cachelifetime
                  *Controls the internal cache expiry lengths. Can be specified as seconds (number) or 'Infinity'.
@@ -592,84 +594,9 @@ const config = tseslint.config(
         }
     },
 
-    /*
-     * ===== DEFAULT EXPORT OVERRIDE =====
-     *
-     * ✅ ==== VERIFIED ====
-     * Deaktiviert default- und anonymous-default-exports für JS-only-Konfigurationen
-     * (wird von eslint-plugin-import automatisch aktiviert)
-     */
-    {
-        files: [
-            // Build tools
-            '**/{vite,webpack,rollup,esbuild,turbo}.config.{ts,js,mts,cts,mjs,cjs}',
-
-            // Test frameworks
-            '**/{jest,vitest,playwright,cypress}.config.{ts,js,mts,cts,mjs,cjs}',
-
-            // Linting tools
-            '**/{eslint,prettier,stylelint}.config.{ts,js,mts,cts,mjs,cjs}',
-
-            // Next.js, Nuxt, etc.
-            '**/{next,nuxt,astro}.config.{ts,js,mts,cts,mjs,cjs}',
-
-            // Legacy configs
-            '**/.{eslintrc,prettierrc}.{js,cjs,mjs,ts}'
-        ],
-        rules: {
-
-            // ✅ ==== VERIFIED ====
-            'import/no-default-export': 'off',
-
-            // ✅ ==== VERIFIED ====
-            'no-restricted-syntax': [
-                'error',
-                {
-                    message: 'Use for...of or Object.keys/entries/values instead',
-                    selector: 'ForInStatement'
-                },
-                {
-                    message: 'With statements are not allowed',
-                    selector: 'WithStatement'
-                },
-                {
-                    message: 'eval() is not allowed for security reasons',
-                    selector: "CallExpression[callee.name='eval']"
-                },
-                {
-                    message: 'Use object spread instead of Object.assign with object literal',
-                    selector: "CallExpression[callee.property.name='assign'][callee.object.name='Object'][arguments.0.type='ObjectExpression']"
-                }
-            ]
-        }
-    },
-    {
-        files: ['**/*.d.ts'],
-        rules: {
-            '@typescript-eslint/consistent-type-imports': 'off',
-
-            // ✅ ==== VERIFIED ====
-            '@typescript-eslint/member-ordering': [
-                'error',
-                {
-                    interfaces: {
-                        memberTypes: 'never',
-                        order: 'alphabetically-case-insensitive'
-                    },
-                    typeLiterals: {
-                        memberTypes: 'never',
-                        order: 'alphabetically-case-insensitive'
-                    }
-                }
-            ],
-
-            // ✅ ==== VERIFIED ====
-            'perfectionist/sort-object-types': 'off',
-
-            // ✅ ==== VERIFIED ====
-            'typescript-sort-keys/interface': 'error'
-        }
-    }
+    // ===== OVERRIDE CONFIGS =====
+    overridesConfigs.all,
+    tsDeclarationOverrides.all
 )
 
 export default config
