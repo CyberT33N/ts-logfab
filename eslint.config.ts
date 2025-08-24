@@ -298,9 +298,9 @@ const config = tseslint.config(
                         'TSInterfaceDeclaration > TSInterfaceBody > TSPropertySignature',
                         'TSTypeAliasDeclaration > TSTypeLiteral > TSPropertySignature'
                     ],
+                    enableFixer: false,
                     exemptEmptyConstructors: true,
                     exemptEmptyFunctions: true,
-                    enableFixer: false,
                     publicOnly: false,
                     require: {
                         ArrowFunctionExpression: true,
@@ -351,12 +351,16 @@ const config = tseslint.config(
             'jsdoc/require-yields-check': 'error',
 
             // ✅ ==== VERIFIED ====
-            "jsdoc/tag-lines": ["error", "never", {
-               "startLines": 1,
-               "endLines": 0,
-               "count": 1,
-               "applyToEndTag": true
-          }],
+            'jsdoc/tag-lines': [
+                'error',
+                'never',
+                {
+                    applyToEndTag: true,
+                    count: 1,
+                    endLines: 0,
+                    startLines: 1
+                }
+            ],
 
             // Type/namepath validity
             'jsdoc/valid-types': 'error'
@@ -475,38 +479,6 @@ const config = tseslint.config(
     eslintPluginUnicorn.configs.all,
     {
         rules: {
-               // ✅ ==== VERIFIED ====
-               "unicorn/prevent-abbreviations": ["warn", {
-                    "extendDefaultReplacements": false,
-                    "replacements": {
-                    "e":   { "event": true },
-                    "err": { "error": true },
-                    "cb":  { "callback": true },
-                    "cmd": { "command": true }
-                    },
-                    "allowList": {
-                    "req": true,
-                    "res": true,
-                    "next": true,
-                    "ctx": true,
-                    "props": true,
-                    "id": true,
-                    "db": true,
-                    "URL": true,
-                    "API": true,
-                    "JWT": true,
-                    "i18n": true
-                    },
-                    "checkProperties": false,
-                    "checkFilenames": false,
-                    "checkDefaultAndNamespaceImports": "internal",
-                    "checkShorthandImports": "internal",
-                    "checkShorthandProperties": false,
-                    "ignore": ["\\.e2e$", "\\.spec$", "\\.d\\.ts$"]
-               }],
-
-            // ✅ ==== VERIFIED ====
-            'unicorn/no-keyword-prefix': 'off',
 
             // ✅ ==== VERIFIED ====
             'unicorn/filename-case': [
@@ -523,6 +495,46 @@ const config = tseslint.config(
                         // Keep index.* as-is (plugin already ignores index.*)
                     ],
                     multipleFileExtensions: true
+                }
+            ],
+
+            // ✅ ==== VERIFIED ====
+            'unicorn/no-keyword-prefix': 'off',
+
+            // ✅ ==== VERIFIED ====
+            'unicorn/prevent-abbreviations': [
+                'warn',
+                {
+                    allowList: {
+                        API: true,
+                        JWT: true,
+                        URL: true,
+                        ctx: true,
+                        db: true,
+                        i18n: true,
+                        id: true,
+                        next: true,
+                        props: true,
+                        req: true,
+                        res: true
+                    },
+                    checkDefaultAndNamespaceImports: 'internal',
+                    checkFilenames: false,
+                    checkProperties: false,
+                    checkShorthandImports: 'internal',
+                    checkShorthandProperties: false,
+                    extendDefaultReplacements: false,
+                    ignore: [
+                        String.raw`\.e2e$`,
+                        String.raw`\.spec$`,
+                        String.raw`\.d\.ts$`
+                    ],
+                    replacements: {
+                        cb: { callback: true },
+                        cmd: { command: true },
+                        e: { event: true },
+                        err: { error: true }
+                    }
                 }
             ]
         }
