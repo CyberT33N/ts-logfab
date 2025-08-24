@@ -49,6 +49,7 @@ const securityRules: {
 
 /**
  * Creates the base security ESLint rules.
+ *
  * @returns The base security ESLint rules.
  */
 const createSecurityBase = (): TSESLint.FlatConfig.Config => {
@@ -66,6 +67,7 @@ const createSecurityBase = (): TSESLint.FlatConfig.Config => {
 
 /**
  * Creates the all security ESLint rules.
+ *
  * @returns The all security ESLint rules.
  */
 const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [createSecurityBase()]
@@ -75,8 +77,8 @@ export const configs = {
     /**
      * Enterprise-grade Security ESLint rules based on OWASP Top 10 and industry standards.
      * Provides eslint-plugin-security configuration for XSS, ReDoS, and code injection prevention.
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-security-config}
      *
+     * @see {@link https://github.com/t33n/ts-logfab#enterprise-security-config}
      */
     all: createSecurityAll(),
 
@@ -89,5 +91,4 @@ export const configs = {
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createSecurityAll()
-
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

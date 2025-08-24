@@ -261,6 +261,7 @@ const vitestRules: {
 
 /**
  * Creates the base Vitest testing configuration.
+ *
  * @returns The base Vitest testing configuration.
  */
 const createVitestBase = (): TSESLint.FlatConfig.Config => {
@@ -297,6 +298,7 @@ const createVitestBase = (): TSESLint.FlatConfig.Config => {
 
 /**
  * Creates the complete Vitest testing configuration.
+ *
  * @returns The complete Vitest testing configuration.
  */
 const createVitestAll = (): TSESLint.FlatConfig.ConfigArray => [createVitestBase()]
@@ -307,6 +309,7 @@ export const configs = {
      * Enterprise-grade Vitest Testing Configuration based on Google Testing Blog,
      * Microsoft Testing Guidelines, and Meta Jest Best Practices.
      * Upgrades critical rules from warn to error and configures Enterprise-Standards.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-vitest-config}
      */
     all: createVitestAll(),
@@ -320,5 +323,4 @@ export const configs = {
      * Alias for compatibility with flat config naming conventions.
      */
     'flat/all': createVitestAll()
-
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

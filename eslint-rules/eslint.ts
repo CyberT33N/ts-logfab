@@ -19,6 +19,8 @@ import { configs as eslintConfigs } from '@eslint/js'
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
+const COMPLEXITY_MAX = 15
+
 // Custom rules
 const eslintRules: {
     /**
@@ -53,7 +55,7 @@ const eslintRules: {
          */
         complexity: [
             'error',
-            15
+            COMPLEXITY_MAX
         ],
 
         /*
@@ -176,7 +178,7 @@ const eslintRules: {
         // Limit callback nesting
         'max-statements': [
             'error',
-            15
+            COMPLEXITY_MAX
         ],
 
         // ✅ ==== VERIFIED ====

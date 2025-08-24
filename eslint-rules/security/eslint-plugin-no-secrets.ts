@@ -156,6 +156,7 @@ const noSecretsRules: {
 
 /**
  * Creates the no-secrets plugin configuration.
+ *
  * @returns The no-secrets plugin configuration.
  */
 const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => ({
@@ -167,18 +168,36 @@ const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => ({
 })
 
 /**
+ * Creates overrides so this file does not flag itself for secrets.
+ *
+ * @returns The overrides config for this module file.
+ */
+const createNoSecretsOverrides = (): TSESLint.FlatConfig.Config => ({
+    files: ['eslint-rules/security/eslint-plugin-no-secrets.ts'],
+    name: 'enterprise/security/overrides:no-secrets-self',
+    rules: {
+        'no-secrets/no-pattern-match': 'off',
+        'no-secrets/no-secrets': 'off'
+    }
+})
+
+/**
  * Creates the all security ESLint rules.
+ *
  * @returns The all security ESLint rules.
  */
-const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [createNoSecretsConfig()]
+const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [
+    createNoSecretsConfig(),
+    createNoSecretsOverrides()
+]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {
     /**
      * Enterprise-grade Security ESLint rules based on OWASP Top 10 and industry standards.
      * Combines eslint-plugin-security with no-secrets for comprehensive security coverage.
-     * @see {@link https://github.com/t33n/ts-logfab#enterprise-security-config}
      *
+     * @see {@link https://github.com/t33n/ts-logfab#enterprise-security-config}
      */
     all: createSecurityAll(),
 
@@ -190,5 +209,10 @@ export const configs = {
     /**
      * No-secrets plugin configuration for enterprise secret detection.
      */
-    'no-secrets': [createNoSecretsConfig()]
+    'no-secrets': [createNoSecretsConfig()],
+
+    /**
+     * Overrides to prevent this module from linting itself with no-secrets.
+     */
+    overrides: [createNoSecretsOverrides()]
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
