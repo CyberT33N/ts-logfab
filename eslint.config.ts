@@ -58,7 +58,6 @@
  */
 
 import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
-import jsdoc from 'eslint-plugin-jsdoc'
 
 /*
  * ===== [FILE FORMAT SPECIFIC] =====
@@ -123,6 +122,7 @@ import tseslint from 'typescript-eslint'
 
 // ==== CUSTOM ====
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
+import { configs as jsdocConfigs } from './eslint-rules/comments/jsdoc'
 import { functionDefinitionParenNewlinePlugin } from './eslint-rules/custom/function-definition-paren-newline'
 import { eslintCommentsTypescriptPlugin } from './eslint-rules/custom/typescript-eslint/comments'
 
@@ -197,196 +197,7 @@ const config = tseslint.config(
     },
 
     // ===== JSDOC PLUGIN =====
-    jsdoc.configs['flat/recommended-typescript-error'],
-    {
-        files: [
-            '**/*.ts',
-            '**/*.tsx',
-            '**/*.mts',
-            '**/*.cts'
-        ],
-        plugins: {
-            jsdoc
-        },
-        rules: {
-            // Core correctness
-            'jsdoc/check-access': 'error',
-            'jsdoc/check-alignment': 'error',
-            'jsdoc/check-line-alignment': 'error',
-            'jsdoc/check-param-names': [
-                'error',
-                { enableFixer: true }
-            ],
-            'jsdoc/check-property-names': [
-                'error',
-                { enableFixer: true }
-            ],
-            'jsdoc/check-tag-names': 'error',
-            'jsdoc/check-template-names': 'error',
-            'jsdoc/check-types': 'error',
-            'jsdoc/check-values': 'error',
-
-            // Style & structure
-            'jsdoc/empty-tags': 'error',
-            'jsdoc/implements-on-classes': 'error',
-
-            // ✅ ==== VERIFIED ====
-            'jsdoc/multiline-blocks': [
-                'error',
-                {
-                    noMultilineBlocks: false,
-                    noSingleLineBlocks: false
-                }
-            ],
-
-            'jsdoc/no-defaults': 'error',
-            'jsdoc/no-multi-asterisks': 'error',
-            'jsdoc/no-types': 'error',
-            'jsdoc/no-undefined-types': 'off',
-            'jsdoc/require-asterisk-prefix': [
-                'error',
-                'always'
-            ],
-
-            // Content quality
-            'jsdoc/require-description': [
-                'warn',
-                {
-                    contexts: [
-                        'FunctionDeclaration',
-                        'ClassDeclaration',
-                        'MethodDefinition'
-                    ]
-                }
-            ],
-
-            // ✅ ==== VERIFIED ====
-            'jsdoc/require-description-complete-sentence': [
-                'error',
-                {
-                    tags: [
-                        'param',
-                        'returns',
-                        'property'
-                    ]
-                }
-            ],
-
-            // Consistent spacing between tags
-            'jsdoc/require-hyphen-before-param-description': [
-                'error',
-                'always'
-            ],
-
-            /**
-             * ✅ ==== VERIFIED ====
-             * Documentation surface (public API only).
-             */
-            'jsdoc/require-jsdoc': [
-                'error',
-                {
-                    checkConstructors: true,
-                    contexts: [
-                        'TSDeclareFunction',
-                        'TSEnumDeclaration',
-                        'TSInterfaceDeclaration',
-                        'TSMethodSignature',
-                        'TSTypeAliasDeclaration',
-                        'PropertyDefinition',
-
-                        // Nur Properties in echten Typdefinitionen (nicht inline)
-                        'TSInterfaceDeclaration > TSInterfaceBody > TSPropertySignature',
-                        'TSTypeAliasDeclaration > TSTypeLiteral > TSPropertySignature'
-                    ],
-                    enableFixer: false,
-                    exemptEmptyConstructors: true,
-                    exemptEmptyFunctions: true,
-                    publicOnly: false,
-                    require: {
-                        ArrowFunctionExpression: true,
-                        ClassDeclaration: true,
-                        ClassExpression: true,
-                        FunctionDeclaration: true,
-                        FunctionExpression: true,
-                        MethodDefinition: true
-                    }
-                }
-            ],
-
-            // Params & returns (TS disables type requirements)
-            'jsdoc/require-param': 'error',
-
-            'jsdoc/require-param-description': 'error',
-
-            'jsdoc/require-param-name': 'error',
-
-            'jsdoc/require-param-type': 'off',
-
-            'jsdoc/require-property': 'error',
-
-            'jsdoc/require-property-description': 'error',
-
-            'jsdoc/require-property-name': 'error',
-
-            'jsdoc/require-property-type': 'off',
-
-            'jsdoc/require-returns': [
-                'error',
-                { exemptedBy: ['constructor'] }
-            ],
-
-            // ✅ ==== VERIFIED ====
-            'jsdoc/require-returns-check': 'error',
-
-            'jsdoc/require-returns-description': 'error',
-
-            'jsdoc/require-returns-type': 'off',
-
-            'jsdoc/require-template': 'error',
-
-            'jsdoc/require-throws': ['warn'],
-
-            'jsdoc/require-yields': 'error',
-
-            'jsdoc/require-yields-check': 'error',
-
-            // ✅ ==== VERIFIED ====
-            'jsdoc/tag-lines': [
-                'error',
-                'never',
-                {
-                    applyToEndTag: true,
-                    count: 1,
-                    endLines: 0,
-                    startLines: 1
-                }
-            ],
-
-            // Type/namepath validity
-            'jsdoc/valid-types': 'error'
-        },
-        settings: {
-            jsdoc: {
-                mode: 'typescript',
-                preferredTypes: {
-                    Boolean: 'boolean',
-                    Function: '(...args: unknown[]) => unknown',
-                    Number: 'number',
-                    Object: 'Record<string, unknown>',
-                    String: 'string',
-                    Symbol: 'symbol',
-                    object: 'Record<string, unknown>'
-                },
-                tagNamePreference: {
-                    augments: {
-                        message: 'Use @extends for inheritance (TSDoc-aligned).',
-                        replacement: 'extends'
-                    },
-                    returns: 'returns'
-                }
-            }
-        }
-    },
+    jsdocConfigs.all,
 
     // ===== SECURITY PLUGIN =====
     securityConfigs.all,
@@ -544,7 +355,6 @@ const config = tseslint.config(
     nodePlugin.configs['flat/all'],
     {
         plugins: {
-            // eslint-disable-next-line id-length
             n: nodePlugin
         },
         rules: {
