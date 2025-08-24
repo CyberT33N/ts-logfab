@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 /*
  *███████████████████████████████████████████████████████████████████████████████
  *██******************** PRESENTED BY t33n Software ***************************██
@@ -19,6 +18,9 @@ import eslintPluginJsonc from 'eslint-plugin-jsonc'
 
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
+
+// ==== CONSTANTS ====
+const ENTERPRISE_INDENT_SIZE = 2
 
 // Enhanced JSONC rules configuration
 const jsoncRules: {
@@ -73,7 +75,7 @@ const jsoncRules: {
         // Property names must be quoted
         'jsonc/indent': [
             'error',
-            2
+            ENTERPRISE_INDENT_SIZE
         ],
 
         'jsonc/key-spacing': [
@@ -218,6 +220,7 @@ const jsoncRules: {
 
 /**
  * Creates the base JSONC configuration.
+ *
  * @returns The base JSONC configuration.
  */
 const createJsoncBase = (): TSESLint.FlatConfig.ConfigArray => [
@@ -230,6 +233,7 @@ const createJsoncBase = (): TSESLint.FlatConfig.ConfigArray => [
 
 /**
  * Creates the complete JSONC configuration.
+ *
  * @returns The complete JSONC configuration.
  */
 const createJsoncAll = (): TSESLint.FlatConfig.ConfigArray => createJsoncBase()
@@ -239,6 +243,7 @@ export const configs = {
     /**
      * Enterprise-grade JSON/JSONC Configuration based on Google/Microsoft/Meta standards.
      * Combines security, data integrity, and formatting standards for JSON and JSONC files.
+     *
      * @see {@link https://github.com/t33n/ts-logfab#enterprise-jsonc-config}
      */
     all: createJsoncAll(),
