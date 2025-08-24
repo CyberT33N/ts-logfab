@@ -15,8 +15,6 @@
 
 import eslintPluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments'
 
-import nodePlugin from 'eslint-plugin-n'
-
 import eslintPluginPreferArrow from 'eslint-plugin-prefer-arrow-functions'
 import reactPerfPlugin from 'eslint-plugin-react-perf'
 import sortKeysFix from 'eslint-plugin-sort-keys-fix'
@@ -51,10 +49,13 @@ import { configs as reactHooksConfigs } from './eslint-rules/frameworks/react/re
 import { configs as importConfigs } from './eslint-rules/modules/imports'
 
 // ==== PACKAGE.JSON ====
+import { configs as nodeConfigs } from './eslint-rules/node/eslint-plugin-n'
 import { configs as packageJsonSharedConfigs } from './eslint-rules/package-json'
 
 // ==== PROMISE ====
 import { configs as promiseConfigs } from './eslint-rules/promise'
+
+// ==== NODE ====
 
 // ==== REGEXP ====
 import { configs as regexpConfigs } from './eslint-rules/regexp'
@@ -479,29 +480,7 @@ const config = tseslint.config(
     unicornConfigs.all,
 
     // ===== NODE PLUGIN =====
-    nodePlugin.configs['flat/all'],
-    {
-        plugins: {
-            n: nodePlugin
-        },
-        rules: {
-            // Enterprise: Force explicit imports
-            'n/file-extension-in-import': 'off',
-
-            'n/no-missing-import': 'off',
-
-            'n/no-unpublished-import': 'off',
-
-            // Already handled by unicorn/prefer-node-protocol
-            'n/prefer-global/process': [
-                'error',
-                'never'
-            ],
-
-            // Off because we use the .ts extension in the imports
-            'n/prefer-node-protocol': 'off'
-        }
-    },
+    nodeConfigs.all,
 
     // ===== UNUSED IMPORTS PLUGIN =====
     {
@@ -518,7 +497,6 @@ const config = tseslint.config(
 
     /*
      * ===== FUNCTION DEFINITION =====
-     * FunctionDefinitionPlugin.configs.flat.all,
      */
     {
         plugins: {
