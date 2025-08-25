@@ -326,24 +326,25 @@ export class AnomalyDetectionManager {
     }
 
     /**
-     * 📝 Logs comprehensive performance metrics to the internal performance log.
+     * Logs comprehensive performance metrics.
      *
+     * @remarks
+     * Key fields: methodName, iterations, duration, memoryDelta, trackingResult, performanceBaseline.
+     * See {@link LogPerformanceMetricsProperties} for details.
      * @param options - The options for logging performance metrics.
-     * @param options.methodName - Unique identifier for the operation being monitored.
-     * @param options.iterations - Number of computational iterations performed.
-     * @param options.duration - Execution duration in milliseconds.
-     * @param options.memoryDelta - Memory consumption change in bytes.
-     * @param options.trackingResult - Anomaly detection tracking results.
-     * @param options.performanceBaseline - Historical baseline data for comparison.
      */
-    readonly #logPerformanceMetrics = ({
-        methodName,
-        iterations,
-        duration,
-        memoryDelta,
-        trackingResult,
-        performanceBaseline
-    }: LogPerformanceMetricsProperties): void => {
+    readonly #logPerformanceMetrics = (
+        options: LogPerformanceMetricsProperties
+    ): void => {
+        const {
+            methodName,
+            iterations,
+            duration,
+            memoryDelta,
+            trackingResult,
+            performanceBaseline
+        } = options
+
         this.#performanceLog.push({
             metrics: {
                 anomaliesDetected: trackingResult.anomalies.length,

@@ -94,7 +94,13 @@ const jsdocRules: {
 
         'jsdoc/no-defaults': 'error',
         'jsdoc/no-multi-asterisks': 'error',
+
+        /**
+         * ✅ ==== VERIFIED ====
+         * Enterporise no types because anti pattern in ts.
+         */
         'jsdoc/no-types': 'error',
+
         'jsdoc/no-undefined-types': 'off',
         'jsdoc/require-asterisk-prefix': [
             'error',
@@ -178,10 +184,10 @@ const jsdocRules: {
                 checkConstructors: true,
 
                 // Require docs for destructured properties inside parameters.
-                checkDestructured: true,
+                checkDestructured: false,
 
                 // Require a root @param for destructured params (e.g., @param options).
-                checkDestructuredRoots: true,
+                checkDestructuredRoots: false,
 
                 // Getters have no parameters; keep disabled to avoid noise.
                 checkGetters: false,
@@ -226,7 +232,11 @@ const jsdocRules: {
             }
         ],
 
+        /**
+         * ✅ ==== VERIFIED ====.
+         */
         'jsdoc/require-param-description': 'error',
+
         'jsdoc/require-param-name': 'error',
         'jsdoc/require-param-type': 'off',
         'jsdoc/require-property': 'error',
@@ -247,7 +257,10 @@ const jsdocRules: {
         'jsdoc/require-yields': 'error',
         'jsdoc/require-yields-check': 'error',
 
-        // ✅ ==== VERIFIED ====
+        /**
+         * ✅ ==== VERIFIED ====
+         * Enterporise new lines between tags.
+         */
         'jsdoc/tag-lines': [
             'error',
             'never',

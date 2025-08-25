@@ -628,17 +628,20 @@ const config = tseslint.config(
                 'error',
                 {
                     allow: [
-                        /* ✅ ==== VERIFIED ====
+                        /*
+                         * ✅ ==== VERIFIED ====
                          * Sometime you can not control external types
                          */
                         '@typescript-eslint/prefer-readonly-parameter-types',
 
-                        /* ✅ ==== VERIFIED ====
+                        /*
+                         * ✅ ==== VERIFIED ====
                          * Sometime you can not control external naming conventions
                          */
                         '@typescript-eslint/naming-convention',
 
-                        /* ✅ ==== VERIFIED ====
+                        /*
+                         * ✅ ==== VERIFIED ====
                          * Sometime it is allowed to use await in a loop
                          */
                         'no-await-in-loop'
