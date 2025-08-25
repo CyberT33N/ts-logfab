@@ -167,7 +167,65 @@ const jsdocRules: {
         ],
 
         // Params & returns (TS disables type requirements)
-        'jsdoc/require-param': 'error',
+        'jsdoc/require-param': [
+            'error',
+            {
+
+                // Starting index for auto-numbered roots (e.g., options0, options1).
+                autoIncrementBase: 0,
+
+                // Enforce documenting constructor parameters (part of public API).
+                checkConstructors: true,
+
+                // Require docs for destructured properties inside parameters.
+                checkDestructured: true,
+
+                // Require a root @param for destructured params (e.g., @param options).
+                checkDestructuredRoots: true,
+
+                // Getters have no parameters; keep disabled to avoid noise.
+                checkGetters: false,
+
+                // Do not auto-document object rest properties; describe in prose if needed.
+                checkRestProperty: false,
+
+                // Require documenting setter inputs (they accept a value).
+                checkSetters: true,
+
+                // Only require destructured subdocs for generic container types; skip for specific types.
+                checkTypesPattern: '/^(?:[oO]bject|[aA]rray|PlainObject|Generic(?:Object|Array)|Record|Map|Set)$/v',
+
+                // Allow safe auto-insertion of missing @param entries.
+                enableFixer: true,
+
+                // Avoid auto-inserting rest array params as {...any}; require explicit docs.
+                enableRestElementFixer: false,
+
+                // Auto-add root entries for destructured params when missing.
+                enableRootFixer: true,
+
+                // Tags that exempt this rule (inheritance/type-only blocks).
+                exemptedBy: [
+                    'inheritdoc',
+                    'inheritDoc',
+                    'type'
+                ],
+
+                // Still report when all params are missing to enforce coverage.
+                ignoreWhenAllParamsMissing: false,
+
+                // Base names used when auto-naming anonymous destructured roots.
+                unnamedRootBase: [
+                    'options',
+                    'config',
+                    'arg'
+                ],
+
+                // Do not require docs for properties of default object literals.
+                useDefaultObjectProperties: false
+            }
+        ],
+
         'jsdoc/require-param-description': 'error',
         'jsdoc/require-param-name': 'error',
         'jsdoc/require-param-type': 'off',
@@ -206,21 +264,67 @@ const jsdocRules: {
     },
     settings: {
         jsdoc: {
+
+            // Treat @augments/@extends as replacing docs to avoid redundant per-member tags.
+            augmentsExtendsReplacesDocs: true,
+
+            // Skip items marked @internal in doc enforcement.
+            ignoreInternal: true,
+
+            // Skip @private or @access private items in doc enforcement.
+            ignorePrivate: true,
+
+            // Treat @ignore as replacing docs; do not require params/returns.
+            ignoreReplacesDocs: true,
+
+            // Treat @implements as replacing docs on implementing classes/members.
+            implementsReplacesDocs: true,
+
+            // Enable TypeScript-flavored mode for parsing and rules.
             mode: 'typescript',
+
+            // Treat @override as replacing docs for overridden members.
+            overrideReplacesDocs: true,
+
+            // Normalize common type names to preferred, precise forms.
             preferredTypes: {
+
+                // Prefer primitive boolean over boxed Boolean.
                 Boolean: 'boolean',
+
+                // Prefer explicit callable signature over broad Function.
                 Function: '(...args: unknown[]) => unknown',
+
+                // Prefer primitive number over boxed Number.
                 Number: 'number',
+
+                // Prefer explicit key/value record over broad Object.
                 Object: 'Record<string, unknown>',
+
+                // Prefer primitive string over boxed String.
                 String: 'string',
+
+                // Keep 'symbol' primitive as-is.
                 Symbol: 'symbol',
+
+                // Prefer explicit key/value record over broad 'object'.
                 object: 'Record<string, unknown>'
             },
+
+            // Normalize tag names and provide guidance for aliases.
             tagNamePreference: {
+
+                // Prefer @extends (TSDoc-aligned) instead of @augments.
                 augments: {
+
+                    // Message shown when auto-replacing deprecated alias.
                     message: 'Use @extends for inheritance (TSDoc-aligned).',
+
+                    // Actual alias replacement.
                     replacement: 'extends'
                 },
+
+                // Normalize to @returns (instead of @return).
                 returns: 'returns'
             }
         }

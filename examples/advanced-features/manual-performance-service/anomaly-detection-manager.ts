@@ -78,6 +78,9 @@ interface LogPerformanceMetricsProperties {
     readonly memoryDelta: number
 
     /** The unique identifier for the operation being monitored. */
+    readonly methodName: string
+
+    /** The unique identifier for the operation being monitored. */
     readonly performanceBaseline: ReturnType<typeof getPerformanceBaseline>
 
     /** The tracking result of the performance anomaly detection operation. */
@@ -325,21 +328,13 @@ export class AnomalyDetectionManager {
     /**
      * 📝 Logs comprehensive performance metrics to the internal performance log.
      *
-     * @remarks
-     * This method records detailed performance data including execution metrics,
-     * anomaly detection results, and baseline comparison status for historical tracking.
-     * @param methodName.methodName
-     * @param methodName - Unique identifier for the operation being monitored.
-     * @param iterations - Number of computational iterations performed.
-     * @param methodName.iterations
-     * @param methodName.duration
-     * @param methodName.memoryDelta
-     * @param methodName.trackingResult
-     * @param methodName.performanceBaseline
-     * @param duration - Execution duration in milliseconds.
-     * @param memoryDelta - Memory consumption change in bytes.
-     * @param trackingResult - Anomaly detection tracking results.
-     * @param performanceBaseline - Historical baseline data for comparison.
+     * @param options - The options for logging performance metrics.
+     * @param options.methodName - Unique identifier for the operation being monitored.
+     * @param options.iterations - Number of computational iterations performed.
+     * @param options.duration - Execution duration in milliseconds.
+     * @param options.memoryDelta - Memory consumption change in bytes.
+     * @param options.trackingResult - Anomaly detection tracking results.
+     * @param options.performanceBaseline - Historical baseline data for comparison.
      */
     readonly #logPerformanceMetrics = ({
         methodName,
