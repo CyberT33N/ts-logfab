@@ -61,7 +61,6 @@ const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB
  *
  * 🔄 **Configuration Tracking:** Captures both the previous configuration state
  * and the newly applied configuration to enable rollback scenarios and change auditing.
- *
  * @see {@link getEnterprisePerformanceConfiguration} for configuration retrieval
  * @see {@link configureEnterprisePerformanceMonitoring} for configuration application
  */
@@ -105,10 +104,8 @@ export interface ConfigurationResult {
  * - Minimum 10 samples required for baseline establishment
  * - 7-day historical data retention for trend analysis
  * - Automatic baseline updates for performance drift detection
- *
  * @returns Configuration result containing both previous and newly applied
- * performance monitoring configurations for comparison and auditing
- *
+ * performance monitoring configurations for comparison and auditing.
  * @example
  * Configuring enhanced performance monitoring:
  * ```typescript
@@ -122,7 +119,6 @@ export interface ConfigurationResult {
  * console.log('Slow method warning:', result.updatedConfig.thresholds.slowMethodWarning);
  * console.log('Memory warning threshold:', result.updatedConfig.thresholds.memoryWarning);
  * ```
- *
  * @example
  * Applying and verifying performance monitoring configuration:
  * ```typescript
@@ -143,7 +139,6 @@ export interface ConfigurationResult {
  * console.log('Baseline tracking enabled:', result.updatedConfig.baseline.trackingEnabled);
  * console.log('Min sample size:', result.updatedConfig.baseline.minSampleSize);
  * ```
- *
  * @see {@link ConfigurationResult} for detailed return value structure
  * @see {@link getEnterprisePerformanceConfiguration} for configuration state retrieval
  * @see {@link configureEnterprisePerformanceMonitoring} for underlying configuration utility
