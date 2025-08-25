@@ -45,7 +45,7 @@ import { configs as noSecretsConfigs } from './eslint-rules/security/eslint-plug
 import { configs as securityConfigs } from './eslint-rules/security/eslint-plugin-security'
 import { configs as vitestConfigs } from './eslint-rules/testing/vitest'
 import { configs as tsDeclarationOverrides } from './eslint-rules/typescript/declaration-files/overrides'
-import { configs as typescriptEslintConfigs } from './eslint-rules/typescript-eslint/typescript-eslint'
+import { configs as typescriptEslintConfigs } from './eslint-rules/typescript-eslint'
 
 /**
  * Enterprise-Grade ESLint Configuration
