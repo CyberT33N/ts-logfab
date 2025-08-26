@@ -60,13 +60,31 @@ export const additionalTypescriptRulesConfig: TSESLint.FlatConfig.Config = {
 }
 
 /**
+ * Creates overrides for TypeScript-ESLint to exclude non-TS data files.
+ *
+ * @returns The overrides configuration array.
+ */
+const createTypescriptEslintOverrides = (): TSESLint.FlatConfig.ConfigArray => [
+    {
+        files: [
+            '**/*.json',
+            '**/*.jsonc',
+            '**/*.json5'
+        ],
+        name: 'typescript-eslint/overrides:exclude-json',
+        ...tseslintConfigs.disableTypeChecked
+    }
+]
+
+/**
  * Creates a configuration array for TypeScript-ESLint with all rules.
  *
  * @returns The configuration array.
  */
 const createTypescriptEslintAll = (): TSESLint.FlatConfig.ConfigArray => [
     ...typescriptStrictAndStylistic,
-    additionalTypescriptRulesConfig
+    additionalTypescriptRulesConfig,
+    ...createTypescriptEslintOverrides()
 ]
 
 export const configs = {
@@ -84,5 +102,10 @@ export const configs = {
     /**
      * Alias for compatibility with flat config naming conventions.
      */
-    'flat/all': createTypescriptEslintAll()
+    'flat/all': createTypescriptEslintAll(),
+
+    /**
+     * File-specific overrides (e.g., excluding JSON/JSONC from typed rules).
+     */
+    overrides: createTypescriptEslintOverrides()
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
