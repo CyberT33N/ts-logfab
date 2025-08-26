@@ -51,11 +51,29 @@ const createStylisticBase = (): TSESLint.FlatConfig.ConfigArray => [
 ]
 
 /**
+ * Creates file-specific rule overrides for Stylistic.
+ *
+ * @returns The overrides for Stylistic rules.
+ */
+const createStylisticOverrides = (): TSESLint.FlatConfig.ConfigArray => [
+    {
+        files: ['eslint-rules/**/*.ts'],
+        name: 'enterprise/overrides:stylistic-rules',
+        rules: {
+            '@stylistic/max-len': 'off'
+        }
+    }
+]
+
+/**
  * Creates the complete Stylistic configuration.
  *
  * @returns The complete Stylistic configuration.
  */
-const createStylisticAll = (): TSESLint.FlatConfig.ConfigArray => createStylisticBase()
+const createStylisticAll = (): TSESLint.FlatConfig.ConfigArray => [
+    ...createStylisticBase(),
+    ...createStylisticOverrides()
+]
 
 // ==== SHARED CONFIGS (Plugin Pattern) ====
 export const configs = {
@@ -75,6 +93,11 @@ export const configs = {
     /**
      * Alias for compatibility with flat config naming conventions.
      */
-    'flat/all': createStylisticAll()
+    'flat/all': createStylisticAll(),
+
+    /**
+     * File-specific rule overrides for Stylistic rules.
+     */
+    overrides: createStylisticOverrides()
 
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>

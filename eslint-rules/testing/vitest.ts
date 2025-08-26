@@ -228,31 +228,19 @@ const vitestRules: {
             }
         ],
 
-        // Upgrade von warn
+        // ✅ ==== VERIFIED ====
         'vitest/valid-title': [
             'error',
             {
                 mustMatch: {
-                    describe: [
-                        String.raw`/^[A-Z]\w*/`,
-                        '/^when /',
-                        '/^with /',
-                        '/^without /'
-                    ],
-                    test: ['/^(returns|throws|calls|handles|processes|validates|transforms|creates|updates|deletes)/']
+                    describe: String.raw`^(?:[A-Z]\w*|when |with |without )`,
+                    test: String.raw`^(?:returns|throws|calls|handles|processes|validates|transforms|creates|updates|deletes)`
                 },
                 mustNotMatch: {
                     // Google style
-                    describe: [
-                        '/^should/',
-                        '/^must/',
-                        '/^can/'
-                    ],
-                    test: [
-                        '/^should/',
-                        '/^must/',
-                        '/^can/'
-                    ]
+                    describe: String.raw`^(?:should|must|can)`,
+                    it: String.raw`^(?:should|must|can)`,
+                    test: String.raw`^(?:should|must|can)`
                 }
             }
         ]

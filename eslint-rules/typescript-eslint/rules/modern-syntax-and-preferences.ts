@@ -17,6 +17,8 @@
 import type { TSESLint } from '@typescript-eslint/utils'
 
 export const modernSyntaxAndPreferencesRules: TSESLint.Linter.RulesRecord = {
+    '@typescript-eslint/await-thenable': 'error',
+
     /*
      * Performance: Verhindert Side Effects bei Type Imports
      * ✅ ==== VERIFIED ====
@@ -46,7 +48,9 @@ export const modernSyntaxAndPreferencesRules: TSESLint.Linter.RulesRecord = {
     '@typescript-eslint/no-import-type-side-effects': 'error',
 
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
+
     '@typescript-eslint/prefer-optional-chain': 'error',
+
     '@typescript-eslint/prefer-readonly': 'error',
 
     // ✅ ==== VERIFIED ====
