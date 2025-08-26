@@ -26,6 +26,7 @@ export const commentsAndDocsRules: TSESLint.Linter.RulesRecord = {
         }
     ],
 
+    // ✅ ==== VERIFIED ====
     '@stylistic/linebreak-style': [
         'error',
         'unix'
