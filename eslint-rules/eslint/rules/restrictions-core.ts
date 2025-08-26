@@ -95,25 +95,38 @@ export const restrictionsCore = {
     'no-multi-assign': 'error',
 
     /*
-     * Modern hasOwn() over hasOwnProperty
-     * Variable & Parameter Management
+     * ✅ ==== VERIFIED ====
+     * Disallow reassigning/mutating function parameters.
+     * - props: true → verbietet auch Eigenschaftsänderungen (param.prop = ...).
+     * - ignorePropertyModificationsFor → eng begrenzte Whitelist für legitime Patterns (z. B. reduce-Accumulator, immer-Draft).
+     *   WICHTIG: req/res NICHT whitelisten (kein „silent augmentation“). Nutze stattdessen z. B. res.locals mit Typisierung.
      */
     'no-param-reassign': [
         'error',
         {
+
+            /*
+             * Erlaube NUR gezielte Patterns (Reduction / immer).
+             * Beispiel: arr.reduce((acc, x) => { acc.sum += x; return acc; }, { sum: 0 })
+             * Beispiel: produce(base, draft => { draft.value = 1 }) // immer-Draft
+             */
             ignorePropertyModificationsFor: [
                 'acc',
                 'accumulator',
-                'ctx',
-                'context',
-                'req',
-                'request',
-                'res',
-                'response',
-                'state'
+                'draft'
             ],
 
-            // Immutability best practice
+            /*
+             * Optional: Varianten whitelisten (z. B. _acc, draftSomething)
+             * Beispiel: reduce((acc_, x) => { acc_.sum++ })
+             * Beispiel: produce(base, draftState => { draftState.ok = true })
+             */
+            ignorePropertyModificationsForRegex: [
+                '^_?acc(umulator)?$',
+                '^draft'
+            ],
+
+            // Strikte Immutability auch für param-Eigenschaften (z. B. param.x = 1 ist verboten)
             props: true
         }
     ],
