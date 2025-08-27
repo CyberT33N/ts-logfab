@@ -1,25 +1,17 @@
 {
+
      /*
-     ✅ Verweist auf das TypeScript-Config-Schema.
-     - Hilft IDEs wie VS Code, bessere Autovervollständigung & Fehlerprüfung bereitzustellen.
-     */
-     "$schema": "https://json.schemastore.org/tsconfig",
+      *✅ Verweist auf das TypeScript-Config-Schema.
+      *- Hilft IDEs wie VS Code, bessere Autovervollständigung & Fehlerprüfung bereitzustellen.
+      */
+    "$schema": "https://json.schemastore.org/tsconfig",
+
           /*
-     * Extend the base TypeScript configuration
-     */
-     "extends": "./tsconfig.base.json",
-     /*
-     ✅ Welche Dateien TypeScript verarbeiten soll.
-     - `electron.vite.config.*` → Erlaubt TypeScript, die Vite-Konfigurationsdatei zu laden.
-     - `eslint.config.mjs` → Erlaubt TypeScript, die eslint.config.mjs-Datei zu laden.
-     - `src/main` → Alle Dateien im `main`-Prozess (Backend-Logik von Electron).
-     - `src/preload` → Alle Dateien im `preload`-Skript (Brücke zwischen Renderer & Main-Prozess).
-     - `src/preload/*.d.ts` → Alle Typdefinitionsdateien für den Preload-Prozess.
-     */
-     "include": [
-          "src/**/*",
-          "global.d.ts"
-     ],
+           * Extend the base TypeScript configuration
+           */
+    "extends": "./tsconfig.base.json",
+
+     
      "compilerOptions": {
           "baseUrl": ".",
           "paths": {
@@ -51,5 +43,18 @@
           "types": [
                "node"
           ]
-     }
-}
+     },
+     /*
+     ✅ Welche Dateien TypeScript verarbeiten soll.
+     - `electron.vite.config.*` → Erlaubt TypeScript, die Vite-Konfigurationsdatei zu laden.
+     - `eslint.config.mjs` → Erlaubt TypeScript, die eslint.config.mjs-Datei zu laden.
+     - `src/main` → Alle Dateien im `main`-Prozess (Backend-Logik von Electron).
+     - `src/preload` → Alle Dateien im `preload`-Skript (Brücke zwischen Renderer & Main-Prozess).
+     - `src/preload/*.d.ts` → Alle Typdefinitionsdateien für den Preload-Prozess.
+     */
+"include": [
+          "src/**/*",
+          "global.d.ts"
+     ]
+};
+

@@ -1,7 +1,7 @@
 {
-  "compilerOptions": {
+    "compilerOptions": {
 
-    /*
+        /*
      *✅ Eingebundene Standardbibliotheken.
      * VERFÜGBARE OPTIONEN:
      * - ES5: Core-Definitions für ES5
@@ -22,28 +22,28 @@
      *
      * AKTUELL VERWENDET: ES2023, DOM, DOM.Iterable
      */
-    "lib": [
-      "ES2023",
-      "DOM",
-      "DOM.Iterable"
-    ],
+        "lib": [
+            "ES2023",
+            "DOM",
+            "DOM.Iterable"
+        ],
 
-    /*
+        /*
      *✅ ECMAScript-Zielversion auf ES2023 gesetzt.
      *- Node.js 20.19 unterstützt ES2023 (siehe Electron 29 Docs)
      *  - https://compat-table.github.io/compat-table/es2016plus/
      *  - https://www.electronjs.org/docs/latest/tutorial/electron-timelines
      *- Keine automatische Downleveling-Transpilation nötig.
      */
-    "target": "ES2023",
+        "target": "ES2023",
 
-    /*
+        /*
      *✅ Klasseneigenschaften mit `Object.defineProperty` setzen.
      *- Wichtig für React/Vue, um sich wie standardmäßige JS-Klassen zu verhalten.
      */
-    "useDefineForClassFields": true,
+        "useDefineForClassFields": true,
 
-    /*
+        /*
      * ═══════════════════════════════════════════════════════════════
      * 📦 MODULE SYSTEM CONFIGURATION
      * ═══════════════════════════════════════════════════════════════
@@ -68,9 +68,9 @@
      * ✅ Kompatibel mit allen Bundlern (Vite, Webpack, esbuild)
      * ✅ Perfekte Balance zwischen modern und praktisch
      */
-    "module": "ESNext",
+        "module": "ESNext",
 
-    /*
+        /*
      * ═══════════════════════════════════════════════════════════════
      * 🔍 MODULE RESOLUTION STRATEGY
      * ═══════════════════════════════════════════════════════════════
@@ -109,135 +109,135 @@
      * ℹ️ Hintergrund: Einige populäre Packages funktionieren mit "node" nicht zuverlässig;
      *    "bundler" löst Exports/Imports korrekt und behält unsere extensionlosen TS-Imports bei.
      */
-    "moduleResolution": "bundler",
+        "moduleResolution": "bundler",
 
-    /*
+        /*
      *✅ Überspringt Typprüfung für Bibliotheken.
      *- Erhöht die Kompiliergeschwindigkeit.
      *- Sollte **deaktiviert** werden, wenn du unsichere Abhängigkeiten prüfst.
      */
-    "skipLibCheck": false,
+        "skipLibCheck": false,
 
-    /*
+        /*
      *✅ Erlaubt das Importieren von `.ts`-Dateien mit Erweiterung.
      *- Notwendig für TypeScript ES-Module (`import "./file.ts"`).
      */
-    "allowImportingTsExtensions": true,
+        "allowImportingTsExtensions": true,
 
-    /*
+        /*
      *✅ Erzwingt, dass jede `.ts`-Datei als ein isoliertes Modul behandelt wird.
      *- Erforderlich für den ESBuild- und Babel-Transpiler.
      */
-    "isolatedModules": true,
+        "isolatedModules": true,
 
-    /*
+        /*
      *✅ Erlaubt das Importieren von `.json`-Dateien.
      *- Ohne diese Option würde TypeScript einen Fehler werfen.
      */
-    "resolveJsonModule": true,
+        "resolveJsonModule": true,
 
-    /*
+        /*
      *✅ Deaktiviert die Ausgabe von `.js`-Dateien.
      *- Wichtig für TypeScript-only-Projekte oder wenn eine separate Build-Pipeline existiert.
      */
-    "noEmit": true,
+        "noEmit": true,
 
-    /*
+        /*
      *✅ Fehler werfen, wenn unbenutzte Variablen vorhanden sind.
      *- Hilft, toten Code zu vermeiden.
      */
-    "noUnusedLocals": true,
+        "noUnusedLocals": true,
 
-    /*
+        /*
      *✅ Aktiviert den "Strict Mode" für TypeScript.
      *- Hilft, viele potenzielle Fehler frühzeitig zu erkennen.
      */
-    "strict": true,
+        "strict": true,
 
-    /*
+        /*
      *✅ Fehler werfen, wenn unbenutzte Funktionsparameter vorhanden sind.
      *- Hilft, unnötigen Code zu reduzieren.
      */
-    "noUnusedParameters": true,
+        "noUnusedParameters": true,
 
-    /*
+        /*
      *✅ Fehler werfen, wenn `switch`-Statements Fälle ohne `break` haben.
      *- Verhindert unerwartetes Verhalten.
      */
-    "noFallthroughCasesInSwitch": true,
+        "noFallthroughCasesInSwitch": true,
 
-    /*
+        /*
      *✅ Erlaubt das Importieren von Modulen, die keinen `default`-Export haben.
      *- Nützlich für CommonJS-Module (`import fs from "fs"`).
      */
-    "allowSyntheticDefaultImports": true,
+        "allowSyntheticDefaultImports": true,
 
-    /*
+        /*
      *✅ Erlaubt Interoperabilität zwischen CommonJS und ES-Modulen.
      *- Falls du CJS (`require()`) und ESM (`import`) mischst, **essentiell**.
      */
-    "esModuleInterop": true,
+        "esModuleInterop": true,
 
-    /*
+        /*
      *⚠️ **Erzeugt Metadaten für Dekoratoren (z. B. für NestJS, TypeORM).**
      *- **Nur aktiv lassen, wenn du Reflection brauchst.**
      */
-    // "emitDecoratorMetadata": true,
-    /*
+        // "emitDecoratorMetadata": true,
+        /*
      *✅ Erlaubt experimentelle Dekoratoren (z. B. `@Injectable()` in NestJS).
      *- Dekoratoren sind noch nicht offiziell in JavaScript, daher "experimentell".
      */
-    "experimentalDecorators": true,
+        "experimentalDecorators": true,
 
-    /*
+        /*
      *✅ Erzwingt explizite Typdeklarationen (kein `any` erlaubt).
      *- Reduziert unerwartetes Verhalten durch dynamische Typen.
      */
-    "noImplicitAny": true,
+        "noImplicitAny": true,
 
-    /*
+        /*
      *✅ Erzwingt explizite Typdeklarationen (kein `any` erlaubt).
      *- Reduziert unerwartetes Verhalten durch dynamische Typen.
      */
-    "strictNullChecks": true,
+        "strictNullChecks": true,
 
-    /*
+        /*
      *✅ Deaktiviert Source Maps.
      *- Falls Debugging nötig ist, setze auf `true`.
      */
-    "sourceMap": true,
+        "sourceMap": true,
 
-    /*
+        /*
      *✅ Erzwingt konsistente Groß-/Kleinschreibung in Imports.
      *- Verhindert Bugs bei case-sensitive Dateisystemen (z. B. Linux).
      */
-    "forceConsistentCasingInFileNames": true,
+        "forceConsistentCasingInFileNames": true,
 
-    /*
+        /*
      *✅ Fehler werfen, wenn eine Funktion nicht explizit `return` hat.
      *- Verhindert Bugs durch unerwartete `undefined`-Rückgaben.
      */
-    "noImplicitReturns": true,
+        "noImplicitReturns": true,
 
-    /*
+        /*
      *✅ Basisverzeichnis für `paths`-Aliase.
      *- Erlaubt z. B. `import foo from "@/utils/foo"` statt `import foo from "../../utils/foo"`.
      */
-    "baseUrl": ".",
+        "baseUrl": ".",
 
-    /*
+        /*
      *✅ Definiert TypeScript-Module mit Aliassen.
      *- `@main/*` -> `src/main/*`
      *- `@/*` -> `src/*`
      *- Vermeidet tiefe, relative Import-Pfade.
      */
-    "paths": {
-      "@/*": ["src/*"],
-      "@test/*": ["test/*"]
-    }
-  },
-  "exclude": [
-    "node_modules", // Ignoriere den `node_modules`-Ordner (keine Typprüfung für Abhängigkeiten)
-    "out" // Ignoriere den `out`-Ordner (falls du Build-Output generierst)
-  ]
-}
+        "paths": {
+            "@/*": ["src/*"],
+            "@test/*": ["test/*"]
+        }
+    },
+    "exclude": [
+        "node_modules", // Ignoriere den `node_modules`-Ordner (keine Typprüfung für Abhängigkeiten)
+        "out" // Ignoriere den `out`-Ordner (falls du Build-Output generierst)
+    ]
+};
