@@ -35,10 +35,18 @@ export const complexityAndMetrics = {
         1
     ],
 
-    // Limit function parameters
+    /*
+     * ✅ ==== VERIFIED ====
+     * Rationale: Limit nesting to 3 to encourage early returns and flatter control flow,
+     * which reduces cognitive load and improves testability.
+     * Anhaltswerte: Große OSS‑Codebasen (z. B. Next.js, Vite, VS Code‑Erweiterungen)
+     * setzen stark auf Early‑Return/Guard‑Clauses und vermeiden tiefe Verschachtelung.
+     * Nicht alle erzwingen dies per Lint‑Regel, aber „≤ 3 Ebenen“ ist ein verbreiteter
+     * Enterprise‑Guardrail, der mit Clean‑Code‑Prinzipien konsistent ist.
+     */
     'max-depth': [
         'error',
-        { max: 4 }
+        { max: 3 }
     ],
 
     /*
@@ -73,12 +81,18 @@ export const complexityAndMetrics = {
     /*
      * Limit function complexity
      * ✅ ==== VERIFIED ====
+     * Rationale: 75 Zeilen balancieren Strenge und Pragmatismus in TypeScript‑Code.
+     * 50 ist für Enterprise‑Servicecode (mit Type Guards, Error‑Handling, Logs) oft zu
+     * eng; 100 lässt zu viel Monolithik zu. 75 fördert Single‑Responsibility und
+     * Refactoring ohne übermäßig zu blockieren.
+     * Anhaltswerte: Viele größere OSS‑Repos und Unternehmensconfigs bewegen sich in
+     * der Spanne 50–100; ~75 ist ein gängiger Mittelwert in kuratierten ESLint‑Configs.
      */
     'max-lines-per-function': [
         'error',
         {
             IIFEs: true,
-            max: 50,
+            max: 75,
             skipBlankLines: true,
             skipComments: true
         }
@@ -101,11 +115,7 @@ export const complexityAndMetrics = {
 
     /*
      * ✅ ==== VERIFIED ====
-     * We use sonarjs/cognitive-complexity
-     * and we don't want to limit the number of statements
+     * Prefer sonarjs/cognitive-complexity over max-statements
      */
-    'max-statements': [
-        'error',
-        COMPLEXITY_MAX
-    ]
+    'max-statements': 'off'
 } satisfies TSESLint.Linter.RulesRecord
