@@ -89,9 +89,7 @@ export const modernSyntaxAndPreferencesRules: TSESLint.Linter.RulesRecord = {
                 },
                 {
                     from: 'package',
-                    name: [
-                        'Router'
-                    ],
+                    name: ['Router'],
                     package: 'express'
                 }
             ],
