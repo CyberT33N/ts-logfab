@@ -35,31 +35,95 @@ export const restrictionsExtended = {
         }
     ],
 
+    /*
+     * ✅ ==== VERIFIED ====
+     * no-restricted-syntax (Enterprise/OSS best practice)
+     * Rationale: Verbietet riskante/überholte Syntaxmuster (ES2024‑Konsens),
+     * die Lesbarkeit, Sicherheit oder Tooling beeinträchtigen.
+     * Anhaltswerte: Verbreitet in großen Repos (z. B. Next.js/TS‑Repos vermeiden
+     * Namespaces, Enums; ESM statt import=; kein new Function/eval; klare setTimeout‑Signaturen).
+     */
     'no-restricted-syntax': [
         'error',
+
+        /*
+         * ✅ ==== VERIFIED ====
+         */
         {
             message: 'Use for...of or Object.keys/entries/values instead',
             selector: 'ForInStatement'
         },
-        {
-            message: 'With statements are not allowed',
-            selector: 'WithStatement'
-        },
+
+        /*
+         * With: abgedeckt durch no-with, hier redundant → entfernt (siehe unten)
+         * {
+         *     message: 'With statements are not allowed',
+         *     selector: 'WithStatement'
+         * },
+         * eval: sicherheitskritisch
+         */
         {
             message: 'eval() is not allowed for security reasons',
             selector: 'CallExpression[callee.name="eval"]'
         },
+
+        // New Function: dynamische Code-Evaluation
+        {
+            message: 'Avoid dynamic code evaluation (new Function)',
+            selector: 'NewExpression[callee.name="Function"]'
+        },
+
+        // Object.assign({}, …) → Spread bevorzugen
         {
             message: 'Use object spread instead of Object.assign with object literal',
             selector: 'CallExpression[callee.property.name="assign"][callee.object.name="Object"][arguments.0.type="ObjectExpression"]'
         },
+
+        // Default-Export verbieten (Namens-Exports fördern Tooling/Refactors)
         {
             message: 'Default exports are forbidden. Use named exports.',
             selector: 'ExportDefaultDeclaration'
+        },
+
+        // TypeScript: Namespaces sind in ES‑Modulen veraltet → Module/Imports nutzen
+        {
+            message: 'TypeScript namespaces are discouraged in ES modules. Use imports instead.',
+            selector: 'TSModuleDeclaration'
+        },
+
+        // TypeScript: import = require() → ESM‑Importe verwenden
+        {
+            message: 'Prefer ES module imports over import = require()',
+            selector: 'TSImportEqualsDeclaration'
+        },
+
+        // TypeScript: Enums vermeiden (stattdessen string/number unions oder as-const Objects)
+        {
+            message: 'Avoid TypeScript enum. Prefer union types or const objects.',
+            selector: 'TSEnumDeclaration'
+        },
+
+        // TypeScript: Non-null assertion (!) vermeiden; Narrowing/Optional Chaining nutzen
+        {
+            message: 'Avoid non-null assertion. Use type narrowing or optional chaining.',
+            selector: 'TSNonNullExpression'
+        },
+
+        // SetTimeout/setInterval: immer [fn, delay]
+        {
+            message: 'setTimeout must be invoked with [handler, delay] arguments.',
+            selector: 'CallExpression[callee.name="setTimeout"][arguments.length!=2]'
+        },
+        {
+            message: 'setInterval must be invoked with [handler, delay] arguments.',
+            selector: 'CallExpression[callee.name="setInterval"][arguments.length!=2]'
         }
     ],
 
-    // ❌ REDUNDANT: Übernommen von @typescript-eslint/no-return-await
+    /*
+     * ✅ ==== VERIFIED ====
+     * ❌ REDUNDANT: Übernommen von @typescript-eslint/no-return-await
+     */
     'no-return-await': 'off',
 
     // Prevents new Function() constructor
