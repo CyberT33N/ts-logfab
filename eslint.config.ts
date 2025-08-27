@@ -678,7 +678,16 @@ const config = tseslint.config(
     configOverrides.all,
 
     /* ═══╡ 📘 TYPESCRIPT DECLARATION OVERRIDES ╞═══ */
-    tsDeclarationOverrides.all
+    tsDeclarationOverrides.all,
+
+    /* ═══╡ 📘 PACKAGE JSON OVERRIDES ╞═══ */
+    {
+        files: ['**/package.json'],
+        name: 'enterprise/overrides:eslint-rules-package-json',
+        rules: {
+            'sort-keys-fix/sort-keys-fix': 'off'
+        }
+    }
 )
 
 export default config
