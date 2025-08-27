@@ -143,8 +143,8 @@ const sonarjsRules: {
         'sonarjs/no-ignored-return': 'error',
 
         /*
-         * String darf max 2x vorkommen
-         * ===== TYPE SAFETY & ARCHITECTURE =====
+         * ✅ ==== VERIFIED ====
+         * Verhindert implizite Abhängigkeiten
          */
         'sonarjs/no-implicit-dependencies': 'error',
 
