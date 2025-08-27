@@ -26,7 +26,10 @@ const unicornRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
-        // ✅ ==== VERIFIED ====
+        /*
+         * ✅ ==== VERIFIED ====
+         * Do not use default exports and then you use always kebab-case
+         */
         'unicorn/filename-case': [
             'error',
             {
