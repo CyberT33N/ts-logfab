@@ -86,6 +86,13 @@ export const modernSyntaxAndPreferencesRules: TSESLint.Linter.RulesRecord = {
                         'NextFunction'
                     ],
                     package: 'express'
+                },
+                {
+                    from: 'package',
+                    name: [
+                        'Router'
+                    ],
+                    package: 'express'
                 }
             ],
 
