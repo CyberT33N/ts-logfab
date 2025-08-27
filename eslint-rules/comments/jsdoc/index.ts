@@ -253,7 +253,10 @@ const jsdocRules: {
         'jsdoc/require-returns-description': 'error',
         'jsdoc/require-returns-type': 'off',
         'jsdoc/require-template': 'error',
-        'jsdoc/require-throws': ['warn'],
+
+        // ✅ ==== VERIFIED ====
+        'jsdoc/require-throws': ['error'],
+
         'jsdoc/require-yields': 'error',
         'jsdoc/require-yields-check': 'error',
 
