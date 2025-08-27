@@ -22,6 +22,7 @@ import tsdoc from 'eslint-plugin-tsdoc'
 import eslintPluginTypescriptSortKeys from 'eslint-plugin-typescript-sort-keys'
 import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint, { parser as tseslintParser } from 'typescript-eslint'
+import eslintPluginZod from 'eslint-plugin-zod'
 
 import { configs as sonarjsConfigs } from './eslint-rules/clean-code/sonarjs'
 import { configs as unicornConfigs } from './eslint-rules/clean-code/unicorn'
@@ -650,6 +651,22 @@ const config = tseslint.config(
             ]
         }
     },
+
+      /*
+     *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     *🔧 ZOD   ►  Zod rules and configuration
+     *╰───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───
+     */
+     {
+          plugins: {
+              'zod': eslintPluginZod
+          },
+          "rules": {
+            "zod/prefer-enum": 2,
+            "zod/require-strict": 2
+          }
+      },
+  
 
     /*
      *╭───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───═══◎◎◎═══───

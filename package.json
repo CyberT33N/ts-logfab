@@ -94,6 +94,7 @@
         "eslint-plugin-unused-imports": "~4.1.4",
         "eslint-plugin-vitest": "~0.5.4",
         "eslint-plugin-xss": "~0.1.12",
+        "eslint-plugin-zod": "^1.4.0",
         "husky": "~9.1.7",
         "jiti": "~2.5.1",
         "pino-pretty": "~13.0.0",
