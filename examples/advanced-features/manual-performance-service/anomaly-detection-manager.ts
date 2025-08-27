@@ -23,7 +23,9 @@ import { setTimeout } from 'node:timers/promises'
 
 import cryptoRandomString from 'crypto-random-string'
 
-import { getPerformanceBaseline, trackMethodPerformance } from '@/logger/performance'
+import {
+    getPerformanceBaseline, trackMethodPerformance
+} from '@/logger/performance'
 import { toWritable } from '@/utils/data-utils'
 
 /*
@@ -51,10 +53,10 @@ import type { ReadonlyDeep } from 'type-fest'
  */
 export interface AnomalyDetectionResult {
     /** The raw execution result of the performance anomaly detection operation. */
-    executionResult: number
+    readonly executionResult: number
 
     /** The performance baseline for the operation. */
-    performanceBaseline: ReturnType<typeof getPerformanceBaseline>
+    readonly performanceBaseline: ReturnType<typeof getPerformanceBaseline>
 
     /** The tracking result of the performance anomaly detection operation. */
     trackingResult: ReturnType<typeof trackMethodPerformance>
@@ -295,15 +297,21 @@ export class AnomalyDetectionManager {
     public readonly performWithAnomalyDetection = async (
         methodName: string, iterations: number
     ): Promise<AnomalyDetectionResult> => {
-        const { startTime, startMemory } = AnomalyDetectionManager.#initializePerformanceMeasurement()
+        const {
+            startTime, startMemory
+        } = AnomalyDetectionManager.#initializePerformanceMeasurement()
 
         const executionResult = await AnomalyDetectionManager.#executeComputationalOperation(iterations)
 
-        const { duration, memoryDelta } = AnomalyDetectionManager.#calculatePerformanceMetrics(
+        const {
+            duration, memoryDelta
+        } = AnomalyDetectionManager.#calculatePerformanceMetrics(
             startTime, startMemory
         )
 
-        const { trackingResult, performanceBaseline } = AnomalyDetectionManager.#retrievePerformanceData(
+        const {
+            trackingResult, performanceBaseline
+        } = AnomalyDetectionManager.#retrievePerformanceData(
             methodName,
             duration,
             memoryDelta

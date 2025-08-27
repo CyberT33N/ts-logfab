@@ -14,28 +14,30 @@
  */
 
 // ==== Imports ====
-import { AnomalyDetectionManager } from './anomaly-detection-manager.ts'
-import { configurePerformanceMonitoring  } from './configuration-manager'
-import type {ConfigurationResult} from './configuration-manager';
-import { PerformanceHelpers, type IPerformanceHelpers } from './PerformanceHelpers.ts'
-import { PerformanceMarksManager ,type  IPerformanceMarksResult } from './PerformanceMarksManager.ts'
+import { AnomalyDetectionManager } from './anomaly-detection-manager'
+import { configurePerformanceMonitoring } from './configuration-manager'
 
-import { PerformanceSnapshotManager } from './PerformanceSnapshotManager.ts'
+import { PerformanceHelpers } from './PerformanceHelpers'
 
+import { PerformanceMarksManager } from './PerformanceMarksManager'
 
-import {
-    StatisticsManager
- 
- 
-} from './StatisticsManager.ts'
-import type { IAnomalyDetectionResult } from './anomaly-detection-manager.ts'
-import type { IPerformanceSnapshotResult } from './PerformanceSnapshotManager.ts'
-import type { IPerformanceStatistics, IClearResult } from './StatisticsManager.ts'
+import { PerformanceSnapshotManager } from './PerformanceSnapshotManager'
+
+import { StatisticsManager } from './StatisticsManager'
+
+import type { AnomalyDetectionResult } from './anomaly-detection-manager'
+import type { ConfigurationResult } from './configuration-manager'
+import type { IPerformanceHelpers } from './PerformanceHelpers'
+import type { IPerformanceMarksResult } from './PerformanceMarksManager'
+import type { IPerformanceSnapshotResult } from './PerformanceSnapshotManager'
+import type {
+    IPerformanceStatistics, IClearResult
+} from './StatisticsManager'
 
 // Re-export types for external use
 
 /**
- * ⚡ **Manual Performance Service**
+ * ⚡ **Manual Performance Service**.
  *
  * @remarks
  * This comprehensive service serves as a unified facade and composition root for all manual
@@ -59,7 +61,6 @@ import type { IPerformanceStatistics, IClearResult } from './StatisticsManager.t
  * - Comprehensive performance baseline establishment
  * - Advanced anomaly detection with configurable thresholds
  * - Historical performance trend analysis
- *
  * @example
  * Comprehensive performance monitoring workflow:
  * ```typescript
@@ -99,7 +100,6 @@ import type { IPerformanceStatistics, IClearResult } from './StatisticsManager.t
  * const clearResult = performanceService.clearAllPerformanceData();
  * console.log(`Cleared ${clearResult.clearedOperations.length} operations`);
  * ```
- *
  * @see {@link PerformanceMarksManager} for manual marks and measures
  * @see {@link PerformanceSnapshotManager} for snapshot-based monitoring
  * @see {@link AnomalyDetectionManager} for anomaly detection capabilities
@@ -107,20 +107,38 @@ import type { IPerformanceStatistics, IClearResult } from './StatisticsManager.t
  * @see {@link StatisticsManager} for analytics and data management
  */
 export class ManualPerformanceService {
+    /**
+     * The performance log for all operations.
+     */
     private readonly _performanceLog: {
         metrics: Record<string, unknown>
         operation: string
         timestamp: Date
     }[] = []
 
+    /**
+     * The manager for manual performance marks and measures.
+     */
     private readonly _marksManager: PerformanceMarksManager
 
+    /**
+     * The manager for performance snapshots.
+     */
     private readonly _snapshotManager: PerformanceSnapshotManager
 
+    /**
+     * The manager for anomaly detection.
+     */
     private readonly _anomalyManager: AnomalyDetectionManager
 
+    /**
+     * The manager for statistics and analytics.
+     */
     private readonly _statsManager: StatisticsManager
 
+    /**
+     * The manager for performance helpers.
+     */
     private readonly _helpers: IPerformanceHelpers
 
     /**
@@ -141,7 +159,7 @@ export class ManualPerformanceService {
      * 📊 **Shared State:** All managers share a common performance log to enable
      * comprehensive cross-operation analysis and unified reporting.
      */
-    public constructor() {
+    constructor() {
         this._helpers = new PerformanceHelpers()
         this._marksManager = new PerformanceMarksManager(this._performanceLog)
         this._snapshotManager = new PerformanceSnapshotManager(
@@ -164,9 +182,7 @@ export class ManualPerformanceService {
      * This method applies enterprise-grade performance monitoring configuration including
      * sophisticated anomaly detection algorithms, baseline tracking, threshold management,
      * and comprehensive reporting capabilities.
-     *
-     * @returns Configuration result with previous and newly applied performance monitoring settings
-     *
+     * @returns Configuration result with previous and newly applied performance monitoring settings.
      * @see {@link configurePerformanceMonitoring} for configuration details
      */
     public static configurePerformanceMonitoring(): ConfigurationResult {
@@ -191,12 +207,9 @@ export class ManualPerformanceService {
      * - Precise timing analysis for performance optimization
      * - GC impact assessment on operation performance
      * - Detailed performance profiling for critical operations
-     *
-     * @param taskName - Unique identifier for the operation (used in performance mark names)
-     * @param iterations - Number of computational iterations to perform
-     *
-     * @returns Promise resolving to comprehensive performance results with marks, measures, and GC data
-     *
+     * @param taskName - Unique identifier for the operation (used in performance mark names).
+     * @param iterations - Number of computational iterations to perform.
+     * @returns Promise resolving to comprehensive performance results with marks, measures, and GC data.
      * @see {@link PerformanceMarksManager.performWithManualMarks} for implementation details
      */
     public async performWithManualMarks(
@@ -225,13 +238,10 @@ export class ManualPerformanceService {
      * - System performance state before and after execution
      * - Calculated differences in resource usage
      * - Memory, CPU, and timing delta analysis
-     *
-     * @param operationName - Unique identifier for the operation being monitored
-     * @param workload - Workload parameter passed to the performance helper operation
-     *
+     * @param operationName - Unique identifier for the operation being monitored.
+     * @param workload - Workload parameter passed to the performance helper operation.
      * @returns Promise resolving to performance snapshot results with before/after states
-     * and calculated performance differences
-     *
+     * and calculated performance differences.
      * @see {@link PerformanceSnapshotManager.performWithSnapshots} for implementation details
      */
     public async performWithSnapshots(
@@ -261,18 +271,15 @@ export class ManualPerformanceService {
      * - Threshold violation detection for duration and memory
      * - Outlier identification using standard deviation analysis
      * - Performance trend analysis and deviation reporting
-     *
-     * @param methodName - Unique identifier for the operation being monitored
-     * @param iterations - Number of computational iterations to perform
-     *
+     * @param methodName - Unique identifier for the operation being monitored.
+     * @param iterations - Number of computational iterations to perform.
      * @returns Promise resolving to anomaly detection results with execution data,
-     * detected anomalies, and baseline comparison information
-     *
+     * detected anomalies, and baseline comparison information.
      * @see {@link AnomalyDetectionManager.performWithAnomalyDetection} for implementation details
      */
     public async performWithAnomalyDetection(
         methodName: string, iterations: number
-    ): Promise<IAnomalyDetectionResult> {
+    ): Promise<AnomalyDetectionResult> {
         return await this._anomalyManager.performWithAnomalyDetection(
             methodName, iterations
         )
@@ -291,10 +298,8 @@ export class ManualPerformanceService {
      * This method provides detailed analytics including performance baselines, anomaly
      * statistics, operation counts, and historical performance trends across all
      * tracked operations.
-     *
      * @returns Comprehensive performance statistics including baselines, anomaly data,
-     * and operational metrics
-     *
+     * and operational metrics.
      * @see {@link StatisticsManager.getPerformanceStatistics} for statistics details
      */
     public getPerformanceStatistics(): IPerformanceStatistics {
@@ -308,9 +313,7 @@ export class ManualPerformanceService {
      * This method performs a comprehensive cleanup of all performance monitoring data,
      * including operation logs, established baselines, and anomaly detection history.
      * Useful for resetting performance monitoring state or cleaning up test data.
-     *
-     * @returns Clear operation results with details of cleared data categories
-     *
+     * @returns Clear operation results with details of cleared data categories.
      * @see {@link StatisticsManager.clearAllPerformanceData} for cleanup details
      */
     public clearAllPerformanceData(): IClearResult {
@@ -330,10 +333,8 @@ export class ManualPerformanceService {
      * This method provides read-only access to the comprehensive performance log that
      * captures all operations performed across all manager instances. Useful for
      * detailed analysis, debugging, and custom reporting.
-     *
      * @returns Read-only array of all performance log entries with operation details,
-     * metrics, and timestamps
-     *
+     * metrics, and timestamps.
      * @see {@link StatisticsManager.getPerformanceLog} for log access details
      */
     public getPerformanceLog(): readonly {
@@ -345,9 +346,11 @@ export class ManualPerformanceService {
     }
 }
 
-export { type IAnomalyDetectionResult } from './anomaly-detection-manager.ts'
-export { type ConfigurationResult } from './configuration-manager.ts'
-export { type IPerformanceHelpers } from './PerformanceHelpers.ts'
-export { type IPerformanceMarksResult } from './PerformanceMarksManager.ts'
-export { type IPerformanceSnapshotResult } from './PerformanceSnapshotManager.ts'
-export { type IClearResult, type IPerformanceStatistics } from './StatisticsManager.ts'
+export { type AnomalyDetectionResult } from './anomaly-detection-manager'
+export { type ConfigurationResult } from './configuration-manager'
+export { type IPerformanceHelpers } from './PerformanceHelpers'
+export { type IPerformanceMarksResult } from './PerformanceMarksManager'
+export { type IPerformanceSnapshotResult } from './PerformanceSnapshotManager'
+export {
+    type IClearResult, type IPerformanceStatistics
+} from './StatisticsManager'

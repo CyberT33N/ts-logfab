@@ -75,6 +75,7 @@ const createEnterpriseOverrides = (): TSESLint.FlatConfig.ConfigArray => [
     {
         files: [
             'src/**/index.ts',
+            'examples/**/index.ts',
             'test/**/*.{ts,tsx,js,mjs,cjs}',
             '**/*.test.{ts,tsx,js}',
             '**/*.spec.{ts,tsx,js}'

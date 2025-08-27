@@ -66,10 +66,10 @@ const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB
  */
 export interface ConfigurationResult {
     /** The previous configuration state. */
-    previousConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
+    readonly previousConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
 
     /** The newly applied configuration. */
-    updatedConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
+    readonly updatedConfig: ReturnType<typeof getEnterprisePerformanceConfiguration>
 }
 
 /**

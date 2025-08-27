@@ -67,6 +67,9 @@ export const additionalTypescriptRulesConfig: TSESLint.FlatConfig.Config = {
 const createTypescriptEslintOverrides = (): TSESLint.FlatConfig.ConfigArray => [
     {
         files: [
+            '**/*.mjs',
+            '**/*.cjs',
+            '**/*.js',
             '**/*.json',
             '**/*.jsonc',
             '**/*.json5'
