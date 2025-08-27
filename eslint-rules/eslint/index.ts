@@ -96,6 +96,13 @@ const createEnterpriseOverrides = (): TSESLint.FlatConfig.ConfigArray => [
         rules: {
             'id-length': 'off'
         }
+    },
+    {
+        files: ['**/*.json'],
+        name: 'enterprise/overrides:eslint-rules-package-json',
+        rules: {
+            'sort-keys': 'off'
+        }
     }
 ]
 
