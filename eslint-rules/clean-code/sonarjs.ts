@@ -19,6 +19,9 @@ import sonarjs from 'eslint-plugin-sonarjs'
 // ==== TYPES ====
 import type { TSESLint } from '@typescript-eslint/utils'
 
+// ==== CONSTANTS ====
+const COMPLEXITY_MAX = 15
+
 /**
  * Enhanced SonarJS rules configuration.
  */
@@ -26,11 +29,25 @@ const sonarjsRules: {
     rules: TSESLint.Linter.RulesRecord
 } = {
     rules: {
+
         // Prüft implizite Dependencies
         'sonarjs/arguments-usage': 'error',
 
         // Erzwingt else-Block für Vollständigkeit
         'sonarjs/bool-param-default': 'error',
+
+        /*
+         * ✅ ==== VERIFIED ====
+         * Cognitive Complexity (Sonar way): 15
+         * Rationale: We align with Sonar's widely adopted default used across
+         * Enterprise und großen OSS‑Projekten (z. B. Konfigurationen, die auf
+         * SonarCloud/SonarQube „Sonar way“ basieren). Fördert Aufteilung großer
+         * Funktionen und flache Kontrollflüsse ohne übermäßig zu blockieren.
+         */
+        'sonarjs/cognitive-complexity': [
+            'error',
+            COMPLEXITY_MAX
+        ],
 
         /*
          * ✅ ==== VERIFIED ====
@@ -48,7 +65,16 @@ const sonarjsRules: {
          * ===== CODE MAINTAINABILITY (Google/Microsoft Standards) =====
          * 'sonarjs/max-lines': ['error', { maximum: 400 }], // covered by eslint/max-lines
          */
-        'sonarjs/expression-complexity': 'error',
+        /*
+         * ✅ ==== VERIFIED ====
+         * Ausdruckskomplexität begrenzen, um schwer wartbare Ausdrücke zu vermeiden.
+         * Rationale: Ergänzt kognitive Komplexität auf Ausdrucksebene (viele Operatoren,
+         * verschachtelte Ternaries). In großen OSS‑Repos üblich, wo Lesbarkeit priorisiert wird.
+         */
+        'sonarjs/expression-complexity': [
+            'error',
+            { max: 3 }
+        ],
 
         /*
          * Return direkt statt Variable
@@ -70,6 +96,12 @@ const sonarjsRules: {
         'sonarjs/jsx-no-leaked-render': 'error',
 
         // Keine verschachtelten switch
+        /*
+         * ✅ ==== VERIFIED ====
+         * Max 3 Ebenen Verschachtelung im Kontrollfluss.
+         * Rationale: Entspricht unserem 'max-depth'‑Leitwert und Clean‑Code‑Empfehlungen.
+         * Reduziert kognitive Last und erleichtert Tests/Refactoring.
+         */
         'sonarjs/nested-control-flow': [
             'error',
             { maximumNestingLevel: 3 }
@@ -82,6 +114,11 @@ const sonarjsRules: {
         'sonarjs/no-collapsible-if': 'error',
 
         // Verhindert überkomplexe Ausdrücke
+        /*
+         * ✅ ==== VERIFIED ====
+         * Duplikate von String-Literalen reduzieren (threshold=3 ist verbreitet),
+         * fördert Konstanten/Enums. Üblich in größeren Codebasen zur Wartbarkeit.
+         */
         'sonarjs/no-duplicate-string': [
             'error',
             { threshold: 3 }
@@ -130,7 +167,6 @@ const sonarjsRules: {
         // Vereinfacht verschachtelte if-Statements
         'sonarjs/prefer-object-literal': 'error',
 
-        // Max 3 Ebenen Verschachtelung
         /*
          * ===== REGEX SAFETY (Performance & Security) =====
          * ENTERPRISE: regexp Plugin hat spezialisiertere Regex-Prüfungen
