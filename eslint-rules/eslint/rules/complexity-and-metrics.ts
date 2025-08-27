@@ -99,7 +99,11 @@ export const complexityAndMetrics = {
         { max: 3 }
     ],
 
-    // Limit callback nesting
+    /*
+     * ✅ ==== VERIFIED ====
+     * We use sonarjs/cognitive-complexity
+     * and we don't want to limit the number of statements
+     */
     'max-statements': [
         'error',
         COMPLEXITY_MAX
