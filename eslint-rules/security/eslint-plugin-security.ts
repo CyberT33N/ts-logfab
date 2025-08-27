@@ -41,14 +41,14 @@ const securityRules: {
 
         /*
          * ✅ ==== VERIFIED ====
-          * Enterprise: Enforce object-injection prevention on server code.
-          * Industry practice: Large backends treat dynamic bracket access `object[expression]`
-          * as an injection sink and escalate to "error" (OWASP A01: Injection).
-          * Rationale: Prevents reads/writes via untrusted keys and improves auditability.
-          * Scope: Apply in server-side paths via ESLint overrides; not necessary for pure UI paths.
-          * Implementation guidance:
-          *  - Prefer Object.entries(...) + destructuring instead of `object[key]`
-          *  - Use precise types (e.g., generics for import.meta.glob) instead of type casts
+         * Enterprise: Enforce object-injection prevention on server code.
+         * Industry practice: Large backends treat dynamic bracket access `object[expression]`
+         * as an injection sink and escalate to "error" (OWASP A01: Injection).
+         * Rationale: Prevents reads/writes via untrusted keys and improves auditability.
+         * Scope: Apply in server-side paths via ESLint overrides; not necessary for pure UI paths.
+         * Implementation guidance:
+         *  - Prefer Object.entries(...) + destructuring instead of `object[key]`
+         *  - Use precise types (e.g., generics for import.meta.glob) instead of type casts
          */
         'security/detect-object-injection': 'error',
 
