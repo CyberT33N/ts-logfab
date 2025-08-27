@@ -62,6 +62,13 @@ const createStylisticOverrides = (): TSESLint.FlatConfig.ConfigArray => [
         rules: {
             '@stylistic/max-len': 'off'
         }
+    },
+    {
+        files: ['**/*.json'],
+        name: 'enterprise/overrides:stylistic-rules-json',
+        rules: {
+            '@stylistic/semi': 'off'
+        }
     }
 ]
 

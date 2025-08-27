@@ -115,7 +115,7 @@ const createUnicornOverrides = (): TSESLint.FlatConfig.ConfigArray => [
     },
     {
         files: ['**/*.json'],
-        name: 'enterprise/clean-code/unicorn-overrides:eslint-rules',
+        name: 'enterprise/clean-code/unicorn-overrides:eslint-rules-json',
         rules: { 'unicorn/prefer-string-raw': 'off' }
     }
 ]
