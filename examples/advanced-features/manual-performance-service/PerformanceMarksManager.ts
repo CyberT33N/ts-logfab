@@ -15,7 +15,7 @@
 
 // ==== Imports ====
 import { setTimeout } from 'node:timers/promises'
-import { ReadonlyDeep } from 'type-fest'
+
 import {
     createPerformanceMark,
     createPerformanceMeasure,
@@ -24,6 +24,8 @@ import {
     getPerformanceMeasures
 } from '@/logger/performance/utils/index.ts'
 import { toWritable } from '@/utils/data-utils.ts'
+
+import type { ReadonlyDeep } from 'type-fest'
 
 /**
  * 📊 Result structure for manual performance marks and measurements operations.
@@ -37,18 +39,17 @@ import { toWritable } from '@/utils/data-utils.ts'
  * - **Marks:** Start/end timing markers for operation boundaries
  * - **Measures:** Calculated durations between performance marks
  * - **GC Data:** Garbage collection events that occurred during execution
- *
  * @see {@link createPerformanceMark} for mark creation utilities
  * @see {@link createPerformanceMeasure} for measure calculation utilities
  * @see {@link getGCPerformanceData} for garbage collection monitoring
  */
 export interface IPerformanceMarksResult {
-    result: number
     performanceData: {
+        gcData: PerformanceEntry[]
         marks: PerformanceEntry[]
         measures: PerformanceEntry[]
-        gcData: PerformanceEntry[]
     }
+    result: number
 }
 
 /**
@@ -70,7 +71,6 @@ export interface IPerformanceMarksResult {
  * - Precise timing analysis for optimization efforts
  * - GC impact assessment on performance
  * - Performance regression detection through historical comparison
- *
  * @example
  * Basic usage for manual performance tracking:
  * ```typescript
@@ -90,15 +90,14 @@ export interface IPerformanceMarksResult {
  *   console.log(`Execution duration: ${durationMeasure.duration}ms`);
  * }
  * ```
- *
  * @see {@link IPerformanceMarksResult} for return value structure
  * @see {@link createPerformanceMark} for underlying mark creation
  * @see {@link createPerformanceMeasure} for measure calculation
  */
 export class PerformanceMarksManager {
-    private readonly _performanceLog: {
-        operation: string
+    readonly #performanceLog: {
         metrics: Record<string, unknown>
+        operation: string
         timestamp: Readonly<Date>
     }[]
 
@@ -108,18 +107,17 @@ export class PerformanceMarksManager {
      * @remarks
      * The manager uses the provided historical performance log to maintain context
      * for performance trend analysis and baseline establishment.
-     *
      * @param performanceLog - Historical performance data used for trend analysis
      * and performance comparison. This log accumulates data across multiple operations.
      */
-    public constructor(
+    constructor(
         performanceLog: ReadonlyDeep<{
-            readonly operation: string
             readonly metrics: Record<string, unknown>
+            readonly operation: string
             readonly timestamp: Readonly<Date>
         }[]>
     ) {
-        this._performanceLog = toWritable(
+        this.#performanceLog = toWritable(
             performanceLog
         )
     }
@@ -142,13 +140,10 @@ export class PerformanceMarksManager {
      * ⚡ **Computational Workload:** The operation performs mathematical calculations
      * with periodic delays to simulate realistic processing patterns and allow GC
      * events to occur naturally.
-     *
-     * @param taskName - Unique identifier for the operation (used in performance mark names)
-     * @param iterations - Number of computational iterations to perform (affects execution time)
-     *
+     * @param taskName - Unique identifier for the operation (used in performance mark names).
+     * @param iterations - Number of computational iterations to perform (affects execution time).
      * @returns Promise resolving to comprehensive performance results including
-     * computational result and detailed performance measurement data
-     *
+     * computational result and detailed performance measurement data.
      * @example
      * Executing operation with detailed performance tracking:
      * ```typescript
@@ -174,7 +169,6 @@ export class PerformanceMarksManager {
      *   });
      * }
      * ```
-     *
      * @see {@link IPerformanceMarksResult} for detailed return value structure
      * @see {@link createPerformanceMark} for mark creation implementation
      * @see {@link createPerformanceMeasure} for measure calculation
@@ -198,7 +192,7 @@ export class PerformanceMarksManager {
                 i
             ) * Math.random()
 
-            if (i % 10000 === 0) {
+            if (i % 10_000 === 0) {
                 await setTimeout(
                     1
                 )
@@ -219,27 +213,27 @@ export class PerformanceMarksManager {
         const measures = getPerformanceMeasures()
         const gcData = getGCPerformanceData()
 
-        this._performanceLog.push(
+        this.#performanceLog.push(
             {
-                operation: taskName,
                 metrics: {
-                    result,
+                    gcEventsCount: gcData.length,
                     iterations,
                     marksCount: marks.length,
                     measuresCount: measures.length,
-                    gcEventsCount: gcData.length
+                    result
                 },
+                operation: taskName,
                 timestamp: new Date()
             }
         )
 
         return {
-            result,
             performanceData: {
+                gcData,
                 marks,
-                measures,
-                gcData
-            }
+                measures
+            },
+            result
         }
     }
 }

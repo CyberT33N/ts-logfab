@@ -17,19 +17,18 @@
 import { AnomalyDetectionManager } from './anomaly-detection-manager'
 import { configurePerformanceMonitoring } from './configuration-manager'
 
-import { PerformanceHelpers } from './PerformanceHelpers'
+import { PerformanceHelpers } from './performance-helpers'
 
+import { PerformanceSnapshotManager } from './performance-snapshot-manager'
 import { PerformanceMarksManager } from './PerformanceMarksManager'
-
-import { PerformanceSnapshotManager } from './PerformanceSnapshotManager'
 
 import { StatisticsManager } from './StatisticsManager'
 
 import type { AnomalyDetectionResult } from './anomaly-detection-manager'
 import type { ConfigurationResult } from './configuration-manager'
-import type { IPerformanceHelpers } from './PerformanceHelpers'
+import type { PerformanceHelpers } from './performance-helpers'
+import type { PerformanceSnapshotResult } from './performance-snapshot-manager'
 import type { IPerformanceMarksResult } from './PerformanceMarksManager'
-import type { IPerformanceSnapshotResult } from './PerformanceSnapshotManager'
 import type {
     IPerformanceStatistics, IClearResult
 } from './StatisticsManager'
@@ -110,7 +109,7 @@ export class ManualPerformanceService {
     /**
      * The performance log for all operations.
      */
-    private readonly _performanceLog: {
+    readonly #performanceLog: {
         metrics: Record<string, unknown>
         operation: string
         timestamp: Date
@@ -119,27 +118,27 @@ export class ManualPerformanceService {
     /**
      * The manager for manual performance marks and measures.
      */
-    private readonly _marksManager: PerformanceMarksManager
+    readonly #marksManager: PerformanceMarksManager
 
     /**
      * The manager for performance snapshots.
      */
-    private readonly _snapshotManager: PerformanceSnapshotManager
+    readonly #snapshotManager: PerformanceSnapshotManager
 
     /**
      * The manager for anomaly detection.
      */
-    private readonly _anomalyManager: AnomalyDetectionManager
+    readonly #anomalyManager: AnomalyDetectionManager
 
     /**
      * The manager for statistics and analytics.
      */
-    private readonly _statsManager: StatisticsManager
+    readonly #statsManager: StatisticsManager
 
     /**
      * The manager for performance helpers.
      */
-    private readonly _helpers: IPerformanceHelpers
+    readonly #helpers: PerformanceHelpers
 
     /**
      * 🏗️ Initializes the manual performance service with all specialized manager instances.
@@ -160,13 +159,13 @@ export class ManualPerformanceService {
      * comprehensive cross-operation analysis and unified reporting.
      */
     constructor() {
-        this._helpers = new PerformanceHelpers()
-        this._marksManager = new PerformanceMarksManager(this._performanceLog)
-        this._snapshotManager = new PerformanceSnapshotManager(
-            this._performanceLog, this._helpers
+        this.#helpers = new PerformanceHelpers()
+        this.#marksManager = new PerformanceMarksManager(this.#performanceLog)
+        this.#snapshotManager = new PerformanceSnapshotManager(
+            this.#performanceLog, this.#helpers
         )
-        this._anomalyManager = new AnomalyDetectionManager(this._performanceLog)
-        this._statsManager = new StatisticsManager(this._performanceLog)
+        this.#anomalyManager = new AnomalyDetectionManager(this.#performanceLog)
+        this.#statsManager = new StatisticsManager(this.#performanceLog)
     }
 
     /*
@@ -215,7 +214,7 @@ export class ManualPerformanceService {
     public async performWithManualMarks(
         taskName: string, iterations: number
     ): Promise<IPerformanceMarksResult> {
-        return await this._marksManager.performWithManualMarks(
+        return await this.#marksManager.performWithManualMarks(
             taskName, iterations
         )
     }
@@ -246,8 +245,8 @@ export class ManualPerformanceService {
      */
     public async performWithSnapshots(
         operationName: string, workload: number
-    ): Promise<IPerformanceSnapshotResult> {
-        return await this._snapshotManager.performWithSnapshots(
+    ): Promise<PerformanceSnapshotResult> {
+        return await this.#snapshotManager.performWithSnapshots(
             operationName, workload
         )
     }
@@ -280,7 +279,7 @@ export class ManualPerformanceService {
     public async performWithAnomalyDetection(
         methodName: string, iterations: number
     ): Promise<AnomalyDetectionResult> {
-        return await this._anomalyManager.performWithAnomalyDetection(
+        return await this.#anomalyManager.performWithAnomalyDetection(
             methodName, iterations
         )
     }
@@ -303,7 +302,7 @@ export class ManualPerformanceService {
      * @see {@link StatisticsManager.getPerformanceStatistics} for statistics details
      */
     public getPerformanceStatistics(): IPerformanceStatistics {
-        return this._statsManager.getPerformanceStatistics()
+        return this.#statsManager.getPerformanceStatistics()
     }
 
     /**
@@ -317,7 +316,7 @@ export class ManualPerformanceService {
      * @see {@link StatisticsManager.clearAllPerformanceData} for cleanup details
      */
     public clearAllPerformanceData(): IClearResult {
-        return this._statsManager.clearAllPerformanceData()
+        return this.#statsManager.clearAllPerformanceData()
     }
 
     /*
@@ -342,15 +341,15 @@ export class ManualPerformanceService {
         operation: string
         timestamp: Date
     }[] {
-        return this._statsManager.getPerformanceLog()
+        return this.#statsManager.getPerformanceLog()
     }
 }
 
 export { type AnomalyDetectionResult } from './anomaly-detection-manager'
 export { type ConfigurationResult } from './configuration-manager'
-export { type IPerformanceHelpers } from './PerformanceHelpers'
+export { type PerformanceHelpers } from './performance-helpers'
+export { type PerformanceSnapshotResult } from './performance-snapshot-manager'
 export { type IPerformanceMarksResult } from './PerformanceMarksManager'
-export { type IPerformanceSnapshotResult } from './PerformanceSnapshotManager'
 export {
     type IClearResult, type IPerformanceStatistics
 } from './StatisticsManager'

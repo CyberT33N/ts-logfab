@@ -15,33 +15,8 @@
 
 // ==== Imports ====
 import { setTimeout } from 'node:timers/promises'
-import { createUsers } from '../../core/models.ts'
 
-/**
- * 🔧 Contract interface for performance testing helper operations.
- *
- * @remarks
- * This interface defines a standardized set of operations for performance testing scenarios,
- * covering various types of computational workloads, data processing, and I/O simulation.
- *
- * Each method represents a different category of performance testing:
- * - Large dataset processing with checksum validation
- * - Complex mathematical computations
- * - I/O operation simulation with variable timing
- * - Default operations for baseline testing
- *
- * @see {@link PerformanceHelpers} for the concrete implementation
- */
-export interface IPerformanceHelpers {
-    processLargeDataset: (size: number) => Promise<{ processed: number
-        checksum: number }>
-    performComplexComputation: (complexity: number) => Promise<{ result: number
-        operations: number }>
-    simulateIOOperations: (operations: number) => Promise<{ operations: number
-        totalTime: number }>
-    defaultOperation: (workload: number) => Promise<{ workload: number
-        result: string }>
-}
+import { createUsers } from '../../core/models'
 
 /**
  * ⚙️ Concrete implementation of performance testing helper operations.
@@ -56,7 +31,6 @@ export interface IPerformanceHelpers {
  * - **CPU-Intensive:** Complex mathematical computations with nested loops
  * - **I/O Simulation:** Variable-timing operations to simulate database or network calls
  * - **Baseline Testing:** Simple operations for establishing performance baselines
- *
  * @example
  * Basic usage for performance testing:
  * ```typescript
@@ -74,10 +48,8 @@ export interface IPerformanceHelpers {
  * const ioResult = await helpers.simulateIOOperations(100);
  * console.log(`Completed ${ioResult.operations} I/O ops in ${ioResult.totalTime}ms`);
  * ```
- *
- * @see {@link IPerformanceHelpers} for the interface contract
  */
-export class PerformanceHelpers implements IPerformanceHelpers {
+export class PerformanceHelpers {
     /**
      * 📊 Processes a large dataset of generated users with checksum validation.
      *
@@ -88,18 +60,17 @@ export class PerformanceHelpers implements IPerformanceHelpers {
      *
      * The checksum calculation incorporates user ID, age, name length, and email
      * length to provide a meaningful computational workload during data processing.
-     *
-     * @param size - Number of user objects to generate and process
-     *
+     * @param size - Number of user objects to generate and process.
      * @returns Promise resolving to processing results with total processed count
-     * and calculated checksum value
-     *
+     * and calculated checksum value.
      * @see {@link createUsers} for user generation implementation
      */
     public async processLargeDataset(
         size: number
-    ): Promise<{ processed: number
-        checksum: number }> {
+    ): Promise<{
+        checksum: number
+        processed: number
+    }> {
         const data = createUsers(
             size
         )
@@ -113,8 +84,8 @@ export class PerformanceHelpers implements IPerformanceHelpers {
         }
 
         return {
-            processed: data.length,
-            checksum
+            checksum,
+            processed: data.length
         }
     }
 
@@ -128,16 +99,16 @@ export class PerformanceHelpers implements IPerformanceHelpers {
      * The computation uses nested loops where the outer loop runs for the specified
      * complexity and the inner loop performs 100 mathematical operations per iteration.
      * Periodic delays are introduced to prevent overwhelming the system.
-     *
-     * @param complexity - Number of outer loop iterations (directly affects computation time)
-     *
+     * @param complexity - Number of outer loop iterations (directly affects computation time).
      * @returns Promise resolving to computation results with final result value
-     * and total number of mathematical operations performed
+     * and total number of mathematical operations performed.
      */
     public async performComplexComputation(
         complexity: number
-    ): Promise<{ result: number
-        operations: number }> {
+    ): Promise<{
+        operations: number
+        result: number
+    }> {
         let result = 0
         let operations = 0
 
@@ -161,8 +132,8 @@ export class PerformanceHelpers implements IPerformanceHelpers {
         }
 
         return {
-            result,
-            operations
+            operations,
+            result
         }
     }
 
@@ -175,16 +146,16 @@ export class PerformanceHelpers implements IPerformanceHelpers {
      *
      * Each simulated I/O operation has a random delay between 5-15ms to represent
      * the variable nature of actual I/O operations in production environments.
-     *
-     * @param operations - Number of I/O operations to simulate
-     *
+     * @param operations - Number of I/O operations to simulate.
      * @returns Promise resolving to simulation results with operation count
-     * and total elapsed time for all operations
+     * and total elapsed time for all operations.
      */
     public async simulateIOOperations(
         operations: number
-    ): Promise<{ operations: number
-        totalTime: number }> {
+    ): Promise<{
+        operations: number
+        totalTime: number
+    }> {
         const startTime = Date.now()
 
         for (let i = 0; i < operations; i++) {
@@ -213,25 +184,25 @@ export class PerformanceHelpers implements IPerformanceHelpers {
      *
      * The delay is directly proportional to the workload parameter (workload * 10ms),
      * providing consistent and predictable performance characteristics.
-     *
-     * @param workload - Workload multiplier that directly affects operation duration
-     *
+     * @param workload - Workload multiplier that directly affects operation duration.
      * @returns Promise resolving to operation results with workload confirmation
-     * and completion message
+     * and completion message.
      */
     public async defaultOperation(
         workload: number
-    ): Promise<{ workload: number
-        result: string }> {
+    ): Promise<{
+        result: string
+        workload: number
+    }> {
         await setTimeout(
             workload * 10
         )
 
         return {
-            workload,
             result: `Default operation completed with workload ${String(
                 workload
-            )}`
+            )}`,
+            workload
         }
     }
 }

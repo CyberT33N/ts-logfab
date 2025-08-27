@@ -135,7 +135,7 @@ export interface IClearResult {
  * @see {@link getAllPerformanceBaselines} for baseline management
  */
 export class StatisticsManager {
-    private readonly _performanceLog: {
+    #performanceLog: {
         operation: string
         metrics: Record<string, unknown>
         timestamp: Date
@@ -157,7 +157,7 @@ export class StatisticsManager {
         readonly metrics: Record<string, unknown>
         readonly timestamp: Readonly<Date>
     }[]>) {
-        this._performanceLog = toWritable(performanceLog)
+        this.#performanceLog = toWritable(performanceLog)
     }
 
     /**
@@ -216,7 +216,7 @@ export class StatisticsManager {
         const allBaselines = getAllPerformanceBaselines()
         const anomalyStats = getAnomalyDetectionStatistics()
         
-        const recentOperations = this._performanceLog
+        const recentOperations = this.#performanceLog
             .slice(-10)
             .map((entry: Readonly<{ operation: string; timestamp: Readonly<Date> }>) => ({
                 operation: entry.operation,
@@ -226,7 +226,7 @@ export class StatisticsManager {
         return {
             allBaselines,
             anomalyStats,
-            performanceLogCount: this._performanceLog.length,
+            performanceLogCount: this.#performanceLog.length,
             recentOperations
         }
     }
@@ -296,7 +296,7 @@ export class StatisticsManager {
      * @see {@link clearAnomalyDetectionData} for anomaly data cleanup
      */
     public clearAllPerformanceData(): IClearResult {
-        const clearedOperations = this._performanceLog.map(
+        const clearedOperations = this.#performanceLog.map(
             (entry: Readonly<{ operation: string; timestamp: Readonly<Date> }>
             ) => entry.operation)
         
@@ -306,7 +306,7 @@ export class StatisticsManager {
         clearAnomalyDetectionData()
         
         // Clear internal log
-        this._performanceLog.splice(0, this._performanceLog.length)
+        this.#performanceLog.splice(0, this.#performanceLog.length)
         
         // Check what remains
         const remainingBaselines = getAllPerformanceBaselines().size
@@ -376,6 +376,6 @@ export class StatisticsManager {
         metrics: Record<string, unknown>
         timestamp: Date
     }[] {
-        return this._performanceLog
+        return this.#performanceLog
     }
 } 
