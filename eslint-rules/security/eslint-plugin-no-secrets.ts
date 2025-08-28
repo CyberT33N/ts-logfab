@@ -168,6 +168,36 @@ const createNoSecretsConfig = (): TSESLint.FlatConfig.Config => ({
 })
 
 /**
+ * Disables pattern-based secret detection for typed and script code files.
+ *
+ * Rationale (Enterprise-Grade):
+ * - Pattern matching like `password: "..."` is high-signal in config/text files, but noisy in
+ *   TypeScript/JavaScript where placeholders and identifier names (e.g., DB_PASSWORD, dbPassword)
+ *   are common and legitimate.
+ * - We keep entropy/signature-based detection (no-secrets/no-secrets) fully active in code to
+ *   catch real secrets (API keys, tokens, DSNs) with much better signal-to-noise.
+ * - This mirrors how large orgs scope secret scanning: pattern rules for config artifacts; entropy
+ *   and signature rules for code.
+ *
+ * @returns The overrides config for code files.
+ */
+const createNoSecretsCodeFileOverrides = (): TSESLint.FlatConfig.Config => ({
+    files: [
+        '**/*.ts',
+        '**/*.tsx',
+        '**/*.mts',
+        '**/*.cts',
+        '**/*.js',
+        '**/*.mjs',
+        '**/*.cjs'
+    ],
+    name: 'enterprise/security/overrides:no-secrets-code-files',
+    rules: {
+        'no-secrets/no-pattern-match': 'off'
+    }
+})
+
+/**
  * Creates overrides so this file does not flag itself for secrets.
  *
  * @returns The overrides config for this module file.
@@ -188,6 +218,7 @@ const createNoSecretsOverrides = (): TSESLint.FlatConfig.Config => ({
  */
 const createSecurityAll = (): TSESLint.FlatConfig.ConfigArray => [
     createNoSecretsConfig(),
+    createNoSecretsCodeFileOverrides(),
     createNoSecretsOverrides()
 ]
 
@@ -212,7 +243,11 @@ export const configs = {
     'no-secrets': [createNoSecretsConfig()],
 
     /**
-     * Overrides to prevent this module from linting itself with no-secrets.
+     * Overrides to prevent this module from linting itself with no-secrets and to scope
+     * pattern-based detection away from code files.
      */
-    overrides: [createNoSecretsOverrides()]
+    overrides: [
+        createNoSecretsCodeFileOverrides(),
+        createNoSecretsOverrides()
+    ]
 } satisfies Record<string, TSESLint.FlatConfig.ConfigArray>
