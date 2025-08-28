@@ -264,7 +264,9 @@ const createVitestBase = (): TSESLint.FlatConfig.Config => {
         files: [
             '**/*.test.{ts,tsx,js,jsx}',
             '**/*.spec.{ts,tsx,js,jsx}',
-            '**/test/**/*.{ts,tsx,js,jsx}'
+            '**/*.suite.{ts,tsx,js,jsx}',
+            '**/*.spec.shared.{ts,tsx,js,jsx}',
+            '**/*.test.shared.{ts,tsx,js,jsx}'
         ],
         languageOptions: {
             globals: {
