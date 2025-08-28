@@ -130,6 +130,12 @@ const sonarjsRules: {
          */
         'sonarjs/no-for-in-iterable': 'error',
 
+        /*
+         * ✅ ==== VERIFIED ====
+         * sonarjs/no-hardcoded-passwords (S2068): zu generisch, produziert in TS/TSX viele False Positives; Mehrwert ist durch no-secrets abgedeckt.
+         */
+        'sonarjs/no-hardcoded-passwords': 'off',
+
         // Verhindert && mit non-boolean
         'sonarjs/no-hook-setter-in-body': 'error',
 
@@ -144,7 +150,6 @@ const sonarjsRules: {
 
         /*
          * ✅ ==== VERIFIED ====
-         * Verhindert implizite Abhängigkeiten
          */
         'sonarjs/no-implicit-dependencies': 'error',
 
