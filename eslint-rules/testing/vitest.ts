@@ -65,10 +65,10 @@ const vitestRules: {
         ],
 
         'vitest/max-expects': [
-            'error',
+            'warn',
             {
-                // Strenger als default
-                max: 5
+                // Enterprise: Hinweis statt harte Schranke
+                max: 8
             }
         ],
 
@@ -96,13 +96,12 @@ const vitestRules: {
         'vitest/no-conditional-tests': 'error',
 
         // Team-spezifisch
-        'vitest/no-disabled-tests': 'warn',
+        'vitest/no-disabled-tests': 'error',
 
         /*
-         * Bleibt warn für Flexibilität
-         * ===== DEPRECATED REGEL EXPLIZIT AUS =====
+         * Deprecated Callback-Pattern vermeiden – async/await bevorzugen
          */
-        'vitest/no-done-callback': 'off',
+        'vitest/no-done-callback': 'error',
 
         // War warn in all
         'vitest/no-duplicate-hooks': 'error',
@@ -134,8 +133,15 @@ const vitestRules: {
         // War warn in all
         'vitest/no-mocks-import': 'error',
 
-        // 'test' prefix ist okay
-        'vitest/no-restricted-matchers': 'off',
+        // Präzise, semantische Matcher erzwingen
+        'vitest/no-restricted-matchers': [
+            'error',
+            {
+                toBeFalsy: 'Nutze präzisere Matcher (z. B. toBe(false), toBeNull, toBeUndefined)',
+                toBeTruthy: 'Nutze präzisere Matcher (z. B. toBe(true), toHaveLength, toContain)',
+                toHaveBeenCalled: 'Bevorzuge toHaveBeenCalledWith oder toHaveBeenCalledTimes für Spezifik'
+            }
+        ],
 
         /*
          * War warn in all
@@ -153,7 +159,7 @@ const vitestRules: {
         'vitest/no-standalone-expect': 'error',
 
         // Hooks sind notwendig
-        'vitest/no-test-prefixes': 'off',
+        'vitest/no-test-prefixes': 'error',
 
         // War warn in all
         'vitest/no-test-return-statement': 'error',
@@ -199,11 +205,12 @@ const vitestRules: {
 
         'vitest/prefer-to-be': 'error',
 
-        'vitest/prefer-to-be-falsy': 'error',
+        // Unscharfe Matcher deaktivieren – via no-restricted-matchers präziser leiten
+        'vitest/prefer-to-be-falsy': 'off',
 
-        'vitest/prefer-to-be-object': 'error',
+        'vitest/prefer-to-be-object': 'off',
 
-        'vitest/prefer-to-be-truthy': 'error',
+        'vitest/prefer-to-be-truthy': 'off',
 
         'vitest/prefer-to-contain': 'error',
 
@@ -261,6 +268,8 @@ const createVitestBase = (): TSESLint.FlatConfig.Config => {
     return {
         name: 'enterprise/testing/vitest-base',
         ...vitest.configs.all,
+
+        // ✅ ==== VERIFIED ====
         files: [
             '**/*.test.{ts,tsx,js,jsx}',
             '**/*.spec.{ts,tsx,js,jsx}',
