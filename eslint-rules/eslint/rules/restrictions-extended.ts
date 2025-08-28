@@ -20,11 +20,94 @@ import type { TSESLint } from '@typescript-eslint/utils'
 export const restrictionsExtended = {
     'no-restricted-properties': [
         'error',
+
+        /*
+         * ✅ ==== VERIFIED ====
+         * MUSS: Verhindert untypisierte, streuende Konfig-Zugriffe und stärkt 12‑Factor/typed config (zod/joi).
+         * Industriestandard: Große OSS‑Repos (Next.js, Remix, NestJS Beispiele) kapseln ENV via Schema (z. B. @t3-oss/env)
+         * für Typsicherheit, Testbarkeit und Secrets‑Hygiene. Direktzugriff führt zu Wildwuchs und erschwert Audits.
+         */
         {
-            message: 'Use environment configuration module instead of direct process.env access',
+            message: 'Use a typed environment configuration module (schema-validated) instead of direct process.env access',
             object: 'process',
             property: 'env'
         },
+
+        /*
+         * MUSS: Harte Terminierung ist außerhalb CLI‑Entry‑Points gefährlich (kein Graceful Shutdown/Flush).
+         * Industriestandard: Google/AWS Operational Guidance empfiehlt Exit‑Pfad zu zentralisieren.
+         * Alternative: Fehler werfen, orchestriert behandeln; oder process.exitCode setzen und Rückgabe dem Runner überlassen.
+         */
+        {
+            message: 'Do not call process.exit(). Throw and let the top-level handler set exitCode, or isolate to CLI entry.',
+            object: 'process',
+            property: 'exit'
+        },
+
+        /*
+         * MUSS: Arbeitsverzeichnisänderungen machen Builds/Tests nondeterministisch und brechen Pfad‑Invarianten.
+         * Industriestandard: Monorepos (Meta, Google) verbieten chdir – Pfade immer absolut/ausgehend vom Repo‑Root.
+         */
+        {
+            message: 'Avoid process.chdir(). Use absolute paths or pass a cwd option to APIs instead.',
+            object: 'process',
+            property: 'chdir'
+        },
+
+        /*
+         * MUSS: Manipulation des Require‑Caches ist fragil (Heisenbugs, Shadowing). Tests sollen Mocks/isolierte Runner nutzen.
+         * Industriestandard: Jest/Vitest bieten modulare Isolation; Node Doku rät von direkter Cache‑Mutation ab.
+         */
+        {
+            message: 'Do not mutate require.cache. Use test runner isolation or dynamic import instead.',
+            object: 'require',
+            property: 'cache'
+        },
+
+        /*
+         * MUSS: require.extensions ist veraltet/unsicher – globale Hook‑Injection.
+         * Industriestandard: Node Core deprecates; Build‑Tools/Loaders statt globaler Runtime‑Patches nutzen.
+         */
+        {
+            message: 'Do not use require.extensions. Prefer loaders/build steps instead.',
+            object: 'require',
+            property: 'extensions'
+        },
+
+        /*
+         * MUSS: module.parent ist unzuverlässig (CJS‑Spezifikum) und bricht in ESM/Tools.
+         * Industriestandard: Für Entrypoint‑Erkennung import.meta.url mit pathToFileURL(process.argv[1]) vergleichen.
+         */
+        {
+            message: 'Avoid module.parent. For entry detection use import.meta.url comparison in ESM.',
+            object: 'module',
+            property: 'parent'
+        },
+
+        /*
+         * MUSS: Buffer.allocUnsafe führt leicht zu uninitialisierten Bytes/Lecks.
+         * Industriestandard: Node empfiehlt Buffer.from/Buffer.alloc.
+         */
+        {
+            message: 'Prefer Buffer.alloc/Buffer.from over Buffer.allocUnsafe for safety.',
+            object: 'Buffer',
+            property: 'allocUnsafe'
+        },
+
+        /*
+         * MUSS: Math.random ist nicht kryptografisch sicher.
+         * Industriestandard/OWASP: Für IDs/Token crypto.getRandomValues/randomUUID/randomBytes verwenden.
+         */
+        {
+            message: 'Do not use Math.random for IDs/tokens. Use crypto.getRandomValues/randomUUID/randomBytes.',
+            object: 'Math',
+            property: 'random'
+        },
+
+        /*
+         * MUSS: Legacy Getter/Setter APIs sind unsicher/undurchsichtig.
+         * Industriestandard: Stattdessen Object.defineProperty / getOwnPropertyDescriptor nutzen.
+         */
         {
             message: 'Use Object.defineProperty instead',
             property: '__defineGetter__'
@@ -32,6 +115,14 @@ export const restrictionsExtended = {
         {
             message: 'Use Object.defineProperty instead',
             property: '__defineSetter__'
+        },
+        {
+            message: 'Use Object.getOwnPropertyDescriptor instead',
+            property: '__lookupGetter__'
+        },
+        {
+            message: 'Use Object.getOwnPropertyDescriptor instead',
+            property: '__lookupSetter__'
         }
     ],
 
